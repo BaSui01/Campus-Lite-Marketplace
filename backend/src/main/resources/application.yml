@@ -14,10 +14,10 @@ spring:
     hikari:
       minimum-idle: ${DB_POOL_MIN_IDLE:10}
       maximum-pool-size: ${DB_POOL_MAX_SIZE:50}
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      pool-name: CampusMarketplaceHikariCP
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      pool-name: ${DB_POOL_NAME:CampusMarketplaceHikariCP}
   
   # JPA 配置
   jpa:
@@ -27,20 +27,20 @@ spring:
     show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:
-        format_sql: true
+        format_sql: ${JPA_FORMAT_SQL:true}
         # 懒加载配置
-        enable_lazy_load_no_trans: false
+        enable_lazy_load_no_trans: ${JPA_ENABLE_LAZY_NO_TRANS:false}
         # 批量操作配置
         jdbc:
-          batch_size: 50
-        order_inserts: true
-        order_updates: true
+          batch_size: ${JPA_BATCH_SIZE:50}
+        order_inserts: ${JPA_ORDER_INSERTS:true}
+        order_updates: ${JPA_ORDER_UPDATES:true}
         # 二级缓存配置
         cache:
-          use_second_level_cache: true
-          use_query_cache: true
+          use_second_level_cache: ${HIBERNATE_SECOND_LEVEL_CACHE:true}
+          use_query_cache: ${HIBERNATE_QUERY_CACHE:true}
           region:
-            factory_class: org.redisson.hibernate.RedissonRegionFactory
+            factory_class: ${HIBERNATE_CACHE_FACTORY:org.redisson.hibernate.RedissonRegionFactory}
   
   # Redis 配置
   data:
@@ -49,6 +49,9 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DATABASE:0}
+      sentinel:
+        master: ${REDIS_SENTINEL_MASTER:}
+        nodes: ${REDIS_SENTINEL_NODES:}
       lettuce:
         pool:
           max-active: ${REDIS_POOL_MAX_ACTIVE:50}
@@ -61,14 +64,14 @@ spring:
     multipart:
       max-file-size: ${FILE_MAX_SIZE:5MB}
       max-request-size: ${FILE_MAX_REQUEST_SIZE:10MB}
-      enabled: true
+      enabled: ${FILE_UPLOAD_ENABLED:true}
 
 # JWT 配置
 jwt:
   secret: ${JWT_SECRET:campus-marketplace-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
   expiration: ${JWT_EXPIRATION:7200000}
-  header: Authorization
-  prefix: Bearer 
+  header: ${JWT_HEADER:Authorization}
+  prefix: ${JWT_PREFIX:Bearer }
 
 # 日志配置
 logging:
@@ -76,11 +79,11 @@ logging:
     root: ${LOG_LEVEL_ROOT:INFO}
     com.campus.marketplace: ${LOG_LEVEL_APP:DEBUG}
     org.hibernate.SQL: ${LOG_LEVEL_SQL:DEBUG}
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.security: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:TRACE}
+    org.springframework.security: ${LOG_LEVEL_SPRING_SECURITY:DEBUG}
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: ${LOG_PATTERN_CONSOLE:"%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"}
+    file: ${LOG_PATTERN_FILE:"%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"}
   file:
     name: ${LOG_FILE_PATH:logs/campus-marketplace.log}
     max-size: ${LOG_FILE_MAX_SIZE:10MB}
@@ -91,17 +94,97 @@ management:
   endpoints:
     web:
       exposure:
-        include: ${ACTUATOR_ENDPOINTS:health,info,metrics}
+        # 暴露的端点（生产环境应限制）
+        include: ${ACTUATOR_ENDPOINTS:health,info,metrics,prometheus,loggers,caches,threaddump,heapdump}
+        # 排除敏感端点
+        exclude: ${ACTUATOR_EXCLUDE:shutdown}
+      base-path: ${ACTUATOR_BASE_PATH:/actuator}
   endpoint:
     health:
       show-details: ${ACTUATOR_HEALTH_SHOW_DETAILS:when-authorized}
+      # 健康检查探针
+      probes:
+        enabled: true
+    # 启用日志级别动态调整
+    loggers:
+      enabled: true
+  # Metrics 配置
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:true}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: ${METRICS_HTTP_HISTOGRAM:true}
+    tags:
+      application: ${spring.application.name}
+  # 追踪配置
+  tracing:
+    sampling:
+      probability: ${TRACING_PROBABILITY:1.0}
 
 # 服务器配置
 server:
   port: ${SERVER_PORT:8080}
   servlet:
-    context-path: /api
+    context-path: ${APP_CONTEXT_PATH:/api}
   tomcat:
     threads:
-      max: 200
-      min-spare: 10
+      max: ${TOMCAT_MAX_THREADS:200}
+      min-spare: ${TOMCAT_MIN_SPARE_THREADS:10}
+
+# 通知与合规配置
+notifications:
+  email:
+    rate:
+      perMinute: ${NOTIF_EMAIL_PER_MINUTE:20}
+  webpush:
+    enabled: ${WEBPUSH_ENABLED:false}
+
+compliance:
+  text:
+    action: ${COMPLIANCE_TEXT_ACTION:REVIEW} # BLOCK/REVIEW/PASS
+  image:
+    enabled: ${COMPLIANCE_IMAGE_ENABLED:false}
+
+# 支付宝支付配置
+alipay:
+  app-id: ${ALIPAY_APP_ID:}
+  private-key: ${ALIPAY_PRIVATE_KEY:}
+  alipay-public-key: ${ALIPAY_PUBLIC_KEY:}
+  gateway-url: ${ALIPAY_GATEWAY_URL:https://openapi-sandbox.dl.alipaydev.com/gateway.do}
+  charset: ${ALIPAY_CHARSET:UTF-8}
+  format: ${ALIPAY_FORMAT:json}
+  sign-type: ${ALIPAY_SIGN_TYPE:RSA2}
+  notify-url: ${ALIPAY_NOTIFY_URL:http://localhost:8080/api/payment/alipay/notify}
+  return-url: ${ALIPAY_RETURN_URL:http://localhost:3000/payment/result}
+
+# 微信支付配置
+wechat:
+  pay:
+    # 版本选择：v2=沙箱环境（推荐开发测试），v3=正式/沙箱环境
+    version: ${WECHAT_PAY_VERSION:v3}
+    
+    # V3配置（正式环境或V3沙箱）
+    app-id: ${WECHAT_APP_ID:}
+    mch-id: ${WECHAT_MCH_ID:}
+    private-key-path: ${WECHAT_PRIVATE_KEY_PATH:}
+    merchant-serial-number: ${WECHAT_MERCHANT_SERIAL_NUMBER:}
+    api-v3-key: ${WECHAT_API_V3_KEY:}
+    notify-url: ${WECHAT_NOTIFY_URL:http://localhost:8080/api/payment/wechat/notify}
+    
+    # V2配置（沙箱环境）
+    v2:
+      app-id: ${WECHAT_V2_APP_ID:}
+      mch-id: ${WECHAT_V2_MCH_ID:}
+      mch-key: ${WECHAT_V2_MCH_KEY:}
+      key-path: ${WECHAT_V2_KEY_PATH:}
+      use-sandbox: ${WECHAT_V2_USE_SANDBOX:true}
+      notify-url: ${WECHAT_V2_NOTIFY_URL:http://localhost:8080/api/payment/wechat/notify}
+
+# OpenAPI/Swagger 开关
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_ENABLED:true}
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:true}

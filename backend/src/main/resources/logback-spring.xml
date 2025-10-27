@@ -1,31 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 日志文件路径 -->
-    <property name="LOG_PATH" value="logs"/>
-    <property name="LOG_FILE" value="campus-marketplace"/>
+    <!-- 从 Spring Environment 读取可覆盖的参数（全部可由环境变量控制） -->
+    <springProperty scope="context" name="ENV_LOG_DIR" source="LOG_DIR" defaultValue="logs"/>
+    <springProperty scope="context" name="ENV_LOG_FILE_BASENAME" source="LOG_FILE_BASENAME" defaultValue="campus-marketplace"/>
+    <springProperty scope="context" name="ENV_LOG_PATTERN" source="LOGBACK_PATTERN" defaultValue="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%line - %msg%n"/>
+    <springProperty scope="context" name="ENV_LOG_PATTERN_COLOR" source="LOGBACK_PATTERN_COLOR" defaultValue="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{50}):%line - %msg%n"/>
+    <springProperty scope="context" name="ENV_LOG_MAX_FILE_SIZE" source="LOG_FILE_MAX_SIZE" defaultValue="10MB"/>
+    <springProperty scope="context" name="ENV_LOG_MAX_HISTORY" source="LOG_FILE_MAX_HISTORY" defaultValue="30"/>
+    <springProperty scope="context" name="ENV_SLOW_QUERY_HISTORY" source="SLOW_QUERY_LOG_MAX_HISTORY" defaultValue="7"/>
 
-    <!-- 控制台输出 -->
+    <!-- 兼容原有属性名供下方引用 -->
+    <property name="LOG_PATH" value="${ENV_LOG_DIR}"/>
+    <property name="LOG_FILE" value="${ENV_LOG_FILE_BASENAME}"/>
+    <property name="LOG_PATTERN" value="${ENV_LOG_PATTERN}"/>
+    <property name="LOG_PATTERN_COLOR" value="${ENV_LOG_PATTERN_COLOR}"/>
+
+    <!-- 控制台输出（带颜色） -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            <charset>UTF-8</charset>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <pattern>
+                    <pattern>
+                        {"level":"%level","logger":"%logger{36}","thread":"%thread","msg":"%message"}
+                    </pattern>
+                </pattern>
+                <mdc/>
+                <context/>
+                <arguments/>
+                <stackTrace/>
+            </providers>
         </encoder>
     </appender>
 
-    <!-- 文件输出 -->
+    <!-- 文件输出（异步，提高性能） -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${LOG_FILE}.log</file>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            <charset>UTF-8</charset>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <pattern>
+                    <pattern>
+                        {"level":"%level","logger":"%logger{50}","thread":"%thread","msg":"%message"}
+                    </pattern>
+                </pattern>
+                <mdc/>
+                <context/>
+                <arguments/>
+                <stackTrace/>
+            </providers>
         </encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/${LOG_FILE}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>30</maxHistory>
+            <maxFileSize>${ENV_LOG_MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${ENV_LOG_MAX_HISTORY}</maxHistory>
         </rollingPolicy>
+    </appender>
+
+    <!-- 异步文件输出（提升 I/O 性能） -->
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE"/>
+        <queueSize>1024</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
     </appender>
 
     <!-- 错误日志单独输出 -->
@@ -36,16 +73,55 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-            <charset>UTF-8</charset>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <pattern>
+                    <pattern>
+                        {"level":"%level","logger":"%logger{50}","thread":"%thread","msg":"%message"}
+                    </pattern>
+                </pattern>
+                <mdc/>
+                <context/>
+                <arguments/>
+                <stackTrace/>
+            </providers>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>${ENV_LOG_MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${ENV_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 异步错误日志 -->
+    <appender name="ASYNC_ERROR_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ERROR_FILE"/>
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- 慢查询日志（独立文件） -->
+    <appender name="SLOW_QUERY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE}-slow-query.log</file>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <pattern>
+                    <pattern>
+                        {"level":"%level","logger":"%logger{50}","thread":"%thread","msg":"%message"}
+                    </pattern>
+                </pattern>
+                <mdc/>
+                <context/>
+                <arguments/>
+                <stackTrace/>
+            </providers>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/${LOG_FILE}-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>30</maxHistory>
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}-slow-query-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>${ENV_SLOW_QUERY_HISTORY}</maxHistory>
         </rollingPolicy>
     </appender>
 
@@ -53,19 +129,49 @@
     <springProfile name="dev">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_ERROR_FILE"/>
+        </root>
+        <logger name="com.campus.marketplace" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC_FILE"/>
+        </logger>
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+        
+        <!-- 慢查询日志 -->
+        <logger name="com.campus.marketplace.common.aspect.SlowQueryMonitorAspect" level="WARN" additivity="false">
+            <appender-ref ref="SLOW_QUERY_FILE"/>
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+    </springProfile>
+
+    <!-- 测试环境 -->
+    <springProfile name="test">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
         </root>
         <logger name="com.campus.marketplace" level="DEBUG"/>
-        <logger name="org.hibernate.SQL" level="DEBUG"/>
     </springProfile>
 
     <!-- 生产环境 -->
     <springProfile name="prod">
         <root level="WARN">
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_ERROR_FILE"/>
         </root>
-        <logger name="com.campus.marketplace" level="INFO"/>
+        <logger name="com.campus.marketplace" level="INFO" additivity="false">
+            <appender-ref ref="ASYNC_FILE"/>
+        </logger>
+        
+        <!-- 慢查询日志 -->
+        <logger name="com.campus.marketplace.common.aspect.SlowQueryMonitorAspect" level="WARN" additivity="false">
+            <appender-ref ref="SLOW_QUERY_FILE"/>
+        </logger>
+        
+        <!-- 关闭不必要的日志 -->
+        <logger name="org.hibernate.SQL" level="WARN"/>
+        <logger name="org.springframework.web" level="WARN"/>
+        <logger name="org.springframework.security" level="WARN"/>
     </springProfile>
 </configuration>
