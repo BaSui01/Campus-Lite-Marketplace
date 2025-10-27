@@ -57,10 +57,11 @@ public class GoodsController {
             @Parameter(description = "页码（从 0 开始）") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int size,
             @Parameter(description = "排序字段（createdAt/price/viewCount）") @RequestParam(defaultValue = "createdAt") String sortBy,
-            @Parameter(description = "排序方向（ASC/DESC）") @RequestParam(defaultValue = "DESC") String sortDirection
+            @Parameter(description = "排序方向（ASC/DESC）") @RequestParam(defaultValue = "DESC") String sortDirection,
+            @Parameter(description = "标签 ID 列表（全部匹配）") @RequestParam(name = "tags", required = false) java.util.List<Long> tagIds
     ) {
         Page<GoodsResponse> result = goodsService.listGoods(
-                keyword, categoryId, minPrice, maxPrice, page, size, sortBy, sortDirection
+                keyword, categoryId, minPrice, maxPrice, page, size, sortBy, sortDirection, tagIds
         );
         return ApiResponse.success(result);
     }

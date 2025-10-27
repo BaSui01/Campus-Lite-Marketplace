@@ -44,4 +44,13 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
      * 统计物品被收藏数量
      */
     long countByGoodsId(Long goodsId);
+
+    /**
+     * 获取用户收藏最多的分类（按次数降序）
+     * 返回 Object[]{categoryId(Long), count(Long)}
+     */
+    @Query("select f.goods.categoryId as categoryId, count(f.id) as cnt " +
+            "from Favorite f where f.userId = :userId and f.goods.categoryId is not null " +
+            "group by f.goods.categoryId order by cnt desc")
+    java.util.List<Object[]> findTopCategoryIdsByUserFavorites(@Param("userId") Long userId);
 }

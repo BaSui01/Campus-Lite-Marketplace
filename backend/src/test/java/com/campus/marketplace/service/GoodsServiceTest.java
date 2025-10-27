@@ -120,6 +120,8 @@ class GoodsServiceTest {
         // 默认返回空标签绑定
         org.mockito.Mockito.lenient().when(goodsTagRepository.findByGoodsIdIn(any())).thenReturn(java.util.List.of());
         org.mockito.Mockito.lenient().when(goodsTagRepository.findByGoodsId(anyLong())).thenReturn(java.util.List.of());
+        org.mockito.Mockito.lenient().when(goodsTagRepository.findGoodsIdsByAllTagIds(anyCollection(), anyLong())).thenReturn(java.util.List.of());
+        org.mockito.Mockito.lenient().when(tagRepository.findAllById(anyCollection())).thenReturn(java.util.List.of());
     }
 
     @AfterEach
@@ -270,6 +272,8 @@ class GoodsServiceTest {
 
         // Then
         verify(goodsRepository).save(argThat(g -> g.getStatus() == GoodsStatus.APPROVED));
+        verify(followService).notifyFollowersOnGoodsApproved(goods);
+        verify(subscriptionService).notifySubscribersOnGoodsApproved(goods);
     }
 
     @Test
@@ -286,6 +290,8 @@ class GoodsServiceTest {
 
         // Then
         verify(goodsRepository).save(argThat(g -> g.getStatus() == GoodsStatus.REJECTED));
+        verify(followService, never()).notifyFollowersOnGoodsApproved(any());
+        verify(subscriptionService, never()).notifySubscribersOnGoodsApproved(any());
     }
 
     @Test

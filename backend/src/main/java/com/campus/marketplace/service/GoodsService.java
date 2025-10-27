@@ -6,6 +6,7 @@ import com.campus.marketplace.common.dto.response.GoodsResponse;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 物品服务接口
@@ -44,7 +45,8 @@ public interface GoodsService {
             int page,
             int size,
             String sortBy,
-            String sortDirection
+            String sortDirection,
+            List<Long> tagIds
     );
 
     /**

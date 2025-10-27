@@ -40,6 +40,7 @@ public class AuthController {
             description = "使用校园邮箱注册新账号，注册成功后赠送 100 积分"
     )
     @PostMapping("/register")
+    @RateLimit(key = "auth:register", maxRequests = 3, timeWindow = 3600, limitType = com.campus.marketplace.common.annotation.RateLimit.LimitType.IP)
     public ApiResponse<Void> register(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "注册信息",

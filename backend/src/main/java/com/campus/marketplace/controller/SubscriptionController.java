@@ -1,0 +1,45 @@
+package com.campus.marketplace.controller;
+
+import com.campus.marketplace.common.dto.request.CreateSubscriptionRequest;
+import com.campus.marketplace.common.dto.response.ApiResponse;
+import com.campus.marketplace.common.dto.response.SubscriptionResponse;
+import com.campus.marketplace.service.SubscriptionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+@Tag(name = "关键词订阅", description = "关键词订阅与取消接口")
+public class SubscriptionController {
+
+    private final SubscriptionService subscriptionService;
+
+    @PostMapping("/subscribe")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "新增订阅", description = "订阅关键词，符合条件的商品上架会提醒")
+    public ApiResponse<Long> subscribe(@Valid @RequestBody CreateSubscriptionRequest request) {
+        return ApiResponse.success(subscriptionService.subscribe(request));
+    }
+
+    @DeleteMapping("/subscribe/{id}")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "取消订阅", description = "取消关键词订阅")
+    public ApiResponse<Void> unsubscribe(@PathVariable Long id) {
+        subscriptionService.unsubscribe(id);
+        return ApiResponse.success(null);
+    }
+
+    @GetMapping("/subscribe")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "订阅列表", description = "查看我订阅的关键词")
+    public ApiResponse<List<SubscriptionResponse>> listSubscriptions() {
+        return ApiResponse.success(subscriptionService.listMySubscriptions());
+    }
+}

@@ -33,6 +33,9 @@ public record CreateGoodsRequest(
         
         @NotNull(message = "物品图片不能为空")
         @Size(min = 1, max = 9, message = "物品图片数量必须在 1-9 张之间")
-        List<String> images
+        List<String> images,
+
+        @Size(max = 10, message = "最多选择 10 个标签")
+        List<Long> tagIds
 ) {
 }

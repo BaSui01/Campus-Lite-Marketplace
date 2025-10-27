@@ -75,6 +75,11 @@ public class GoodsDetailResponse {
     private List<String> images;
 
     /**
+     * 标签列表
+     */
+    private List<TagResponse> tags;
+
+    /**
      * 卖家信息
      */
     private SellerInfo seller;

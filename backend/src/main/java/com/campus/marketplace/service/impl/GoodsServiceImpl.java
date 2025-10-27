@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * 物品服务实现类
@@ -63,6 +64,7 @@ public class GoodsServiceImpl implements GoodsService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final SensitiveWordFilter sensitiveWordFilter;
+    private final com.campus.marketplace.service.ComplianceService complianceService;
     private final MessageService messageService;
     private final TagRepository tagRepository;
     private final GoodsTagRepository goodsTagRepository;
@@ -88,9 +90,28 @@ public class GoodsServiceImpl implements GoodsService {
             throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND);
         }
 
-        // 3. 敏感词过滤
-        String filteredTitle = sensitiveWordFilter.filter(request.title());
-        String filteredDescription = sensitiveWordFilter.filter(request.description());
+        // 3. 合规：文本与图片
+        String filteredTitle;
+        String filteredDescription;
+        if (complianceService != null) {
+            var titleMod = complianceService.moderateText(request.title(), "GOODS_TITLE");
+            var descMod = complianceService.moderateText(request.description(), "GOODS_DESC");
+            if ((titleMod.hit() && titleMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK)
+                    || (descMod.hit() && descMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK)) {
+                throw new BusinessException(ErrorCode.INVALID_PARAMETER, "包含敏感词，请修改后再发布");
+            }
+            filteredTitle = titleMod.filteredText();
+            filteredDescription = descMod.filteredText();
+            if (request.images() != null && !request.images().isEmpty()) {
+                var imgRes = complianceService.scanImages(request.images(), "GOODS_IMAGES");
+                if (imgRes.action() == com.campus.marketplace.service.ComplianceService.ImageAction.REJECT) {
+                    throw new BusinessException(ErrorCode.INVALID_PARAMETER, "图片未通过安全检测");
+                }
+            }
+        } else {
+            filteredTitle = sensitiveWordFilter.filter(request.title());
+            filteredDescription = sensitiveWordFilter.filter(request.description());
+        }
 
         // 4. 创建物品
         Goods goods = Goods.builder()
@@ -412,7 +433,79 @@ public class GoodsServiceImpl implements GoodsService {
             log.error("⚠️ 发送审核通知失败: sellerId={}, goodsId={}", goods.getSellerId(), id, e);
         }
 
+        if (approved) {
+            followService.notifyFollowersOnGoodsApproved(goods);
+            subscriptionService.notifySubscribersOnGoodsApproved(goods);
+        }
+
         log.info("物品审核完成: goodsId={}, status={}", id, goods.getStatus());
+    }
+
+    private Map<Long, List<TagResponse>> loadTagsForGoods(List<Long> goodsIds) {
+        if (goodsIds == null || goodsIds.isEmpty()) {
+            return Map.of();
+        }
+        List<GoodsTag> bindings = goodsTagRepository.findByGoodsIdIn(goodsIds);
+        if (bindings.isEmpty()) {
+            return Map.of();
+        }
+        Set<Long> tagIds = bindings.stream()
+                .map(GoodsTag::getTagId)
+                .collect(Collectors.toCollection(HashSet::new));
+        Map<Long, Tag> tagMap = StreamSupport.stream(
+                        tagRepository.findAllById(tagIds).spliterator(), false)
+                .collect(Collectors.toMap(Tag::getId, tag -> tag));
+
+        Map<Long, List<TagResponse>> result = new HashMap<>();
+        for (GoodsTag binding : bindings) {
+            Tag tag = tagMap.get(binding.getTagId());
+            if (tag == null) {
+                continue;
+            }
+            result.computeIfAbsent(binding.getGoodsId(), key -> new ArrayList<>())
+                    .add(toTagResponse(tag));
+        }
+        result.values().forEach(list -> list.sort(Comparator.comparing(TagResponse::name)));
+        return result;
+    }
+
+    private TagResponse toTagResponse(Tag tag) {
+        return TagResponse.builder()
+                .id(tag.getId())
+                .name(tag.getName())
+                .description(tag.getDescription())
+                .enabled(tag.getEnabled())
+                .createdAt(tag.getCreatedAt())
+                .updatedAt(tag.getUpdatedAt())
+                .build();
+    }
+
+    private void syncGoodsTags(Long goodsId, List<Long> tagIds) {
+        goodsTagRepository.deleteByGoodsId(goodsId);
+        if (tagIds == null || tagIds.isEmpty()) {
+            return;
+        }
+        List<Long> distinct = tagIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        if (distinct.size() > 10) {
+            throw new BusinessException(ErrorCode.INVALID_PARAMETER, "最多绑定 10 个标签");
+        }
+        List<Tag> tags = StreamSupport.stream(
+                        tagRepository.findAllById(distinct).spliterator(), false)
+                .toList();
+        if (tags.size() != distinct.size()) {
+            throw new BusinessException(ErrorCode.TAG_NOT_FOUND, "存在已失效的标签");
+        }
+        tags.forEach(tag -> {
+            if (Boolean.FALSE.equals(tag.getEnabled())) {
+                throw new BusinessException(ErrorCode.OPERATION_FAILED, "标签已被禁用: " + tag.getName());
+            }
+        });
+        distinct.forEach(tagId -> goodsTagRepository.save(
+                GoodsTag.builder().goodsId(goodsId).tagId(tagId).build()
+        ));
     }
 
     /**
@@ -427,45 +520,7 @@ public class GoodsServiceImpl implements GoodsService {
                 : description;
     }
 
-    private void syncGoodsTags(Long goodsId, List<Long> tagIds) {
-        if (tagIds == null) {
-            goodsTagRepository.deleteByGoodsId(goodsId);
-            return;
-        }
-        if (tagIds.isEmpty()) {
-            goodsTagRepository.deleteByGoodsId(goodsId);
-            return;
-        }
-        goodsTagRepository.deleteByGoodsIdAndTagIdNotIn(goodsId, tagIds);
-        Set<Long> exists = goodsTagRepository.findByGoodsId(goodsId).stream()
-                .map(GoodsTag::getTagId).collect(Collectors.toSet());
-        for (Long tid : tagIds) {
-            if (!exists.contains(tid)) {
-                goodsTagRepository.save(GoodsTag.builder().goodsId(goodsId).tagId(tid).build());
-            }
-        }
-    }
-
-    private Map<Long, List<TagResponse>> loadTagsForGoods(List<Long> goodsIds) {
-        if (goodsIds == null || goodsIds.isEmpty()) return Map.of();
-        var relations = goodsTagRepository.findByGoodsIdIn(goodsIds);
-        Map<Long, List<Long>> mapping = new HashMap<>();
-        for (var r : relations) {
-            mapping.computeIfAbsent(r.getGoodsId(), k -> new ArrayList<>()).add(r.getTagId());
-        }
-        Map<Long, String> tagNames = tagRepository.findAllById(
-                mapping.values().stream().flatMap(List::stream).distinct().toList()
-        ).stream().collect(Collectors.toMap(Tag::getId, Tag::getName));
-
-        Map<Long, List<TagResponse>> res = new HashMap<>();
-        for (var e : mapping.entrySet()) {
-            List<TagResponse> list = e.getValue().stream()
-                    .map(id -> TagResponse.builder().id(id).name(tagNames.getOrDefault(id, "")).build())
-                    .toList();
-            res.put(e.getKey(), list);
-        }
-        return res;
-    }
+    
 
     private GoodsResponse convertToResponse(Goods goods, Map<Long, List<TagResponse>> tagsMap) {
         GoodsResponse base = convertToResponse(goods);
