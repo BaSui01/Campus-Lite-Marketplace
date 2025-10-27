@@ -1,7 +1,10 @@
 package com.campus.marketplace.service;
 
 import com.campus.marketplace.common.dto.request.CreateOrderRequest;
+import com.campus.marketplace.common.dto.request.PayOrderRequest;
+import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
 import com.campus.marketplace.common.dto.response.OrderResponse;
+import com.campus.marketplace.common.dto.response.PaymentResponse;
 import org.springframework.data.domain.Page;
 
 /**
@@ -21,6 +24,29 @@ public interface OrderService {
      * @return 订单号
      */
     String createOrder(CreateOrderRequest request);
+
+    /**
+     * 支付订单
+     * 
+     * @param request 支付请求
+     * @return 支付响应（包含支付链接）
+     */
+    PaymentResponse payOrder(PayOrderRequest request);
+
+    /**
+     * 处理支付回调
+     * 
+     * @param request 回调请求
+     * @return 是否处理成功
+     */
+    boolean handlePaymentCallback(PaymentCallbackRequest request);
+
+    /**
+     * 取消超时订单
+     * 
+     * @return 取消的订单数量
+     */
+    int cancelTimeoutOrders();
 
     /**
      * 查询买家订单列表
