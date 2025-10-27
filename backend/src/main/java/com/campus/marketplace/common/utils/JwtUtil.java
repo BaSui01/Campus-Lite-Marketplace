@@ -2,7 +2,6 @@ package com.campus.marketplace.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,21 +86,35 @@ public class JwtUtil {
     }
 
     /**
-     * 从 Token 中获取角色列表
+     * 从 Token 中获取角色列表（类型安全）
      */
-    @SuppressWarnings("unchecked")
     public List<String> getRolesFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        return (List<String>) claims.get("roles");
+        Object obj = claims.get("roles");
+        if (obj instanceof List<?> list) {
+            List<String> out = new java.util.ArrayList<>(list.size());
+            for (Object e : list) {
+                if (e != null) out.add(String.valueOf(e));
+            }
+            return out;
+        }
+        return java.util.Collections.emptyList();
     }
 
     /**
-     * 从 Token 中获取权限列表
+     * 从 Token 中获取权限列表（类型安全）
      */
-    @SuppressWarnings("unchecked")
     public List<String> getPermissionsFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        return (List<String>) claims.get("permissions");
+        Object obj = claims.get("permissions");
+        if (obj instanceof List<?> list) {
+            List<String> out = new java.util.ArrayList<>(list.size());
+            for (Object e : list) {
+                if (e != null) out.add(String.valueOf(e));
+            }
+            return out;
+        }
+        return java.util.Collections.emptyList();
     }
 
     /**

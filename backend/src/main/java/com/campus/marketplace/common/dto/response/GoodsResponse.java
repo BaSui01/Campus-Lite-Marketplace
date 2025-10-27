@@ -88,4 +88,9 @@ public class GoodsResponse {
      * 发布时间
      */
     private LocalDateTime createdAt;
+
+    /**
+     * 标签列表
+     */
+    private List<TagResponse> tags;
 }

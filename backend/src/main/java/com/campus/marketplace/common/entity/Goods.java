@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +26,7 @@ import java.util.Map;
         @Index(name = "idx_goods_status", columnList = "status"),
         @Index(name = "idx_goods_category", columnList = "category_id"),
         @Index(name = "idx_goods_created_at", columnList = "created_at"),
+        @Index(name = "idx_goods_campus", columnList = "campus_id"),
         @Index(name = "idx_goods_price", columnList = "price")
 })
 @Getter
@@ -78,6 +81,19 @@ public class Goods extends BaseEntity {
     private User seller;
 
     /**
+     * 校区 ID
+     */
+    @Column(name = "campus_id")
+    private Long campusId;
+
+    /**
+     * 校区（懒加载）
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", insertable = false, updatable = false)
+    private Campus campus;
+
+    /**
      * 物品状态
      */
     @Enumerated(EnumType.STRING)
@@ -112,6 +128,13 @@ public class Goods extends BaseEntity {
     @Type(JsonBinaryType.class)
     @Column(name = "extra_attrs", columnDefinition = "jsonb")
     private Map<String, Object> extraAttrs;
+
+    /**
+     * 标签绑定列表（懒加载）
+     */
+    @OneToMany(mappedBy = "goods", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<GoodsTag> goodsTags = new ArrayList<>();
 
     /**
      * 增加浏览量

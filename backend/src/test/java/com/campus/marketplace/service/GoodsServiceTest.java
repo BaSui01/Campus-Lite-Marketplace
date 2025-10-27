@@ -63,6 +63,21 @@ class GoodsServiceTest {
     @Mock
     private SensitiveWordFilter sensitiveWordFilter;
 
+    @Mock
+    private MessageService messageService;
+
+    @Mock
+    private com.campus.marketplace.repository.TagRepository tagRepository;
+
+    @Mock
+    private com.campus.marketplace.repository.GoodsTagRepository goodsTagRepository;
+
+    @Mock
+    private FollowService followService;
+
+    @Mock
+    private SubscriptionService subscriptionService;
+
     @InjectMocks
     private GoodsServiceImpl goodsService;
 
@@ -98,8 +113,13 @@ class GoodsServiceTest {
                 "九成新，无划痕，配件齐全",
                 new BigDecimal("4999.00"),
                 1L,
-                List.of("image1.jpg", "image2.jpg")
+                List.of("image1.jpg", "image2.jpg"),
+                java.util.List.of()
         );
+
+        // 默认返回空标签绑定
+        org.mockito.Mockito.lenient().when(goodsTagRepository.findByGoodsIdIn(any())).thenReturn(java.util.List.of());
+        org.mockito.Mockito.lenient().when(goodsTagRepository.findByGoodsId(anyLong())).thenReturn(java.util.List.of());
     }
 
     @AfterEach
@@ -184,23 +204,23 @@ class GoodsServiceTest {
         Goods goods2 = createTestGoods(2L, "商品2", GoodsStatus.APPROVED);
         Page<Goods> goodsPage = new PageImpl<>(List.of(goods1, goods2));
 
-        when(goodsRepository.findByConditions(
-                eq(GoodsStatus.APPROVED), any(), any(), any(), any(), any(Pageable.class)
+        when(goodsRepository.findByConditionsWithCampus(
+                eq(GoodsStatus.APPROVED), any(), any(), any(), any(), any(), any(Pageable.class)
         )).thenReturn(goodsPage);
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(testCategory));
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 
         // When
         Page<GoodsResponse> result = goodsService.listGoods(
-                null, null, null, null, 0, 20, "createdAt", "DESC"
+                null, null, null, null, 0, 20, "createdAt", "DESC", null
         );
 
         // Then
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("商品1");
         assertThat(result.getContent().get(1).getTitle()).isEqualTo("商品2");
-        verify(goodsRepository).findByConditions(
-                eq(GoodsStatus.APPROVED), any(), any(), any(), any(), any(Pageable.class)
+        verify(goodsRepository).findByConditionsWithCampus(
+                eq(GoodsStatus.APPROVED), any(), any(), any(), any(), any(), any(Pageable.class)
         );
     }
 

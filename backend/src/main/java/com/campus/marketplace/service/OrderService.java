@@ -49,6 +49,20 @@ public interface OrderService {
     int cancelTimeoutOrders();
 
     /**
+     * 取消订单（买家/卖家均可在未支付时取消）
+     *
+     * @param orderNo 订单号
+     */
+    void cancelOrder(String orderNo);
+
+    /**
+     * 评价订单
+     * 
+     * @param request 评价请求
+     */
+    void reviewOrder(com.campus.marketplace.common.dto.request.ReviewOrderRequest request);
+
+    /**
      * 查询买家订单列表
      * 
      * @param status 订单状态（可选）

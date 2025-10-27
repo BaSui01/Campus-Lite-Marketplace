@@ -1,6 +1,5 @@
 package com.campus.marketplace.common.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**

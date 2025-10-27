@@ -2,11 +2,13 @@ package com.campus.marketplace.common.aspect;
 
 import com.campus.marketplace.common.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
+import com.campus.marketplace.service.ViewLogService;
 
 import java.time.LocalDateTime;
 
@@ -21,7 +23,10 @@ import java.time.LocalDateTime;
 @Slf4j
 @Aspect
 @Component
+@RequiredArgsConstructor
 public class ViewLogAspect {
+
+    private final ViewLogService viewLogService;
 
     /**
      * 定义切点：GoodsService.getGoodsDetail 方法
@@ -54,8 +59,8 @@ public class ViewLogAspect {
                 log.info("【浏览日志】用户: {}, 物品ID: {}, 时间: {}", 
                         username, goodsId, LocalDateTime.now());
 
-                // TODO: 这里可以将日志异步写入数据库
-                // 例如：viewLogService.saveViewLog(username, goodsId, LocalDateTime.now());
+                // 异步写入数据库
+                viewLogService.saveAsync(username, goodsId, System.currentTimeMillis());
             }
         } catch (Exception e) {
             log.error("记录浏览日志失败", e);

@@ -64,6 +64,18 @@ public class FavoriteServiceImpl implements FavoriteService {
             throw new BusinessException(ErrorCode.GOODS_NOT_APPROVED);
         }
 
+        // 3.1 校区隔离：无跨校权限禁止跨校收藏
+        try {
+            if (!SecurityUtil.hasAuthority("system:campus:cross")) {
+                if (user.getCampusId() != null && goods.getCampusId() != null
+                        && !user.getCampusId().equals(goods.getCampusId())) {
+                    throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区收藏被禁止");
+                }
+            }
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception ignored) { }
+
         // 4. 检查是否已收藏
         if (favoriteRepository.existsByUserIdAndGoodsId(user.getId(), goodsId)) {
             throw new BusinessException(ErrorCode.FAVORITE_EXISTS);

@@ -20,7 +20,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_order_buyer", columnList = "buyer_id"),
         @Index(name = "idx_order_seller", columnList = "seller_id"),
         @Index(name = "idx_order_status", columnList = "status"),
-        @Index(name = "idx_order_created_at", columnList = "created_at")
+        @Index(name = "idx_order_created_at", columnList = "created_at"),
+        @Index(name = "idx_order_campus", columnList = "campus_id")
 })
 @Getter
 @Setter
@@ -73,6 +74,19 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", insertable = false, updatable = false)
     private User seller;
+
+    /**
+     * 校区 ID
+     */
+    @Column(name = "campus_id")
+    private Long campusId;
+
+    /**
+     * 校区（懒加载）
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", insertable = false, updatable = false)
+    private Campus campus;
 
     /**
      * 订单金额

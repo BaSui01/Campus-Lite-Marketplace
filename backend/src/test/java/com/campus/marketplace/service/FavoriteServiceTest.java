@@ -138,6 +138,22 @@ class FavoriteServiceTest {
     }
 
     @Test
+    @DisplayName("添加收藏失败 - 跨校收藏无权限")
+    void addFavorite_Fail_CrossCampusWithoutAuthority() {
+        testUser.setCampusId(1L);
+        testGoods.setCampusId(2L);
+
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(testUser));
+        when(goodsRepository.findById(1L)).thenReturn(Optional.of(testGoods));
+        // 默认 hasAuthority 返回 false
+
+        assertThatThrownBy(() -> favoriteService.addFavorite(1L))
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("code", ErrorCode.FORBIDDEN.getCode())
+                .hasMessageContaining("跨校区收藏被禁止");
+    }
+
+    @Test
     @DisplayName("添加收藏失败 - 物品未审核")
     void addFavorite_Fail_WhenGoodsNotApproved() {
         // Given

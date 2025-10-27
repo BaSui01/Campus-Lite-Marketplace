@@ -18,6 +18,10 @@ import com.campus.marketplace.repository.OrderRepository;
 import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.OrderService;
 import com.campus.marketplace.service.PaymentService;
+import com.campus.marketplace.service.NotificationService;
+import com.campus.marketplace.service.AuditLogService;
+import com.campus.marketplace.repository.CouponUserRelationRepository;
+import com.campus.marketplace.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -47,6 +51,12 @@ public class OrderServiceImpl implements OrderService {
     private final GoodsRepository goodsRepository;
     private final UserRepository userRepository;
     private final PaymentService paymentService;
+    private final com.campus.marketplace.repository.ReviewRepository reviewRepository;
+    private final com.campus.marketplace.common.utils.SensitiveWordFilter sensitiveWordFilter;
+    private final NotificationService notificationService;
+    private final AuditLogService auditLogService;
+    private final CouponUserRelationRepository couponUserRelationRepository;
+    private final CouponService couponService;
 
     /**
      * 创建订单
@@ -62,6 +72,18 @@ public class OrderServiceImpl implements OrderService {
 
         Goods goods = goodsRepository.findById(request.goodsId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.GOODS_NOT_FOUND));
+        // 校区隔离：普通用户禁止跨校购买
+        try {
+            // 无跨校权限时，要求买家与物品同校区
+            if (!com.campus.marketplace.common.utils.SecurityUtil.hasAuthority("system:campus:cross")) {
+                if (buyer.getCampusId() != null && goods.getCampusId() != null
+                        && !buyer.getCampusId().equals(goods.getCampusId())) {
+                    throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区购买被禁止");
+                }
+            }
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception ignored) { }
 
         if (goods.getStatus() == GoodsStatus.SOLD) {
             log.warn("物品已售出: goodsId={}", goods.getId());
@@ -96,6 +118,7 @@ public class OrderServiceImpl implements OrderService {
                 .goodsId(goods.getId())
                 .buyerId(buyer.getId())
                 .sellerId(goods.getSellerId())
+                .campusId(buyer.getCampusId())
                 .amount(amount)
                 .discountAmount(discountAmount)
                 .actualAmount(actualAmount)
@@ -201,14 +224,153 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 取消超时订单
+     *
+     * 自动取消超过30分钟未支付的订单，并恢复物品状态
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int cancelTimeoutOrders() {
         log.info("开始取消超时订单");
+
+        // 查找30分钟前创建的待支付订单
+        LocalDateTime timeoutThreshold = LocalDateTime.now().minusMinutes(30);
+        var timeoutOrders = orderRepository.findTimeoutOrders(
+                OrderStatus.PENDING_PAYMENT,
+                timeoutThreshold
+        );
+
         int cancelledCount = 0;
+        for (Order order : timeoutOrders) {
+            try {
+                // 取消订单
+                order.setStatus(OrderStatus.CANCELLED);
+                orderRepository.save(order);
+
+                // 恢复物品状态
+                Goods goods = goodsRepository.findById(order.getGoodsId())
+                        .orElse(null);
+                if (goods != null && goods.getStatus() == GoodsStatus.SOLD) {
+                    goods.setStatus(GoodsStatus.APPROVED);
+                    goodsRepository.save(goods);
+                    log.info("物品状态已恢复: goodsId={}, orderNo={}",
+                            goods.getId(), order.getOrderNo());
+                }
+
+                cancelledCount++;
+                log.info("订单已取消: orderNo={}, createdAt={}",
+                        order.getOrderNo(), order.getCreatedAt());
+            } catch (Exception e) {
+                log.error("取消订单失败: orderNo={}", order.getOrderNo(), e);
+            }
+        }
+
         log.info("取消超时订单完成: count={}", cancelledCount);
         return cancelledCount;
+    }
+
+    /**
+     * 取消订单（未支付）并回退资源
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelOrder(String orderNo) {
+        String username = SecurityUtil.getCurrentUsername();
+        User current = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        Order order = orderRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        boolean isOwner = order.getBuyerId().equals(current.getId()) || order.getSellerId().equals(current.getId());
+        if (!isOwner && !(SecurityUtil.hasRole("ADMIN") || SecurityUtil.hasRole("SUPER_ADMIN"))) {
+            throw new BusinessException(ErrorCode.PERMISSION_DENIED);
+        }
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            return; // 幂等
+        }
+        if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "非待支付订单不可直接取消，请走退款流程");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
+
+        Goods goods = goodsRepository.findById(order.getGoodsId()).orElse(null);
+        if (goods != null && goods.getStatus() == GoodsStatus.SOLD) {
+            goods.setStatus(GoodsStatus.APPROVED);
+            goodsRepository.save(goods);
+        }
+
+        // 优惠券回退（若有绑定）
+        couponUserRelationRepository.findFirstByOrderIdAndStatus(order.getId(), com.campus.marketplace.common.enums.CouponStatus.USED)
+                .ifPresent(rel -> couponService.refundCoupon(rel.getId()));
+
+        // 通知双方
+        notificationService.sendNotification(order.getBuyerId(), com.campus.marketplace.common.enums.NotificationType.ORDER_CANCELLED,
+                "订单已取消", "订单 " + orderNo + " 已取消", order.getId(), "ORDER", "/orders/" + orderNo);
+        notificationService.sendNotification(order.getSellerId(), com.campus.marketplace.common.enums.NotificationType.ORDER_CANCELLED,
+                "订单已取消", "订单 " + orderNo + " 已取消", order.getId(), "ORDER", "/orders/" + orderNo);
+
+        // 审计记录
+        auditLogService.logActionAsync(current.getId(), current.getUsername(),
+                com.campus.marketplace.common.enums.AuditActionType.ORDER_CANCEL,
+                "ORDER", order.getId(), "CANCEL", "SUCCESS", null, null);
+    }
+
+    /**
+     * 评价订单
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void reviewOrder(com.campus.marketplace.common.dto.request.ReviewOrderRequest request) {
+        log.info("评价订单: orderNo={}, rating={}", request.orderNo(), request.rating());
+
+        String username = SecurityUtil.getCurrentUsername();
+        User buyer = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        Order order = orderRepository.findByOrderNo(request.orderNo())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (!order.getBuyerId().equals(buyer.getId())) {
+            log.warn("非买家尝试评价订单: orderNo={}, buyerId={}, currentUserId={}",
+                    order.getOrderNo(), order.getBuyerId(), buyer.getId());
+            throw new BusinessException(ErrorCode.PERMISSION_DENIED);
+        }
+
+        if (order.getStatus() != OrderStatus.COMPLETED) {
+            log.warn("订单未完成，无法评价: orderNo={}, status={}", order.getOrderNo(), order.getStatus());
+            throw new BusinessException(ErrorCode.OPERATION_FAILED);
+        }
+
+        if (reviewRepository.existsByOrderId(order.getId())) {
+            log.warn("订单已评价: orderNo={}", order.getOrderNo());
+            throw new BusinessException(ErrorCode.OPERATION_FAILED);
+        }
+
+        String filteredContent = sensitiveWordFilter.filter(request.content());
+
+        com.campus.marketplace.common.entity.Review review = com.campus.marketplace.common.entity.Review.builder()
+                .orderId(order.getId())
+                .buyerId(buyer.getId())
+                .sellerId(order.getSellerId())
+                .rating(request.rating())
+                .content(filteredContent)
+                .build();
+
+        reviewRepository.save(review);
+        log.info("评价保存成功: orderNo={}, rating={}", order.getOrderNo(), request.rating());
+
+        User seller = userRepository.findById(order.getSellerId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        int creditScoreChange = (request.rating() - 3) * 2;
+        seller.setCreditScore(seller.getCreditScore() + creditScoreChange);
+        userRepository.save(seller);
+
+        log.info("卖家信用分更新: sellerId={}, change={}, newScore={}",
+                seller.getId(), creditScoreChange, seller.getCreditScore());
     }
 
     /**
@@ -254,8 +416,29 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public Order getOrderDetail(String orderNo) {
-        return orderRepository.findByOrderNoWithDetails(orderNo)
+        Order order = orderRepository.findByOrderNoWithDetails(orderNo)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        // 所有者或管理员可见；且无跨校权限的用户若非同校拒绝
+        try {
+            String username = SecurityUtil.getCurrentUsername();
+            User current = userRepository.findByUsername(username).orElse(null);
+            boolean isOwner = current != null && (order.getBuyerId().equals(current.getId()) || order.getSellerId().equals(current.getId()));
+            boolean isAdmin = SecurityUtil.hasRole("ADMIN") || SecurityUtil.hasRole("SUPER_ADMIN");
+            if (!isOwner && !isAdmin) {
+                throw new BusinessException(ErrorCode.FORBIDDEN);
+            }
+            if (!SecurityUtil.hasAuthority("system:campus:cross")) {
+                if (current != null && order.getCampusId() != null && current.getCampusId() != null
+                        && !order.getCampusId().equals(current.getCampusId())) {
+                    throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区访问被禁止");
+                }
+            }
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception ignored) { }
+
+        return order;
     }
 
     /**

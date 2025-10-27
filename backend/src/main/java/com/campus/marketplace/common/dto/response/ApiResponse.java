@@ -1,30 +1,27 @@
 package com.campus.marketplace.common.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.campus.marketplace.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 统一 API 响应格式
- * 
- * 所有接口返回统一的 JSON 格式
- * 
+ * 统一响应格式
+ *
  * @author BaSui
- * @date 2025-10-25
+ * @date 2025-10-27
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
 
     /**
-     * 响应码（200 表示成功）
+     * 状态码
      */
-    private Integer code;
+    private int code;
 
     /**
      * 响应消息
@@ -37,24 +34,25 @@ public class ApiResponse<T> {
     private T data;
 
     /**
-     * 时间戳
-     */
-    private Long timestamp;
-
-    /**
      * 成功响应（带数据）
+     *
+     * @param data 响应数据
+     * @param <T> 数据类型
+     * @return ApiResponse
      */
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
-                .code(200)
-                .message("操作成功")
+                .code(ErrorCode.SUCCESS.getCode())
+                .message(ErrorCode.SUCCESS.getMessage())
                 .data(data)
-                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
     /**
      * 成功响应（无数据）
+     *
+     * @param <T> 数据类型
+     * @return ApiResponse
      */
     public static <T> ApiResponse<T> success() {
         return success(null);
@@ -62,37 +60,64 @@ public class ApiResponse<T> {
 
     /**
      * 成功响应（自定义消息）
+     *
+     * @param message 消息
+     * @param data 数据
+     * @param <T> 数据类型
+     * @return ApiResponse
      */
     public static <T> ApiResponse<T> success(String message, T data) {
         return ApiResponse.<T>builder()
-                .code(200)
+                .code(ErrorCode.SUCCESS.getCode())
                 .message(message)
                 .data(data)
-                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
     /**
      * 失败响应
+     *
+     * @param errorCode 错误码
+     * @param <T> 数据类型
+     * @return ApiResponse
      */
-    public static <T> ApiResponse<T> error(Integer code, String message) {
+    public static <T> ApiResponse<T> error(ErrorCode errorCode) {
         return ApiResponse.<T>builder()
-                .code(code)
-                .message(message)
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
                 .data(null)
-                .timestamp(System.currentTimeMillis())
                 .build();
     }
 
     /**
-     * 失败响应（带数据）
+     * 失败响应（自定义消息）
+     *
+     * @param errorCode 错误码
+     * @param message 自定义消息
+     * @param <T> 数据类型
+     * @return ApiResponse
      */
-    public static <T> ApiResponse<T> error(Integer code, String message, T data) {
+    public static <T> ApiResponse<T> error(ErrorCode errorCode, String message) {
+        return ApiResponse.<T>builder()
+                .code(errorCode.getCode())
+                .message(message)
+                .data(null)
+                .build();
+    }
+
+    /**
+     * 失败响应（自定义状态码和消息）
+     *
+     * @param code 状态码
+     * @param message 消息
+     * @param <T> 数据类型
+     * @return ApiResponse
+     */
+    public static <T> ApiResponse<T> error(int code, String message) {
         return ApiResponse.<T>builder()
                 .code(code)
                 .message(message)
-                .data(data)
-                .timestamp(System.currentTimeMillis())
+                .data(null)
                 .build();
     }
 }

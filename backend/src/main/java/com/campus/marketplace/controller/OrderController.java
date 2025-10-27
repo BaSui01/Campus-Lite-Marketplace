@@ -103,4 +103,17 @@ public class OrderController {
         Order order = orderService.getOrderDetail(orderNo);
         return ApiResponse.success(order);
     }
+
+    /**
+     * 取消订单（未支付）
+     *
+     * POST /api/orders/{orderNo}/cancel
+     */
+    @PostMapping("/{orderNo}/cancel")
+    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
+    public ApiResponse<Void> cancelOrder(@PathVariable String orderNo) {
+        log.info("取消订单: orderNo={}", orderNo);
+        orderService.cancelOrder(orderNo);
+        return ApiResponse.success(null);
+    }
 }

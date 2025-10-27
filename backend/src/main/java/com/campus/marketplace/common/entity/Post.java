@@ -16,7 +16,8 @@ import lombok.*;
 @Table(name = "t_post", indexes = {
         @Index(name = "idx_post_author", columnList = "author_id"),
         @Index(name = "idx_post_status", columnList = "status"),
-        @Index(name = "idx_post_created_at", columnList = "created_at")
+        @Index(name = "idx_post_created_at", columnList = "created_at"),
+        @Index(name = "idx_post_campus", columnList = "campus_id")
 })
 @Getter
 @Setter
@@ -49,6 +50,19 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", insertable = false, updatable = false)
     private User author;
+
+    /**
+     * 校区 ID
+     */
+    @Column(name = "campus_id")
+    private Long campusId;
+
+    /**
+     * 校区（懒加载）
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campus_id", insertable = false, updatable = false)
+    private Campus campus;
 
     /**
      * 帖子状态（复用物品状态枚举）

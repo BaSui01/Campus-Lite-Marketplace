@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -65,4 +67,24 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * 检查物品是否已有订单
      */
     boolean existsByGoodsIdAndStatusNot(Long goodsId, OrderStatus status);
+
+    /**
+     * 查找超时订单
+     *
+     * 查找指定状态且创建时间早于指定时间的订单
+     *
+     * @param status 订单状态
+     * @param createdBefore 创建时间阈值
+     * @return 超时订单列表
+     */
+    @Query("SELECT o FROM Order o WHERE o.status = :status AND o.createdAt < :createdBefore")
+    List<Order> findTimeoutOrders(
+            @Param("status") OrderStatus status,
+            @Param("createdBefore") LocalDateTime createdBefore
+    );
+
+    /**
+     * 按校区统计订单数量
+     */
+    long countByCampusId(Long campusId);
 }

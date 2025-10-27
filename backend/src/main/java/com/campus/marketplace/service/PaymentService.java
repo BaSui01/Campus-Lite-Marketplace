@@ -32,4 +32,16 @@ public interface PaymentService {
      * @return 是否验证通过
      */
     boolean verifySignature(String orderNo, String transactionId, String signature);
+
+    /**
+     * 发起退款
+     *
+     * @param order 订单
+     * @param amount 退款金额
+     * @param paymentMethod 渠道
+     * @return 是否成功发起
+     */
+    boolean refund(com.campus.marketplace.common.entity.Order order,
+                   java.math.BigDecimal amount,
+                   PaymentMethod paymentMethod);
 }

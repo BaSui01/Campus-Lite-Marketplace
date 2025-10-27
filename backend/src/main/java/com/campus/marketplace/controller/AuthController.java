@@ -5,12 +5,9 @@ import com.campus.marketplace.common.dto.request.RegisterRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.LoginResponse;
 import com.campus.marketplace.service.AuthService;
+import com.campus.marketplace.common.annotation.RateLimit;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +61,7 @@ public class AuthController {
             description = "使用用户名和密码登录，返回 JWT Token"
     )
     @PostMapping("/login")
+    @RateLimit(key = "auth:login", maxRequests = 5, timeWindow = 60, limitType = com.campus.marketplace.common.annotation.RateLimit.LimitType.IP)
     public ApiResponse<LoginResponse> login(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "登录凭证",
