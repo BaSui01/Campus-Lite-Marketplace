@@ -41,6 +41,8 @@ public enum ErrorCode {
     GOODS_SOLD(3001, "物品已售出"),
     GOODS_NOT_APPROVED(3002, "物品未审核通过"),
     GOODS_OFFLINE(3003, "物品已下架"),
+    GOODS_ALREADY_SOLD(3004, "物品已售出或已有订单"),
+    CANNOT_BUY_OWN_GOODS(3005, "不能购买自己的物品"),
 
     // ============================================
     // 订单相关错误 (4000-4999)
