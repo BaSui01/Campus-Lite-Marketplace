@@ -64,6 +64,7 @@ public class SensitiveWordFilter {
     /**
      * 添加单个敏感词
      */
+    @SuppressWarnings("unchecked")
     private void addWord(String word) {
         if (word == null || word.isEmpty()) {
             return;
@@ -160,6 +161,7 @@ public class SensitiveWordFilter {
      * @param beginIndex 开始位置
      * @return 敏感词长度，0 表示不存在
      */
+    @SuppressWarnings("unchecked")
     private int checkSensitiveWord(String text, int beginIndex) {
         boolean isEnd = false;
         int matchLength = 0;

@@ -221,5 +221,5 @@ gatling-results/
 
 # ============ Kiro IDE ============
 # Kiro 临时文件（保留 .kiro/steering 和 .kiro/specs）
-.kiro/
+
 

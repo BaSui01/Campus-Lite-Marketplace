@@ -2,7 +2,7 @@ package com.campus.marketplace.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +67,7 @@ public class JwtUtil {
                 .subject(subject)
                 .issuedAt(now)
                 .expiration(expirationDate)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key)  // 移除过时的 SignatureAlgorithm 参数，自动使用 HS256
                 .compact();
     }
 
@@ -173,7 +173,7 @@ public class JwtUtil {
                     .claims(newClaims)
                     .issuedAt(new Date())
                     .expiration(new Date(System.currentTimeMillis() + expiration))
-                    .signWith(key, SignatureAlgorithm.HS256)
+                    .signWith(key)  // 移除过时的 SignatureAlgorithm 参数
                     .compact();
         } catch (Exception e) {
             log.error("Token 刷新失败", e);
