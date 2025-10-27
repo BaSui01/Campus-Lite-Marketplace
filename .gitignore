@@ -1,0 +1,225 @@
+# ==========================================
+# 校园轻享集市系统 - Git 排除规则
+# ==========================================
+
+# ============ 操作系统 ============
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ============ IDE & 编辑器 ============
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# Eclipse
+.project
+.classpath
+.settings/
+.metadata/
+bin/
+tmp/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# NetBeans
+nbproject/
+nbbuild/
+dist/
+nbdist/
+
+# ============ Java & Maven ============
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# 编译输出
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# ============ Spring Boot ============
+# 日志文件
+logs/
+*.log
+*.log.*
+spring.log
+
+# 临时文件
+*.tmp
+*.temp
+*.swp
+*.swo
+*~.nib
+
+# ============ Node.js & 前端 ============
+# 依赖
+node_modules/
+jspm_packages/
+bower_components/
+
+# 构建输出
+dist/
+dist-ssr/
+build/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# 环境变量
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 编辑器
+.vscode-test
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ============ 数据库 ============
+# PostgreSQL
+*.sql
+*.dump
+*.backup
+
+# H2 Database
+*.db
+*.mv.db
+*.trace.db
+
+# ============ 测试 ============
+# 测试覆盖率
+coverage/
+*.lcov
+.nyc_output/
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+
+# JUnit
+TEST-*.xml
+
+# ============ 文件上传 ============
+# 上传文件目录
+uploads/
+upload/
+files/
+static/uploads/
+
+# 图片缓存
+*.cache
+
+# ============ 配置文件（敏感信息）============
+# 包含密码/密钥的配置
+application-prod.yml
+application-prod.properties
+application-secret.yml
+application-secret.properties
+
+# 密钥文件
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+
+# ============ Docker ============
+# Docker 临时文件
+.dockerignore
+docker-compose.override.yml
+
+# ============ 其他 ============
+# 备份文件
+*.bak
+*.backup
+*.old
+
+# 压缩文件
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+*.zip
+
+# 临时目录
+temp/
+tmp/
+.tmp/
+
+# 系统文件
+.Spotlight-V100
+.Trashes
+
+# ============ 项目特定 ============
+# 沙箱支付测试数据
+sandbox-data/
+
+# 本地开发配置
+local.properties
+local-config.yml
+
+# 生成的文档
+generated-docs/
+
+# 性能测试结果
+jmeter-results/
+gatling-results/
+
+# ============ Kiro IDE ============
+# Kiro 临时文件（保留 .kiro/steering 和 .kiro/specs）
+.kiro/
+

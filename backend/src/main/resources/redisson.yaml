@@ -1,0 +1,21 @@
+# Redisson 配置文件
+# 用于 Hibernate 二级缓存和分布式锁
+
+# 单机模式（开发环境）
+singleServerConfig:
+  address: "redis://localhost:6379"
+  database: 0
+  connectionPoolSize: 50
+  connectionMinimumIdleSize: 10
+  idleConnectionTimeout: 10000
+  connectTimeout: 10000
+  timeout: 3000
+  retryAttempts: 3
+  retryInterval: 1500
+
+# 线程池配置
+threads: 16
+nettyThreads: 32
+
+# 编码方式
+codec: !<org.redisson.codec.JsonJacksonCodec> {}
