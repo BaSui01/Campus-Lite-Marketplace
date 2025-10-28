@@ -114,14 +114,14 @@ class CacheServiceTest {
     @Test
     @DisplayName("应该批量删除缓存（根据模式）")
     void shouldDeleteCacheByPattern() {
-        // Given: Mock 获取匹配的键
-        when(redisUtil.hasKey("goods:*")).thenReturn(true);
+        // Given: RedisUtil 返回删除数量
+        when(redisUtil.deleteByPattern("goods:*")).thenReturn(5L);
 
         // When: 批量删除缓存
         cacheService.deleteByPattern("goods:*");
 
         // Then: 验证删除操作被调用
-        verify(redisUtil, atLeastOnce()).hasKey(anyString());
+        verify(redisUtil).deleteByPattern("goods:*");
     }
 
     @Test

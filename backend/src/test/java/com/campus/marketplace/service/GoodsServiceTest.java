@@ -78,6 +78,9 @@ class GoodsServiceTest {
     @Mock
     private SubscriptionService subscriptionService;
 
+    @Mock
+    private com.campus.marketplace.common.utils.EncryptUtil encryptUtil;
+
     @InjectMocks
     private GoodsServiceImpl goodsService;
 
@@ -102,10 +105,10 @@ class GoodsServiceTest {
 
         // 准备测试分类
         testCategory = Category.builder()
-                .id(1L)
                 .name("电子产品")
                 .description("电子产品分类")
                 .build();
+        testCategory.setId(1L);
 
         // 准备测试请求
         validRequest = new CreateGoodsRequest(
@@ -122,6 +125,7 @@ class GoodsServiceTest {
         org.mockito.Mockito.lenient().when(goodsTagRepository.findByGoodsId(anyLong())).thenReturn(java.util.List.of());
         org.mockito.Mockito.lenient().when(goodsTagRepository.findGoodsIdsByAllTagIds(anyCollection(), anyLong())).thenReturn(java.util.List.of());
         org.mockito.Mockito.lenient().when(tagRepository.findAllById(anyCollection())).thenReturn(java.util.List.of());
+        org.mockito.Mockito.lenient().when(encryptUtil.maskEmail(anyString())).thenAnswer(inv -> inv.getArgument(0));
     }
 
     @AfterEach

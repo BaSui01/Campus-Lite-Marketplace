@@ -69,6 +69,9 @@ class NotificationServiceTest {
     @Mock
     private WebPushService webPushService;
 
+    @Mock
+    private com.campus.marketplace.service.NotificationTemplateService templateService;
+
     @InjectMocks
     private NotificationServiceImpl notificationService;
 
@@ -148,6 +151,19 @@ class NotificationServiceTest {
     }
 
     @Test
+    @DisplayName("站内通知：退订则不发送")
+    void sendNotification_Unsubscribed_Skip() {
+        when(preferenceService.isUnsubscribed(eq(1L), anyString(), eq(com.campus.marketplace.common.enums.NotificationChannel.IN_APP)))
+                .thenReturn(true);
+
+        notificationService.sendNotification(
+                1L, NotificationType.ORDER_PAID, "标题", "内容", 1L, "order", "/orders/1");
+
+        verify(notificationRepository, never()).save(any());
+        verify(valueOperations, never()).increment(anyString());
+    }
+
+    @Test
     @DisplayName("发送邮件通知成功（异步）")
     void sendEmailNotification_Success() {
         // 🎯 准备
@@ -168,6 +184,38 @@ class NotificationServiceTest {
         assertThat(sentEmail.getTo()).containsExactly("test@example.com");
         assertThat(sentEmail.getSubject()).isEqualTo("订单支付成功");
         assertThat(sentEmail.getText()).isEqualTo("您的订单 #123456 已支付成功");
+    }
+
+    @Test
+    @DisplayName("邮件通知：通道关闭或静默时段不发送")
+    void sendEmailNotification_DisabledOrQuiet_Skip() {
+        when(preferenceService.isChannelEnabled(1L, com.campus.marketplace.common.enums.NotificationChannel.EMAIL)).thenReturn(false);
+        notificationService.sendEmailNotification(1L, "S", "T");
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
+
+        reset(preferenceService);
+        when(preferenceService.isChannelEnabled(1L, com.campus.marketplace.common.enums.NotificationChannel.EMAIL)).thenReturn(true);
+        when(preferenceService.isInQuietHours(eq(1L), eq(com.campus.marketplace.common.enums.NotificationChannel.EMAIL), any()))
+                .thenReturn(true);
+        notificationService.sendEmailNotification(1L, "S", "T");
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
+    }
+
+    @Test
+    @DisplayName("邮件通知：达到每分钟速率限制则跳过发送")
+    void sendEmailNotification_RateLimited_Skip() {
+        // 将限额设为 0（任何大于 0 的计数都触发限流）
+        try {
+            java.lang.reflect.Field f = NotificationServiceImpl.class.getDeclaredField("emailPerMinute");
+            f.setAccessible(true);
+            f.setInt(notificationService, 0);
+        } catch (Exception ignored) {}
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(valueOperations.increment(anyString())).thenReturn(1L);
+
+        notificationService.sendEmailNotification(1L, "S", "T");
+        verify(mailSender, never()).send(any(SimpleMailMessage.class));
     }
 
     @Test
@@ -258,6 +306,38 @@ class NotificationServiceTest {
 
         // ✅ 验证
         verify(notificationRepository).deleteByIds(1L, notificationIds);
+    }
+
+    @Test
+    @DisplayName("模板通知：渲染后触发站内+邮件发送")
+    void sendTemplateNotification_RendersAndSends() {
+        var rendered = new com.campus.marketplace.service.NotificationTemplateService.Rendered(
+                "渲染后的标题", "渲染后的内容",
+                java.util.Set.of(com.campus.marketplace.common.enums.NotificationChannel.IN_APP,
+                        com.campus.marketplace.common.enums.NotificationChannel.EMAIL)
+        );
+        when(templateService.render(anyString(), any(), anyMap())).thenReturn(rendered);
+        when(notificationRepository.save(any(Notification.class))).thenReturn(testNotification);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+
+        notificationService.sendTemplateNotification(
+                1L,
+                com.campus.marketplace.common.enums.NotificationType.ORDER_PAID.name(),
+                java.util.Map.of("orderNo", "O1"),
+                com.campus.marketplace.common.enums.NotificationType.ORDER_PAID,
+                123L,
+                "ORDER",
+                "/orders/O1"
+        );
+
+        // 验证站内通知保存
+        verify(notificationRepository).save(argThat(n ->
+                n.getReceiverId().equals(1L)
+                        && n.getTitle().equals("渲染后的标题")
+                        && n.getContent().equals("渲染后的内容")
+        ));
+        // 验证邮件发送
+        verify(mailSender).send(any(SimpleMailMessage.class));
     }
 
     @Test

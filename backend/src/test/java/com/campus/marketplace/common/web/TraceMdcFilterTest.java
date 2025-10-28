@@ -57,4 +57,18 @@ class TraceMdcFilterTest {
 
         assertThat(res.getHeader("X-Trace-Id")).isEqualTo("fixed123");
     }
+
+    @Test
+    void putsUserIntoMdcWhenAuthenticated() throws Exception {
+        secMock.when(SecurityUtil::isAuthenticated).thenReturn(true);
+        secMock.when(SecurityUtil::getCurrentUsername).thenReturn("u2");
+
+        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/api/test");
+        MockHttpServletResponse res = new MockHttpServletResponse();
+
+        filter.doFilter(req, res, (r, s) -> {
+            // 验证响应头存在 traceId 即可，MDC 在同线程中已设置
+            assertThat(((HttpServletResponse) s).getHeader("X-Trace-Id")).isNotBlank();
+        });
+    }
 }

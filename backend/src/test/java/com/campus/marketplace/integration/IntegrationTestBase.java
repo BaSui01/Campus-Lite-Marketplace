@@ -28,9 +28,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * @author BaSui 😎
  * @date 2025-10-27
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = com.campus.marketplace.MarketplaceApplication.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("test-ci")
 @Testcontainers(disabledWithoutDocker = true)
 @Transactional
 public abstract class IntegrationTestBase {

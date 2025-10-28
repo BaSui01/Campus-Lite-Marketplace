@@ -85,6 +85,12 @@ class ExportServiceTest {
     @Test
     @DisplayName("执行 GOODS 导出并生成下载 token")
     void runExport_goods_success() throws Exception {
+        // 放宽阈值，避免单页即触发
+        try {
+            var f = ExportServiceImpl.class.getDeclaredField("maxRows");
+            f.setAccessible(true);
+            f.setLong(exportService, 200000L);
+        } catch (Exception ignored) {}
         // 捕获注册的任务
         Map<String, TaskRunner> map = new HashMap<>();
         doAnswer(inv -> { map.put(inv.getArgument(0), inv.getArgument(2)); return null; })
@@ -125,6 +131,59 @@ class ExportServiceTest {
         String content = java.nio.file.Files.readString(new File(saved.getFilePath()).toPath(), StandardCharsets.UTF_8);
         assertThat(content).contains("id,title,price,status,createdAt");
         assertThat(content).contains("iPhone");
+    }
+
+    @Test
+    @DisplayName("导出超过阈值时应失败并记录错误")
+    void runExport_exceed_threshold_failed() throws Exception {
+        // 将 maxRows 调小为 1000
+        try {
+            var f = ExportServiceImpl.class.getDeclaredField("maxRows");
+            f.setAccessible(true);
+            f.setLong(exportService, 1000L);
+        } catch (Exception ignored) {}
+
+        // 捕获注册的任务
+        Map<String, TaskRunner> map = new HashMap<>();
+        doAnswer(inv -> { map.put(inv.getArgument(0), inv.getArgument(2)); return null; })
+                .when(taskService).register(anyString(), anyString(), any());
+        exportService.afterPropertiesSet();
+
+        // Job 存储
+        AtomicReference<ExportJob> holder = new AtomicReference<>();
+        ExportJob job = ExportJob.builder().id(2L).type("GOODS").status("PENDING").requestedBy("admin").createdAt(Instant.now()).build();
+        holder.set(job);
+        when(jobRepo.findById(2L)).thenAnswer(inv -> Optional.of(holder.get()));
+        when(jobRepo.save(any())).thenAnswer(inv -> { holder.set(inv.getArgument(0)); return holder.get(); });
+
+        // 构造 1001 条数据（两页）
+        List<Goods> page1 = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            Goods g = Goods.builder()
+                    .title("g"+i).description("d").price(new java.math.BigDecimal("1.00"))
+                    .categoryId(1L).sellerId(1L)
+                    .status(com.campus.marketplace.common.enums.GoodsStatus.APPROVED)
+                    .build();
+            g.setId((long) i + 1);
+            page1.add(g);
+        }
+        Goods extra = Goods.builder().title("extra").description("d").price(new java.math.BigDecimal("1.00")).categoryId(1L).sellerId(1L)
+                .status(com.campus.marketplace.common.enums.GoodsStatus.APPROVED).build();
+        extra.setId(2000L);
+
+        when(goodsRepository.findAll(PageRequest.of(0, 1000))).thenReturn(new PageImpl<>(page1));
+        when(goodsRepository.findAll(PageRequest.of(1, 1000))).thenReturn(new PageImpl<>(List.of(extra)));
+        lenient().when(goodsRepository.findAll(PageRequest.of(2, 1000))).thenReturn(Page.empty());
+
+        TaskRunner runner = map.get("export.run");
+        try {
+            runner.run("2");
+            org.junit.jupiter.api.Assertions.fail("应当抛出异常");
+        } catch (Exception ignored) {}
+
+        ExportJob saved = holder.get();
+        assertThat(saved.getStatus()).isEqualTo("FAILED");
+        assertThat(saved.getError()).contains("超出导出上限");
     }
 
     @Test

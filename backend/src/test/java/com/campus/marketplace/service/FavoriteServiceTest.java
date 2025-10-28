@@ -86,10 +86,10 @@ class FavoriteServiceTest {
 
         // 准备测试分类
         testCategory = Category.builder()
-                .id(1L)
                 .name("电子产品")
                 .description("电子产品分类")
                 .build();
+        testCategory.setId(1L);
 
         // 准备测试物品
         testGoods = Goods.builder()

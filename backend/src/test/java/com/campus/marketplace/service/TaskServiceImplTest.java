@@ -100,4 +100,30 @@ class TaskServiceImplTest {
         when(taskRepo.findByName("t4")).thenReturn(Optional.of(t));
         assertThatThrownBy(() -> taskService.trigger("t4", null)).isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    @DisplayName("runAsync: 锁繁忙则执行记录标记为 FAILED")
+    void runAsync_lock_busy_marks_failed() {
+        ScheduledTask t = ScheduledTask.builder().id(1L).name("t5").status("ENABLED").build();
+        when(taskRepo.findByName("t5")).thenReturn(Optional.of(t));
+
+        Map<Long, TaskExecution> store = new HashMap<>();
+        when(execRepo.save(any())).thenAnswer(inv -> {
+            TaskExecution e = inv.getArgument(0);
+            if (e.getId() == null) e.setId(200L);
+            store.put(e.getId(), e);
+            return e;
+        });
+        when(execRepo.findById(200L)).thenAnswer(inv -> Optional.of(store.get(200L)));
+
+        when(redissonClient.getLock(anyString())).thenReturn(rLock);
+        try { when(rLock.tryLock(eq(0L), anyLong(), any())).thenReturn(false); } catch (InterruptedException e) { throw new RuntimeException(e); }
+
+        taskService.register("t5", "desc", params -> {});
+        Long id = taskService.trigger("t5", "p");
+        assertThat(id).isEqualTo(200L);
+        TaskExecution finished = store.get(200L);
+        assertThat(finished.getStatus()).isEqualTo("FAILED");
+        assertThat(finished.getError()).contains("Lock busy");
+    }
 }
