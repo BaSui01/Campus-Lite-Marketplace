@@ -12,16 +12,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
- * 关注关系
- *
- * follower 关注 seller（当前复用用户表）
+ * 用户关注关系。
  *
  * @author BaSui
- * @date 2025-10-27
- * @since 2025-10-28
+ * @date 2025-10-28
  */
 @Getter
 @Setter
@@ -35,19 +32,31 @@ import org.hibernate.annotations.Where;
                 @Index(name = "idx_follow_follower", columnList = "follower_id"),
                 @Index(name = "idx_follow_seller", columnList = "seller_id")
         })
-@Where(clause = "deleted = false")
+@SQLRestriction("deleted = false")
 public class Follow extends BaseEntity {
 
+    /**
+     * 关注者用户 ID
+     */
     @Column(name = "follower_id", nullable = false)
     private Long followerId;
 
+    /**
+     * 被关注用户 ID
+     */
     @Column(name = "seller_id", nullable = false)
     private Long sellerId;
 
+    /**
+     * 关注者用户
+     */
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "follower_id", insertable = false, updatable = false)
     private User follower;
 
+    /**
+     * 被关注用户
+     */
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "seller_id", insertable = false, updatable = false)
     private User seller;
