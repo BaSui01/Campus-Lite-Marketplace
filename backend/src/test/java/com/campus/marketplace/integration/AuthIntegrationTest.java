@@ -43,7 +43,7 @@ public class AuthIntegrationTest extends IntegrationTestBase {
                 "test@campus.edu"
         );
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andDo(print())
@@ -55,7 +55,7 @@ public class AuthIntegrationTest extends IntegrationTestBase {
         // ========== 2. 用户登录 ==========
         LoginRequest loginRequest = new LoginRequest("testuser", "Test@123456");
 
-        MvcResult loginResult = mockMvc.perform(post("/auth/login")
+        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andDo(print())
@@ -83,7 +83,7 @@ public class AuthIntegrationTest extends IntegrationTestBase {
                 "first@campus.edu"
         );
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(firstRequest)))
                 .andExpect(status().isOk());
@@ -95,7 +95,7 @@ public class AuthIntegrationTest extends IntegrationTestBase {
                 "second@campus.edu"
         );
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(secondRequest)))
                 .andDo(print())
@@ -122,7 +122,7 @@ public class AuthIntegrationTest extends IntegrationTestBase {
         // 使用错误密码登录
         LoginRequest loginRequest = new LoginRequest("wrongpassworduser", "Wrong@123456"); // 错误密码
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andDo(print())
@@ -141,7 +141,7 @@ public class AuthIntegrationTest extends IntegrationTestBase {
                 "invalid@campus.edu"
         );
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())

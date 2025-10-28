@@ -18,8 +18,6 @@ spring:
       port: ${CI_REDIS_PORT:6379}
       password: ${CI_REDIS_PASSWORD:}
       database: 0
-  profiles:
-    active: test-ci
 
   task:
     scheduling:

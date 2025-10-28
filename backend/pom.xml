@@ -253,6 +253,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- H2 数据库（测试用） -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
@@ -576,11 +582,14 @@
                         <configuration>
                             <generatorName>typescript-axios</generatorName>
                             <inputSpec>${project.build.directory}/openapi-frontend.json</inputSpec>
-                            <output>${project.basedir}/../frontend/src/api</output>
+                            <!-- 🎯 BaSui修改：输出到 Monorepo 公共层 -->
+                            <output>${project.basedir}/../frontend/packages/shared/src/api</output>
                             <skipValidateSpec>true</skipValidateSpec>
                             <configOptions>
                                 <withInterfaces>true</withInterfaces>
                                 <useSingleRequestParameter>true</useSingleRequestParameter>
+                                <supportsES6>true</supportsES6>
+                                <withSeparateModelsAndApi>true</withSeparateModelsAndApi>
                             </configOptions>
                         </configuration>
                     </plugin>

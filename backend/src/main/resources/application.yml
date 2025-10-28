@@ -41,7 +41,15 @@ spring:
           use_query_cache: ${HIBERNATE_QUERY_CACHE:true}
           region:
             factory_class: ${HIBERNATE_CACHE_FACTORY:org.redisson.hibernate.RedissonRegionFactory}
-  
+
+  # Flyway 数据库迁移配置
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:true}
+    baseline-version: ${FLYWAY_BASELINE_VERSION:0}
+    locations: ${FLYWAY_LOCATIONS:classpath:db/migration}
+    validate-on-migrate: ${FLYWAY_VALIDATE_ON_MIGRATE:true}
+
   # Redis 配置
   data:
     redis:
@@ -90,7 +98,7 @@ spring:
 
 # JWT 配置
 jwt:
-  secret: ${JWT_SECRET:campus-marketplace-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
+  secret: ${JWT_SECRET:5bwzFhN2dpPiac1wgPaFgb5iu_lEB5JrSxZqv-WIOwRiE_dQOE-fMFxy24-iOXgWm1NxybaJMrkbCXG9mY0a4Q}
   expiration: ${JWT_EXPIRATION:7200000}
   header: ${JWT_HEADER:Authorization}
   prefix: ${JWT_PREFIX:Bearer }
@@ -98,7 +106,7 @@ jwt:
 # AES 加密配置
 encrypt:
   aes:
-    key: ${AES_KEY:sample-aes-key}
+    key: ${AES_KEY:JrOagghJ4Ot3e63ObB1CJtOjvwYnk1chSwXR86E_MJs}
 
 # 日志配置
 logging:

@@ -1,12 +1,14 @@
 package com.campus.marketplace.integration;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.context.annotation.Import;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.GenericContainer;
@@ -33,6 +35,18 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ActiveProfiles("test-ci")
 @Testcontainers(disabledWithoutDocker = true)
 @Transactional
+@Import(TestCiOverrides.class)
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:h2:mem:it_db;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH",
+    "spring.datasource.username=sa",
+    "spring.datasource.password=",
+    "spring.datasource.driver-class-name=org.h2.Driver",
+    "spring.jpa.hibernate.ddl-auto=update",
+    "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
+    "spring.flyway.enabled=false",
+    "spring.test.database.replace=NONE",
+    "spring.datasource.hikari.maximum-pool-size=5"
+})
 public abstract class IntegrationTestBase {
 
     @Autowired
@@ -66,14 +80,17 @@ public abstract class IntegrationTestBase {
      */
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        // 配置 PostgreSQL
-        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgresContainer::getUsername);
-        registry.add("spring.datasource.password", postgresContainer::getPassword);
-
-        // 配置 Redis
-        registry.add("spring.data.redis.host", redisContainer::getHost);
-        registry.add("spring.data.redis.port", redisContainer::getFirstMappedPort);
+        // 统一使用 H2 以稳定 CI 环境；如需容器数据库，请在特定 IT 中单独覆盖
+        registry.add("spring.datasource.url", () -> "jdbc:h2:mem:it_db;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH");
+        registry.add("spring.datasource.username", () -> "sa");
+        registry.add("spring.datasource.password", () -> "");
+        registry.add("spring.datasource.driver-class-name", () -> "org.h2.Driver");
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
+        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.H2Dialect");
+        registry.add("spring.flyway.enabled", () -> "false");
+        registry.add("spring.test.database.replace", () -> "NONE");
+        registry.add("spring.datasource.hikari.maximum-pool-size", () -> "5");
+        // Redis 在 TestCiOverrides 中禁用自动配置
     }
 
     /**
@@ -84,5 +101,25 @@ public abstract class IntegrationTestBase {
     @BeforeEach
     protected void setUp() {
         // 子类可选择性覆盖
+    }
+}
+
+@org.springframework.boot.test.context.TestConfiguration
+@org.springframework.boot.autoconfigure.ImportAutoConfiguration(exclude = {
+        org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class
+})
+class TestCiOverrides {
+    @org.springframework.context.annotation.Bean
+    @org.springframework.context.annotation.Primary
+    public com.campus.marketplace.service.SmsService testSmsService() {
+        return (phone, templateCode, params) -> { };
+    }
+
+    @org.springframework.context.annotation.Bean
+    @org.springframework.core.annotation.Order(0)
+    public org.springframework.security.web.SecurityFilterChain testSecurityChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+        return http.build();
     }
 }
