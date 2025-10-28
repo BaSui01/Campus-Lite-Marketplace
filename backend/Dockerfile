@@ -11,24 +11,22 @@
 # =====================================================
 
 # ==================== 阶段1：构建阶段 ====================
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM maven:3.9-eclipse-temurin-21 AS builder
 
 # 设置工作目录
 WORKDIR /app
 
-# 复制 Maven 包装器和项目配置文件
-COPY mvnw .
-COPY .mvn .mvn
+# 仅复制依赖相关文件以最大化缓存
 COPY pom.xml .
 
-# 下载依赖（利用 Docker 缓存）
-RUN ./mvnw dependency:go-offline -B
+# 预下载依赖（利用 Docker 缓存）
+RUN mvn -B -e -Dmaven.test.skip=true dependency:go-offline
 
 # 复制源代码
 COPY src ./src
 
 # 构建应用（跳过测试以加速构建）
-RUN ./mvnw clean package -DskipTests -B
+RUN mvn -B -DskipTests clean package
 
 # ==================== 阶段2：运行阶段 ====================
 FROM eclipse-temurin:21-jre-alpine
