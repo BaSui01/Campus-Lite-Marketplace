@@ -1,6 +1,7 @@
 package com.campus.marketplace.common.config;
 
 import com.campus.marketplace.websocket.MessageWebSocketHandler;
+import com.campus.marketplace.websocket.WebSocketAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -25,6 +26,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final MessageWebSocketHandler messageWebSocketHandler;
+    private final WebSocketAuthInterceptor webSocketAuthInterceptor;
 
     /**
      * 注册 WebSocket 处理器
@@ -37,6 +39,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(messageWebSocketHandler, "/ws/message")
+                .addInterceptors(webSocketAuthInterceptor)
                 .setAllowedOrigins("*") // 允许所有来源（生产环境应限制）
                 .withSockJS(); // 启用 SockJS 降级支持
     }

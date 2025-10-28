@@ -11,6 +11,9 @@ import com.campus.marketplace.service.impl.WechatPaymentService;
 import com.campus.marketplace.service.impl.WechatPaymentServiceV2;
 import com.campus.marketplace.service.impl.AlipayPaymentService;
 import com.campus.marketplace.service.RefundService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.wechat.pay.java.core.notification.RequestParam;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -39,6 +42,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
+@Tag(name = "支付管理", description = "支付创建、状态查询与第三方回调处理")
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -173,19 +177,25 @@ public class PaymentController {
 
                 // 更新订单状态为已支付
                 try {
-                    // 查询订单金额（简化处理，生产环境应从回调数据获取）
+                    // ✅ 安全实践：从数据库查询订单金额，而不是信任回调数据
+                    // 原因：防止回调数据被篡改，确保金额以系统记录为准
                     com.campus.marketplace.common.entity.Order order = orderService.getOrderDetail(orderNo);
-                    BigDecimal amount = order != null ? order.getAmount() : BigDecimal.ZERO;
-                    
+                    if (order == null) {
+                        log.error("💥 订单不存在: orderNo={}", orderNo);
+                        throw new IllegalStateException("订单不存在");
+                    }
+
+                    BigDecimal amount = order.getAmount();
+
                     PaymentCallbackRequest callbackRequest = new PaymentCallbackRequest(
                             orderNo,
                             transactionId,
                             amount,
                             "SUCCESS",
-                            null // 沙箱模式简化签名验证
+                            null // 签名已由微信支付服务验证
                     );
                     boolean updateSuccess = orderService.handlePaymentCallback(callbackRequest);
-                    
+
                     if (updateSuccess) {
                         log.info("🎉 订单状态更新成功: orderNo={}", orderNo);
                     } else {
@@ -227,7 +237,8 @@ public class PaymentController {
      */
     @GetMapping("/status/{orderNo}")
     @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
-    public ApiResponse<String> queryPaymentStatus(@PathVariable String orderNo) {
+    @Operation(summary = "查询支付状态", description = "根据订单号查询当前支付状态")
+    public ApiResponse<String> queryPaymentStatus(@Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo) {
         log.info("🔍 查询支付状态: orderNo={}, version={}", orderNo, wechatPayVersion);
         
         String status;

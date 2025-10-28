@@ -24,6 +24,9 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.32</lombok.version>
+        <flyway.version>10.15.0</flyway.version>
+        <!-- 统一控制最低覆盖率门槛，可在本地/CI 通过 -Dcoverage.minimum=0.80 临时调整 -->
+        <coverage.minimum>0.85</coverage.minimum>
     </properties>
 
     <dependencies>
@@ -165,7 +168,6 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.3.0</version>
         </dependency>
-
         <!-- Dotenv (环境变量管理) -->
         <dependency>
             <groupId>me.paulschwarz</groupId>
@@ -200,6 +202,18 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <!-- Flyway 数据库迁移 -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+
         <!-- Thumbnailator (图片压缩和缩略图) -->
         <dependency>
             <groupId>net.coobird</groupId>
@@ -219,6 +233,18 @@
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>3.17.4</version>
+        </dependency>
+
+        <!-- 阿里云短信 SDK -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>dysmsapi20170525</artifactId>
+            <version>2.0.24</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>tea-openapi</artifactId>
+            <version>0.2.8</version>
         </dependency>
 
         <!-- 测试依赖 -->
@@ -250,6 +276,26 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>1.19.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- E2E/契约/并发 辅助测试库 -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>5.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
+            <version>2.1.22</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -284,6 +330,11 @@
             <url>https://repo1.maven.org/maven2/</url>
         </pluginRepository>
         <pluginRepository>
+            <id>springdoc</id>
+            <name>springdoc Releases</name>
+            <url>https://repo.springdoc.org/release</url>
+        </pluginRepository>
+        <pluginRepository>
             <id>aliyun-public</id>
             <name>Aliyun Maven Public</name>
             <url>https://maven.aliyun.com/repository/public</url>
@@ -302,6 +353,131 @@
 
     <build>
         <plugins>
+            <!-- 依赖安全扫描：OWASP Dependency-Check（按 CVSS >= 7 失败） -->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>10.0.4</version>
+                <configuration>
+                    <format>HTML</format>
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <skipProvidedScope>true</skipProvidedScope>
+                    <skipSystemScope>true</skipSystemScope>
+                </configuration>
+            </plugin>
+            <!-- 突变测试：PIT（设门槛，低于则失败） -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.15.5</version>
+                <configuration>
+                    <targetClasses>
+                        <param>com.campus.marketplace.service.*</param>
+                        <param>com.campus.marketplace.common.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.campus.marketplace.service.*</param>
+                        <param>com.campus.marketplace.common.*</param>
+                    </targetTests>
+                    <mutators>
+                        <mutator>STRONGER</mutator>
+                    </mutators>
+                    <threads>2</threads>
+                    <mutationThreshold>60</mutationThreshold>
+                    <timeoutConst>8000</timeoutConst>
+                    <failWhenNoMutations>false</failWhenNoMutations>
+                </configuration>
+            </plugin>
+            <!-- JaCoCo 覆盖率：为 surefire/failsafe 注入 agent，verify 阶段生成报告并校验门槛 -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <configuration>
+                    <append>true</append>
+                    <!-- 与 surefire/failsafe 协同：将 agent 参数注入到 ${jacocoArgLine} 变量 -->
+                    <propertyName>jacocoArgLine</propertyName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <!-- Controller 必须 85% -->
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <includes>
+                                        <include>com.campus.marketplace.controller.*</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${coverage.minimum}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <!-- AOP 必须 85% -->
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <includes>
+                                        <include>com.campus.marketplace.common.aspect.*</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${coverage.minimum}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <!-- Service 实现先设为 60%，后续逐步提升至 85% -->
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <includes>
+                                        <include>com.campus.marketplace.service.impl.*</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.60</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                            <!-- 排除不计入覆盖率的样板代码/配置/实体/DTO/启动类等 -->
+                            <excludes>
+                                <exclude>**/*Application.class</exclude>
+                                <exclude>com/campus/marketplace/common/config/**</exclude>
+                                <exclude>com/campus/marketplace/common/dto/**</exclude>
+                                <exclude>com/campus/marketplace/common/entity/**</exclude>
+                                <exclude>com/campus/marketplace/common/mail/**</exclude>
+                                <exclude>com/campus/marketplace/common/annotation/**</exclude>
+                                <exclude>com/campus/marketplace/common/utils/**</exclude>
+                                <exclude>com/campus/marketplace/websocket/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -333,7 +509,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <argLine>-XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                    <!-- 先拼接 JaCoCo 的 agent，再追加 JVM 选项（避免覆盖 JaCoCo 注入参数） -->
+                    <argLine>${jacocoArgLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
                     <!-- 避免控制台大量输出并降低通道干扰风险 -->
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <!-- 单进程执行以减少通道竞争（Windows 下更稳定） -->
@@ -341,9 +518,36 @@
                     <reuseForks>true</reuseForks>
                     <!-- 在本地/CI 无 Docker 环境时，排除需要 Testcontainers 的集成测试 -->
                     <excludes>
+                        <exclude>**/*IT.java</exclude>
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <!-- 在 verify 阶段运行集成测试（使用 Failsafe），可通过 -DskipITs=true 跳过 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <skipITs>${skipITs}</skipITs>
+                    <!-- 先拼接 JaCoCo 的 agent，再追加 JVM 选项 -->
+                    <argLine>${jacocoArgLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                    <includes>
+                        <include>**/*IT.java</include>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -359,5 +563,30 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>openapi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>openapi-generator-maven-plugin</artifactId>
+                        <version>7.6.0</version>
+                        <configuration>
+                            <generatorName>typescript-axios</generatorName>
+                            <inputSpec>${project.build.directory}/openapi-frontend.json</inputSpec>
+                            <output>${project.basedir}/../frontend/src/api</output>
+                            <skipValidateSpec>true</skipValidateSpec>
+                            <configOptions>
+                                <withInterfaces>true</withInterfaces>
+                                <useSingleRequestParameter>true</useSingleRequestParameter>
+                            </configOptions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

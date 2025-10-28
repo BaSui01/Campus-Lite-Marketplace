@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,9 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationPreferenceService preferenceService;
     private final WebPushService webPushService;
     private final com.campus.marketplace.service.NotificationTemplateService templateService;
+
+    @Value("${spring.mail.from:${spring.mail.username:}}")
+    private String mailFrom;
 
     private static final String UNREAD_COUNT_KEY = "notification:unread:";
     private static final String EMAIL_RATE_KEY = "notification:email:rate:";
@@ -132,7 +136,10 @@ public class NotificationServiceImpl implements NotificationService {
         message.setTo(user.getEmail());
         message.setSubject(subject);
         message.setText(text);
-        message.setFrom("noreply@campus-marketplace.com"); // 发件人
+        // 发件人（优先 spring.mail.from，其次 spring.mail.username）
+        if (mailFrom != null && !mailFrom.isBlank()) {
+            message.setFrom(mailFrom);
+        }
 
         // 🎯 发送邮件
         try {

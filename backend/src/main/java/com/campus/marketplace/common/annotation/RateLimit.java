@@ -60,6 +60,29 @@ public @interface RateLimit {
     LimitType limitType() default LimitType.USER;
 
     /**
+     * 限流算法（默认滑动窗口）
+     */
+    Algorithm algorithm() default Algorithm.SLIDING_WINDOW;
+
+    /**
+     * 令牌桶容量（algorithm=TOKEN_BUCKET 生效）。
+     * 默认 0 表示使用 maxRequests 值。
+     */
+    int tokenBucketCapacity() default 0;
+
+    /**
+     * 每个补给周期补充的令牌数（algorithm=TOKEN_BUCKET 生效）。
+     * 默认 0 表示使用 tokenBucketCapacity 值。
+     */
+    int refillTokens() default 0;
+
+    /**
+     * 令牌补给周期（与 timeUnit 搭配，algorithm=TOKEN_BUCKET 生效）。
+     * 默认 0 表示使用 timeWindow 值。
+     */
+    long refillInterval() default 0;
+
+    /**
      * 限流类型枚举
      */
     enum LimitType {
@@ -77,5 +100,13 @@ public @interface RateLimit {
          * IP 级别限流（针对单个 IP）
          */
         IP
+    }
+
+    /**
+     * 限流算法类型
+     */
+    enum Algorithm {
+        SLIDING_WINDOW,
+        TOKEN_BUCKET
     }
 }

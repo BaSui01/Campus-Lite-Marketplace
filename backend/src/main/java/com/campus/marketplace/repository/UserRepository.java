@@ -72,6 +72,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     /**
+     * 根据邮箱查询用户
+     */
+    Optional<User> findByEmail(String email);
+
+    /**
      * 统计校区下用户数量
      */
     long countByCampusId(Long campusId);
@@ -83,4 +88,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User u SET u.campusId = :toCampusId WHERE u.campusId = :fromCampusId")
     int updateCampusByCampusId(@Param("fromCampusId") Long fromCampusId,
                                @Param("toCampusId") Long toCampusId);
+
+    /**
+     * 查询已删除超过指定时间的用户（用于定时清理）
+     *
+     * ✅ 真实实现：避免全量遍历，使用查询优化性能
+     *
+     * @param cutoffTime 截止时间（在此之前删除的用户）
+     * @return 符合条件的已删除用户列表
+     */
+    @Query("SELECT u FROM User u WHERE u.status = com.campus.marketplace.common.enums.UserStatus.DELETED " +
+           "AND u.deletedAt IS NOT NULL AND u.deletedAt < :cutoffTime")
+    java.util.List<User> findDeletedUsersBefore(@Param("cutoffTime") java.time.LocalDateTime cutoffTime);
 }

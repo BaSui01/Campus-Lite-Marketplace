@@ -4,6 +4,7 @@ import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.FollowResponse;
 import com.campus.marketplace.service.FollowService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +31,7 @@ public class FollowController {
     @PostMapping("/follow/{sellerId}")
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "关注卖家", description = "关注指定卖家，后续有新上架会收到通知")
-    public ApiResponse<Void> follow(@PathVariable Long sellerId) {
+    public ApiResponse<Void> follow(@Parameter(description = "卖家ID", example = "20002") @PathVariable Long sellerId) {
         followService.followSeller(sellerId);
         return ApiResponse.success(null);
     }
@@ -38,7 +39,7 @@ public class FollowController {
     @DeleteMapping("/follow/{sellerId}")
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "取消关注", description = "取消对卖家的关注")
-    public ApiResponse<Void> unfollow(@PathVariable Long sellerId) {
+    public ApiResponse<Void> unfollow(@Parameter(description = "卖家ID", example = "20002") @PathVariable Long sellerId) {
         followService.unfollowSeller(sellerId);
         return ApiResponse.success(null);
     }

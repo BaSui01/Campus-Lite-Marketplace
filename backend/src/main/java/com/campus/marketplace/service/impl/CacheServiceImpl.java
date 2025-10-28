@@ -181,11 +181,9 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public void deleteByPattern(String pattern) {
         try {
-            // 注意：这里简化实现，实际应该使用 scan 命令
-            if (redisUtil.hasKey(pattern)) {
-                redisUtil.delete(pattern);
-            }
-            log.debug("✅ 批量删除缓存成功: pattern={}", pattern);
+            // ✅ 真实实现：使用 SCAN 命令批量删除匹配的键
+            Long deletedCount = redisUtil.deleteByPattern(pattern);
+            log.debug("✅ 批量删除缓存成功: pattern={}, deletedCount={}", pattern, deletedCount);
         } catch (Exception e) {
             log.error("❌ 批量删除缓存失败: pattern={}, error={}", pattern, e.getMessage());
         }

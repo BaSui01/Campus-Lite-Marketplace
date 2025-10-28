@@ -5,6 +5,7 @@ import com.campus.marketplace.repository.NotificationTemplateRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app.init", name = "seed", havingValue = "true", matchIfMissing = true)
 public class NotificationTemplateInitializer {
 
     private final NotificationTemplateRepository repo;

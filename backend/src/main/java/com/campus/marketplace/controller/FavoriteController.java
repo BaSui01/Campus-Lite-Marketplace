@@ -34,7 +34,7 @@ public class FavoriteController {
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "添加收藏", description = "用户收藏物品")
     public ApiResponse<Void> addFavorite(
-            @Parameter(description = "物品 ID") @PathVariable Long goodsId
+            @Parameter(description = "物品 ID", example = "12345") @PathVariable Long goodsId
     ) {
         favoriteService.addFavorite(goodsId);
         return ApiResponse.success(null);
@@ -47,7 +47,7 @@ public class FavoriteController {
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "取消收藏", description = "用户取消收藏物品")
     public ApiResponse<Void> removeFavorite(
-            @Parameter(description = "物品 ID") @PathVariable Long goodsId
+            @Parameter(description = "物品 ID", example = "12345") @PathVariable Long goodsId
     ) {
         favoriteService.removeFavorite(goodsId);
         return ApiResponse.success(null);
@@ -60,8 +60,8 @@ public class FavoriteController {
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "查询收藏列表", description = "查询当前用户的收藏列表")
     public ApiResponse<Page<GoodsResponse>> listFavorites(
-            @Parameter(description = "页码（从 0 开始）") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int size
+            @Parameter(description = "页码（从 0 开始）", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "每页数量", example = "20") @RequestParam(defaultValue = "20") int size
     ) {
         Page<GoodsResponse> result = favoriteService.listFavorites(page, size);
         return ApiResponse.success(result);
@@ -73,7 +73,7 @@ public class FavoriteController {
     @GetMapping("/{goodsId}/check")
     @Operation(summary = "检查是否已收藏", description = "检查当前用户是否已收藏指定物品")
     public ApiResponse<Boolean> isFavorited(
-            @Parameter(description = "物品 ID") @PathVariable Long goodsId
+            @Parameter(description = "物品 ID", example = "12345") @PathVariable Long goodsId
     ) {
         boolean favorited = favoriteService.isFavorited(goodsId);
         return ApiResponse.success(favorited);

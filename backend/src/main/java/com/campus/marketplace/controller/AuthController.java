@@ -6,6 +6,9 @@ import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.LoginResponse;
 import com.campus.marketplace.service.AuthService;
 import com.campus.marketplace.common.annotation.RateLimit;
+import com.campus.marketplace.common.dto.request.ConfirmRegisterByEmailRequest;
+import com.campus.marketplace.common.dto.request.ResetPasswordByEmailRequest;
+import com.campus.marketplace.common.dto.request.ResetPasswordBySmsRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "认证管理", description = "用户注册、登录、登出等认证相关接口")
 public class AuthController {
@@ -50,6 +53,69 @@ public class AuthController {
         log.info("收到注册请求: username={}", request.username());
         authService.register(request);
         return ApiResponse.success("注册成功", null);
+    }
+
+    /**
+     * 发送注册邮箱验证码
+     */
+    @PostMapping("/register/code")
+    @RateLimit(key = "auth:register:code", maxRequests = 5, timeWindow = 300)
+    @Operation(summary = "发送注册邮箱验证码")
+    public ApiResponse<Void> sendRegisterEmailCode(@RequestParam String email) {
+        authService.sendRegisterEmailCode(email);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 邮箱验证码注册
+     */
+    @PostMapping("/register/by-email")
+    @Operation(summary = "邮箱验证码注册")
+    public ApiResponse<Void> registerByEmail(@Valid @RequestBody ConfirmRegisterByEmailRequest request) {
+        authService.registerByEmailCode(request);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 发送重置密码邮箱验证码
+     */
+    @PostMapping("/password/reset/code/email")
+    @RateLimit(key = "auth:pwd:reset:email:code", maxRequests = 5, timeWindow = 300)
+    @Operation(summary = "发送重置密码邮箱验证码")
+    public ApiResponse<Void> sendResetEmailCode(@RequestParam String email) {
+        authService.sendResetEmailCode(email);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 通过邮箱验证码重置密码
+     */
+    @PostMapping("/password/reset/email")
+    @Operation(summary = "通过邮箱验证码重置密码")
+    public ApiResponse<Void> resetPasswordByEmail(@Valid @RequestBody ResetPasswordByEmailRequest request) {
+        authService.resetPasswordByEmailCode(request);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 发送重置密码短信验证码（开发阶段日志）
+     */
+    @PostMapping("/password/reset/code/sms")
+    @RateLimit(key = "auth:pwd:reset:sms:code", maxRequests = 5, timeWindow = 300)
+    @Operation(summary = "发送重置密码短信验证码")
+    public ApiResponse<Void> sendResetSmsCode(@RequestParam String phone) {
+        authService.sendResetSmsCode(phone);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 通过短信验证码重置密码
+     */
+    @PostMapping("/password/reset/sms")
+    @Operation(summary = "通过短信验证码重置密码")
+    public ApiResponse<Void> resetPasswordBySms(@Valid @RequestBody ResetPasswordBySmsRequest request) {
+        authService.resetPasswordBySmsCode(request);
+        return ApiResponse.success(null);
     }
 
     /**

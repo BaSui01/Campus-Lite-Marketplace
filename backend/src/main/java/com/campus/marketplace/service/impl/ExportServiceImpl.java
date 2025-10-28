@@ -12,7 +12,6 @@ import com.campus.marketplace.repository.GoodsRepository;
 import com.campus.marketplace.repository.OrderRepository;
 import com.campus.marketplace.service.ExportService;
 import com.campus.marketplace.service.TaskService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -39,9 +38,8 @@ public class ExportServiceImpl implements ExportService, InitializingBean {
     private final OrderRepository orderRepository;
     private final TaskService taskService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final long MAX_ROWS = 200_000; // 阈值限制
+    // 可通过测试反射或配置覆盖
+    private long maxRows = 200_000; // 阈值限制
     private static final long DOWNLOAD_TTL_MINUTES = 60;
 
     @Override
@@ -71,8 +69,25 @@ public class ExportServiceImpl implements ExportService, InitializingBean {
 
     @Override
     public List<ExportJob> listMyJobs() {
-        // 简化：返回所有，实际应按当前用户过滤
-        return jobRepo.findAll();
+        // ✅ 真实实现：根据当前用户和角色返回导出任务列表
+        String currentUsername = SecurityUtil.getCurrentUsername();
+
+        // 管理员：返回当前校区的所有任务
+        if (SecurityUtil.hasRole("ADMIN")) {
+            Long campusId = CampusContextHolder.getCampusId();
+            if (campusId != null) {
+                log.debug("🔍 管理员查询校区导出任务: campusId={}", campusId);
+                return jobRepo.findByCampusIdOrderByCreatedAtDesc(campusId);
+            } else {
+                // 超级管理员：返回所有任务
+                log.debug("🔍 超级管理员查询所有导出任务");
+                return jobRepo.findAll();
+            }
+        }
+
+        // 普通用户：只返回自己的任务
+        log.debug("🔍 用户查询自己的导出任务: username={}", currentUsername);
+        return jobRepo.findByRequestedByOrderByCreatedAtDesc(currentUsername);
     }
 
     @Override
@@ -147,7 +162,7 @@ public class ExportServiceImpl implements ExportService, InitializingBean {
             for (Goods g : p.getContent()) {
                 pw.printf(Locale.ROOT, "%d,%s,%.2f,%s,%s%n", g.getId(), escape(g.getTitle()), g.getPrice(), g.getStatus(), g.getCreatedAt());
                 total++;
-                if (total > MAX_ROWS) throw new BusinessException(ErrorCode.OPERATION_FAILED, "超出导出上限");
+                if (total > maxRows) throw new BusinessException(ErrorCode.OPERATION_FAILED, "超出导出上限");
             }
             page++;
         }
@@ -165,7 +180,7 @@ public class ExportServiceImpl implements ExportService, InitializingBean {
             for (Order o : p.getContent()) {
                 pw.printf(Locale.ROOT, "%d,%s,%.2f,%s,%s%n", o.getId(), o.getOrderNo(), o.getAmount(), o.getStatus(), o.getCreatedAt());
                 total++;
-                if (total > MAX_ROWS) throw new BusinessException(ErrorCode.OPERATION_FAILED, "超出导出上限");
+                if (total > maxRows) throw new BusinessException(ErrorCode.OPERATION_FAILED, "超出导出上限");
             }
             page++;
         }

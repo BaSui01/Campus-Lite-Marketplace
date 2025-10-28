@@ -6,6 +6,7 @@ import com.campus.marketplace.common.enums.NotificationChannel;
 import com.campus.marketplace.repository.NotificationTemplateRepository;
 import com.campus.marketplace.service.NotificationTemplateService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -41,7 +42,7 @@ public class NotificationTemplateAdminController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('system:rate-limit:manage')")
     @Operation(summary = "删除")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
+    public ApiResponse<Void> delete(@Parameter(description = "模板ID", example = "3001") @PathVariable Long id) {
         repository.deleteById(id);
         return ApiResponse.success();
     }
@@ -49,7 +50,7 @@ public class NotificationTemplateAdminController {
     @PostMapping("/render/{code}")
     @PreAuthorize("hasAuthority('system:rate-limit:manage')")
     @Operation(summary = "渲染预览")
-    public ApiResponse<Map<String, Object>> render(@PathVariable String code,
+    public ApiResponse<Map<String, Object>> render(@Parameter(description = "模板编码", example = "ORDER_PAID") @PathVariable String code,
                                                    @RequestBody(required = false) Map<String, Object> params) {
         var locale = LocaleContextHolder.getLocale();
         var rendered = templateService.render(code, locale, params == null ? Map.of() : params);

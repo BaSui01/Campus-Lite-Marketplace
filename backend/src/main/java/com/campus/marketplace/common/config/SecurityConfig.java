@@ -60,20 +60,22 @@ public class SecurityConfig {
                 // 配置请求授权
                 .authorizeHttpRequests(auth -> auth
                         // 公开接口（不需要认证）
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         
                         // Swagger UI 和 API 文档
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+
+                        // 管理后台必须具备明确权限
+                        .requestMatchers("/api/admin/**").hasAuthority("system:statistics:view")
                         
                         // 物品查询接口（公开）
-                        .requestMatchers(HttpMethod.GET, "/goods/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/goods/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                         
                         // 帖子查询接口（公开）
-                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         
                         // WebSocket 连接
                         .requestMatchers("/ws/**").permitAll()

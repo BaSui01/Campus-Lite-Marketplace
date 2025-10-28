@@ -26,15 +26,15 @@ public class SearchController {
     @GetMapping
     @Operation(summary = "全文检索", description = "支持 goods/post，两者默认 goods；关键词必填，返回高亮片段与排序")
     public ApiResponse<Page<SearchResultItem>> search(
-            @Parameter(description = "搜索类型：goods/post，默认 goods")
+            @Parameter(description = "搜索类型：goods/post，默认 goods", example = "goods")
             @RequestParam(required = false) String type,
-            @Parameter(description = "搜索关键词（必填）")
+            @Parameter(description = "搜索关键词（必填）", example = "耳机")
             @RequestParam(name = "q") String q,
-            @Parameter(description = "页码，从0开始")
+            @Parameter(description = "页码，从0开始", example = "0")
             @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "每页大小")
+            @Parameter(description = "每页大小", example = "20")
             @RequestParam(defaultValue = "20") int size,
-            @Parameter(description = "标签 ID 列表（仅 goods 生效）")
+            @Parameter(description = "标签 ID 列表（仅 goods 生效）", example = "1,2,3")
             @RequestParam(name = "tags", required = false) java.util.List<Long> tagIds
     ) {
         if (q == null || q.isBlank()) {

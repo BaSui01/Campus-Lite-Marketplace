@@ -5,6 +5,10 @@ import com.campus.marketplace.common.dto.response.NotificationResponse;
 import com.campus.marketplace.common.enums.NotificationStatus;
 import com.campus.marketplace.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +47,9 @@ public class NotificationController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "查询通知列表", description = "分页查询当前用户的通知列表")
     public ApiResponse<Page<NotificationResponse>> listNotifications(
-            @RequestParam(required = false) NotificationStatus status,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @Parameter(description = "通知状态", example = "UNREAD") @RequestParam(required = false) NotificationStatus status,
+            @Parameter(description = "页码（从0开始）", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "每页大小", example = "20") @RequestParam(defaultValue = "20") int size
     ) {
         log.info("查询通知列表: status={}, page={}, size={}", status, page, size);
 
@@ -77,6 +81,14 @@ public class NotificationController {
     @PutMapping("/mark-read")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "标记通知为已读", description = "批量标记指定的通知为已读")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = java.util.List.class),
+                    examples = @ExampleObject(name = "请求示例", value = "[101,102,103]")
+            )
+    )
     public ApiResponse<String> markAsRead(@RequestBody List<Long> notificationIds) {
         log.info("标记通知为已读: ids={}", notificationIds);
 
@@ -110,6 +122,14 @@ public class NotificationController {
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "删除通知", description = "批量删除指定的通知（软删除）")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = java.util.List.class),
+                    examples = @ExampleObject(name = "请求示例", value = "[201,202]")
+            )
+    )
     public ApiResponse<String> deleteNotifications(@RequestBody List<Long> notificationIds) {
         log.info("删除通知: ids={}", notificationIds);
 

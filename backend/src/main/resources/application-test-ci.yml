@@ -1,0 +1,49 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${CI_DB_HOST:localhost}:${CI_DB_PORT:5432}/${CI_DB_NAME:campus_marketplace_test}
+    username: ${CI_DB_USERNAME:postgres}
+    password: ${CI_DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 10
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  data:
+    redis:
+      host: ${CI_REDIS_HOST:localhost}
+      port: ${CI_REDIS_PORT:6379}
+      password: ${CI_REDIS_PASSWORD:}
+      database: 0
+  profiles:
+    active: test-ci
+
+  task:
+    scheduling:
+      enabled: false
+
+app:
+  scheduling:
+    privacy:
+      enabled: false
+
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always

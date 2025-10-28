@@ -9,6 +9,7 @@ import com.campus.marketplace.repository.PrivacyRequestRepository;
 import com.campus.marketplace.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import jakarta.persistence.EntityManager;
  */
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "app.scheduling.privacy.enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class PrivacyCleanupScheduler {
 

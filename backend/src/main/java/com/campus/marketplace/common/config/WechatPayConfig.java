@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * 微信支付V3配置类 💰
@@ -41,6 +42,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Data
 @Configuration
+@Profile("prod")
 @ConditionalOnProperty(name = "wechat.pay.version", havingValue = "v3", matchIfMissing = true)
 @ConfigurationProperties(prefix = "wechat.pay")
 public class WechatPayConfig {
@@ -90,8 +92,8 @@ public class WechatPayConfig {
      *
      * @return Config 实例
      */
-    @Bean
-    public Config wechatPayConfig() {
+    @Bean(name = "wechatPayV3Config")
+    public Config wechatPayV3Config() {
         log.info("🚀 初始化微信支付V3配置: merchantId={}", mchId);
 
         try {

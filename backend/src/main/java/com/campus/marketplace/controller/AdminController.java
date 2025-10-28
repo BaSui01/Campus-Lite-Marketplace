@@ -65,7 +65,7 @@ public class AdminController {
     @PreAuthorize("hasAuthority('system:user:ban')")
     @Operation(summary = "解封用户", description = "管理员解封用户")
     public ApiResponse<Void> unbanUser(
-            @Parameter(description = "用户 ID") @PathVariable Long userId
+            @Parameter(description = "用户 ID", example = "10002") @PathVariable Long userId
     ) {
         userService.unbanUser(userId);
         return ApiResponse.success(null);
@@ -203,7 +203,7 @@ public class AdminController {
     @PreAuthorize("hasAuthority('system:statistics:view')")
     @Operation(summary = "获取趋势数据", description = "最近 N 天的数据趋势分析")
     public ApiResponse<Map<String, Object>> getTrendData(
-            @Parameter(description = "天数") @RequestParam(defaultValue = "30") int days
+            @Parameter(description = "天数", example = "30") @RequestParam(defaultValue = "30") int days
     ) {
         Map<String, Object> data = statisticsService.getTrendData(days);
         return ApiResponse.success(data);
@@ -222,7 +222,7 @@ public class AdminController {
     @PreAuthorize("hasAuthority('system:statistics:view')")
     @Operation(summary = "获取热门物品排行榜", description = "浏览量最高的物品 Top N")
     public ApiResponse<List<Map<String, Object>>> getTopGoods(
-            @Parameter(description = "数量限制") @RequestParam(defaultValue = "10") int limit
+            @Parameter(description = "数量限制", example = "10") @RequestParam(defaultValue = "10") int limit
     ) {
         List<Map<String, Object>> data = statisticsService.getTopGoods(limit);
         return ApiResponse.success(data);
@@ -241,7 +241,7 @@ public class AdminController {
     @PreAuthorize("hasAuthority('system:statistics:view')")
     @Operation(summary = "获取活跃用户排行榜", description = "积分最高的用户 Top N")
     public ApiResponse<List<Map<String, Object>>> getTopUsers(
-            @Parameter(description = "数量限制") @RequestParam(defaultValue = "20") int limit
+            @Parameter(description = "数量限制", example = "20") @RequestParam(defaultValue = "20") int limit
     ) {
         List<Map<String, Object>> data = statisticsService.getTopUsers(limit);
         return ApiResponse.success(data);
@@ -260,7 +260,7 @@ public class AdminController {
     @PreAuthorize("hasAuthority('system:statistics:view')")
     @Operation(summary = "获取收入统计（按月）", description = "最近 N 个月的平台收入统计")
     public ApiResponse<Map<String, Object>> getRevenueByMonth(
-            @Parameter(description = "月数") @RequestParam(defaultValue = "12") int months
+            @Parameter(description = "月数", example = "12") @RequestParam(defaultValue = "12") int months
     ) {
         Map<String, Object> data = statisticsService.getRevenueByMonth(months);
         return ApiResponse.success(data);

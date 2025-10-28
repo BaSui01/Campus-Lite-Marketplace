@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class PaymentServiceImpl implements PaymentService {
 
     private final AlipayPaymentService alipayPaymentService;
-    private final WechatPaymentService wechatPaymentService;
+    private final org.springframework.beans.factory.ObjectProvider<WechatPaymentService> wechatPaymentServiceProvider;
 
     /**
      * 创建支付订单 🚀
@@ -48,8 +48,13 @@ public class PaymentServiceImpl implements PaymentService {
                 yield alipayPaymentService.createPayment(order);
             }
             case WECHAT -> {
+                var wechat = wechatPaymentServiceProvider.getIfAvailable();
+                if (wechat == null) {
+                    log.warn("微信支付未启用，拒绝创建订单: orderNo={}", order.getOrderNo());
+                    throw new BusinessException(ErrorCode.PAYMENT_METHOD_NOT_SUPPORTED, "微信支付未启用");
+                }
                 log.info("💰 使用微信支付");
-                yield wechatPaymentService.createPayment(order);
+                yield wechat.createPayment(order);
             }
             default -> {
                 log.error("❌ 不支持的支付方式: {}", paymentMethod);
@@ -61,32 +66,50 @@ public class PaymentServiceImpl implements PaymentService {
     /**
      * 验证支付回调签名 🔐
      *
-     * 简化实现：由具体的支付回调Controller调用对应服务的验签方法
-     * 这里暂时返回true（实际使用时应该抛出异常，提示使用具体服务）
+     * ✅ 说明：签名验证由具体的支付服务（WechatPaymentService/AlipayPaymentService）完成
+     * 此方法仅用于兼容旧代码，实际回调处理中应直接调用具体服务的验签方法
+     *
+     * @deprecated 请使用具体支付服务的验签方法
      */
     @Override
+    @Deprecated
     public boolean verifySignature(String orderNo, String transactionId, String signature) {
         log.warn("⚠️ verifySignature方法已废弃，请使用具体支付服务的验签方法");
+        // 返回 true 仅为兼容旧代码，新代码应使用具体服务的验签方法
         return true;
     }
 
+    /**
+     * 发起退款 💰
+     *
+     * ✅ 真实实现：根据支付方式路由到对应的退款服务
+     * - 支付宝：调用 AlipayPaymentService.refund()
+     * - 微信支付：调用 WechatPaymentService.refund()
+     */
     @Override
     public boolean refund(com.campus.marketplace.common.entity.Order order,
                           java.math.BigDecimal amount,
                           PaymentMethod paymentMethod) {
-        log.info("发起退款: orderNo={}, method={}, amount={}", order.getOrderNo(), paymentMethod, amount);
-        // 简化：暂未接入具体SDK退款，此处仅进行路由与占位
+        log.info("🚀 发起退款: orderNo={}, method={}, amount={}", order.getOrderNo(), paymentMethod, amount);
+
         return switch (paymentMethod) {
             case ALIPAY -> {
-                boolean ok = alipayPaymentService.refund(order, amount);
-                yield ok;
+                log.info("💳 使用支付宝退款");
+                yield alipayPaymentService.refund(order, amount);
             }
             case WECHAT -> {
-                // TODO: 集成 微信支付V3退款接口
-                log.warn("微信退款SDK未集成，返回失败占位");
+                var wechat = wechatPaymentServiceProvider.getIfAvailable();
+                if (wechat == null) {
+                    log.error("❌ 微信支付未启用，拒绝退款: orderNo={}", order.getOrderNo());
+                    yield false;
+                }
+                log.info("💰 使用微信支付退款");
+                yield wechat.refund(order, amount);
+            }
+            default -> {
+                log.error("❌ 不支持的支付方式: {}", paymentMethod);
                 yield false;
             }
-            default -> false;
         };
     }
 }

@@ -57,10 +57,7 @@ public class RateLimitAspect {
         // 构建限流键
         String limitKey = buildLimitKey(joinPoint, rateLimit);
 
-        // 获取时间窗口（转换为毫秒）
-        long timeWindowMs = rateLimit.timeUnit().toMillis(rateLimit.timeWindow());
         long currentTimeMs = System.currentTimeMillis();
-        long windowStartMs = currentTimeMs - timeWindowMs;
 
         // 请求与响应对象
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -80,47 +77,15 @@ public class RateLimitAspect {
         }
 
         try {
-            // 1. 清理时间窗口外的过期数据
-            redisTemplate.opsForZSet().removeRangeByScore(limitKey, 0, windowStartMs);
-
-            // 2. 统计时间窗口内的请求次数
-            Long count = redisTemplate.opsForZSet().count(limitKey, windowStartMs, currentTimeMs);
-            if (count == null) {
-                count = 0L;
+            if (rateLimit.algorithm() == RateLimit.Algorithm.TOKEN_BUCKET) {
+                return applyTokenBucket(joinPoint, rateLimit, limitKey, currentTimeMs, response);
+            } else {
+                return applySlidingWindow(joinPoint, rateLimit, limitKey, currentTimeMs, response);
             }
-
-            // 3. 检查是否超过限流阈值
-            if (count >= rateLimit.maxRequests()) {
-                log.warn("🚫 接口限流触发: key={}, count={}, max={}", limitKey, count, rateLimit.maxRequests());
-                // 设置标准 RateLimit-* 响应头
-                setRateLimitHeaders(response, rateLimit.maxRequests(), 0L,
-                        secondsUntilReset(currentTimeMs, windowStartMs, timeWindowMs));
-                throw new BusinessException(ErrorCode.TOO_MANY_REQUESTS);
-            }
-
-            // 4. 添加当前请求到 ZSET
-            String requestId = currentTimeMs + ":" + Thread.currentThread().threadId();
-            redisTemplate.opsForZSet().add(limitKey, requestId, currentTimeMs);
-
-            // 5. 设置过期时间（时间窗口 * 2，确保数据能被清理）
-            redisTemplate.expire(limitKey, timeWindowMs * 2, TimeUnit.MILLISECONDS);
-
-            log.debug("✅ 限流检查通过: key={}, count={}/{}", limitKey, count + 1, rateLimit.maxRequests());
-
-            // 设置标准 RateLimit-* 响应头（通过时）
-            setRateLimitHeaders(response, rateLimit.maxRequests(),
-                    Math.max(0, (long) rateLimit.maxRequests() - (count + 1)),
-                    secondsUntilReset(currentTimeMs, windowStartMs, timeWindowMs));
-
-            // 执行目标方法
-            return joinPoint.proceed();
-
         } catch (BusinessException e) {
-            // 业务异常直接抛出
             throw e;
         } catch (Exception e) {
             log.error("❌ 限流检查失败: key={}, error={}", limitKey, e.getMessage(), e);
-            // 限流失败不影响业务，直接放行
             return joinPoint.proceed();
         }
     }
@@ -211,5 +176,151 @@ public class RateLimitAspect {
         long left = windowSizeMs - elapsed;
         if (left < 0) left = 0;
         return (long) Math.ceil(left / 1000.0);
+    }
+
+    private Object applySlidingWindow(ProceedingJoinPoint joinPoint,
+                                      RateLimit rateLimit,
+                                      String limitKey,
+                                      long currentTimeMs,
+                                      HttpServletResponse response) throws Throwable {
+        long timeWindowMs = rateLimit.timeUnit().toMillis(rateLimit.timeWindow());
+        long windowStartMs = currentTimeMs - timeWindowMs;
+
+        // 1. 清理时间窗口外的过期数据
+        redisTemplate.opsForZSet().removeRangeByScore(limitKey, 0, windowStartMs);
+
+        // 2. 统计时间窗口内的请求次数
+        Long count = redisTemplate.opsForZSet().count(limitKey, windowStartMs, currentTimeMs);
+        if (count == null) count = 0L;
+
+        // 3. 检查是否超过限流阈值
+        if (count >= rateLimit.maxRequests()) {
+            log.warn("🚫 接口限流触发(SW): key={}, count={}, max={}", limitKey, count, rateLimit.maxRequests());
+            setRateLimitHeaders(response, rateLimit.maxRequests(), 0L,
+                    secondsUntilReset(currentTimeMs, windowStartMs, timeWindowMs));
+            throw new BusinessException(ErrorCode.TOO_MANY_REQUESTS);
+        }
+
+        // 4. 添加当前请求到 ZSET
+        String requestId = currentTimeMs + ":" + Thread.currentThread().threadId();
+        redisTemplate.opsForZSet().add(limitKey, requestId, currentTimeMs);
+
+        // 5. 设置过期时间（时间窗口 * 2，确保数据能被清理）
+        redisTemplate.expire(limitKey, timeWindowMs * 2, TimeUnit.MILLISECONDS);
+
+        log.debug("✅ 限流检查通过(SW): key={}, count={}/{}", limitKey, count + 1, rateLimit.maxRequests());
+
+        setRateLimitHeaders(response, rateLimit.maxRequests(),
+                Math.max(0, (long) rateLimit.maxRequests() - (count + 1)),
+                secondsUntilReset(currentTimeMs, windowStartMs, timeWindowMs));
+
+        return joinPoint.proceed();
+    }
+
+    private Object applyTokenBucket(ProceedingJoinPoint joinPoint,
+                                    RateLimit rateLimit,
+                                    String limitKey,
+                                    long nowMs,
+                                    HttpServletResponse response) throws Throwable {
+        int capacity = rateLimit.tokenBucketCapacity() > 0 ? rateLimit.tokenBucketCapacity() : rateLimit.maxRequests();
+        int refill = rateLimit.refillTokens() > 0 ? rateLimit.refillTokens() : capacity;
+        long intervalMs = (rateLimit.refillInterval() > 0 ? rateLimit.refillInterval() : rateLimit.timeWindow());
+        intervalMs = rateLimit.timeUnit().toMillis(intervalMs);
+
+        // 使用 Redis HASH 存储：{ tokens, ts }
+        String tbKey = limitKey + ":tb";
+
+        // Lua 原子脚本（Token Bucket）
+        String script = """
+                local key = KEYS[1]
+                local now = tonumber(ARGV[1])
+                local capacity = tonumber(ARGV[2])
+                local refill = tonumber(ARGV[3])
+                local interval = tonumber(ARGV[4])
+                local data = redis.call('HMGET', key, 'tokens', 'ts')
+                local tokens = tonumber(data[1])
+                local ts = tonumber(data[2])
+                if tokens == nil or ts == nil then
+                  tokens = capacity
+                  ts = now
+                else
+                  if now > ts then
+                    local elapsed = now - ts
+                    local refillCount = math.floor(elapsed / interval)
+                    if refillCount > 0 then
+                      tokens = math.min(capacity, tokens + refillCount * refill)
+                      ts = ts + refillCount * interval
+                    end
+                  end
+                end
+                if tokens <= 0 then
+                  redis.call('HMSET', key, 'tokens', tokens, 'ts', ts)
+                  return {-1, ts}
+                else
+                  tokens = tokens - 1
+                  redis.call('HMSET', key, 'tokens', tokens, 'ts', ts)
+                  return {tokens, ts}
+                end
+                """;
+
+        org.springframework.data.redis.core.script.DefaultRedisScript<java.util.List<Object>> redisScript =
+                new org.springframework.data.redis.core.script.DefaultRedisScript<>();
+        redisScript.setScriptText(script);
+        // 泛型在运行期会被擦除，使用 List.class 作为结果类型
+        @SuppressWarnings("unchecked")
+        Class<java.util.List<Object>> listClass = (Class<java.util.List<Object>>) (Class<?>) java.util.List.class;
+        redisScript.setResultType(listClass);
+
+        java.util.List<Object> result = redisTemplate.execute(
+                redisScript,
+                java.util.Collections.singletonList(tbKey),
+                String.valueOf(nowMs),
+                String.valueOf(capacity),
+                String.valueOf(refill),
+                String.valueOf(intervalMs)
+        );
+
+        long remaining;
+        long ts;
+        if (result != null && result.size() >= 2) {
+            Object r0 = result.get(0);
+            Object r1 = result.get(1);
+            remaining = toLong(r0);
+            ts = toLong(r1);
+        } else {
+            // 脚本失败时放行
+            return joinPoint.proceed();
+        }
+
+        long resetSeconds = tokenBucketResetSeconds(nowMs, ts, intervalMs);
+        if (remaining < 0) {
+            log.warn("🚫 接口限流触发(TB): key={}, capacity={}, refill={}/{}ms", limitKey, capacity, refill, intervalMs);
+            setRateLimitHeaders(response, capacity, 0L, resetSeconds);
+            throw new BusinessException(ErrorCode.TOO_MANY_REQUESTS);
+        }
+
+        // 设置过期时间（两倍从空到满的时间）
+        long ttlMs = (long) Math.ceil((double) capacity / Math.max(1, refill)) * intervalMs * 2;
+        redisTemplate.expire(tbKey, ttlMs, TimeUnit.MILLISECONDS);
+
+        setRateLimitHeaders(response, capacity, Math.max(0, remaining), resetSeconds);
+        return joinPoint.proceed();
+    }
+
+    private long tokenBucketResetSeconds(long nowMs, long lastRefillTs, long intervalMs) {
+        long elapsed = nowMs - lastRefillTs;
+        long left = intervalMs - (elapsed % intervalMs);
+        if (left < 0) left = 0;
+        return (long) Math.ceil(left / 1000.0);
+    }
+
+    private long toLong(Object obj) {
+        if (obj == null) return 0L;
+        if (obj instanceof Long l) return l;
+        if (obj instanceof Integer i) return i.longValue();
+        if (obj instanceof byte[] b) {
+            try { return Long.parseLong(new String(b)); } catch (Exception ignored) { return 0L; }
+        }
+        try { return Long.parseLong(String.valueOf(obj)); } catch (Exception e) { return 0L; }
     }
 }

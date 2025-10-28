@@ -5,6 +5,7 @@ import com.campus.marketplace.common.enums.NotificationChannel;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.service.NotificationPreferenceService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,8 +26,8 @@ public class NotificationPreferenceController {
     @PostMapping("/channel/{channel}/enabled/{enabled}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "设置渠道开关")
-    public ApiResponse<Void> setChannelEnabled(@PathVariable NotificationChannel channel,
-                                               @PathVariable boolean enabled) {
+    public ApiResponse<Void> setChannelEnabled(@Parameter(description = "通知渠道", example = "EMAIL") @PathVariable NotificationChannel channel,
+                                               @Parameter(description = "是否启用", example = "true") @PathVariable boolean enabled) {
         Long userId = com.campus.marketplace.common.utils.SecurityUtil.getCurrentUserId();
         preferenceService.setChannelEnabled(userId, channel, enabled);
         return ApiResponse.success();
@@ -35,9 +36,9 @@ public class NotificationPreferenceController {
     @PostMapping("/channel/{channel}/quiet-hours")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "设置静默时段")
-    public ApiResponse<Void> setQuietHours(@PathVariable NotificationChannel channel,
-                                           @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime start,
-                                           @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime end) {
+    public ApiResponse<Void> setQuietHours(@Parameter(description = "通知渠道", example = "WEB_PUSH") @PathVariable NotificationChannel channel,
+                                           @Parameter(description = "开始时间", example = "22:00") @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime start,
+                                           @Parameter(description = "结束时间", example = "08:00") @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime end) {
         Long userId = SecurityUtil.getCurrentUserId();
         preferenceService.setQuietHours(userId, channel, start, end);
         return ApiResponse.success();
@@ -46,8 +47,8 @@ public class NotificationPreferenceController {
     @PostMapping("/unsubscribe/{channel}/{templateCode}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "退订模板")
-    public ApiResponse<Void> unsubscribe(@PathVariable NotificationChannel channel,
-                                         @PathVariable String templateCode) {
+    public ApiResponse<Void> unsubscribe(@Parameter(description = "通知渠道", example = "EMAIL") @PathVariable NotificationChannel channel,
+                                         @Parameter(description = "模板编码", example = "ORDER_PAID") @PathVariable String templateCode) {
         Long userId = SecurityUtil.getCurrentUserId();
         preferenceService.unsubscribe(userId, templateCode, channel);
         return ApiResponse.success();
@@ -56,8 +57,8 @@ public class NotificationPreferenceController {
     @DeleteMapping("/unsubscribe/{channel}/{templateCode}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "取消退订")
-    public ApiResponse<Void> resubscribe(@PathVariable NotificationChannel channel,
-                                         @PathVariable String templateCode) {
+    public ApiResponse<Void> resubscribe(@Parameter(description = "通知渠道", example = "EMAIL") @PathVariable NotificationChannel channel,
+                                         @Parameter(description = "模板编码", example = "ORDER_PAID") @PathVariable String templateCode) {
         Long userId = SecurityUtil.getCurrentUserId();
         preferenceService.resubscribe(userId, templateCode, channel);
         return ApiResponse.success();

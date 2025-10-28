@@ -5,6 +5,8 @@ import com.campus.marketplace.common.dto.response.PaymentResponse;
 import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wechat.pay.java.core.Config;
 import com.wechat.pay.java.core.exception.ServiceException;
 import com.wechat.pay.java.core.notification.NotificationConfig;
@@ -17,8 +19,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Profile;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Map;
 
 /**
  * 微信支付V3服务实现类 💰
@@ -40,12 +45,14 @@ import java.math.BigDecimal;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Profile("prod")
 @ConditionalOnProperty(name = "wechat.pay.version", havingValue = "v3", matchIfMissing = true)
 public class WechatPaymentService {
 
     private final NativePayService nativePayService;
     private final Config wechatPayV3Config;
     private final WechatPayConfig wechatPayConfig;
+    private final ObjectMapper objectMapper;
 
     /**
      * 支付超时时间（分钟）
@@ -199,7 +206,12 @@ public class WechatPaymentService {
      * @return JSON格式的成功响应
      */
     public String buildSuccessResponse() {
-        return "{\"code\":\"SUCCESS\",\"message\":\"成功\"}";
+        try {
+            return objectMapper.writeValueAsString(Map.of("code", "SUCCESS", "message", "成功"));
+        } catch (JsonProcessingException e) {
+            log.error("微信支付成功响应序列化异常", e);
+            return "{\"code\":\"SUCCESS\",\"message\":\"成功\"}";
+        }
     }
 
     /**
@@ -209,7 +221,12 @@ public class WechatPaymentService {
      * @return JSON格式的失败响应
      */
     public String buildFailResponse(String errorMsg) {
-        return "{\"code\":\"FAIL\",\"message\":\"" + errorMsg + "\"}";
+        try {
+            return objectMapper.writeValueAsString(Map.of("code", "FAIL", "message", errorMsg));
+        } catch (JsonProcessingException e) {
+            log.error("微信支付失败响应序列化异常: {}", errorMsg, e);
+            return "{\"code\":\"FAIL\",\"message\":\"系统异常\"}";
+        }
     }
 
     /**
@@ -221,7 +238,23 @@ public class WechatPaymentService {
      * @return 金额（分）
      */
     private Integer convertToFen(BigDecimal amount) {
-        return amount.multiply(new BigDecimal("100")).intValue();
+        if (amount == null) {
+            throw new BusinessException(ErrorCode.PAYMENT_CREATE_FAILED, "订单金额不能为空");
+        }
+
+        try {
+            BigDecimal normalized = amount.setScale(2, RoundingMode.HALF_UP);
+            BigDecimal fen = normalized.movePointRight(2);
+
+            if (fen.compareTo(BigDecimal.ZERO) < 0) {
+                throw new BusinessException(ErrorCode.PAYMENT_CREATE_FAILED, "订单金额不能为负数");
+            }
+
+            return fen.intValueExact();
+        } catch (ArithmeticException ex) {
+            log.error("订单金额换算异常: amount={}", amount, ex);
+            throw new BusinessException(ErrorCode.PAYMENT_CREATE_FAILED, "订单金额超出支持范围");
+        }
     }
 
     /**
@@ -236,5 +269,22 @@ public class WechatPaymentService {
                 .plusMinutes(PAYMENT_TIMEOUT_MINUTES);
 
         return expireTime.format(java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
+    /**
+     * 发起退款（V3）
+     * 注意：真实生产需持有 RefundService 并根据支付单金额/退款单号调用。
+     * 这里以最小实现对接统一门面，实际渠道细节由专用服务维护。
+     */
+    public boolean refund(Order order, BigDecimal amount) {
+        try {
+            // 由于本服务侧未持有 RefundService（SDK），此处仅做最小可用占位，记录审计并返回失败，避免静默通过。
+            // 集成建议：注入 com.wechat.pay.java.service.refund.RefundService 并调用其 create() 完成退款申请。
+            log.warn("微信退款尚未接入 RefundService SDK，请集成后完成退款: orderNo={}, amount={}", order.getOrderNo(), amount);
+            return false;
+        } catch (Exception e) {
+            log.error("微信退款异常: orderNo={}", order.getOrderNo(), e);
+            return false;
+        }
     }
 }

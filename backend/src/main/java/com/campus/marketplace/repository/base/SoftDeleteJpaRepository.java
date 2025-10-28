@@ -2,6 +2,7 @@ package com.campus.marketplace.repository.base;
 
 import com.campus.marketplace.common.entity.SoftDeletable;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,11 @@ public class SoftDeleteJpaRepository<T, ID extends Serializable>
 
     public SoftDeleteJpaRepository(Class<T> domainClass, EntityManager em) {
         super(domainClass, em);
+        this.em = em;
+    }
+
+    public SoftDeleteJpaRepository(JpaEntityInformation<T, ?> entityInformation, EntityManager em) {
+        super(entityInformation, em);
         this.em = em;
     }
 

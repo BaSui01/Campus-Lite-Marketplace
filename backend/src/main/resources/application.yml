@@ -49,15 +49,20 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DATABASE:0}
-      sentinel:
-        master: ${REDIS_SENTINEL_MASTER:}
-        nodes: ${REDIS_SENTINEL_NODES:}
+      # 使用 Redisson 的独立配置文件，避免误触发哨兵模式
+      redisson:
+        file: classpath:redisson.yaml
       lettuce:
         pool:
           max-active: ${REDIS_POOL_MAX_ACTIVE:50}
           max-idle: ${REDIS_POOL_MAX_IDLE:20}
           min-idle: ${REDIS_POOL_MIN_IDLE:10}
           max-wait: 3000ms
+
+  # 供 Redisson Starter 读取的旧前缀（与 Spring Boot 3 兼容）
+  redis:
+    redisson:
+      file: classpath:redisson.yaml
   
   # 文件上传配置
   servlet:
@@ -66,12 +71,34 @@ spring:
       max-request-size: ${FILE_MAX_REQUEST_SIZE:10MB}
       enabled: ${FILE_UPLOAD_ENABLED:true}
 
+  # 邮件配置（使用真实 SMTP）
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: ${MAIL_SSL_ENABLE:true}
+          starttls:
+            enable: ${MAIL_STARTTLS_ENABLE:false}
+    from: ${MAIL_FROM:${MAIL_USERNAME:}}
+
 # JWT 配置
 jwt:
   secret: ${JWT_SECRET:campus-marketplace-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
   expiration: ${JWT_EXPIRATION:7200000}
   header: ${JWT_HEADER:Authorization}
   prefix: ${JWT_PREFIX:Bearer }
+
+# AES 加密配置
+encrypt:
+  aes:
+    key: ${AES_KEY:sample-aes-key}
 
 # 日志配置
 logging:
@@ -127,7 +154,7 @@ management:
 server:
   port: ${SERVER_PORT:8080}
   servlet:
-    context-path: ${APP_CONTEXT_PATH:/api}
+    context-path: ${APP_CONTEXT_PATH:/}
   tomcat:
     threads:
       max: ${TOMCAT_MAX_THREADS:200}
@@ -140,6 +167,16 @@ notifications:
       perMinute: ${NOTIF_EMAIL_PER_MINUTE:20}
   webpush:
     enabled: ${WEBPUSH_ENABLED:false}
+
+# 短信配置（阿里云）
+sms:
+  provider: ${SMS_PROVIDER:aliyun}
+  aliyun:
+    accessKeyId: ${ALIYUN_SMS_ACCESS_KEY_ID:}
+    accessKeySecret: ${ALIYUN_SMS_ACCESS_KEY_SECRET:}
+    signName: ${ALIYUN_SMS_SIGN_NAME:}
+    templateRegister: ${ALIYUN_SMS_TEMPLATE_REGISTER:SMS_0000001}
+    templateReset: ${ALIYUN_SMS_TEMPLATE_RESET:SMS_0000002}
 
 compliance:
   text:
@@ -188,3 +225,17 @@ springdoc:
     enabled: ${SPRINGDOC_ENABLED:true}
   swagger-ui:
     enabled: ${SWAGGER_UI_ENABLED:true}
+    groups-order: ASC
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    urls-primary-name: 前台接口
+  group-configs:
+    - group: 前台接口
+      paths-to-match:
+        - /api/**
+      paths-to-exclude:
+        - /api/admin/**
+    - group: 后台接口
+      paths-to-match:
+        - /api/admin/**

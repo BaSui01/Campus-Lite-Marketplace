@@ -4,6 +4,7 @@ import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.service.FileService;
 import com.campus.marketplace.common.annotation.RateLimit;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,7 +92,7 @@ public class FileController {
     @DeleteMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "删除文件", description = "删除指定的文件（包括缩略图）")
-    public ApiResponse<Boolean> deleteFile(@RequestParam("url") String fileUrl) {
+    public ApiResponse<Boolean> deleteFile(@Parameter(description = "文件URL", example = "https://cdn.campus.com/uploads/xxx.png") @RequestParam("url") String fileUrl) {
         log.info("收到文件删除请求: {}", fileUrl);
 
         boolean result = fileService.deleteFile(fileUrl);

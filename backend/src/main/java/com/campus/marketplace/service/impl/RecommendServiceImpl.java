@@ -47,7 +47,7 @@ public class RecommendServiceImpl implements RecommendService {
     private final RedissonClient redissonClient;
 
     private static final String HOT_KEY_PREFIX = "goods:rank:"; // goods:rank:{campus}
-    private static final long HOT_TTL_SECONDS = Duration.ofMinutes(5).toSeconds();
+    private static final long BASE_HOT_TTL_SECONDS = Duration.ofMinutes(5).toSeconds();
 
     @Override
     public void refreshHotRanking(Long campusId, int topN) {
@@ -69,13 +69,23 @@ public class RecommendServiceImpl implements RecommendService {
                 redis.delete(key);
                 long rank = 0;
                 for (Goods g : goodsList) {
-                    double score = g.getViewCount() * 0.7 + g.getFavoriteCount() * 0.3;
+                    // 新增时间衰减：越新权重大（简单平滑：24小时半衰）
+                    double hours = 0d;
+                    if (g.getCreatedAt() != null) {
+                        hours = java.time.Duration.between(g.getCreatedAt(), java.time.LocalDateTime.now()).toHours();
+                        if (hours < 0) hours = 0;
+                    }
+                    double timeDecay = 1.0 / (1.0 + (hours / 24.0));
+                    double score = g.getViewCount() * 0.6 + g.getFavoriteCount() * 0.3 + 100 * timeDecay;
                     redis.zAdd(key, g.getId(), score);
                     rank++;
                     if (rank >= topN) break;
                 }
                 // 设置TTL
-                redis.expire(key, HOT_TTL_SECONDS, TimeUnit.SECONDS);
+                long recentViewTotal;
+                try { recentViewTotal = Math.max(0L, viewLogRepository.count()); } catch (Exception ignore) { recentViewTotal = 0L; }
+                long ttl = computeHotTtlSeconds(recentViewTotal);
+                redis.expire(key, ttl, TimeUnit.SECONDS);
                 log.info("热榜刷新完成: campusId={}, size={}", campusId, Math.min(goodsList.size(), topN));
             } finally {
                 lock.unlock();
@@ -159,7 +169,7 @@ public class RecommendServiceImpl implements RecommendService {
             for (Goods g : recGoods) {
                 redis.lPush(cacheKey, g.getId());
             }
-            redis.expire(cacheKey, HOT_TTL_SECONDS, java.util.concurrent.TimeUnit.SECONDS);
+            redis.expire(cacheKey, BASE_HOT_TTL_SECONDS, java.util.concurrent.TimeUnit.SECONDS);
         } catch (Exception e) {
             log.debug("写入个性化缓存失败: userId={}", user.getId());
         }
@@ -217,5 +227,15 @@ public class RecommendServiceImpl implements RecommendService {
     private String truncate(String text) {
         if (text == null) return null;
         return text.length() > 100 ? text.substring(0, 100) + "..." : text;
+    }
+
+    private long computeHotTtlSeconds(long recentViewTotal) {
+        // 视图总量越大，刷新更频繁；最低2分钟，最高10分钟
+        if (recentViewTotal <= 1000) return BASE_HOT_TTL_SECONDS; // 5 分钟
+        if (recentViewTotal >= 100_000) return Duration.ofMinutes(2).toSeconds();
+        // 线性插值 1000→5min, 100000→2min
+        double ratio = (recentViewTotal - 1000d) / (100000d - 1000d);
+        long seconds = (long) (Duration.ofMinutes(5).toSeconds() - ratio * (Duration.ofMinutes(5).toSeconds() - Duration.ofMinutes(2).toSeconds()));
+        return Math.max(Duration.ofMinutes(2).toSeconds(), Math.min(Duration.ofMinutes(10).toSeconds(), seconds));
     }
 }

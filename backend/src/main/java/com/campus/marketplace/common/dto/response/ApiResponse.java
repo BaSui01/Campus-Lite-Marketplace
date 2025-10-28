@@ -1,6 +1,7 @@
 package com.campus.marketplace.common.dto.response;
 
 import com.campus.marketplace.common.exception.ErrorCode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,21 +17,25 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "统一响应包装结构")
 public class ApiResponse<T> {
 
     /**
      * 状态码
      */
+    @Schema(description = "业务状态码，0 表示成功")
     private int code;
 
     /**
      * 响应消息
      */
+    @Schema(description = "人类可读的响应消息", example = "操作成功")
     private String message;
 
     /**
      * 响应数据
      */
+    @Schema(description = "业务数据载荷", nullable = true)
     private T data;
 
     /**

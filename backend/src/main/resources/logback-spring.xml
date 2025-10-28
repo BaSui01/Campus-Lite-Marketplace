@@ -127,22 +127,30 @@
 
     <!-- 开发环境 -->
     <springProfile name="dev">
+        <!-- 控制台纯文本输出，便于本地观察 -->
+        <appender name="CONSOLE_PLAIN" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}:%line - %msg%n</pattern>
+            </encoder>
+        </appender>
+
         <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="CONSOLE_PLAIN"/>
             <appender-ref ref="ASYNC_FILE"/>
             <appender-ref ref="ASYNC_ERROR_FILE"/>
         </root>
         <logger name="com.campus.marketplace" level="DEBUG" additivity="false">
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="CONSOLE_PLAIN"/>
             <appender-ref ref="ASYNC_FILE"/>
         </logger>
-        <logger name="org.hibernate.SQL" level="DEBUG"/>
-        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+        <!-- 关闭 SQL/参数刷屏，仅保留告警 -->
+        <logger name="org.hibernate.SQL" level="WARN"/>
+        <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
         
         <!-- 慢查询日志 -->
         <logger name="com.campus.marketplace.common.aspect.SlowQueryMonitorAspect" level="WARN" additivity="false">
             <appender-ref ref="SLOW_QUERY_FILE"/>
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="CONSOLE_PLAIN"/>
         </logger>
     </springProfile>
 

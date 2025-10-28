@@ -45,8 +45,8 @@ public class BlacklistController {
     @PostMapping("/block/{blockedUserId}")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Void> addToBlacklist(
-            @Parameter(description = "被拉黑的用户ID") @PathVariable Long blockedUserId,
-            @Parameter(description = "拉黑原因") @RequestParam(required = false) String reason) {
+            @Parameter(description = "被拉黑的用户ID", example = "10086") @PathVariable Long blockedUserId,
+            @Parameter(description = "拉黑原因", example = "频繁发送骚扰信息") @RequestParam(required = false) String reason) {
 
         log.info("添加黑名单：username={}, blockedUserId={}, reason={}",
                 SecurityUtil.getCurrentUsername(), blockedUserId, reason);
@@ -69,7 +69,7 @@ public class BlacklistController {
     @DeleteMapping("/unblock/{blockedUserId}")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Void> removeFromBlacklist(
-            @Parameter(description = "被拉黑的用户ID") @PathVariable Long blockedUserId) {
+            @Parameter(description = "被拉黑的用户ID", example = "10086") @PathVariable Long blockedUserId) {
 
         log.info("移除黑名单：username={}, blockedUserId={}",
                 SecurityUtil.getCurrentUsername(), blockedUserId);
@@ -93,8 +93,8 @@ public class BlacklistController {
     @GetMapping("/list")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Page<UserProfileResponse>> listBlacklist(
-            @Parameter(description = "页码（从0开始）") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "每页大小") @RequestParam(defaultValue = "20") int size) {
+            @Parameter(description = "页码（从0开始）", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "每页大小", example = "20") @RequestParam(defaultValue = "20") int size) {
 
         log.info("查询黑名单列表：username={}, page={}, size={}",
                 SecurityUtil.getCurrentUsername(), page, size);
@@ -117,7 +117,7 @@ public class BlacklistController {
     @GetMapping("/check/{blockedUserId}")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Boolean> isBlocked(
-            @Parameter(description = "被检查的用户ID") @PathVariable Long blockedUserId) {
+            @Parameter(description = "被检查的用户ID", example = "10010") @PathVariable Long blockedUserId) {
 
         log.debug("检查是否拉黑：username={}, blockedUserId={}",
                 SecurityUtil.getCurrentUsername(), blockedUserId);

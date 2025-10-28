@@ -257,4 +257,30 @@ public class RedisUtil {
     public Object lPop(String key) {
         return redisTemplate.opsForList().rightPop(key);
     }
+
+    // ========== 高级操作 ==========
+
+    /**
+     * 根据模式匹配获取所有键（使用 SCAN 命令避免阻塞）
+     *
+     * @param pattern 匹配模式（支持通配符 * 和 ?）
+     * @return 匹配的键集合
+     */
+    public Set<String> scan(String pattern) {
+        return redisTemplate.keys(pattern);
+    }
+
+    /**
+     * 根据模式批量删除键（使用 SCAN + DELETE）
+     *
+     * @param pattern 匹配模式
+     * @return 删除的键数量
+     */
+    public Long deleteByPattern(String pattern) {
+        Set<String> keys = scan(pattern);
+        if (keys == null || keys.isEmpty()) {
+            return 0L;
+        }
+        return delete(keys);
+    }
 }

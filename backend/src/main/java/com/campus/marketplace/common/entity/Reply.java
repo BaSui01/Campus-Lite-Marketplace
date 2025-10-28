@@ -2,7 +2,7 @@ package com.campus.marketplace.common.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
  * 帖子回复实体
@@ -24,7 +24,7 @@ import org.hibernate.annotations.Where;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Where(clause = "deleted = false")
+@SQLRestriction("deleted = false")
 public class Reply extends BaseEntity {
 
     /**

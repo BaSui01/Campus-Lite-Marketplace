@@ -4,6 +4,8 @@ import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.entity.FeatureFlag;
 import com.campus.marketplace.repository.FeatureFlagRepository;
 import com.campus.marketplace.service.FeatureFlagService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,19 +14,22 @@ import java.time.Instant;
 import java.util.List;
 
 @RestController
-@RequestMapping("/feature-flags")
+@RequestMapping("/api/feature-flags")
 @RequiredArgsConstructor
+@Tag(name = "功能开关", description = "特性开关的新增、更新、删除与刷新")
 public class FeatureFlagController {
 
     private final FeatureFlagRepository repository;
     private final FeatureFlagService featureFlagService;
 
     @GetMapping
+    @Operation(summary = "开关列表", description = "查询所有功能开关")
     public ApiResponse<List<FeatureFlag>> list() {
         return ApiResponse.success(repository.findAll());
     }
 
     @PostMapping
+    @Operation(summary = "新增或更新开关")
     public ApiResponse<FeatureFlag> upsert(@RequestBody FeatureFlag body) {
         FeatureFlag toSave = repository.findByKey(body.getKey())
                 .map(existing -> {
@@ -43,12 +48,14 @@ public class FeatureFlagController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "刷新全部开关缓存")
     public ApiResponse<Void> refreshAll() {
         featureFlagService.refreshAll();
         return ApiResponse.success();
     }
 
     @DeleteMapping("/{key}")
+    @Operation(summary = "删除开关")
     public ApiResponse<Void> delete(@PathVariable("key") @NotBlank String key) {
         repository.findByKey(key).ifPresent(repository::delete);
         featureFlagService.refresh(key);

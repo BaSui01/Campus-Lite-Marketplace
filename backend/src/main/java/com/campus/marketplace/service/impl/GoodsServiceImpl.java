@@ -70,6 +70,7 @@ public class GoodsServiceImpl implements GoodsService {
     private final GoodsTagRepository goodsTagRepository;
     private final FollowService followService;
     private final SubscriptionService subscriptionService;
+    private final EncryptUtil encryptUtil;
 
     /**
      * 发布物品
@@ -315,8 +316,8 @@ public class GoodsServiceImpl implements GoodsService {
                 .username(seller.getUsername())
                 .avatar(seller.getAvatar())
                 .points(seller.getPoints())
-                .phone(seller.getPhone() != null ? EncryptUtil.maskPhone(seller.getPhone()) : null)
-                .email(seller.getEmail() != null ? EncryptUtil.maskEmail(seller.getEmail()) : null)
+                .phone(seller.getPhone() != null ? encryptUtil.maskPhone(seller.getPhone()) : null)
+                .email(seller.getEmail() != null ? encryptUtil.maskEmail(seller.getEmail()) : null)
                 .build();
 
         // 转换图片数组为列表
