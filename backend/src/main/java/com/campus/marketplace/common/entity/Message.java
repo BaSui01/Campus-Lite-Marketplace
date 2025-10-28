@@ -142,13 +142,13 @@ public class Message implements Serializable {
     }
 
     /**
-     * 检查是否可以撤回（2分钟内）
+     * 检查是否可以撤回（1分钟内）
      */
     public boolean canRecall() {
         if (this.isRecalled) {
             return false;
         }
-        LocalDateTime twoMinutesAgo = LocalDateTime.now().minusMinutes(2);
-        return this.createdAt.isAfter(twoMinutesAgo);
+        LocalDateTime oneMinuteAgo = LocalDateTime.now().minusMinutes(1);
+        return this.createdAt.isAfter(oneMinuteAgo);
     }
 }

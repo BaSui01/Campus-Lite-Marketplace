@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 /**
  * 隐私请求仓库
@@ -27,4 +28,11 @@ public interface PrivacyRequestRepository extends JpaRepository<PrivacyRequest, 
     List<PrivacyRequest> findByStatus(PrivacyRequestStatus status);
 
     List<PrivacyRequest> findByUserId(Long userId);
+
+    /**
+     * 查询到期的删除类隐私请求
+     */
+    List<PrivacyRequest> findByTypeAndStatusInAndScheduledAtBefore(PrivacyRequestType type,
+                                                                   List<PrivacyRequestStatus> statuses,
+                                                                   LocalDateTime before);
 }

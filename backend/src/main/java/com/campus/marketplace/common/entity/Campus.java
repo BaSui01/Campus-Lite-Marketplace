@@ -3,6 +3,7 @@ package com.campus.marketplace.common.entity;
 import com.campus.marketplace.common.enums.CampusStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "t_campus", indexes = {
@@ -14,6 +15,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Where(clause = "deleted = false")
 public class Campus extends BaseEntity {
 
     @Column(name = "code", nullable = false, length = 50, unique = true)

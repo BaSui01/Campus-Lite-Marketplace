@@ -2,6 +2,7 @@ package com.campus.marketplace.common.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 /**
  * 收藏实体
@@ -23,6 +24,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Where(clause = "deleted = false")
 public class Favorite extends BaseEntity {
 
     /**

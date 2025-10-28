@@ -14,6 +14,7 @@ import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.PostService;
 import com.campus.marketplace.service.MessageService;
 import com.campus.marketplace.common.dto.request.SendMessageRequest;
+import com.campus.marketplace.common.dto.request.UpdatePostRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -269,8 +270,64 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
 
-        postRepository.delete(post);
-        log.info("帖子删除成功: postId={}", id);
+        // 软删除
+        post.markDeleted();
+        postRepository.save(post);
+        log.info("帖子软删除成功: postId={}", id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePost(Long id, UpdatePostRequest request) {
+        log.info("修改帖子: postId={}", id);
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        // 鉴权：作者或管理员
+        String username = SecurityUtil.getCurrentUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        if (!post.getAuthorId().equals(user.getId()) && !user.isAdmin()) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        String newTitle = request.title() != null ? request.title() : post.getTitle();
+        String newContent = request.content() != null ? request.content() : post.getContent();
+
+        // 合规/敏感词过滤
+        String filteredTitle;
+        String filteredContent;
+        if (complianceService != null) {
+            var titleMod = complianceService.moderateText(newTitle, "POST_TITLE");
+            var contentMod = complianceService.moderateText(newContent, "POST_CONTENT");
+            if (titleMod.hit() && titleMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK
+                    || contentMod.hit() && contentMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK) {
+                throw new com.campus.marketplace.common.exception.BusinessException(
+                        com.campus.marketplace.common.exception.ErrorCode.INVALID_PARAM, "包含敏感词，请修改后再提交");
+            }
+            filteredTitle = titleMod.filteredText();
+            filteredContent = contentMod.filteredText();
+        } else {
+            filteredTitle = sensitiveWordFilter.filter(newTitle);
+            filteredContent = sensitiveWordFilter.filter(newContent);
+        }
+
+        boolean contentChanged = !filteredTitle.equals(post.getTitle()) || !filteredContent.equals(post.getContent());
+
+        post.setTitle(filteredTitle);
+        post.setContent(filteredContent);
+        if (request.images() != null) {
+            post.setImages(request.images().isEmpty() ? null : request.images().toArray(new String[0]));
+        }
+
+        // 内容变更后重置为待审核
+        if (contentChanged) {
+            post.setStatus(GoodsStatus.PENDING);
+        }
+
+        postRepository.save(post);
+        log.info("帖子修改成功: postId={}, resetToPending={}", id, contentChanged);
     }
 
     /**

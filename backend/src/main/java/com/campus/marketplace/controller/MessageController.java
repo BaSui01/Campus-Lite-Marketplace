@@ -10,6 +10,9 @@ import com.campus.marketplace.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +52,23 @@ public class MessageController {
     @Operation(summary = "发送消息", description = "发送私信给指定用户，支持文本/图片/商品卡片")
     @PostMapping("/send")
     @PreAuthorize("hasRole('USER')")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = SendMessageRequest.class),
+                    examples = @ExampleObject(
+                            name = "请求示例",
+                            value = """
+                                    {
+                                      \"receiverId\": 10086,
+                                      \"messageType\": \"TEXT\",
+                                      \"content\": \"你好，请问还在吗？\"
+                                    }
+                                    """
+                    )
+            )
+    )
     @RateLimit(key = "message:send", maxRequests = 20, timeWindow = 60)
     public ApiResponse<Long> sendMessage(@Valid @RequestBody SendMessageRequest request) {
         log.info("用户发送消息：username={}, receiverId={}, type={}",
@@ -95,8 +115,8 @@ public class MessageController {
     @GetMapping("/conversations")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Page<ConversationResponse>> listConversations(
-            @Parameter(description = "页码（从0开始）") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "每页大小") @RequestParam(defaultValue = "20") int size) {
+            @Parameter(description = "页码（从0开始）", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "每页大小", example = "20") @RequestParam(defaultValue = "20") int size) {
 
         log.info("查询会话列表：username={}, page={}, size={}",
                 SecurityUtil.getCurrentUsername(), page, size);
@@ -123,9 +143,9 @@ public class MessageController {
     @GetMapping("/conversations/{conversationId}/messages")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Page<MessageResponse>> listMessages(
-            @Parameter(description = "会话ID") @PathVariable Long conversationId,
-            @Parameter(description = "页码（从0开始）") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "每页大小") @RequestParam(defaultValue = "50") int size) {
+            @Parameter(description = "会话ID", example = "20001") @PathVariable Long conversationId,
+            @Parameter(description = "页码（从0开始）", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "每页大小", example = "50") @RequestParam(defaultValue = "50") int size) {
 
         log.info("查询聊天记录：username={}, conversationId={}, page={}, size={}",
                 SecurityUtil.getCurrentUsername(), conversationId, page, size);
@@ -151,7 +171,7 @@ public class MessageController {
     @PostMapping("/conversations/{conversationId}/mark-read")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Integer> markConversationAsRead(
-            @Parameter(description = "会话ID") @PathVariable Long conversationId) {
+            @Parameter(description = "会话ID", example = "20001") @PathVariable Long conversationId) {
 
         log.info("标记会话为已读：username={}, conversationId={}",
                 SecurityUtil.getCurrentUsername(), conversationId);
@@ -166,17 +186,17 @@ public class MessageController {
      * 撤回消息
      *
      * 🔙 撤回自己发送的消息
-     * ⏰ 仅限2分钟内的消息
+     * ⏰ 仅限1分钟内的消息
      * 📡 实时通知接收者
      *
      * @param messageId 消息ID
      * @return 成功响应
      */
-    @Operation(summary = "撤回消息", description = "撤回自己发送的消息（2分钟内有效）")
+    @Operation(summary = "撤回消息", description = "撤回自己发送的消息（1分钟内有效）")
     @PostMapping("/messages/{messageId}/recall")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Void> recallMessage(
-            @Parameter(description = "消息ID") @PathVariable Long messageId) {
+            @Parameter(description = "消息ID", example = "30001") @PathVariable Long messageId) {
 
         log.info("撤回消息：username={}, messageId={}",
                 SecurityUtil.getCurrentUsername(), messageId);

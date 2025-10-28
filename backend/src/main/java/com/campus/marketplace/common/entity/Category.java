@@ -2,13 +2,7 @@ package com.campus.marketplace.common.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import org.hibernate.annotations.Where;
 
 /**
  * 物品分类实体
@@ -23,14 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public class Category implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Where(clause = "deleted = false")
+public class Category extends BaseEntity {
 
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
@@ -45,7 +33,4 @@ public class Category implements Serializable {
     @Builder.Default
     private Integer sortOrder = 0;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 }

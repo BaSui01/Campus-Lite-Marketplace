@@ -490,7 +490,7 @@ public class MessageServiceImpl implements MessageService {
 
         // 5. 检查撤回时限
         if (!message.canRecall()) {
-            throw new BusinessException(ErrorCode.OPERATION_FAILED, "超过撤回时限（2分钟内）");
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "超过撤回时限（1分钟内）");
         }
 
         // 6. 撤回消息

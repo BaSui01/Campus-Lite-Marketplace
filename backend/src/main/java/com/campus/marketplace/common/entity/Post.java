@@ -1,6 +1,7 @@
 package com.campus.marketplace.common.entity;
 
 import com.campus.marketplace.common.enums.GoodsStatus;
+import org.hibernate.annotations.Where;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Where(clause = "deleted = false")
 public class Post extends BaseEntity {
 
     /**

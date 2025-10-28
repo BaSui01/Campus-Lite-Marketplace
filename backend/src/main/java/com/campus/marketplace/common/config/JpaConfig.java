@@ -16,7 +16,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableJpaAuditing
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "com.campus.marketplace.repository")
+@EnableJpaRepositories(
+        basePackages = "com.campus.marketplace.repository",
+        repositoryBaseClass = com.campus.marketplace.repository.base.SoftDeleteJpaRepository.class
+)
 public class JpaConfig {
     // JPA 配置主要在 application.yml 中完成
     // 这里只做注解启用

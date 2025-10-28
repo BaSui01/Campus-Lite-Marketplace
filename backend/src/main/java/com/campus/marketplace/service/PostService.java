@@ -81,6 +81,14 @@ public interface PostService {
     void approvePost(Long id, boolean approved, String reason);
 
     /**
+     * 修改帖子（作者或管理员）
+     *
+     * @param id 帖子ID
+     * @param request 修改内容
+     */
+    void updatePost(Long id, com.campus.marketplace.common.dto.request.UpdatePostRequest request);
+
+    /**
      * 删除帖子（作者或管理员）
      * 
      * @param id 帖子 ID

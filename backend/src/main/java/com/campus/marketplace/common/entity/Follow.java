@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 /**
  * 关注关系
@@ -34,6 +35,7 @@ import lombok.Setter;
                 @Index(name = "idx_follow_follower", columnList = "follower_id"),
                 @Index(name = "idx_follow_seller", columnList = "seller_id")
         })
+@Where(clause = "deleted = false")
 public class Follow extends BaseEntity {
 
     @Column(name = "follower_id", nullable = false)

@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.Where;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,7 @@ import lombok.Setter;
 @Table(name = "t_tag", indexes = {
         @Index(name = "idx_tag_enabled", columnList = "enabled")
 })
+@Where(clause = "deleted = false")
 public class Tag extends BaseEntity {
 
     /**

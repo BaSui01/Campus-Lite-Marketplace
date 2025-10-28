@@ -2,6 +2,7 @@ package com.campus.marketplace.common.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 /**
  * 商品与标签关联实体
@@ -24,6 +25,7 @@ import lombok.*;
                 @Index(name = "idx_goods_tag_goods", columnList = "goods_id"),
                 @Index(name = "idx_goods_tag_tag", columnList = "tag_id")
         })
+@Where(clause = "deleted = false")
 public class GoodsTag extends BaseEntity {
 
     @Column(name = "goods_id", nullable = false)
