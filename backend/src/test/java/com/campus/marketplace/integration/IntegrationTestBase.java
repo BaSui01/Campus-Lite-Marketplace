@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
@@ -41,12 +42,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
     "spring.datasource.username=sa",
     "spring.datasource.password=",
     "spring.datasource.driver-class-name=org.h2.Driver",
-    "spring.jpa.hibernate.ddl-auto=update",
+    "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
     "spring.flyway.enabled=false",
     "spring.test.database.replace=NONE",
     "spring.datasource.hikari.maximum-pool-size=5"
 })
+@EntityScan(basePackages = "com.campus.marketplace.common.entity")
 public abstract class IntegrationTestBase {
 
     @Autowired
