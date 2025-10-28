@@ -18,7 +18,8 @@ import lombok.Setter;
  *
  * follower 关注 seller（当前复用用户表）
  *
- * @author Codex
+ * @author BaSui
+ * @date 2025-10-27
  * @since 2025-10-28
  */
 @Getter

@@ -8,7 +8,8 @@ import lombok.*;
  *
  * 保存绑定关系并保留审计信息，便于统计与去重
  *
- * @author Codex
+ * @author BaSui
+ * @date 2025-10-27
  * @since 2025-10-28
  */
 @Getter

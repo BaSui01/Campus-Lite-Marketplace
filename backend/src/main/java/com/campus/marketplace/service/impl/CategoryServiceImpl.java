@@ -17,6 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 分类服务实现
+ *
+ * 实现分类的创建/更新/删除与分类树构建
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor

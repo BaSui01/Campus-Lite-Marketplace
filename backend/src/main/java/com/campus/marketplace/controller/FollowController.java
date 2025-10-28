@@ -11,6 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 关注订阅控制器（关注卖家）
+ *
+ * 提供关注/取关与关注列表接口
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

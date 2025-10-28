@@ -16,7 +16,8 @@ import lombok.Setter;
  *
  * 用户可按关键词+校区订阅新品推送
  *
- * @author Codex
+ * @author BaSui
+ * @date 2025-10-27
  * @since 2025-10-28
  */
 @Getter

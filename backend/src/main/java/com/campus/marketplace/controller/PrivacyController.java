@@ -14,6 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 隐私合规控制器
+ *
+ * 提供隐私请求创建/查询与管理员处理接口
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "隐私合规", description = "数据导出与注销申请接口")

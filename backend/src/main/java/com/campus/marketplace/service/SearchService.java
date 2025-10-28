@@ -15,4 +15,11 @@ public interface SearchService {
      * @param tagIds 标签过滤（仅 goods 生效）
      */
     Page<SearchResultItem> search(String type, String q, int page, int size, List<Long> tagIds);
+
+    /**
+     * 重载方法，向后兼容旧调用方（无标签过滤）
+     */
+    default Page<SearchResultItem> search(String type, String q, int page, int size) {
+        return search(type, q, page, size, null);
+    }
 }

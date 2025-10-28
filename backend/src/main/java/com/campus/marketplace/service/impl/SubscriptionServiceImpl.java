@@ -21,6 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * 订阅服务实现
+ *
+ * 提供关键词订阅/取消与匹配触发通知
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor

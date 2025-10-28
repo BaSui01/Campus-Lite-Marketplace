@@ -19,6 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 标签服务实现
+ *
+ * 实现标签的创建、更新、删除、合并与查询
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor

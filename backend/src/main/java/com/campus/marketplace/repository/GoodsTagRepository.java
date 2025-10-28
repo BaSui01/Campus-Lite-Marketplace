@@ -11,6 +11,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 商品-标签关联关系仓库
+ *
+ * 负责商品与标签绑定关系的增删查与批量操作
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @Repository
 public interface GoodsTagRepository extends JpaRepository<GoodsTag, Long> {
 

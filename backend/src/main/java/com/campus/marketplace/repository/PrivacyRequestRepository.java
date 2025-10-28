@@ -9,6 +9,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 隐私请求仓库
+ *
+ * 管理导出/删除请求的持久化查询
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @Repository
 public interface PrivacyRequestRepository extends JpaRepository<PrivacyRequest, Long> {
 

@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
  * 隐私请求实体
  *
  * 记录数据导出与删除申请，支持审核与延迟处理
+ *
+ * @author BaSui
+ * @date 2025-10-27
  */
 @Getter
 @Setter

@@ -2,7 +2,6 @@ package com.campus.marketplace.service;
 
 import com.campus.marketplace.common.entity.ExportJob;
 import com.campus.marketplace.common.entity.Goods;
-import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.ExportJobRepository;

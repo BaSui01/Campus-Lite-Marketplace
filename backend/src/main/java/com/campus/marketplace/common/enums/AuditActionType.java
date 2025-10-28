@@ -36,7 +36,8 @@ public enum AuditActionType {
     REPORT_CREATE("创建举报"),
     REPORT_HANDLE("处理举报"),
 
-    COMPLIANCE_CHECK("合规检查");
+    COMPLIANCE_CHECK("合规检查"),
+    NOTIFICATION_FAIL("通知发送失败");
     
     private final String description;
 }

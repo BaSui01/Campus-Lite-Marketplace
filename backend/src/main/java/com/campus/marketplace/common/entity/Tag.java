@@ -13,10 +13,10 @@ import lombok.Setter;
 /**
  * 标签实体
  *
- * 用于对商品（及后续帖子）打标签
- * 支持启停用与去重合并
+ * 用于对商品（及后续帖子）打标签，支持启停用与去重合并
  *
- * @author Codex
+ * @author BaSui
+ * @date 2025-10-27
  * @since 2025-10-28
  */
 @Getter

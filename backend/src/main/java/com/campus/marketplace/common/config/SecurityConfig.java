@@ -69,6 +69,8 @@ public class SecurityConfig {
                         // 物品查询接口（公开）
                         .requestMatchers(HttpMethod.GET, "/goods/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()
                         
                         // 帖子查询接口（公开）
                         .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()

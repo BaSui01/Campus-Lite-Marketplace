@@ -70,7 +70,22 @@ public class SearchServiceImpl implements SearchService {
 
         switch (type == null ? "goods" : type.toLowerCase()) {
             case "goods" -> {
-                Page<GoodsSearchProjection> pageData = goodsRepository.searchGoodsFts(q, campusFilter, pageable);
+                List<Long> goodsIdsFilter = null;
+                if (!sanitizedTagIds.isEmpty()) {
+                    goodsIdsFilter = goodsTagRepository.findGoodsIdsByAllTagIds(
+                            sanitizedTagIds,
+                            sanitizedTagIds.size()
+                    );
+                    if (goodsIdsFilter.isEmpty()) {
+                        result = Page.empty(pageable);
+                        break;
+                    }
+                }
+
+                Page<GoodsSearchProjection> pageData = goodsIdsFilter == null
+                        ? goodsRepository.searchGoodsFts(q, campusFilter, pageable)
+                        : goodsRepository.searchGoodsFtsWithIds(q, campusFilter, goodsIdsFilter.toArray(Long[]::new), pageable);
+
                 result = new PageImpl<>(
                         pageData.stream().map(p -> SearchResultItem.builder()
                                 .type("GOODS")
@@ -126,8 +141,8 @@ public class SearchServiceImpl implements SearchService {
             } catch (Exception ignored) { }
         });
 
-        log.info("搜索完成: type={}, q='{}', campusId={}, cost={}ms, total={}",
-                type, q, campusFilter, duration, result.getTotalElements());
+        log.info("搜索完成: type={}, q='{}', campusId={}, tags={}, cost={}ms, total={}",
+                type, q, campusFilter, sanitizedTagIds, duration, result.getTotalElements());
         return result;
     }
 }

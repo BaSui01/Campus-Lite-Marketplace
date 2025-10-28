@@ -9,6 +9,7 @@ import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.common.utils.SensitiveWordFilter;
+import com.campus.marketplace.common.component.NotificationDispatcher;
 import com.campus.marketplace.service.ComplianceService;
 import com.campus.marketplace.repository.PostRepository;
 import com.campus.marketplace.repository.ReplyRepository;
@@ -37,6 +38,7 @@ public class ReplyServiceImpl implements ReplyService {
     private final SensitiveWordFilter sensitiveWordFilter;
     private final ComplianceService complianceService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final NotificationDispatcher notificationDispatcher;
 
     private static final int REPLY_RATE_LIMIT = 5;
     private static final String REPLY_RATE_KEY_PREFIX = "reply:rate:";
@@ -104,6 +106,46 @@ public class ReplyServiceImpl implements ReplyService {
         redisTemplate.expire(rateLimitKey, 1, TimeUnit.MINUTES);
 
         log.info("回复创建成功: replyId={}, postId={}, authorId={}", reply.getId(), request.postId(), user.getId());
+
+        // 通知帖子作者
+        try {
+            if (!user.getId().equals(post.getAuthorId())) {
+                notificationDispatcher.enqueueTemplate(
+                        post.getAuthorId(),
+                        "POST_REPLIED",
+                        java.util.Map.of(
+                                "postTitle", post.getTitle(),
+                                "replyPreview", filteredContent.length() > 20 ? filteredContent.substring(0, 20) : filteredContent
+                        ),
+                        com.campus.marketplace.common.enums.NotificationType.POST_REPLIED.name(),
+                        post.getId(),
+                        "POST",
+                        "/posts/" + post.getId()
+                );
+            }
+        } catch (Exception ignored) {}
+
+        // 解析 @提及 并通知
+        try {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("@([a-zA-Z0-9_\\u4e00-\\u9fa5]{2,20})").matcher(filteredContent);
+            java.util.Set<String> names = new java.util.HashSet<>();
+            while (m.find()) names.add(m.group(1));
+            for (String name : names) {
+                userRepository.findByUsername(name).ifPresent(mentioned -> {
+                    if (!mentioned.getId().equals(user.getId())) {
+                        notificationDispatcher.enqueueTemplate(
+                                mentioned.getId(),
+                                "POST_MENTIONED",
+                                java.util.Map.of("postTitle", post.getTitle()),
+                                com.campus.marketplace.common.enums.NotificationType.POST_MENTIONED.name(),
+                                post.getId(),
+                                "POST",
+                                "/posts/" + post.getId()
+                        );
+                    }
+                });
+            }
+        } catch (Exception ignored) {}
 
         return reply.getId();
     }

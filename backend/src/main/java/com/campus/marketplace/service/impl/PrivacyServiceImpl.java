@@ -19,6 +19,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * 隐私合规服务实现
+ *
+ * 提供隐私请求的创建、查询与完成标记逻辑
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor

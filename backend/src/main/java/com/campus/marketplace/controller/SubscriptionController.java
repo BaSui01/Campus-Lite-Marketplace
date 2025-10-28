@@ -13,6 +13,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 关键词订阅控制器
+ *
+ * 提供关键词订阅/取消与订阅列表接口
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

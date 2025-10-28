@@ -7,6 +7,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 关注关系仓库
+ *
+ * 提供关注/取关与统计相关的持久化操作
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, Long> {
 

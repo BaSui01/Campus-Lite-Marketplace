@@ -13,7 +13,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 @DisplayName("标签服务测试")
 class TagServiceImplTest {
 
@@ -30,40 +40,46 @@ class TagServiceImplTest {
     @DisplayName("创建标签成功")
     void createTag_success() {
         tagService.createTag(new CreateTagRequest("  数码  ", "电子类", true));
-        org.mockito.Mockito.verify(tagRepository).save(org.mockito.ArgumentMatchers.argThat(tag ->
+        verify(tagRepository).save(argThat(tag ->
                 tag.getName().equals("数码") && tag.getEnabled()));
     }
 
     @Test
     @DisplayName("合并标签应重定向商品绑定")
     void mergeTag_shouldReassignBindings() {
-        Tag source = Tag.builder().id(1L).name("old").enabled(true).build();
-        Tag target = Tag.builder().id(2L).name("new").enabled(true).build();
+        Tag source = Tag.builder().name("old").enabled(true).build();
+        source.setId(1L);
+        Tag target = Tag.builder().name("new").enabled(true).build();
+        target.setId(2L);
 
-        GoodsTag binding1 = GoodsTag.builder().id(10L).goodsId(100L).tagId(1L).build();
-        GoodsTag binding2 = GoodsTag.builder().id(11L).goodsId(200L).tagId(1L).build();
+        GoodsTag binding1 = GoodsTag.builder().goodsId(100L).tagId(1L).build();
+        binding1.setId(10L);
+        GoodsTag binding2 = GoodsTag.builder().goodsId(200L).tagId(1L).build();
+        binding2.setId(11L);
 
-        org.mockito.Mockito.when(tagRepository.findById(1L)).thenReturn(java.util.Optional.of(source));
-        org.mockito.Mockito.when(tagRepository.findById(2L)).thenReturn(java.util.Optional.of(target));
-        org.mockito.Mockito.when(goodsTagRepository.findByTagId(1L)).thenReturn(java.util.List.of(binding1, binding2));
-        org.mockito.Mockito.when(goodsTagRepository.findByGoodsIdAndTagId(100L, 2L))
-                .thenReturn(java.util.Optional.of(GoodsTag.builder().id(12L).goodsId(100L).tagId(2L).build()));
-        org.mockito.Mockito.when(goodsTagRepository.findByGoodsIdAndTagId(200L, 2L))
-                .thenReturn(java.util.Optional.empty());
+        when(tagRepository.findById(1L)).thenReturn(Optional.of(source));
+        when(tagRepository.findById(2L)).thenReturn(Optional.of(target));
+        when(goodsTagRepository.findByTagId(1L)).thenReturn(List.of(binding1, binding2));
+        GoodsTag existed = GoodsTag.builder().goodsId(100L).tagId(2L).build();
+        existed.setId(12L);
+        when(goodsTagRepository.findByGoodsIdAndTagId(100L, 2L))
+                .thenReturn(Optional.of(existed));
+        when(goodsTagRepository.findByGoodsIdAndTagId(200L, 2L))
+                .thenReturn(Optional.empty());
 
         tagService.mergeTag(new MergeTagRequest(1L, 2L));
 
-        org.mockito.Mockito.verify(goodsTagRepository).deleteById(10L);
-        org.mockito.Mockito.verify(goodsTagRepository).save(org.mockito.ArgumentMatchers.argThat(gt ->
+        verify(goodsTagRepository).deleteById(10L);
+        verify(goodsTagRepository).save(argThat(gt ->
                 gt.getGoodsId().equals(200L) && gt.getTagId().equals(2L)));
-        org.mockito.Mockito.verify(tagRepository).delete(source);
+        verify(tagRepository).delete(source);
     }
 
     @Test
     @DisplayName("合并标签时源标签不存在应抛出异常")
     void mergeTag_sourceMissing_shouldThrow() {
-        org.mockito.Mockito.when(tagRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-        org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class,
+        when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(BusinessException.class,
                 () -> tagService.mergeTag(new MergeTagRequest(1L, 2L)));
     }
 }

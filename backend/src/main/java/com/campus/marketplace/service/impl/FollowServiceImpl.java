@@ -20,6 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 关注服务实现
+ *
+ * 提供关注/取消关注、关注列表查询及商品上架通知
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor

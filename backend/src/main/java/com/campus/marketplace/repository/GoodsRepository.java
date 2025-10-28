@@ -129,6 +129,23 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
                                                @Param("campusId") Long campusId,
                                                Pageable pageable);
 
+    @Query(value = "SELECT g.id as id, g.title as title, " +
+            "ts_headline('chinese', coalesce(g.description, ''), plainto_tsquery('chinese', :q), 'MaxFragments=2, MaxWords=12, MinWords=4, StartSel=<em>, StopSel=</em>') as snippet, " +
+            "ts_rank(g.search_vector, plainto_tsquery('chinese', :q)) as rank, " +
+            "g.campus_id as campusId, g.price as price " +
+            "FROM t_goods g " +
+            "WHERE g.status = 'APPROVED' " +
+            "AND g.search_vector @@ plainto_tsquery('chinese', :q) " +
+            "AND (:campusId IS NULL OR g.campus_id = :campusId) " +
+            "AND g.id = ANY(:goodsIds) " +
+            "ORDER BY rank DESC, g.created_at DESC",
+            countQuery = "SELECT COUNT(*) FROM t_goods g WHERE g.status='APPROVED' AND g.search_vector @@ plainto_tsquery('chinese', :q) AND (:campusId IS NULL OR g.campus_id = :campusId) AND g.id = ANY(:goodsIds)",
+            nativeQuery = true)
+    Page<GoodsSearchProjection> searchGoodsFtsWithIds(@Param("q") String q,
+                                                      @Param("campusId") Long campusId,
+                                                      @Param("goodsIds") Long[] goodsIds,
+                                                      Pageable pageable);
+
     /**
      * 根据卖家 ID 查询物品
      */

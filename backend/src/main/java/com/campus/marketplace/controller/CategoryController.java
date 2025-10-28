@@ -14,6 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 分类标签控制器
+ *
+ * 提供分类树查询与分类管理接口
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "分类标签", description = "分类树查询及分类管理接口")

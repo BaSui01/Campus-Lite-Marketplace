@@ -15,6 +15,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 标签管理控制器
+ *
+ * 提供标签的查询、创建、更新、删除与合并接口
+ *
+ * @author BaSui
+ * @date 2025-10-27
+ */
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "标签管理", description = "标签查询、创建、更新与合并接口")

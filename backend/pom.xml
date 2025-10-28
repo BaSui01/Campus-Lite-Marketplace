@@ -333,7 +333,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                    <argLine>-XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                    <!-- 避免控制台大量输出并降低通道干扰风险 -->
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <!-- 单进程执行以减少通道竞争（Windows 下更稳定） -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
                     <!-- 在本地/CI 无 Docker 环境时，排除需要 Testcontainers 的集成测试 -->
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>

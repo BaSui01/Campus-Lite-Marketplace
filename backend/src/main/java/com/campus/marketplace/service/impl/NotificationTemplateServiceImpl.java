@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,9 +28,8 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         String titlePattern = messageSource.getMessage(tpl.getTitleKey(), null, locale);
         String contentPattern = messageSource.getMessage(tpl.getContentKey(), null, locale);
 
-        Object[] values = toOrderedValues(params);
-        String title = MessageFormat.format(titlePattern, values);
-        String content = MessageFormat.format(contentPattern, values);
+        String title = renderNamed(titlePattern, params);
+        String content = renderNamed(contentPattern, params);
 
         Set<NotificationChannel> channels = Arrays.stream(tpl.getChannels().split(","))
                 .map(String::trim)
@@ -42,12 +40,15 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         return new Rendered(title, content, channels);
     }
 
-    private Object[] toOrderedValues(Map<String, Object> params) {
-        if (params == null || params.isEmpty()) return new Object[0];
-        // MessageFormat按索引取值；这里约定按key排序构造
-        return params.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(Map.Entry::getValue)
-                .toArray();
+    private String renderNamed(String pattern, Map<String, Object> params) {
+        if (pattern == null) return null;
+        if (params == null || params.isEmpty()) return pattern;
+        String rendered = pattern;
+        for (Map.Entry<String, Object> e : params.entrySet()) {
+            String key = e.getKey();
+            String val = String.valueOf(e.getValue());
+            rendered = rendered.replace("{" + key + "}", val);
+        }
+        return rendered;
     }
 }

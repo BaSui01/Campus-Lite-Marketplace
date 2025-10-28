@@ -5,7 +5,6 @@ import com.campus.marketplace.common.entity.TaskExecution;
 import com.campus.marketplace.repository.ScheduledTaskRepository;
 import com.campus.marketplace.repository.TaskExecutionRepository;
 import com.campus.marketplace.service.impl.TaskServiceImpl;
-import com.campus.marketplace.service.task.TaskRunner;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
