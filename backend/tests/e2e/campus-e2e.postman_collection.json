@@ -1,0 +1,558 @@
+{
+  "info": {
+    "name": "Campus Marketplace E2E",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "校园轻享集市端到端流程：注册→登录→发布→审核→下单→支付→验收"
+  },
+  "item": [
+    {
+      "name": "01 - 健康检查并初始化变量",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "health"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const now = Date.now().toString();",
+              "const defaultPassword = 'Campus#1234';",
+              "pm.environment.set('suffix', now);",
+              "pm.environment.set('password', defaultPassword);",
+              "pm.environment.set('sellerUsername', `e2e_seller_${now}`);",
+              "pm.environment.set('buyerUsername', `e2e_buyer_${now}`);",
+              "pm.environment.set('sellerToken', '');",
+              "pm.environment.set('buyerToken', '');",
+              "pm.environment.set('adminToken', '');",
+              "pm.environment.set('sellerUserId', '');",
+              "pm.environment.set('buyerUserId', '');",
+              "pm.environment.set('categoryId', '');",
+              "pm.environment.set('goodsId', '');",
+              "pm.environment.set('orderNo', '');",
+              "pm.environment.set('orderAmount', '');",
+              "pm.environment.set('transactionId', `txn_${now}`);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('健康检查成功', () => pm.response.code === 200);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - 注册卖家账号",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{sellerUsername}}\",\n  \"password\": \"{{password}}\",\n  \"email\": \"{{sellerUsername}}@campus.edu\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('卖家注册成功', () => json.code === 200);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - 卖家登录获取 Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{sellerUsername}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('卖家登录成功', () => json.code === 200 && json.data && json.data.token);",
+              "pm.environment.set('sellerToken', json.data.token);",
+              "pm.environment.set('sellerUserId', json.data.userInfo.id.toString());"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - 查询分类树捕获分类ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{sellerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/categories/tree",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "categories",
+            "tree"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('分类获取成功', () => Array.isArray(json.data));",
+              "function firstLeaf(nodes) {\n  for (const node of nodes || []) {\n    if (!node.children || node.children.length === 0) {\n      return node.id;\n    }\n    const nested = firstLeaf(node.children);\n    if (nested) {\n      return nested;\n    }\n  }\n  return null;\n}",
+              "const categoryId = firstLeaf(json.data);",
+              "pm.test('捕获分类ID', () => !!categoryId);",
+              "pm.environment.set('categoryId', categoryId);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - 卖家发布物品",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{sellerToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"E2E 自动化校验商品 {{suffix}}\",\n  \"description\": \"用于端到端流程校验的自动化商品，创建时间 {{suffix}}\",\n  \"price\": 199.99,\n  \"categoryId\": {{categoryId}},\n  \"images\": [\"https://cdn.campus.test/e2e/{{suffix}}.jpg\"],\n  \"tagIds\": []\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/goods",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "goods"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('物品发布成功', () => json.code === 200 && json.data);",
+              "pm.environment.set('goodsId', json.data.toString());"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - 管理员登录",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('管理员登录成功', () => json.code === 200 && json.data && json.data.token);",
+              "pm.environment.set('adminToken', json.data.token);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - 管理员审核通过物品",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"approved\": true,\n  \"rejectReason\": null\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/goods/{{goodsId}}/approve",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "goods",
+            "{{goodsId}}",
+            "approve"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('物品审核通过', () => json.code === 200);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - 注册买家账号",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{buyerUsername}}\",\n  \"password\": \"{{password}}\",\n  \"email\": \"{{buyerUsername}}@campus.edu\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('买家注册成功', () => json.code === 200);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - 买家登录获取 Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{buyerUsername}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('买家登录成功', () => json.code === 200 && json.data && json.data.token);",
+              "pm.environment.set('buyerToken', json.data.token);",
+              "pm.environment.set('buyerUserId', json.data.userInfo.id.toString());"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - 买家创建订单",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{buyerToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"goodsId\": {{goodsId}}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "orders"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('订单创建成功', () => json.code === 200 && json.data);",
+              "pm.environment.set('orderNo', json.data);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - 买家查看订单详情 (待支付)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{buyerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/orders/{{orderNo}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "orders",
+            "{{orderNo}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('成功获取订单详情', () => json.code === 200 && json.data);",
+              "pm.test('订单状态为待支付', () => json.data.status === 'PENDING_PAYMENT');",
+              "pm.environment.set('orderAmount', json.data.actualAmount);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - 管理员模拟支付回调 (微信)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderNo\": \"{{orderNo}}\",\n  \"transactionId\": \"{{transactionId}}\",\n  \"amount\": {{orderAmountNumber}},\n  \"status\": \"SUCCESS\",\n  \"signature\": \"e2e-mock\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/payment/mock/wechat",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "payment",
+            "mock",
+            "wechat"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const amountRaw = pm.environment.get('orderAmount');",
+              "pm.variables.set('orderAmountNumber', amountRaw ? Number(amountRaw) : 0);",
+              "pm.environment.set('transactionId', `txn_${Date.now()}`);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('模拟支付成功', () => json.code === 200);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 - 买家查看订单详情 (已支付)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{buyerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/orders/{{orderNo}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "orders",
+            "{{orderNo}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('订单支付状态更新', () => json.code === 200 && json.data.status === 'PAID');",
+              "pm.test('支付金额保持一致', () => Number(json.data.actualAmount) === Number(pm.environment.get('orderAmount')));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
