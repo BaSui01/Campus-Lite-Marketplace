@@ -30,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = AdminController.class)
 @AutoConfigureMockMvc(addFilters = true)
 @Import(AdminControllerAuthMatrixTest.TestSecurityConfig.class)
-@org.junit.jupiter.api.Disabled("暂时跳过：SecurityFilterChain 在 WebMvcTest 下未正确拦截，待单独调试修复")
 // 安全链路最小化配置（WebMvcTest + 自定义 SecurityFilterChain）
 class AdminControllerAuthMatrixTest {
 
@@ -65,6 +64,14 @@ class AdminControllerAuthMatrixTest {
             resp.setStatus(403);
             return null;
         }).when(jwtAccessDeniedHandler).handle(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
+
+        org.mockito.Mockito.doAnswer(invocation -> {
+            jakarta.servlet.http.HttpServletRequest request = invocation.getArgument(0);
+            jakarta.servlet.http.HttpServletResponse response = invocation.getArgument(1);
+            jakarta.servlet.FilterChain chain = invocation.getArgument(2);
+            chain.doFilter(request, response);
+            return null;
+        }).when(jwtAuthenticationFilter).doFilter(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
     }
 
     @Test
@@ -80,7 +87,6 @@ class AdminControllerAuthMatrixTest {
 
     @Test
     @DisplayName("未登录访问管理员统计接口 -> 401")
-    @org.junit.jupiter.api.Disabled("Security filter chain 未串联 JWT 鉴权，暂不验证 401")
     void admin_stats_unauth_401() throws Exception {
         mockMvc.perform(get("/api/admin/statistics/overview")
                         .accept(MediaType.APPLICATION_JSON))
@@ -90,7 +96,6 @@ class AdminControllerAuthMatrixTest {
     @Test
     @DisplayName("已登录但无权限访问管理员统计接口 -> 403")
     @WithMockUser(username = "u1", roles = "USER")
-    @org.junit.jupiter.api.Disabled("Security filter chain 未串联授权拦截，暂不验证 403")
     void admin_stats_forbidden_403() throws Exception {
         mockMvc.perform(get("/api/admin/statistics/overview")
                         .accept(MediaType.APPLICATION_JSON))

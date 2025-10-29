@@ -1,7 +1,6 @@
 package com.campus.marketplace.integration;
 
 import com.campus.marketplace.service.OrderService;
-import com.campus.marketplace.service.PaymentService;
 import com.campus.marketplace.service.impl.WechatPaymentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - 构造同一回调请求调用两次，均返回 200
  * - 验签被调用
  * - 订单回调处理被调用两次（由服务实现保证幂等）
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 class PaymentWebhookIdempotencyIT extends IntegrationTestBase {
 
     @Autowired
@@ -33,8 +36,6 @@ class PaymentWebhookIdempotencyIT extends IntegrationTestBase {
     @MockBean
     private WechatPaymentService wechatPaymentService;
 
-    @MockBean
-    private PaymentService paymentService;
 
     @MockBean
     private OrderService orderService;
@@ -48,14 +49,12 @@ class PaymentWebhookIdempotencyIT extends IntegrationTestBase {
         when(wechatPaymentService.buildFailResponse(anyString())).thenReturn("{\"code\":\"FAIL\"}");
 
         // 验签通过
-        when(paymentService.verifySignature(eq(orderNo), eq(txnId), any())).thenReturn(true);
-
         // 订单金额与回调处理
         com.campus.marketplace.common.entity.Order order = new com.campus.marketplace.common.entity.Order();
         order.setOrderNo(orderNo);
         order.setAmount(new BigDecimal("99.99"));
         when(orderService.getOrderDetail(orderNo)).thenReturn(order);
-        when(orderService.handlePaymentCallback(any())).thenReturn(true);
+        when(orderService.handlePaymentCallback(any(), anyBoolean())).thenReturn(true);
     }
 
     @Test
@@ -87,7 +86,6 @@ class PaymentWebhookIdempotencyIT extends IntegrationTestBase {
                         .content(body))
                 .andExpect(status().isOk());
 
-        Mockito.verify(paymentService, times(2)).verifySignature(eq(orderNo), eq(txnId), any());
-        Mockito.verify(orderService, times(2)).handlePaymentCallback(any());
+        Mockito.verify(orderService, times(2)).handlePaymentCallback(any(), eq(true));
     }
 }

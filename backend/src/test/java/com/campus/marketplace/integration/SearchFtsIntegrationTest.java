@@ -1,10 +1,13 @@
 package com.campus.marketplace.integration;
 
 import com.campus.marketplace.common.dto.response.SearchResultItem;
+import com.campus.marketplace.common.entity.Campus;
 import com.campus.marketplace.common.entity.Category;
 import com.campus.marketplace.common.entity.Goods;
 import com.campus.marketplace.common.entity.User;
+import com.campus.marketplace.common.enums.CampusStatus;
 import com.campus.marketplace.common.enums.GoodsStatus;
+import com.campus.marketplace.repository.CampusRepository;
 import com.campus.marketplace.repository.CategoryRepository;
 import com.campus.marketplace.repository.GoodsRepository;
 import com.campus.marketplace.repository.UserRepository;
@@ -57,6 +60,7 @@ class SearchFtsIntegrationTest {
     }
 
     @Autowired JdbcTemplate jdbcTemplate;
+    @Autowired CampusRepository campusRepository;
     @Autowired CategoryRepository categoryRepository;
     @Autowired GoodsRepository goodsRepository;
     @Autowired UserRepository userRepository;
@@ -94,26 +98,45 @@ class SearchFtsIntegrationTest {
     @Test
     @DisplayName("FTS：高亮与排序，以及校区过滤")
     void fts_highlight_rank_and_campusFilter() {
+        // 创建两个校区（修复外键约束问题）
+        Campus campusA = Campus.builder()
+                .code("CAMPUS_A")
+                .name("北京大学")
+                .status(CampusStatus.ACTIVE)
+                .build();
+        campusRepository.save(campusA);
+
+        Campus campusB = Campus.builder()
+                .code("CAMPUS_B")
+                .name("清华大学")
+                .status(CampusStatus.ACTIVE)
+                .build();
+        campusRepository.save(campusB);
+
         Category cat = new Category();
         cat.setName("数码");
         categoryRepository.save(cat);
 
         User s1 = User.builder().username("s1").password("p").email("s1@c.edu").build();
-        s1.setCampusId(1L);
+        s1.setCampusId(campusA.getId());
         userRepository.save(s1);
         User s2 = User.builder().username("s2").password("p").email("s2@c.edu").build();
-        s2.setCampusId(2L);
+        s2.setCampusId(campusB.getId());
         userRepository.save(s2);
 
         Goods g1 = Goods.builder().title("二手自行车").description("很好很好的自行车 自行车").price(new BigDecimal("100"))
                 .categoryId(cat.getId()).sellerId(s1.getId()).status(GoodsStatus.APPROVED).build();
-        g1.setCampusId(1L);
+        g1.setCampusId(campusA.getId());
         goodsRepository.save(g1);
 
         Goods g2 = Goods.builder().title("低价转让").description("自行车一辆").price(new BigDecimal("90"))
                 .categoryId(cat.getId()).sellerId(s2.getId()).status(GoodsStatus.APPROVED).build();
-        g2.setCampusId(2L);
+        g2.setCampusId(campusB.getId());
         goodsRepository.save(g2);
+
+        // 手动触发 FTS 向量更新（确保触发器生效）
+        goodsRepository.flush();
+        jdbcTemplate.execute("UPDATE t_goods SET search_vector = setweight(to_tsvector('chinese', coalesce(title,'')),'A') || setweight(to_tsvector('chinese', coalesce(description,'')),'B') WHERE id IN (" + g1.getId() + "," + g2.getId() + ")");
 
         Page<SearchResultItem> all = searchService.search("goods", "自行车", 0, 10);
         assertThat(all.getTotalElements()).isEqualTo(2);
@@ -124,12 +147,12 @@ class SearchFtsIntegrationTest {
         var auth = new UsernamePasswordAuthenticationToken("u10", null, List.of(new SimpleGrantedAuthority("ROLE_STUDENT")));
         SecurityContextHolder.getContext().setAuthentication(auth);
         User u10 = User.builder().username("u10").password("p").email("u10@c.edu").build();
-        u10.setCampusId(1L);
+        u10.setCampusId(campusA.getId());
         userRepository.save(u10);
 
         Page<SearchResultItem> onlyCampus = searchService.search("goods", "自行车", 0, 10);
         assertThat(onlyCampus.getTotalElements()).isEqualTo(1);
-        assertThat(onlyCampus.getContent().get(0).getCampusId()).isEqualTo(1L);
+        assertThat(onlyCampus.getContent().get(0).getCampusId()).isEqualTo(campusA.getId());
     }
 
     @Test

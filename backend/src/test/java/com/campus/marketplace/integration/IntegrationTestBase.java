@@ -9,7 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.GenericContainer;
@@ -37,17 +36,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 @Transactional
 @Import(TestCiOverrides.class)
-@TestPropertySource(properties = {
-    "spring.datasource.url=jdbc:h2:mem:it_db;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH",
-    "spring.datasource.username=sa",
-    "spring.datasource.password=",
-    "spring.datasource.driver-class-name=org.h2.Driver",
-    "spring.jpa.hibernate.ddl-auto=create-drop",
-    "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
-    "spring.flyway.enabled=false",
-    "spring.test.database.replace=NONE",
-    "spring.datasource.hikari.maximum-pool-size=5"
-})
 @EntityScan(basePackages = "com.campus.marketplace.common.entity")
 public abstract class IntegrationTestBase {
 
@@ -82,13 +70,12 @@ public abstract class IntegrationTestBase {
      */
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        // 统一使用 H2 以稳定 CI 环境；如需容器数据库，请在特定 IT 中单独覆盖
-        registry.add("spring.datasource.url", () -> "jdbc:h2:mem:it_db;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH");
-        registry.add("spring.datasource.username", () -> "sa");
-        registry.add("spring.datasource.password", () -> "");
-        registry.add("spring.datasource.driver-class-name", () -> "org.h2.Driver");
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.H2Dialect");
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.PostgreSQLDialect");
         registry.add("spring.flyway.enabled", () -> "false");
         registry.add("spring.test.database.replace", () -> "NONE");
         registry.add("spring.datasource.hikari.maximum-pool-size", () -> "5");
@@ -115,6 +102,35 @@ class TestCiOverrides {
     @org.springframework.context.annotation.Primary
     public com.campus.marketplace.service.SmsService testSmsService() {
         return (phone, templateCode, params) -> { };
+    }
+
+    /**
+     * Mock PaymentService for testing 💳
+     *
+     * 在测试环境下，退款操作直接返回成功，避免调用真实支付宝沙箱API
+     */
+    @org.springframework.context.annotation.Bean
+    @org.springframework.context.annotation.Primary
+    public com.campus.marketplace.service.PaymentService testPaymentService(
+            com.campus.marketplace.service.impl.AlipayPaymentService alipayPaymentService) {
+        return new com.campus.marketplace.service.PaymentService() {
+            @Override
+            public com.campus.marketplace.common.dto.response.PaymentResponse createPayment(
+                    com.campus.marketplace.common.entity.Order order,
+                    com.campus.marketplace.common.enums.PaymentMethod paymentMethod) {
+                // 使用真实的支付宝沙箱创建支付
+                return alipayPaymentService.createPayment(order);
+            }
+
+            @Override
+            public boolean refund(
+                    com.campus.marketplace.common.entity.Order order,
+                    java.math.BigDecimal amount,
+                    com.campus.marketplace.common.enums.PaymentMethod paymentMethod) {
+                // ✅ 测试环境退款直接返回成功（避免调用真实沙箱API）
+                return true;
+            }
+        };
     }
 
     @org.springframework.context.annotation.Bean

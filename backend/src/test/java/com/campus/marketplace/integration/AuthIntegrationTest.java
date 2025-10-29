@@ -114,7 +114,7 @@ public class AuthIntegrationTest extends IntegrationTestBase {
                 "wrongpwd@campus.edu"
         );
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isOk());

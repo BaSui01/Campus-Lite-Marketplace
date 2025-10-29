@@ -29,13 +29,20 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Order Service Pay And Callback Test
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("订单服务：支付与回调分支测试")
 class OrderServicePayAndCallbackTest {
 
     @Mock private OrderRepository orderRepository;
     @Mock private com.campus.marketplace.repository.GoodsRepository goodsRepository;
-    @Mock(lenient = true) private UserRepository userRepository;
+    @Mock private UserRepository userRepository;
     @Mock private PaymentService paymentService;
     @Mock private com.campus.marketplace.repository.ReviewRepository reviewRepository;
     @Mock private com.campus.marketplace.common.utils.SensitiveWordFilter sensitiveWordFilter;
@@ -127,10 +134,9 @@ class OrderServicePayAndCallbackTest {
     void callback_invalid_signature() {
         Order order = newPendingOrder();
         when(orderRepository.findByOrderNo("O1")).thenReturn(Optional.of(order));
-        when(paymentService.verifySignature(eq("O1"), eq("T1"), any())).thenReturn(false);
 
         PaymentCallbackRequest req = new PaymentCallbackRequest("O1", "T1", new BigDecimal("100"), "SUCCESS", "sig");
-        assertThatThrownBy(() -> orderService.handlePaymentCallback(req))
+        assertThatThrownBy(() -> orderService.handlePaymentCallback(req, false))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("code", ErrorCode.PAYMENT_FAILED.getCode());
     }
@@ -140,10 +146,9 @@ class OrderServicePayAndCallbackTest {
     void callback_amount_mismatch() {
         Order order = newPendingOrder();
         when(orderRepository.findByOrderNo("O1")).thenReturn(Optional.of(order));
-        when(paymentService.verifySignature(eq("O1"), eq("T1"), any())).thenReturn(true);
 
         PaymentCallbackRequest req = new PaymentCallbackRequest("O1", "T1", new BigDecimal("101"), "SUCCESS", "sig");
-        assertThatThrownBy(() -> orderService.handlePaymentCallback(req))
+        assertThatThrownBy(() -> orderService.handlePaymentCallback(req, true))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("code", ErrorCode.PAYMENT_FAILED.getCode());
     }
@@ -154,10 +159,9 @@ class OrderServicePayAndCallbackTest {
         Order order = newPendingOrder();
         order.setStatus(OrderStatus.PAID);
         when(orderRepository.findByOrderNo("O1")).thenReturn(Optional.of(order));
-        when(paymentService.verifySignature(eq("O1"), eq("T1"), any())).thenReturn(true);
 
         PaymentCallbackRequest req = new PaymentCallbackRequest("O1", "T1", new BigDecimal("100"), "SUCCESS", "sig");
-        assertThat(orderService.handlePaymentCallback(req)).isFalse();
+        assertThat(orderService.handlePaymentCallback(req, true)).isFalse();
     }
 
     @Test
@@ -165,10 +169,9 @@ class OrderServicePayAndCallbackTest {
     void callback_status_fail() {
         Order order = newPendingOrder();
         when(orderRepository.findByOrderNo("O1")).thenReturn(Optional.of(order));
-        when(paymentService.verifySignature(eq("O1"), eq("T1"), any())).thenReturn(true);
 
         PaymentCallbackRequest req = new PaymentCallbackRequest("O1", "T1", new BigDecimal("100"), "FAIL", "sig");
-        assertThat(orderService.handlePaymentCallback(req)).isFalse();
+        assertThat(orderService.handlePaymentCallback(req, true)).isFalse();
     }
 
     @Test
@@ -176,10 +179,9 @@ class OrderServicePayAndCallbackTest {
     void callback_success() {
         Order order = newPendingOrder();
         when(orderRepository.findByOrderNo("O1")).thenReturn(Optional.of(order));
-        when(paymentService.verifySignature(eq("O1"), eq("T1"), any())).thenReturn(true);
 
         PaymentCallbackRequest req = new PaymentCallbackRequest("O1", "T1", new BigDecimal("100"), "SUCCESS", "sig");
-        boolean ok = orderService.handlePaymentCallback(req);
+        boolean ok = orderService.handlePaymentCallback(req, true);
         assertThat(ok).isTrue();
         verify(orderRepository, atLeastOnce()).save(argThat(o -> o.getStatus() == OrderStatus.PAID));
     }

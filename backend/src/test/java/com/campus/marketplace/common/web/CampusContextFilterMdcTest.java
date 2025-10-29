@@ -42,7 +42,8 @@ class CampusContextFilterMdcTest {
 
     @Test
     void injectsCampusIdIntoMdc() throws ServletException, IOException {
-        User u = User.builder().id(1L).username("u1").campusId(99L).build();
+        User u = User.builder().username("u1").campusId(99L).build();
+        u.setId(1L);
         when(userRepo.findByUsername("u1")).thenReturn(Optional.of(u));
 
         MockHttpServletRequest req = new MockHttpServletRequest("GET", "/api/x");

@@ -48,6 +48,9 @@ class MessageWebSocketHandlerTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private com.campus.marketplace.service.MessageService messageService;
+
     @InjectMocks
     private MessageWebSocketHandler handler;
 
@@ -109,13 +112,16 @@ class MessageWebSocketHandlerTest {
         // 准备：没有 Token 的 URI
         URI uri = new URI("ws://localhost:8080/ws/message");
         when(session.getUri()).thenReturn(uri);
+        // 关键：Mock objectMapper 以避免 sendErrorMessage 失败
+        when(objectMapper.writeValueAsString(any(WebSocketMessage.class)))
+                .thenReturn("{\"type\":\"ERROR\",\"content\":\"缺少认证 Token\"}");
 
         // 执行：建立连接
         handler.afterConnectionEstablished(session);
 
-        // 验证：连接被拒绝（CloseStatus.SERVER_ERROR = 1011，因为 catch 块捕获了异常）
+        // 验证：连接被拒绝（CloseStatus.NOT_ACCEPTABLE = 1003）
         verify(sessionManager, never()).addSession(anyLong(), any());
-        verify(session).close(eq(CloseStatus.SERVER_ERROR)); // 实际返回 code=1011
+        verify(session).close(eq(CloseStatus.NOT_ACCEPTABLE)); // 期望 code=1003
     }
 
     @Test
@@ -142,7 +148,7 @@ class MessageWebSocketHandlerTest {
     }
 
     @Test
-    @DisplayName("💬 接收文本消息 - 记录日志（任务22待实现）")
+    @DisplayName("💬 接收文本消息 - 转发给接收者")
     void testHandleTextMessage() throws Exception {
         // 准备：文本消息
         String textJson = "{\"type\":\"TEXT\",\"content\":\"Hello\",\"toUserId\":2001}";
@@ -154,16 +160,20 @@ class MessageWebSocketHandlerTest {
 
         when(sessionManager.getUserId(TEST_SESSION_ID)).thenReturn(TEST_USER_ID);
         when(objectMapper.readValue(textJson, WebSocketMessage.class)).thenReturn(textMsg);
-        // 关键：Mock objectMapper 以避免 sendErrorMessage 失败
+        // 关键1：Mock messageService.sendMessage() 返回消息ID
+        when(messageService.sendMessage(any())).thenReturn(1234L);
+        // 关键2：Mock objectMapper 序列化 ACK 消息
         when(objectMapper.writeValueAsString(any(WebSocketMessage.class)))
-                .thenReturn("{\"type\":\"ERROR\",\"content\":\"私信功能将在任务22实现\"}");
+                .thenReturn("{\"type\":\"SYSTEM\",\"content\":\"消息发送成功\",\"messageId\":1234}");
 
         // 执行：处理文本消息
         TextMessage textMessage = new TextMessage(textJson);
         handler.handleTextMessage(session, textMessage);
 
-        // 验证：消息已接收（任务22会实现转发逻辑）
-        verify(sessionManager).getUserId(TEST_SESSION_ID);
+        // 验证：消息已保存到数据库
+        verify(messageService).sendMessage(any());
+        // 验证：ACK 消息已发送给发送者
+        verify(session).sendMessage(any(TextMessage.class));
     }
 
     @Test

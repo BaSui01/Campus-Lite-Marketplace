@@ -28,6 +28,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Category Service Impl Test
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("分类服务实现测试")
 class CategoryServiceImplTest {
@@ -55,7 +62,8 @@ class CategoryServiceImplTest {
 
     @AfterEach
     void tearDown() {
-        reset(categoryRepository, goodsRepository);
+        reset(categoryRepository);
+        reset(goodsRepository);
     }
 
     @Test

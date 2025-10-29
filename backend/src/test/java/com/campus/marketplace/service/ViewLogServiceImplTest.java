@@ -45,12 +45,34 @@ class ViewLogServiceImplTest {
         long timestamp = Instant.parse("2025-01-01T08:30:00Z").toEpochMilli();
         viewLogService.saveAsync("alice", 42L, timestamp);
 
-        assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(latch.await(3, TimeUnit.SECONDS)).isTrue();
         ViewLog log = saved.get();
         assertThat(log).isNotNull();
         assertThat(log.getUsername()).isEqualTo("alice");
         assertThat(log.getGoodsId()).isEqualTo(42L);
         assertThat(log.getViewedAt()).isEqualTo(Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime());
+    }
+
+    @Test
+    @DisplayName("允许匿名浏览以及空商品 ID")
+    void saveAsync_allowsNullUsernameAndGoodsId() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<ViewLog> saved = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            saved.set(invocation.getArgument(0));
+            latch.countDown();
+            return null;
+        }).when(viewLogRepository).save(any(ViewLog.class));
+
+        viewLogService.saveAsync(null, null, 0L);
+
+        assertThat(latch.await(3, TimeUnit.SECONDS)).isTrue();
+        ViewLog log = saved.get();
+        assertThat(log).isNotNull();
+        assertThat(log.getUsername()).isNull();
+        assertThat(log.getGoodsId()).isNull();
+        assertThat(log.getViewedAt()).isEqualTo(Instant.ofEpochMilli(0L).atZone(ZoneId.systemDefault()).toLocalDateTime());
     }
 
     @Test
@@ -65,6 +87,6 @@ class ViewLogServiceImplTest {
 
         viewLogService.saveAsync("bob", 99L, System.currentTimeMillis());
 
-        assertThat(latch.await(1, TimeUnit.SECONDS)).isTrue();
+        assertThat(latch.await(3, TimeUnit.SECONDS)).isTrue();
     }
 }

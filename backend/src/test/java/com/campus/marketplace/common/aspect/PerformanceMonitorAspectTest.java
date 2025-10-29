@@ -12,8 +12,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * 性能监控切面测试类（单元测试）
@@ -56,6 +61,12 @@ class PerformanceMonitorAspectTest {
         // Then: 验证方法被执行，并返回结果
         assertEquals("test result", result);
         verify(joinPoint, times(1)).proceed();
+
+        Map<String, Object> stats = performanceMonitorAspect.getPerformanceStats();
+        assertThat(stats).containsKey("GoodsService.listGoods(..)");
+        Map<String, Object> methodStats = (Map<String, Object>) stats.get("GoodsService.listGoods(..)");
+        assertThat(methodStats.get("totalCalls")).isEqualTo(1L);
+        assertThat(methodStats.get("totalErrors")).isEqualTo(0L);
     }
 
     @Test
@@ -107,6 +118,9 @@ class PerformanceMonitorAspectTest {
         // 获取性能统计数据
         Map<String, Object> stats = performanceMonitorAspect.getPerformanceStats();
         assertNotNull(stats);
+        Map<String, Object> methodStats = (Map<String, Object>) stats.get("GoodsService.listGoods(..)");
+        assertThat(methodStats.get("totalCalls")).isEqualTo(5L);
+        assertThat((Long) methodStats.get("totalExecutionTime")).isGreaterThanOrEqualTo(0L);
     }
 
     @Test
@@ -124,7 +138,7 @@ class PerformanceMonitorAspectTest {
 
         // Then: 验证报告包含必要信息
         assertNotNull(stats);
-        // 等实现后可以验证具体字段
-        // assertTrue(stats.containsKey("totalCalls"));
+        Map<String, Object> methodStats = (Map<String, Object>) stats.get("GoodsService.listGoods(..)");
+        assertThat(methodStats).containsKeys("avgExecutionTime", "maxExecutionTime", "slowCount");
     }
 }

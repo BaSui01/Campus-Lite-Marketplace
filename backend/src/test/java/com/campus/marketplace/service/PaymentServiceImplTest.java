@@ -21,6 +21,13 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Payment Service Impl Test
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PaymentServiceImpl 路由与分支测试")
 class PaymentServiceImplTest {
@@ -102,11 +109,5 @@ class PaymentServiceImplTest {
         when(wechatProvider.getIfAvailable()).thenReturn(wechat);
         when(wechat.refund(o, BigDecimal.TEN)).thenReturn(true);
         assertThat(paymentService.refund(o, BigDecimal.TEN, PaymentMethod.WECHAT)).isTrue();
-    }
-
-    @Test
-    @DisplayName("verifySignature 永远返回 true（已标注废弃）")
-    void verifySignature_alwaysTrue() {
-        assertThat(paymentService.verifySignature("O1","T1","sig")).isTrue();
     }
 }

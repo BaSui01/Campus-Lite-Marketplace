@@ -29,6 +29,13 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Wechat Payment Service Test
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("微信支付V3服务实现测试")
 class WechatPaymentServiceTest {
@@ -39,6 +46,10 @@ class WechatPaymentServiceTest {
 
     private ObjectMapper objectMapper;
     private WechatPaymentService wechatPaymentService;
+
+    private static class DummyJsonProcessingException extends JsonProcessingException {
+        DummyJsonProcessingException() { super("err"); }
+    }
 
     @BeforeEach
     void setUp() {
@@ -205,7 +216,7 @@ class WechatPaymentServiceTest {
     @DisplayName("成功响应序列化失败时返回兜底 JSON")
     void buildSuccessResponse_fallback() throws JsonProcessingException {
         ObjectMapper mapper = mock(ObjectMapper.class);
-        when(mapper.writeValueAsString(any())).thenThrow(new JsonProcessingException("err") {});
+        when(mapper.writeValueAsString(any())).thenThrow(new DummyJsonProcessingException());
         WechatPaymentService service = new WechatPaymentService(nativePayService, wechatPayV3Config, wechatPayConfig, mapper);
 
         assertThat(service.buildSuccessResponse()).isEqualTo("{\"code\":\"SUCCESS\",\"message\":\"成功\"}");
@@ -215,7 +226,7 @@ class WechatPaymentServiceTest {
     @DisplayName("失败响应序列化失败时返回兜底 JSON")
     void buildFailResponse_fallback() throws JsonProcessingException {
         ObjectMapper mapper = mock(ObjectMapper.class);
-        when(mapper.writeValueAsString(any())).thenThrow(new JsonProcessingException("err") {});
+        when(mapper.writeValueAsString(any())).thenThrow(new DummyJsonProcessingException());
         WechatPaymentService service = new WechatPaymentService(nativePayService, wechatPayV3Config, wechatPayConfig, mapper);
 
         assertThat(service.buildFailResponse("oops")).isEqualTo("{\"code\":\"FAIL\",\"message\":\"系统异常\"}");

@@ -10,10 +10,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * 慢查询监控切面测试类
@@ -41,6 +48,7 @@ class SlowQueryMonitorAspectTest {
         // Mock JoinPoint 返回方法签名信息
         when(joinPoint.getSignature()).thenReturn(signature);
         when(signature.toString()).thenReturn("GoodsRepository.findById(..)");
+        when(joinPoint.getArgs()).thenReturn(new Object[0]);
     }
 
     @Test
@@ -58,6 +66,9 @@ class SlowQueryMonitorAspectTest {
         // Then: 慢查询被记录（日志中应该有 WARN 日志）
         assertEquals("query result", result);
         verify(joinPoint, times(1)).proceed();
+
+        Map<String, Object> stats = slowQueryMonitorAspect.getSlowQueryStatistics();
+        assertThat(stats.get("totalSlowQueries")).isEqualTo(1L);
     }
 
     @Test
@@ -75,6 +86,9 @@ class SlowQueryMonitorAspectTest {
         // Then: 正常查询不记录为慢查询
         assertEquals("query result", result);
         verify(joinPoint, times(1)).proceed();
+
+        Map<String, Object> stats = slowQueryMonitorAspect.getSlowQueryStatistics();
+        assertThat(stats.get("totalSlowQueries")).isEqualTo(0L);
     }
 
     @Test
@@ -149,6 +163,7 @@ class SlowQueryMonitorAspectTest {
     @DisplayName("应该获取慢查询详情列表")
     void shouldGetSlowQueryDetails() throws Throwable {
         // Given: 执行慢查询
+        when(joinPoint.getArgs()).thenReturn(new Object[]{1L});
         when(joinPoint.proceed()).thenAnswer(invocation -> {
             Thread.sleep(600);
             return "result";
@@ -157,11 +172,13 @@ class SlowQueryMonitorAspectTest {
         slowQueryMonitorAspect.monitorSlowQuery(joinPoint);
 
         // When: 获取慢查询详情
-        Map<String, Object> stats = slowQueryMonitorAspect.getSlowQueryStatistics();
+        List<SlowQueryMonitorAspect.SlowQueryRecord> records = slowQueryMonitorAspect.getSlowQueryRecords();
 
         // Then: 包含慢查询详情
-        assertNotNull(stats);
-        // 可以验证是否包含详情列表（根据实现）
+        assertThat(records).hasSizeGreaterThanOrEqualTo(1);
+        SlowQueryMonitorAspect.SlowQueryRecord record = records.get(records.size() - 1);
+        assertThat(record.getMethodName()).isEqualTo("GoodsRepository.findById(..)");
+        assertThat(record.getParameters()).contains("1");
     }
 
     @Test
