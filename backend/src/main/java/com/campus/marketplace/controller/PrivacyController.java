@@ -24,8 +24,9 @@ import java.util.List;
  * 提供隐私请求创建/查询与管理员处理接口
  *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "隐私合规", description = "数据导出与注销申请接口")
@@ -64,14 +65,14 @@ public class PrivacyController {
     }
 
     @GetMapping("/api/admin/privacy/requests")
-    @PreAuthorize("hasAuthority('system:compliance:review')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_COMPLIANCE_REVIEW)")
     @Operation(summary = "查看待处理隐私请求", description = "管理员查看等待处理的隐私请求")
     public ApiResponse<List<PrivacyRequestResponse>> listPendingRequests() {
         return ApiResponse.success(privacyService.listPendingRequests());
     }
 
     @PostMapping("/api/admin/privacy/requests/{id}/complete")
-    @PreAuthorize("hasAuthority('system:compliance:review')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_COMPLIANCE_REVIEW)")
     @Operation(summary = "标记隐私请求完成", description = "管理员处理完成后上传结果路径")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,

@@ -1,0 +1,218 @@
+# 🔒 每周安全扫描工作流
+# 作用：定期检查依赖安全漏洞，及时发现并修复高危风险
+# 执行：每周一凌晨 2:00（UTC）自动运行，也可手动触发
+
+name: Security Weekly Scan
+
+on:
+  # 定时触发：每周一凌晨 2:00 UTC（北京时间 10:00）
+  schedule:
+    - cron: '0 2 * * 1'
+
+  # 手动触发
+  workflow_dispatch:
+    inputs:
+      cvss_threshold:
+        description: 'CVSS 阈值（失败构建）'
+        required: false
+        default: '7'
+        type: choice
+        options:
+          - '7'
+          - '8'
+          - '9'
+      upload_sarif:
+        description: '是否上传 SARIF 到 GitHub Security'
+        required: false
+        default: 'true'
+        type: boolean
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: false  # 安全扫描不中断，确保完整执行
+
+permissions:
+  contents: read
+  security-events: write  # 允许上传 SARIF 到 GitHub Security
+
+jobs:
+  dependency-check:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: ☕ 设置 Temurin JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: 📦 下载并缓存 NVD 数据库（加速扫描）
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: nvd-data-${{ github.run_id }}
+          restore-keys: |
+            nvd-data-
+
+      - name: 🔍 运行 OWASP Dependency-Check（HTML 格式）
+        run: |
+          mvn -B -f backend/pom.xml \
+            org.owasp:dependency-check-maven:check \
+            -Dformat=HTML \
+            -DfailBuildOnCVSS=${{ inputs.cvss_threshold || '7' }} \
+            -DsuppressionFile=backend/.owasp/suppressions.xml
+        continue-on-error: true  # 允许失败，稍后通过 Issue 告警
+
+      - name: 📊 生成 SARIF 报告（用于 GitHub Security）
+        if: ${{ inputs.upload_sarif == 'true' || inputs.upload_sarif == '' }}
+        run: |
+          mvn -B -f backend/pom.xml \
+            org.owasp:dependency-check-maven:check \
+            -Dformat=SARIF \
+            -DfailBuildOnCVSS=10  # SARIF 生成不失败
+        continue-on-error: true
+
+      - name: 🔐 上传 SARIF 到 GitHub Security
+        if: ${{ inputs.upload_sarif == 'true' || inputs.upload_sarif == '' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: backend/target/dependency-check-report.sarif
+          category: dependency-check
+        continue-on-error: true  # 避免因 GitHub Security 服务问题导致失败
+
+      - name: 📄 上传 HTML 报告到 Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report-${{ github.run_number }}
+          path: backend/target/dependency-check-report.html
+          retention-days: 90  # 保留 90 天
+          if-no-files-found: warn
+
+      - name: 📋 解析扫描结果并提取高危漏洞
+        if: always()
+        id: parse_results
+        run: |
+          # 检查 HTML 报告是否存在高危漏洞
+          if [ -f backend/target/dependency-check-report.html ]; then
+            # 提取 CVSS >= 7 的漏洞数量
+            HIGH_VULN_COUNT=$(grep -o 'CVSS Score: [7-9]\.[0-9]' backend/target/dependency-check-report.html | wc -l || echo "0")
+            CRITICAL_VULN_COUNT=$(grep -o 'CVSS Score: [9-9]\.[0-9]' backend/target/dependency-check-report.html | wc -l || echo "0")
+
+            echo "high_count=$HIGH_VULN_COUNT" >> $GITHUB_OUTPUT
+            echo "critical_count=$CRITICAL_VULN_COUNT" >> $GITHUB_OUTPUT
+
+            if [ "$HIGH_VULN_COUNT" -gt 0 ]; then
+              echo "has_vulnerabilities=true" >> $GITHUB_OUTPUT
+            else
+              echo "has_vulnerabilities=false" >> $GITHUB_OUTPUT
+            fi
+
+            echo "📊 扫描结果："
+            echo "  - 高危漏洞（CVSS 7-8.9）: $HIGH_VULN_COUNT"
+            echo "  - 严重漏洞（CVSS 9-10）: $CRITICAL_VULN_COUNT"
+          else
+            echo "⚠️ 未找到扫描报告"
+            echo "has_vulnerabilities=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🚨 创建 GitHub Issue（发现高危漏洞时）
+        if: steps.parse_results.outputs.has_vulnerabilities == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const high = '${{ steps.parse_results.outputs.high_count }}';
+            const critical = '${{ steps.parse_results.outputs.critical_count }}';
+            const runNumber = '${{ github.run_number }}';
+            const runUrl = '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}';
+
+            const issueTitle = `🔒 安全告警：发现 ${high} 个高危依赖漏洞 (Week ${new Date().toISOString().slice(0, 10)})`;
+            const issueBody = `
+            ## 🚨 安全扫描告警
+
+            **扫描时间**: ${new Date().toISOString()}
+            **扫描编号**: #${runNumber}
+            **扫描报告**: [查看详细报告](${runUrl})
+
+            ---
+
+            ### 📊 漏洞统计
+
+            | 严重程度 | 数量 |
+            |---------|------|
+            | 🔴 严重（CVSS 9-10） | **${critical}** |
+            | 🟠 高危（CVSS 7-8.9） | **${high}** |
+
+            ---
+
+            ### 🔧 处理建议
+
+            1. **立即查看报告**：下载 [dependency-check-report-${runNumber}](${runUrl}) Artifacts
+            2. **分析影响范围**：确认漏洞是否影响生产环境
+            3. **升级依赖**：参考 \`docs/quality-assurance-plan.md\` 安全整改计划
+            4. **验证兼容性**：运行完整测试套件 \`mvn verify\`
+            5. **更新文档**：升级完成后更新安全整改计划
+
+            ---
+
+            ### 📝 相关文档
+
+            - [质量保障计划](../blob/main/docs/quality-assurance-plan.md)
+            - [OWASP Dependency-Check 官方文档](https://jeremylong.github.io/DependencyCheck/)
+            - [Maven 依赖管理最佳实践](../blob/main/backend/pom.xml)
+
+            ---
+
+            **自动创建于**: \`security-weekly-scan\` 工作流
+            `;
+
+            // 搜索是否已有未关闭的安全告警 Issue
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'security,dependencies',
+              per_page: 10
+            });
+
+            const existingIssue = issues.data.find(issue =>
+              issue.title.includes('安全告警') &&
+              issue.title.includes(new Date().toISOString().slice(0, 10))
+            );
+
+            if (existingIssue) {
+              // 更新现有 Issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `🔄 **扫描结果更新** (#${runNumber})\n\n${issueBody}`
+              });
+              console.log(`✅ 已更新现有 Issue: #${existingIssue.number}`);
+            } else {
+              // 创建新 Issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: issueBody,
+                labels: ['security', 'dependencies', 'high-priority']
+              });
+              console.log(`✅ 已创建新 Issue`);
+            }
+
+      - name: ✅ 扫描完成通知
+        if: always()
+        run: |
+          if [ "${{ steps.parse_results.outputs.has_vulnerabilities }}" == "true" ]; then
+            echo "⚠️ 发现 ${{ steps.parse_results.outputs.high_count }} 个高危漏洞！"
+            echo "🚨 已自动创建 GitHub Issue，请及时处理！"
+            exit 1  # 失败退出
+          else
+            echo "✅ 未发现高危漏洞，依赖安全！"
+          fi

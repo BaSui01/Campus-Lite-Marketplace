@@ -11,6 +11,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Notification Dispatcher
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Slf4j
 @Component
 @RequiredArgsConstructor

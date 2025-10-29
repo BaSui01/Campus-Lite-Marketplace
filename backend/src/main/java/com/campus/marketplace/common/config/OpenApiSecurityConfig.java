@@ -19,6 +19,13 @@ import org.springframework.context.annotation.Configuration;
         scheme = "bearer",
         bearerFormat = "JWT"
 )
+/**
+ * Open Api Security Config
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 public class OpenApiSecurityConfig {
 
     /**

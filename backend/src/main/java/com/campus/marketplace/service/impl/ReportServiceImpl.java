@@ -22,6 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+/**
+ * Report Service Impl
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor

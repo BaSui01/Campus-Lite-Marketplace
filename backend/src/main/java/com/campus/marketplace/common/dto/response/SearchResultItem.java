@@ -9,7 +9,11 @@ import java.math.BigDecimal;
 
 /**
  * 搜索结果项
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Data
 @Builder
 @NoArgsConstructor

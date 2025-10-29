@@ -7,6 +7,7 @@ import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.common.utils.SensitiveWordFilter;
 import com.campus.marketplace.repository.PostRepository;
@@ -29,12 +30,13 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 帖子服务实现类
- * 
+ *
  * 提供论坛帖子的发布、查询、审核等功能
- * 
+ *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -147,7 +149,7 @@ public class PostServiceImpl implements PostService {
         // 校区过滤：普通用户仅看本校，跨校权限不过滤
         Long campusFilter = null;
         try {
-            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 String username = SecurityUtil.getCurrentUsername();
                 User u = userRepository.findByUsername(username).orElse(null);
                 campusFilter = u != null ? u.getCampusId() : null;
@@ -180,7 +182,7 @@ public class PostServiceImpl implements PostService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Long campusFilter = null;
         try {
-            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 String username = SecurityUtil.getCurrentUsername();
                 User u = userRepository.findByUsername(username).orElse(null);
                 campusFilter = u != null ? u.getCampusId() : null;
@@ -204,7 +206,7 @@ public class PostServiceImpl implements PostService {
 
         // 校区鉴权
         try {
-            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 String username = SecurityUtil.getCurrentUsername();
                 User current = userRepository.findByUsername(username).orElse(null);
                 if (current != null && post.getCampusId() != null && current.getCampusId() != null

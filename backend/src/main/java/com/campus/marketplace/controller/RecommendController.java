@@ -13,6 +13,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Recommend Controller
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Slf4j
 @RestController
 @RequestMapping("/api/recommend")

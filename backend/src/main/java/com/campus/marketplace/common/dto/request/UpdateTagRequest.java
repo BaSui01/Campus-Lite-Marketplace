@@ -5,7 +5,11 @@ import jakarta.validation.constraints.Size;
 
 /**
  * 更新标签请求
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public record UpdateTagRequest(
         @NotBlank(message = "标签名称不能为空")
         @Size(max = 50, message = "标签名称长度不能超过 50 个字符")

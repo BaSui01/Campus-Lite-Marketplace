@@ -8,7 +8,11 @@ import java.time.LocalDateTime;
 
 /**
  * 隐私请求响应
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Builder
 public record PrivacyRequestResponse(
         Long id,

@@ -19,7 +19,11 @@ import java.io.IOException;
 
 /**
  * 每次请求解析并注入当前用户的 campusId 到 ThreadLocal 与 MDC
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Component
 @ConditionalOnBean(name = "entityManagerFactory")

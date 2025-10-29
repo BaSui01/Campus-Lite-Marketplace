@@ -15,6 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalTime;
 import java.util.Map;
 
+/**
+ * Notification Preference Controller
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @RestController
 @RequestMapping("/api/notifications/preferences")
 @RequiredArgsConstructor

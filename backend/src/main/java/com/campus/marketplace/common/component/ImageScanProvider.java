@@ -1,4 +1,11 @@
 package com.campus.marketplace.common.component;
+/**
+ * Image Scan Provider
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 
 public interface ImageScanProvider {
 

@@ -11,6 +11,13 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
+/**
+ * Notification Template Initializer
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Slf4j
 @Configuration
 @RequiredArgsConstructor

@@ -5,6 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * Update Campus Request
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Data
 public class UpdateCampusRequest {
     @NotBlank

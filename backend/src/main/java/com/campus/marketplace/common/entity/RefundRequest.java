@@ -19,6 +19,13 @@ import java.math.BigDecimal;
         @Index(name = "uk_refund_order_no", columnList = "order_no", unique = true),
         @Index(name = "idx_refund_status", columnList = "status")
 })
+/**
+ * Refund Request
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 public class RefundRequest extends BaseEntity {
 
     @Column(name = "refund_no", nullable = false, length = 50, unique = true)

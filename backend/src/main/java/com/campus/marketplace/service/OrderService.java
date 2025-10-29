@@ -9,12 +9,13 @@ import org.springframework.data.domain.Page;
 
 /**
  * 订单服务接口
- * 
+ *
  * 提供订单创建、查询、支付等功能
- * 
+ *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 public interface OrderService {
 
     /**
@@ -35,11 +36,12 @@ public interface OrderService {
 
     /**
      * 处理支付回调
-     * 
+     *
      * @param request 回调请求
+     * @param signatureVerified 回调签名是否已通过校验
      * @return 是否处理成功
      */
-    boolean handlePaymentCallback(PaymentCallbackRequest request);
+    boolean handlePaymentCallback(PaymentCallbackRequest request, boolean signatureVerified);
 
     /**
      * 取消超时订单

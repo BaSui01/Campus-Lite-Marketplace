@@ -7,6 +7,13 @@ import lombok.*;
 @Table(name = "t_notification_template", indexes = {
         @Index(name = "uk_tpl_code", columnList = "code", unique = true)
 })
+/**
+ * Notification Template
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Getter
 @Setter
 @NoArgsConstructor

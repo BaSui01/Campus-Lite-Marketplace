@@ -25,8 +25,9 @@ import java.util.List;
  * 提供标签的查询、创建、更新、删除与合并接口
  *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "标签管理", description = "标签查询、创建、更新与合并接口")
@@ -41,7 +42,7 @@ public class TagController {
     }
 
     @PostMapping("/api/admin/tags")
-    @PreAuthorize("hasAuthority('system:tag:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_TAG_MANAGE)")
     @Operation(summary = "创建标签", description = "管理员新增标签")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
@@ -65,7 +66,7 @@ public class TagController {
     }
 
     @PutMapping("/api/admin/tags/{id}")
-    @PreAuthorize("hasAuthority('system:tag:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_TAG_MANAGE)")
     @Operation(summary = "更新标签", description = "管理员修改标签名称或状态")
     public ApiResponse<Void> updateTag(@Parameter(description = "标签ID", example = "101") @PathVariable Long id,
                                        @Valid @RequestBody UpdateTagRequest request) {
@@ -74,7 +75,7 @@ public class TagController {
     }
 
     @DeleteMapping("/api/admin/tags/{id}")
-    @PreAuthorize("hasAuthority('system:tag:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_TAG_MANAGE)")
     @Operation(summary = "删除标签", description = "管理员删除标签，删除前需确保无绑定")
     public ApiResponse<Void> deleteTag(@Parameter(description = "标签ID", example = "101") @PathVariable Long id) {
         tagService.deleteTag(id);
@@ -82,7 +83,7 @@ public class TagController {
     }
 
     @PostMapping("/api/admin/tags/merge")
-    @PreAuthorize("hasAuthority('system:tag:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_TAG_MANAGE)")
     @Operation(summary = "合并标签", description = "将来源标签合并至目标标签")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,

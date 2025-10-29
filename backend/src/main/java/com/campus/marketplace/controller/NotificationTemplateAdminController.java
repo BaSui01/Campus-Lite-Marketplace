@@ -16,6 +16,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Notification Template Admin Controller
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @RestController
 @RequestMapping("/api/admin/notification-templates")
 @RequiredArgsConstructor
@@ -26,21 +33,21 @@ public class NotificationTemplateAdminController {
     private final NotificationTemplateService templateService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('system:rate-limit:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "列表")
     public ApiResponse<List<NotificationTemplate>> list() {
         return ApiResponse.success(repository.findAll());
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('system:rate-limit:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "创建或更新")
     public ApiResponse<NotificationTemplate> save(@RequestBody NotificationTemplate tpl) {
         return ApiResponse.success(repository.save(tpl));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('system:rate-limit:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "删除")
     public ApiResponse<Void> delete(@Parameter(description = "模板ID", example = "3001") @PathVariable Long id) {
         repository.deleteById(id);
@@ -48,7 +55,7 @@ public class NotificationTemplateAdminController {
     }
 
     @PostMapping("/render/{code}")
-    @PreAuthorize("hasAuthority('system:rate-limit:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "渲染预览")
     public ApiResponse<Map<String, Object>> render(@Parameter(description = "模板编码", example = "ORDER_PAID") @PathVariable String code,
                                                    @RequestBody(required = false) Map<String, Object> params) {

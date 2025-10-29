@@ -17,7 +17,11 @@ import java.util.List;
  *
  * - 定时按校区刷新热门榜单，结果写入 Redis
  * - 使用 RecommendService 内部的分布式锁保障幂等
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Component
 @RequiredArgsConstructor

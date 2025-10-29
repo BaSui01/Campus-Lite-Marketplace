@@ -4,7 +4,11 @@ import java.util.Map;
 
 /**
  * 短信发送服务（可插拔）。
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public interface SmsService {
 
     /**

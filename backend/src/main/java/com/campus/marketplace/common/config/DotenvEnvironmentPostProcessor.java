@@ -16,7 +16,11 @@ import java.util.Map;
 
 /**
  * Load variables from a .env file (project root or its parents) into Spring Environment.
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public class DotenvEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
     private static final String SOURCE_NAME = "dotenv";
 

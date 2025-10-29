@@ -4,7 +4,11 @@ import java.util.List;
 
 /**
  * 管理端软删除数据治理服务
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public interface SoftDeleteAdminService {
 
     /**

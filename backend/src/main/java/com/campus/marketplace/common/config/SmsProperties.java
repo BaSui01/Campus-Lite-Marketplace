@@ -6,7 +6,11 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * 短信配置属性（阿里云）。
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "sms.aliyun")

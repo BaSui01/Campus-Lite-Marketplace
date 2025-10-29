@@ -10,6 +10,7 @@ import com.campus.marketplace.common.enums.MessageStatus;
 import com.campus.marketplace.common.enums.MessageType;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.common.utils.SensitiveWordFilter;
 import com.campus.marketplace.service.ComplianceService;
@@ -49,8 +50,9 @@ import java.time.LocalDateTime;
  * 5. 自动创建/获取会话
  *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -106,7 +108,7 @@ public class MessageServiceImpl implements MessageService {
 
         // 2.1 校区隔离：无跨校权限禁止跨校通信
         try {
-            if (!SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (!SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 if (sender.getCampusId() != null && receiver.getCampusId() != null
                         && !sender.getCampusId().equals(receiver.getCampusId())) {
                     throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区通信被禁止");

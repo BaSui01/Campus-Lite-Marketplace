@@ -13,6 +13,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Compliance Admin Controller
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @RestController
 @RequestMapping("/api/admin/compliance")
 @RequiredArgsConstructor
@@ -23,7 +30,7 @@ public class ComplianceAdminController {
     private final ComplianceAuditLogRepository auditRepository;
 
     @PostMapping("/whitelist")
-    @PreAuthorize("hasAuthority('system:compliance:review')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_COMPLIANCE_REVIEW)")
     @Operation(summary = "添加白名单")
     public ApiResponse<ComplianceWhitelist> addWhitelist(@RequestParam String type,
                                                          @RequestParam Long targetId) {
@@ -32,7 +39,7 @@ public class ComplianceAdminController {
     }
 
     @DeleteMapping("/whitelist/{id}")
-    @PreAuthorize("hasAuthority('system:compliance:review')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_COMPLIANCE_REVIEW)")
     @Operation(summary = "移除白名单")
     public ApiResponse<Void> removeWhitelist(@PathVariable Long id) {
         whitelistRepository.deleteById(id);
@@ -40,7 +47,7 @@ public class ComplianceAdminController {
     }
 
     @GetMapping("/audit")
-    @PreAuthorize("hasAuthority('system:compliance:review')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_COMPLIANCE_REVIEW)")
     @Operation(summary = "查询审计日志")
     public ApiResponse<Page<ComplianceAuditLog>> listAudit(@RequestParam String targetType,
                                                            @RequestParam Long targetId,

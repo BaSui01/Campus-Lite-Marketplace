@@ -18,7 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * 说明：为满足 Spec #2 阶段三的“规则管理与动态刷新、黑白名单”要求，
  * 先提供内存实现，后续可替换为 DB/Redis 持久化。
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Component
 public class RateLimitRuleManager {

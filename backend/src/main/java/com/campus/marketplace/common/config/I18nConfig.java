@@ -11,7 +11,11 @@ import java.util.Locale;
 
 /**
  * 国际化配置
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Configuration
 public class I18nConfig {
 

@@ -19,7 +19,11 @@ import java.util.List;
 
 /**
  * 管理端软删除治理接口
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/soft-delete")

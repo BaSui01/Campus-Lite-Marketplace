@@ -6,7 +6,11 @@ import jakarta.validation.constraints.Size;
 
 /**
  * 创建隐私请求 DTO
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public record CreatePrivacyRequest(
         @NotNull(message = "请求类型不能为空")
         PrivacyRequestType type,

@@ -20,6 +20,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Campus Controller
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @RestController
 @RequestMapping("/api/admin/campuses")
 @RequiredArgsConstructor
@@ -29,14 +36,14 @@ public class CampusController {
     private final CampusService campusService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('system:campus:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CAMPUS_MANAGE)")
     @Operation(summary = "校区列表", description = "查询全部校区")
     public ApiResponse<List<Campus>> list() {
         return ApiResponse.success(campusService.listAll());
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('system:campus:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CAMPUS_MANAGE)")
     @Operation(summary = "创建校区")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
@@ -60,7 +67,7 @@ public class CampusController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('system:campus:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CAMPUS_MANAGE)")
     @Operation(summary = "更新校区")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
@@ -84,7 +91,7 @@ public class CampusController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('system:campus:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CAMPUS_MANAGE)")
     @Operation(summary = "删除校区")
     public ApiResponse<Void> delete(@Parameter(description = "校区ID", example = "1") @PathVariable Long id) {
         campusService.delete(id);
@@ -92,7 +99,7 @@ public class CampusController {
     }
 
     @PostMapping("/migrate-users/validate")
-    @PreAuthorize("hasAuthority('system:campus:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CAMPUS_MANAGE)")
     @Operation(summary = "校区迁移验证", description = "迁移前的影响评估与校验")
     public ApiResponse<CampusMigrationValidationResponse> validateMigration(@Valid @RequestBody CampusMigrationRequest req) {
         CampusMigrationValidationResponse res = campusService.validateUserMigration(req.getFromCampusId(), req.getToCampusId());
@@ -100,7 +107,7 @@ public class CampusController {
     }
 
     @PostMapping("/migrate-users")
-    @PreAuthorize("hasAuthority('system:campus:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CAMPUS_MANAGE)")
     @Operation(summary = "执行校区迁移", description = "将用户从源校区迁移至目标校区")
     public ApiResponse<Integer> migrateUsers(@Valid @RequestBody CampusMigrationRequest req) {
         int moved = campusService.migrateUsers(req.getFromCampusId(), req.getToCampusId());

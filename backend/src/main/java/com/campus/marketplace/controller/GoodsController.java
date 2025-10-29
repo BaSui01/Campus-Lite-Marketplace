@@ -22,12 +22,13 @@ import java.math.BigDecimal;
 
 /**
  * 物品控制器
- * 
+ *
  * 处理物品相关的 HTTP 请求
- * 
+ *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @RestController
 @RequestMapping("/api/goods")
 @RequiredArgsConstructor
@@ -108,7 +109,7 @@ public class GoodsController {
      * 查询待审核物品列表（管理员）
      */
     @GetMapping("/pending")
-    @PreAuthorize("hasAuthority('system:goods:approve')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_GOODS_APPROVE)")
     @Operation(summary = "查询待审核物品列表", description = "管理员查询所有待审核的物品")
     public ApiResponse<Page<GoodsResponse>> listPendingGoods(
             @Parameter(description = "页码（从 0 开始）") @RequestParam(defaultValue = "0") int page,
@@ -122,7 +123,7 @@ public class GoodsController {
      * 审核物品（管理员）
      */
     @PostMapping("/{id}/approve")
-    @PreAuthorize("hasAuthority('system:goods:approve')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_GOODS_APPROVE)")
     @Operation(summary = "审核物品", description = "管理员审核物品，通过或拒绝")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,

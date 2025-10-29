@@ -9,7 +9,11 @@ import java.util.List;
  *
  * - 热门榜单（按校区）
  * - 个性化推荐（基于浏览/收藏召回，冷启动回退热榜）
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public interface RecommendService {
 
     /**

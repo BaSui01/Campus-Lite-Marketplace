@@ -7,6 +7,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Notification Preference Repository
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Repository
 public interface NotificationPreferenceRepository extends JpaRepository<NotificationPreference, Long> {
     Optional<NotificationPreference> findByUserIdAndChannel(Long userId, NotificationChannel channel);

@@ -10,7 +10,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 /**
  * 可选的开发环境“日志邮件发送器”。仅在明确开启 mail.mock.enabled=true 时生效。
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Configuration
 @Profile("dev")
 @ConditionalOnProperty(name = "mail.mock.enabled", havingValue = "true")

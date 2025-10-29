@@ -5,6 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Campus Migration Validation Response
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Data
 @Builder
 @NoArgsConstructor

@@ -23,7 +23,11 @@ import jakarta.persistence.EntityManager;
  *
  * 1) 执行到期的“删除账号”请求：将用户状态置为 DELETED 并记录 deletedAt
  * 2) 对已注销超过30天的账号进行清理：优先物理删除；失败则匿名化敏感信息
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "app.scheduling.privacy.enabled", havingValue = "true", matchIfMissing = true)

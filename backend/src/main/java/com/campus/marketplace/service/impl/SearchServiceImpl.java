@@ -5,6 +5,7 @@ import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.entity.SearchLog;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.GoodsRepository;
 import com.campus.marketplace.repository.GoodsTagRepository;
@@ -25,6 +26,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+/**
+ * Search Service Impl
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
 
 @Slf4j
 @Service
@@ -58,7 +66,7 @@ public class SearchServiceImpl implements SearchService {
         // 校区过滤：普通用户限定本校
         Long campusFilter = null;
         try {
-            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 String username = SecurityUtil.getCurrentUsername();
                 User u = userRepository.findByUsername(username).orElse(null);
                 campusFilter = u != null ? u.getCampusId() : null;

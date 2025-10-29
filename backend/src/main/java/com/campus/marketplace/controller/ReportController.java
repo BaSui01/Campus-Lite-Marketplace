@@ -16,6 +16,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Report Controller
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @RestController
 @RequestMapping("/api/reports")
 @RequiredArgsConstructor
@@ -51,7 +58,7 @@ public class ReportController {
     }
 
     @GetMapping("/pending")
-    @PreAuthorize("hasAuthority('system:report:handle')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_REPORT_HANDLE)")
     @Operation(summary = "查询待处理举报列表", description = "管理员查询所有待处理的举报")
     public ApiResponse<Page<ReportResponse>> listPendingReports(
             @Parameter(description = "页码", example = "0") @RequestParam(defaultValue = "0") int page,
@@ -73,7 +80,7 @@ public class ReportController {
     }
 
     @PostMapping("/{id}/handle")
-    @PreAuthorize("hasAuthority('system:report:handle')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_REPORT_HANDLE)")
     @Operation(summary = "处理举报", description = "管理员处理举报")
     public ApiResponse<Void> handleReport(
             @Parameter(description = "举报 ID", example = "555") @PathVariable Long id,

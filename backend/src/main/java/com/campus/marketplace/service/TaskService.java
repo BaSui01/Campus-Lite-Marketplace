@@ -3,6 +3,13 @@ package com.campus.marketplace.service;
 import com.campus.marketplace.common.entity.ScheduledTask;
 
 import java.util.List;
+/**
+ * Task Service
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 
 public interface TaskService {
     void register(String name, String description, com.campus.marketplace.service.task.TaskRunner runner);

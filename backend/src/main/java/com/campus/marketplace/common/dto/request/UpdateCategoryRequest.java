@@ -5,7 +5,11 @@ import jakarta.validation.constraints.Size;
 
 /**
  * 更新分类请求
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public record UpdateCategoryRequest(
         @NotBlank(message = "分类名称不能为空")
         @Size(max = 50, message = "分类名称长度不能超过 50 个字符")

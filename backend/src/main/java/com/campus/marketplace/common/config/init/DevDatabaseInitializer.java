@@ -15,7 +15,11 @@ import java.sql.ResultSet;
  * 仅在 active profile 包含 "dev" 时生效。
  *
  * 作用：在 JPA 初始化前尝试连接 postgres 默认库，若目标库不存在则创建之。
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 public class DevDatabaseInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 

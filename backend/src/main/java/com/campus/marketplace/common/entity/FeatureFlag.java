@@ -14,6 +14,13 @@ import java.time.Instant;
 @Table(name = "t_feature_flag", indexes = {
         @Index(name = "uk_feature_key", columnList = "feature_key", unique = true)
 })
+/**
+ * Feature Flag
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 public class FeatureFlag {
 
     @Id

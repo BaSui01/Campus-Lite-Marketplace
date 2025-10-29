@@ -15,6 +15,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * Audit Log Controller
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @RestController
 @RequestMapping("/api/audit-logs")
 @RequiredArgsConstructor
@@ -24,7 +31,7 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('system:audit:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_AUDIT_VIEW)")
     @Operation(summary = "查询审计日志列表", description = "管理员查询系统审计日志")
     public ApiResponse<Page<AuditLogResponse>> listAuditLogs(
             @Parameter(description = "操作人ID", example = "10001") @RequestParam(required = false) Long operatorId,

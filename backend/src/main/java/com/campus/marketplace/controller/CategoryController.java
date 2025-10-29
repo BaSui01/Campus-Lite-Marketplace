@@ -24,8 +24,9 @@ import java.util.List;
  * 提供分类树查询与分类管理接口
  *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "分类标签", description = "分类树查询及分类管理接口")
@@ -40,7 +41,7 @@ public class CategoryController {
     }
 
     @PostMapping("/api/admin/categories")
-    @PreAuthorize("hasAuthority('system:category:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CATEGORY_MANAGE)")
     @Operation(summary = "创建分类", description = "管理员创建新的分类节点")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
@@ -65,7 +66,7 @@ public class CategoryController {
     }
 
     @PutMapping("/api/admin/categories/{id}")
-    @PreAuthorize("hasAuthority('system:category:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CATEGORY_MANAGE)")
     @Operation(summary = "更新分类", description = "管理员更新分类信息")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
@@ -92,7 +93,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/api/admin/categories/{id}")
-    @PreAuthorize("hasAuthority('system:category:manage')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CATEGORY_MANAGE)")
     @Operation(summary = "删除分类", description = "管理员删除分类节点，删除前需确保无子节点及关联商品")
     public ApiResponse<Void> deleteCategory(@Parameter(description = "分类ID", example = "201") @PathVariable Long id) {
         categoryService.deleteCategory(id);

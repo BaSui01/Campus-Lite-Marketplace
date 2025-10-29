@@ -8,6 +8,7 @@ import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.CategoryRepository;
 import com.campus.marketplace.repository.FavoriteRepository;
@@ -27,10 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 收藏服务实现类
- * 
+ *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -66,7 +68,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         // 3.1 校区隔离：无跨校权限禁止跨校收藏
         try {
-            if (!SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (!SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 if (user.getCampusId() != null && goods.getCampusId() != null
                         && !user.getCampusId().equals(goods.getCampusId())) {
                     throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区收藏被禁止");

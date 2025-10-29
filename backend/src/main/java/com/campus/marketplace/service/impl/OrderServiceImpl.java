@@ -12,6 +12,7 @@ import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.enums.OrderStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.GoodsRepository;
 import com.campus.marketplace.repository.OrderRepository;
@@ -37,12 +38,13 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * 订单服务实现类
- * 
+ *
  * 实现订单创建、查询、支付等功能
- * 
+ *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -77,7 +79,7 @@ public class OrderServiceImpl implements OrderService {
         // 校区隔离：普通用户禁止跨校购买
         try {
             // 无跨校权限时，要求买家与物品同校区
-            if (!com.campus.marketplace.common.utils.SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (!com.campus.marketplace.common.utils.SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 if (buyer.getCampusId() != null && goods.getCampusId() != null
                         && !buyer.getCampusId().equals(goods.getCampusId())) {
                     throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区购买被禁止");
@@ -198,17 +200,14 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean handlePaymentCallback(PaymentCallbackRequest request) {
+    public boolean handlePaymentCallback(PaymentCallbackRequest request, boolean signatureVerified) {
         log.info("处理支付回调: orderNo={}, transactionId={}, status={}",
                 request.orderNo(), request.transactionId(), request.status());
 
         Order order = orderRepository.findByOrderNo(request.orderNo())
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
-        boolean signatureValid = paymentService.verifySignature(
-                request.orderNo(), request.transactionId(), request.signature()
-        );
-        if (!signatureValid) {
+        if (!signatureVerified) {
             log.error("支付签名验证失败: orderNo={}", request.orderNo());
             throw new BusinessException(ErrorCode.PAYMENT_FAILED);
         }
@@ -484,7 +483,7 @@ public class OrderServiceImpl implements OrderService {
             if (!isOwner && !isAdmin) {
                 throw new BusinessException(ErrorCode.FORBIDDEN);
             }
-            if (!SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (!SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 if (current != null && order.getCampusId() != null && current.getCampusId() != null
                         && !order.getCampusId().equals(current.getCampusId())) {
                     throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区访问被禁止");

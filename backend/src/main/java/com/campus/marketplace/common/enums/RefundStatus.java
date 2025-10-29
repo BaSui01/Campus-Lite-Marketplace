@@ -1,4 +1,11 @@
 package com.campus.marketplace.common.enums;
+/**
+ * Refund Status
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 
 public enum RefundStatus {
     APPLIED,       // 已申请

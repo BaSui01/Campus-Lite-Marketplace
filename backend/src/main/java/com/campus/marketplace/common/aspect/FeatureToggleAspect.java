@@ -16,6 +16,13 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
+/**
+ * Feature Toggle Aspect
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Slf4j
 @Aspect
 @Component

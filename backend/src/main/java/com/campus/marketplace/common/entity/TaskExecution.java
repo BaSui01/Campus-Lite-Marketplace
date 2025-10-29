@@ -14,6 +14,13 @@ import java.time.Instant;
 @Table(name = "t_task_execution", indexes = {
         @Index(name = "idx_task_name_time", columnList = "taskName,startedAt")
 })
+/**
+ * Task Execution
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 public class TaskExecution {
 
     @Id

@@ -10,6 +10,13 @@ import lombok.*;
 @Table(name = "t_compliance_whitelist", uniqueConstraints = {
         @UniqueConstraint(name = "uk_comp_white", columnNames = {"type", "target_id"})
 })
+/**
+ * Compliance Whitelist
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Getter
 @Setter
 @NoArgsConstructor

@@ -6,7 +6,11 @@ import jakarta.validation.constraints.Size;
 
 /**
  * 邮箱验证码注册请求
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public record ConfirmRegisterByEmailRequest(
         @Email @NotBlank String email,
         @NotBlank String code,

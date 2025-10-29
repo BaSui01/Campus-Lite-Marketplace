@@ -11,6 +11,13 @@ import lombok.*;
 }, uniqueConstraints = {
         @UniqueConstraint(name = "uk_user_tpl_channel", columnNames = {"user_id", "template_code", "channel"})
 })
+/**
+ * Notification Unsubscribe
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Getter
 @Setter
 @NoArgsConstructor

@@ -14,7 +14,11 @@ import java.time.Duration;
 
 /**
  * 验证码服务实现：Redis 存储，邮件真实发送，短信开发环境日志发送。
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor

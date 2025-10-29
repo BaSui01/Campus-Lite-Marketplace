@@ -5,6 +5,13 @@ import com.campus.marketplace.common.enums.CampusStatus;
 import com.campus.marketplace.common.dto.response.CampusMigrationValidationResponse;
 
 import java.util.List;
+/**
+ * Campus Service
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 
 public interface CampusService {
     List<Campus> listAll();

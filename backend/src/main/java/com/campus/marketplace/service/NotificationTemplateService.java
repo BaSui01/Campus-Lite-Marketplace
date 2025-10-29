@@ -5,6 +5,13 @@ import com.campus.marketplace.common.enums.NotificationChannel;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+/**
+ * Notification Template Service
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 
 public interface NotificationTemplateService {
 

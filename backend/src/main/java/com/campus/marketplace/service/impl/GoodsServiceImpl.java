@@ -13,6 +13,7 @@ import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.EncryptUtil;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.common.utils.SensitiveWordFilter;
@@ -51,10 +52,11 @@ import java.util.stream.StreamSupport;
 
 /**
  * 物品服务实现类
- * 
+ *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -186,7 +188,7 @@ public class GoodsServiceImpl implements GoodsService {
 
         Long campusFilter = null;
         try {
-            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority("system:campus:cross")) {
+            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
                 String username = SecurityUtil.getCurrentUsername();
                 User u = userRepository.findByUsername(username).orElse(null);
                 campusFilter = u != null ? u.getCampusId() : null;
@@ -248,18 +250,14 @@ public class GoodsServiceImpl implements GoodsService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.GOODS_NOT_FOUND));
 
         // 2. 校区鉴权：无跨校权限的用户仅可访问同校区资源
-        try {
-            if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority("system:campus:cross")) {
-                String username = SecurityUtil.getCurrentUsername();
-                User current = userRepository.findByUsername(username).orElse(null);
-                if (current != null && goods.getCampusId() != null && current.getCampusId() != null
-                        && !goods.getCampusId().equals(current.getCampusId())) {
-                    throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区访问被禁止");
-                }
+        if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
+            String username = SecurityUtil.getCurrentUsername();
+            User current = userRepository.findByUsername(username).orElse(null);
+            if (current != null && goods.getCampusId() != null && current.getCampusId() != null
+                    && !goods.getCampusId().equals(current.getCampusId())) {
+                throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区访问被禁止");
             }
-        } catch (BusinessException e) {
-            throw e;
-        } catch (Exception ignored) { }
+        }
 
         // 3. 增加浏览量
         goods.incrementViewCount();

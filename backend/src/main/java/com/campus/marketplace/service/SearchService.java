@@ -4,6 +4,13 @@ import com.campus.marketplace.common.dto.response.SearchResultItem;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+/**
+ * Search Service
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 
 public interface SearchService {
     /**

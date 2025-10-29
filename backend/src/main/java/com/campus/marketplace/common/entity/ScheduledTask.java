@@ -12,6 +12,13 @@ import lombok.*;
 @Table(name = "t_task", indexes = {
         @Index(name = "uk_task_name", columnList = "name", unique = true)
 })
+/**
+ * Scheduled Task
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 public class ScheduledTask {
 
     @Id

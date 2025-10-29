@@ -6,7 +6,11 @@ import java.time.LocalDateTime;
 
 /**
  * 标签响应
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Builder
 public record TagResponse(
         Long id,

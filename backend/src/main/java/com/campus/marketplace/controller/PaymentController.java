@@ -6,7 +6,6 @@ import com.campus.marketplace.common.dto.response.ApiResponse;
 
 import java.math.BigDecimal;
 import com.campus.marketplace.service.OrderService;
-import com.campus.marketplace.service.PaymentService;
 import com.campus.marketplace.service.impl.WechatPaymentService;
 import com.campus.marketplace.service.impl.WechatPaymentServiceV2;
 import com.campus.marketplace.service.impl.AlipayPaymentService;
@@ -36,8 +35,9 @@ import java.util.stream.Collectors;
  * 支持微信支付V2（沙箱）和V3（正式/沙箱）双版本切换
  *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @Slf4j
 @RestController
 @RequestMapping("/api/payment")
@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 @Tag(name = "支付管理", description = "支付创建、状态查询与第三方回调处理")
 public class PaymentController {
 
-    private final PaymentService paymentService;
     private final OrderService orderService;
     private final RefundService refundService;
     
@@ -165,16 +164,6 @@ public class PaymentController {
                 log.info("✅ 微信支付{}回调处理成功: orderNo={}, transactionId={}", 
                         wechatPayVersion.toUpperCase(), orderNo, transactionId);
 
-                // 使用统一支付服务做一次签名校验占位（V2 无签名则传 null）以避免未使用字段告警
-                try {
-                    String signatureHeader = httpRequest.getHeader("Wechatpay-Signature");
-                    boolean verified = paymentService.verifySignature(orderNo, transactionId,
-                            "v3".equalsIgnoreCase(wechatPayVersion) ? signatureHeader : null);
-                    log.debug("支付回调签名校验结果：orderNo={}, verified={}", orderNo, verified);
-                } catch (Exception ex) {
-                    log.warn("统一支付服务验签占位调用异常（不影响回调主流程）：orderNo={}", orderNo, ex);
-                }
-
                 // 更新订单状态为已支付
                 try {
                     // ✅ 安全实践：从数据库查询订单金额，而不是信任回调数据
@@ -194,7 +183,7 @@ public class PaymentController {
                             "SUCCESS",
                             null // 签名已由微信支付服务验证
                     );
-                    boolean updateSuccess = orderService.handlePaymentCallback(callbackRequest);
+                    boolean updateSuccess = orderService.handlePaymentCallback(callbackRequest, true);
 
                     if (updateSuccess) {
                         log.info("🎉 订单状态更新成功: orderNo={}", orderNo);

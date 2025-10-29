@@ -4,6 +4,13 @@ import com.campus.marketplace.common.enums.ComplianceAction;
 
 import java.util.List;
 import java.util.Set;
+/**
+ * Compliance Service
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 
 public interface ComplianceService {
 

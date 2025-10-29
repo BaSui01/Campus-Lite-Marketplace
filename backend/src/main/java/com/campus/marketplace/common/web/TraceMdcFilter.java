@@ -15,7 +15,11 @@ import java.util.UUID;
 
 /**
  * 请求 Trace 与 MDC 透传过滤器
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Component
 public class TraceMdcFilter extends OncePerRequestFilter {

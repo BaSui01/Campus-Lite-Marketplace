@@ -59,11 +59,13 @@ public class PerformanceMonitorAspect {
             // 计算执行时间
             long executionTime = System.currentTimeMillis() - startTime;
             
+            boolean isSlow = executionTime > SLOW_QUERY_THRESHOLD;
+
             // 记录性能数据
-            recordPerformance(methodName, executionTime, hasException);
+            recordPerformance(methodName, executionTime, hasException, isSlow);
             
             // 记录慢查询
-            if (executionTime > SLOW_QUERY_THRESHOLD) {
+            if (isSlow) {
                 log.warn("⚠️ 慢查询检测: 方法={}, 耗时={}ms", methodName, executionTime);
             }
             
@@ -79,9 +81,9 @@ public class PerformanceMonitorAspect {
     /**
      * 记录性能数据
      */
-    private void recordPerformance(String methodName, long executionTime, boolean hasException) {
+    private void recordPerformance(String methodName, long executionTime, boolean hasException, boolean isSlow) {
         performanceStats.computeIfAbsent(methodName, k -> new MethodStats())
-                .record(executionTime, hasException);
+                .record(executionTime, hasException, isSlow);
     }
 
     /**
@@ -97,6 +99,8 @@ public class PerformanceMonitorAspect {
             statMap.put("totalExecutionTime", stats.totalExecutionTime.get());
             statMap.put("avgExecutionTime", 
                     stats.totalCalls.get() > 0 ? stats.totalExecutionTime.get() / stats.totalCalls.get() : 0);
+            statMap.put("maxExecutionTime", stats.maxExecutionTime.get());
+            statMap.put("slowCount", stats.slowCount.get());
             result.put(methodName, statMap);
         });
         
@@ -111,12 +115,19 @@ public class PerformanceMonitorAspect {
         private final AtomicLong totalErrors = new AtomicLong(0);
         private final AtomicLong totalExecutionTime = new AtomicLong(0);
 
-        public void record(long executionTime, boolean hasException) {
+        public void record(long executionTime, boolean hasException, boolean isSlow) {
             totalCalls.incrementAndGet();
             totalExecutionTime.addAndGet(executionTime);
+            maxExecutionTime.accumulateAndGet(executionTime, Math::max);
             if (hasException) {
                 totalErrors.incrementAndGet();
             }
+            if (isSlow) {
+                slowCount.incrementAndGet();
+            }
         }
+
+        private final AtomicLong maxExecutionTime = new AtomicLong(0);
+        private final AtomicLong slowCount = new AtomicLong(0);
     }
 }

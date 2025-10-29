@@ -13,6 +13,13 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Notification Template Service Impl
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Service
 @RequiredArgsConstructor
 public class NotificationTemplateServiceImpl implements NotificationTemplateService {

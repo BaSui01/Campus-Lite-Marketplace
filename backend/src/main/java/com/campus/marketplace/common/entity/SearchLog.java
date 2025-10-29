@@ -16,6 +16,13 @@ import lombok.*;
         @Index(name = "idx_search_created_at", columnList = "created_at"),
         @Index(name = "idx_search_campus", columnList = "campus_id")
 })
+/**
+ * Search Log
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 public class SearchLog extends BaseEntity {
 
     @Column(name = "username", length = 50)

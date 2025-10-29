@@ -10,6 +10,13 @@ import java.time.LocalTime;
 @Table(name = "t_notification_preference", uniqueConstraints = {
         @UniqueConstraint(name = "uk_user_channel", columnNames = {"user_id", "channel"})
 })
+/**
+ * Notification Preference
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Getter
 @Setter
 @NoArgsConstructor

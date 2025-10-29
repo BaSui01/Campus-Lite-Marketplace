@@ -16,6 +16,13 @@ import org.hibernate.annotations.Type;
         @Index(name = "idx_payment_order_no", columnList = "order_no"),
         @Index(name = "idx_payment_trade_no", columnList = "trade_no")
 })
+/**
+ * Payment Log
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 public class PaymentLog extends BaseEntity {
 
     @Column(name = "order_no", nullable = false, length = 50)

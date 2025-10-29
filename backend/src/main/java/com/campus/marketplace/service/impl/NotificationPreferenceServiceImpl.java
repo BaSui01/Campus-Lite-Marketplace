@@ -12,6 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 
+/**
+ * Notification Preference Service Impl
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Service
 @RequiredArgsConstructor
 public class NotificationPreferenceServiceImpl implements NotificationPreferenceService {

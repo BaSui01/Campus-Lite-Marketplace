@@ -6,7 +6,11 @@ import jakarta.validation.constraints.Size;
 
 /**
  * 通过短信验证码重置密码请求
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public record ResetPasswordBySmsRequest(
         @NotBlank String username,
         @NotBlank @Pattern(regexp = "^\\+?\\d{6,20}$") String phone,

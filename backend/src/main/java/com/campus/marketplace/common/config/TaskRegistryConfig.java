@@ -14,6 +14,13 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+/**
+ * Task Registry Config
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Slf4j
 @Configuration
 @RequiredArgsConstructor

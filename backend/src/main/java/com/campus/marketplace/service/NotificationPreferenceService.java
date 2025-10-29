@@ -3,6 +3,13 @@ package com.campus.marketplace.service;
 import com.campus.marketplace.common.enums.NotificationChannel;
 
 import java.time.LocalTime;
+/**
+ * Notification Preference Service
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 
 public interface NotificationPreferenceService {
     void setChannelEnabled(Long userId, NotificationChannel channel, boolean enabled);

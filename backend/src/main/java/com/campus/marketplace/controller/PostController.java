@@ -20,12 +20,13 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 帖子控制器
- * 
+ *
  * 处理论坛帖子相关的 HTTP 请求
- * 
+ *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
@@ -140,7 +141,7 @@ public class PostController {
      * 审核帖子（管理员）
      */
     @PostMapping("/{id}/approve")
-    @PreAuthorize("hasAuthority('system:post:approve')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_POST_APPROVE)")
     @Operation(summary = "审核帖子", description = "管理员审核帖子，通过或拒绝")
     public ApiResponse<Void> approvePost(
             @Parameter(description = "帖子 ID", example = "98765") @PathVariable Long id,

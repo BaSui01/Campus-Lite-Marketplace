@@ -17,15 +17,16 @@ import java.util.Map;
 
 /**
  * 管理员控制器
- * 
+ *
  * 功能模块：
  * 1. 用户管理 - 封禁/解封用户
  * 2. 数据统计 - 系统概览、趋势分析、排行榜
  * 3. 系统管理 - 自动解封过期用户
- * 
- * @author BaSui（专业又搞笑的工程师）
- * @date 2025-10-27
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
@@ -46,7 +47,7 @@ public class AdminController {
      * @return 操作结果
      */
     @PostMapping("/users/ban")
-    @PreAuthorize("hasAuthority('system:user:ban')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_USER_BAN)")
     @Operation(summary = "封禁用户", description = "管理员封禁违规用户")
     public ApiResponse<Void> banUser(@Valid @RequestBody BanUserRequest request) {
         userService.banUser(request);
@@ -62,7 +63,7 @@ public class AdminController {
      * @return 操作结果
      */
     @PostMapping("/users/{userId}/unban")
-    @PreAuthorize("hasAuthority('system:user:ban')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_USER_BAN)")
     @Operation(summary = "解封用户", description = "管理员解封用户")
     public ApiResponse<Void> unbanUser(
             @Parameter(description = "用户 ID", example = "10002") @PathVariable Long userId
@@ -79,7 +80,7 @@ public class AdminController {
      * @return 解封的用户数量
      */
     @PostMapping("/users/auto-unban")
-    @PreAuthorize("hasAuthority('system:user:ban')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_USER_BAN)")
     @Operation(summary = "自动解封过期用户", description = "定时任务：自动解封封禁已过期的用户")
     public ApiResponse<Integer> autoUnbanExpiredUsers() {
         int count = userService.autoUnbanExpiredUsers();
@@ -99,7 +100,7 @@ public class AdminController {
      * @return 系统概览统计数据
      */
     @GetMapping("/statistics/overview")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取系统概览统计", description = "系统整体数据概览")
     public ApiResponse<Map<String, Object>> getSystemOverview() {
         Map<String, Object> data = statisticsService.getSystemOverview();
@@ -116,7 +117,7 @@ public class AdminController {
      * @return 用户统计数据
      */
     @GetMapping("/statistics/users")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取用户统计数据", description = "用户相关统计")
     public ApiResponse<Map<String, Object>> getUserStatistics() {
         Map<String, Object> data = statisticsService.getUserStatistics();
@@ -133,7 +134,7 @@ public class AdminController {
      * @return 物品统计数据
      */
     @GetMapping("/statistics/goods")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取物品统计数据", description = "物品相关统计")
     public ApiResponse<Map<String, Object>> getGoodsStatistics() {
         Map<String, Object> data = statisticsService.getGoodsStatistics();
@@ -150,7 +151,7 @@ public class AdminController {
      * @return 订单统计数据
      */
     @GetMapping("/statistics/orders")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取订单统计数据", description = "订单相关统计")
     public ApiResponse<Map<String, Object>> getOrderStatistics() {
         Map<String, Object> data = statisticsService.getOrderStatistics();
@@ -167,7 +168,7 @@ public class AdminController {
      * @return 今日统计数据
      */
     @GetMapping("/statistics/today")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取今日统计数据", description = "今日数据概览")
     public ApiResponse<Map<String, Object>> getTodayStatistics() {
         Map<String, Object> data = statisticsService.getTodayStatistics();
@@ -183,7 +184,7 @@ public class AdminController {
      * @return 分类统计数据（分类名 -> 物品数量）
      */
     @GetMapping("/statistics/categories")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取分类统计数据", description = "物品分类分布统计")
     public ApiResponse<Map<String, Long>> getCategoryStatistics() {
         Map<String, Long> data = statisticsService.getCategoryStatistics();
@@ -200,7 +201,7 @@ public class AdminController {
      * @return 趋势数据
      */
     @GetMapping("/statistics/trend")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取趋势数据", description = "最近 N 天的数据趋势分析")
     public ApiResponse<Map<String, Object>> getTrendData(
             @Parameter(description = "天数", example = "30") @RequestParam(defaultValue = "30") int days
@@ -219,7 +220,7 @@ public class AdminController {
      * @return 热门物品列表
      */
     @GetMapping("/statistics/top-goods")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取热门物品排行榜", description = "浏览量最高的物品 Top N")
     public ApiResponse<List<Map<String, Object>>> getTopGoods(
             @Parameter(description = "数量限制", example = "10") @RequestParam(defaultValue = "10") int limit
@@ -238,7 +239,7 @@ public class AdminController {
      * @return 活跃用户列表
      */
     @GetMapping("/statistics/top-users")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取活跃用户排行榜", description = "积分最高的用户 Top N")
     public ApiResponse<List<Map<String, Object>>> getTopUsers(
             @Parameter(description = "数量限制", example = "20") @RequestParam(defaultValue = "20") int limit
@@ -257,7 +258,7 @@ public class AdminController {
      * @return 收入统计数据
      */
     @GetMapping("/statistics/revenue")
-    @PreAuthorize("hasAuthority('system:statistics:view')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
     @Operation(summary = "获取收入统计（按月）", description = "最近 N 个月的平台收入统计")
     public ApiResponse<Map<String, Object>> getRevenueByMonth(
             @Parameter(description = "月数", example = "12") @RequestParam(defaultValue = "12") int months

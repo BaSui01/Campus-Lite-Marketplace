@@ -12,7 +12,11 @@ import java.time.LocalDateTime;
 
 /**
  * 基础实体类，提供主键与审计字段。
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Getter
 @Setter
 @MappedSuperclass

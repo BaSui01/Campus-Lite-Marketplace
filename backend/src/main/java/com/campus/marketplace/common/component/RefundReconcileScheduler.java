@@ -17,7 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 对账任务：按日生成差异报告（简化版：标记长时间处理中记录）
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Component
 @RequiredArgsConstructor

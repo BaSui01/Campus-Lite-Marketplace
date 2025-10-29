@@ -16,7 +16,11 @@ import java.util.Properties;
 
 /**
  * 开发环境用的日志邮件发送器：不真正发送邮件，只把内容输出到日志。
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 @Slf4j
 public class LoggingJavaMailSender implements JavaMailSender {
 

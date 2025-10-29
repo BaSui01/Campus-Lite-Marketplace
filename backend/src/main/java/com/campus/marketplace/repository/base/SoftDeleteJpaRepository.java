@@ -12,7 +12,11 @@ import java.util.List;
 
 /**
  * 通用软删除仓库基类：拦截 delete、deleteById、deleteAll 等方法改为软删
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public class SoftDeleteJpaRepository<T, ID extends Serializable>
         extends SimpleJpaRepository<T, ID> {
 

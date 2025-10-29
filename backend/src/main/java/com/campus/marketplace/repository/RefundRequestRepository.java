@@ -11,6 +11,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Refund Request Repository
+ *
+ * @author BaSui
+ * @date 2025-10-29
+ */
+
 @Repository
 public interface RefundRequestRepository extends JpaRepository<RefundRequest, Long> {
 

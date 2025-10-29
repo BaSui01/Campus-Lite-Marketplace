@@ -5,7 +5,11 @@ import java.util.List;
 
 /**
  * 更新帖子请求 DTO
+ *
+ * @author BaSui
+ * @date 2025-10-29
  */
+
 public record UpdatePostRequest(
         @Size(min = 1, max = 100, message = "帖子标题长度必须在 1-100 字符之间")
         String title,
