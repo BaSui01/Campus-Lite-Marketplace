@@ -1,5 +1,6 @@
 package com.campus.marketplace.common.config;
 
+import com.campus.marketplace.common.security.PermissionCodes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,13 +25,14 @@ import java.util.List;
 
 /**
  * Spring Security 配置类
- * 
+ *
  * 配置基于 JWT 的无状态认证机制
  * 配置 CORS、CSRF 防护和权限控制
- * 
+ *
  * @author BaSui
- * @date 2025-10-25
+ * @date 2025-10-29
  */
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -67,7 +69,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
                         // 管理后台必须具备明确权限
-                        .requestMatchers("/api/admin/**").hasAuthority("system:statistics:view")
+                        .requestMatchers("/api/admin/**").hasAuthority(PermissionCodes.SYSTEM_STATISTICS_VIEW)
                         
                         // 物品查询接口（公开）
                         .requestMatchers(HttpMethod.GET, "/api/goods/**").permitAll()

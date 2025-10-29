@@ -100,4 +100,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.status = com.campus.marketplace.common.enums.UserStatus.DELETED " +
            "AND u.deletedAt IS NOT NULL AND u.deletedAt < :cutoffTime")
     java.util.List<User> findDeletedUsersBefore(@Param("cutoffTime") java.time.LocalDateTime cutoffTime);
+
+    /**
+     * 统计绑定指定角色的用户数量。
+     */
+    long countByRoles_Name(String roleName);
 }
