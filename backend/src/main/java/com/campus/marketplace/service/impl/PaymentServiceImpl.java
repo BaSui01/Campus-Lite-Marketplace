@@ -18,8 +18,9 @@ import org.springframework.stereotype.Service;
  * - 微信支付：WechatPaymentService
  *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -61,22 +62,6 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new BusinessException(ErrorCode.PAYMENT_METHOD_NOT_SUPPORTED, "不支持的支付方式");
             }
         };
-    }
-
-    /**
-     * 验证支付回调签名 🔐
-     *
-     * ✅ 说明：签名验证由具体的支付服务（WechatPaymentService/AlipayPaymentService）完成
-     * 此方法仅用于兼容旧代码，实际回调处理中应直接调用具体服务的验签方法
-     *
-     * @deprecated 请使用具体支付服务的验签方法
-     */
-    @Override
-    @Deprecated
-    public boolean verifySignature(String orderNo, String transactionId, String signature) {
-        log.warn("⚠️ verifySignature方法已废弃，请使用具体支付服务的验签方法");
-        // 返回 true 仅为兼容旧代码，新代码应使用具体服务的验签方法
-        return true;
     }
 
     /**

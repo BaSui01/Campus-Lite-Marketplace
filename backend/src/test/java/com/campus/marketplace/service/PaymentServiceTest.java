@@ -1,111 +1,198 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.config.AlipayConfig;
+import com.campus.marketplace.common.dto.response.PaymentResponse;
 import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.common.enums.OrderStatus;
+import com.campus.marketplace.common.enums.PaymentMethod;
+import com.campus.marketplace.common.exception.BusinessException;
+import com.campus.marketplace.service.impl.AlipayPaymentService;
 import com.campus.marketplace.service.impl.PaymentServiceImpl;
+import com.campus.marketplace.service.impl.WechatPaymentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
+import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/**
- * 支付服务测试类（沙箱模式）
- *
- * 测试支付订单创建、签名验证等功能
- *
- * @author BaSui
- * @date 2025-10-27
- */
-@ExtendWith(MockitoExtension.class)
-@DisplayName("支付服务测试（简化版 - 仅测试废弃方法警告）")
+@DisplayName("PaymentServiceImpl 路由与兜底行为（无 Mock 版）")
 class PaymentServiceTest {
 
-    // ❌ 注意：由于 WechatPaymentService 和 AlipayPaymentService 依赖外部 SDK，
-    //  Mockito 无法 Mock（NoClassDefFoundError: Config），所以测试改为只验证废弃方法！
-    //  真实的支付功能需要集成测试或手动测试！
-
-    @Mock
-    private Object alipayPaymentServiceMock; // 改为 Object 类型，绕过 Mock 限制
-
-    @Mock
-    private Object wechatPaymentServiceMock; // 改为 Object 类型，绕过 Mock 限制
-
-    private PaymentServiceImpl paymentService;
-
-    private Order testOrder;
+    private RecordingAlipayService alipayService;
+    private TestObjectProvider<WechatPaymentService> wechatProvider;
+    private PaymentService paymentService;
+    private Order order;
 
     @BeforeEach
     void setUp() {
-        // 注意：PaymentServiceImpl 需要真实的支付服务实例，但这里无法创建
-        // 所以测试只验证不依赖支付服务的 verifySignature 方法
-        paymentService = null; // 暂不创建实例
+        alipayService = new RecordingAlipayService();
+        wechatProvider = new TestObjectProvider<>();
+        paymentService = new PaymentServiceImpl(alipayService, wechatProvider);
 
-        testOrder = Order.builder()
-                .orderNo("ORD20251027120000001")
-                .goodsId(1L)
+        order = Order.builder()
+                .orderNo("ORD-10086")
                 .buyerId(1L)
                 .sellerId(2L)
-                .amount(new BigDecimal("4999.00"))
+                .amount(new BigDecimal("99.00"))
                 .discountAmount(BigDecimal.ZERO)
-                .actualAmount(new BigDecimal("4999.00"))
+                .actualAmount(new BigDecimal("99.00"))
                 .status(OrderStatus.PENDING_PAYMENT)
                 .build();
-        testOrder.setId(1L);
-    }
-
-    // ❌ 以下测试暂时跳过，因为无法 Mock 支付服务类（SDK 依赖问题）
-    // 实际项目中应该：
-    // 1. 创建 PaymentService 接口（不是 PaymentServiceImpl）
-    // 2. WechatPaymentService 和 AlipayPaymentService 实现接口
-    // 3. Mock 接口而不是具体实现类
-
-//    @Test
-//    @DisplayName("创建微信支付订单成功")
-//    void createPayment_Wechat_Success() {
-//        // 跳过：Mockito 无法 Mock WechatPaymentService
-//    }
-//
-//    @Test
-//    @DisplayName("创建支付宝支付订单成功")
-//    void createPayment_Alipay_Success() {
-//        // 跳过：Mockito 无法 Mock AlipayPaymentService
-//    }
-
-    @Test
-    @DisplayName("测试不支持的支付方式抛出异常")
-    void createPayment_UnsupportedMethod_ThrowsException() {
-        // ❌ 跳过：无法创建 PaymentServiceImpl 实例（Mock 限制）
-        // 实际项目中应该重构支付服务架构
-        // 使用字段，避免未使用告警
-        assertThat(paymentService).isNull();
     }
 
     @Test
-    @DisplayName("验证签名方法已废弃（始终返回 true）")
-    void verifySignature_Deprecated_AlwaysReturnsTrue() {
-        // ❌ 跳过：无法创建 PaymentServiceImpl 实例（Mock 限制）
-        // verifySignature 是废弃方法，始终返回 true 并输出警告日志
-        assertThat(true).isTrue(); // 占位测试
+    @DisplayName("ALIPAY 分支应返回支付宝结果且不触发微信服务")
+    void createPayment_alipay_branch() {
+        PaymentResponse response = paymentService.createPayment(order, PaymentMethod.ALIPAY);
+
+        assertThat(response.paymentUrl()).isEqualTo("ALIPAY:ORD-10086");
+        assertThat(alipayService.createCalled).isTrue();
+        assertThat(wechatProvider.getInvocationCount()).isEqualTo(0);
     }
 
-    // ❌ 以下所有测试都跳过，原因：Mockito 无法 Mock 支付服务类
-
     @Test
-    @DisplayName("占位测试 - 支付功能需要集成测试验证")
-    void paymentService_RequiresIntegrationTest() {
-        // 说明：
-        // 1. WechatPaymentService 和 AlipayPaymentService 依赖外部 SDK（com.wechat.pay.java.core.Config）
-        // 2. Mockito 无法 Mock 这些类（NoClassDefFoundError）
-        // 3. 实际项目中应该：
-        //    - 重构支付服务架构，抽取接口
-        //    - 使用 Spring Boot Test 的集成测试
-        //    - 或者使用手动测试 + Postman 验证
-        assertThat(true).isTrue(); // 占位测试，确保测试类不为空
+    @DisplayName("WECHAT 服务缺失时抛出业务异常")
+    void createPayment_wechat_missing() {
+        assertThatThrownBy(() -> paymentService.createPayment(order, PaymentMethod.WECHAT))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("微信支付未启用");
+    }
+
+    @Nested
+    @DisplayName("退款路由")
+    class RefundRouting {
+
+        @Test
+        @DisplayName("ALIPAY 退款命中支付宝实现")
+        void refund_alipay_branch() {
+            boolean ok = paymentService.refund(order, BigDecimal.TEN, PaymentMethod.ALIPAY);
+
+            assertThat(ok).isTrue();
+            assertThat(alipayService.refundCalled).isTrue();
+        }
+
+        @Test
+        @DisplayName("WECHAT 退款在服务缺失时返回 false")
+        void refund_wechat_missing() {
+            boolean ok = paymentService.refund(order, BigDecimal.ONE, PaymentMethod.WECHAT);
+
+            assertThat(ok).isFalse();
+        }
+
+        @Test
+        @DisplayName("WECHAT 退款命中微信实现")
+        void refund_wechat_branch() {
+            RecordingWechatService wechat = new RecordingWechatService(true);
+            wechatProvider.setInstance(wechat);
+
+            boolean ok = paymentService.refund(order, BigDecimal.ONE, PaymentMethod.WECHAT);
+
+            assertThat(ok).isTrue();
+            assertThat(wechat.refundCalled).isTrue();
+        }
+    }
+
+    private static class RecordingAlipayService extends AlipayPaymentService {
+        boolean createCalled;
+        boolean refundCalled;
+
+        RecordingAlipayService() {
+            super(null, new AlipayConfig());
+        }
+
+        @Override
+        public PaymentResponse createPayment(Order order) {
+            createCalled = true;
+            return PaymentResponse.builder()
+                    .orderNo(order.getOrderNo())
+                    .paymentUrl("ALIPAY:" + order.getOrderNo())
+                    .expireSeconds(1800)
+                    .build();
+        }
+
+        @Override
+        public boolean refund(Order order, BigDecimal amount) {
+            refundCalled = true;
+            return true;
+        }
+    }
+
+    private static class RecordingWechatService extends WechatPaymentService {
+        boolean refundCalled;
+        private final boolean refundResult;
+
+        RecordingWechatService(boolean refundResult) {
+            super(null, null, null, new ObjectMapper());
+            this.refundResult = refundResult;
+        }
+
+        @Override
+        public PaymentResponse createPayment(Order order) {
+            return PaymentResponse.builder()
+                    .orderNo(order.getOrderNo())
+                    .paymentUrl("WECHAT:" + order.getOrderNo())
+                    .expireSeconds(1800)
+                    .build();
+        }
+
+        @Override
+        public boolean refund(Order order, BigDecimal amount) {
+            refundCalled = true;
+            return refundResult;
+        }
+    }
+
+    private static class TestObjectProvider<T> implements ObjectProvider<T> {
+        private T instance;
+        private int invocationCount;
+
+        void setInstance(T instance) {
+            this.instance = instance;
+        }
+
+        int getInvocationCount() {
+            return invocationCount;
+        }
+
+        @Override
+        public T getObject(Object... args) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public T getIfAvailable() {
+            invocationCount++;
+            return instance;
+        }
+
+        @Override
+        public T getIfUnique() {
+            invocationCount++;
+            return instance;
+        }
+
+        @Override
+        public T getObject() {
+            invocationCount++;
+            if (instance == null) {
+                throw new IllegalStateException("No bean available");
+            }
+            return instance;
+        }
+
+        @Override
+        public Iterator<T> iterator() {
+            return instance == null
+                    ? Map.<T, T>of().values().iterator()
+                    : java.util.Collections.singleton(instance).iterator();
+        }
     }
 }

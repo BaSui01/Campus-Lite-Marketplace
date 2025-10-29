@@ -14,10 +14,11 @@ public interface AuthService {
 
     /**
      * 用户注册
-     * 
+     *
      * @param request 注册请求
+     * @return 注册成功后的用户ID
      */
-    void register(RegisterRequest request);
+    Long register(RegisterRequest request);
 
     // 发送注册邮箱验证码
     void sendRegisterEmailCode(String email);

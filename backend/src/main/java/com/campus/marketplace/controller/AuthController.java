@@ -35,7 +35,7 @@ public class AuthController {
 
     /**
      * 用户注册
-     * 
+     *
      * POST /api/auth/register
      */
     @Operation(
@@ -44,15 +44,15 @@ public class AuthController {
     )
     @PostMapping("/register")
     @RateLimit(key = "auth:register", maxRequests = 3, timeWindow = 3600, limitType = com.campus.marketplace.common.annotation.RateLimit.LimitType.IP)
-    public ApiResponse<Void> register(
+    public ApiResponse<Long> register(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "注册信息",
                     required = true
             )
             @Valid @RequestBody RegisterRequest request) {
         log.info("收到注册请求: username={}", request.username());
-        authService.register(request);
-        return ApiResponse.success("注册成功", null);
+        Long userId = authService.register(request);
+        return ApiResponse.success("注册成功", userId);
     }
 
     /**

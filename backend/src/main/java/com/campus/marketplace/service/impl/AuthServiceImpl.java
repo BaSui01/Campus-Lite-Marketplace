@@ -28,10 +28,11 @@ import java.util.stream.Collectors;
 
 /**
  * 认证服务实现类
- * 
+ *
  * @author BaSui
- * @date 2025-10-25
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -47,16 +48,12 @@ public class AuthServiceImpl implements AuthService {
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
 
-    private static final String REG_EMAIL_CODE_KEY = "reg:email:code:";
-    private static final String RESET_EMAIL_CODE_KEY = "reset:email:code:";
-    private static final String RESET_SMS_CODE_KEY = "reset:sms:code:";
-
     /**
      * 用户注册
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void register(RegisterRequest request) {
+    public Long register(RegisterRequest request) {
         log.info("用户注册: username={}, email={}", request.username(), request.email());
 
         // 1. 检查用户名是否已存在
@@ -87,6 +84,9 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         log.info("用户注册成功: userId={}, username={}", user.getId(), user.getUsername());
+
+        // 返回用户ID
+        return user.getId();
     }
 
     // ========== 邮箱验证码注册/重置密码 ==========

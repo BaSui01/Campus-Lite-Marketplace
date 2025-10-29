@@ -6,12 +6,13 @@ import com.campus.marketplace.common.enums.PaymentMethod;
 
 /**
  * 支付服务接口
- * 
+ *
  * 提供统一的支付接口，支持多种支付方式
- * 
+ *
  * @author BaSui
- * @date 2025-10-27
+ * @date 2025-10-29
  */
+
 public interface PaymentService {
 
     /**
@@ -22,16 +23,6 @@ public interface PaymentService {
      * @return 支付响应
      */
     PaymentResponse createPayment(Order order, PaymentMethod paymentMethod);
-
-    /**
-     * 验证支付回调签名
-     * 
-     * @param orderNo 订单号
-     * @param transactionId 支付流水号
-     * @param signature 签名
-     * @return 是否验证通过
-     */
-    boolean verifySignature(String orderNo, String transactionId, String signature);
 
     /**
      * 发起退款
