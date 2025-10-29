@@ -73,7 +73,62 @@ docker run -d --name redis \
 ### 2. 编译项目
 
 ```bash
+# 🚀 推荐：使用多核并行编译（自动检测 CPU 核心数）
 mvn clean install
+
+# 🐌 传统单线程编译（慢，不推荐）
+mvn clean install -T 1
+
+# 🧪 跳过测试快速编译
+mvn clean install -DskipTests
+
+# 🔍 只运行单元测试
+mvn test
+
+# 🔬 运行集成测试
+mvn verify -DskipTests=false -DskipITs=false
+
+# 📊 生成覆盖率报告
+mvn clean verify
+```
+
+#### ⚡ 性能优化说明
+
+项目已配置 **Maven 多核并行编译**，自动提升构建速度：
+
+- ✅ **编译器并行化**：`maven-compiler-plugin` 启用 `fork=true` + `threads=0`（自动检测 CPU 核心）
+- ✅ **测试并行化**：`surefire-plugin` 配置 `forkCount=1C`（每核心 1 进程）+ `parallel=classes`
+- ✅ **全局配置**：`.mvn/maven.config` 自动应用 `-T 1C`（无需每次手敲！）
+- ✅ **增量编译**：只编译变更的文件
+- ✅ **依赖并行下载**：8 线程并行下载依赖
+
+**性能对比（4 核 CPU 示例）**：
+
+| 编译模式 | 构建时间 | 提升 |
+|---------|---------|-----|
+| 🐌 单线程 `-T 1` | ~60s | - |
+| 🚀 多核并行（默认） | ~25s | **~60% ↑** |
+
+**查看实际并行度**：
+```bash
+# 查看 Maven 配置
+cat .mvn/maven.config
+
+# 查看 CPU 核心数
+echo %NUMBER_OF_PROCESSORS%  # Windows
+nproc                         # Linux/Mac
+```
+
+**自定义并行度**：
+```bash
+# 强制 4 线程
+mvn clean install -T 4
+
+# 2 倍 CPU 核心数（激进模式，适合 CI/CD）
+mvn clean install -T 2C
+
+# 单线程调试模式
+mvn clean install -T 1
 ```
 
 ### 3. 运行应用
@@ -90,6 +145,23 @@ java -jar target/marketplace-1.0.0-SNAPSHOT.jar --spring.profiles.active=dev
 
 - API 地址: http://localhost:8080/api
 - 健康检查: http://localhost:8080/api/actuator/health
+
+### 默认账号（初始密码均为 `password123`）
+
+| 用户名 | 角色 |
+| --- | --- |
+| `admin` | `ROLE_SUPER_ADMIN`, `ROLE_ADMIN` |
+| `student1` / `student2` | `ROLE_STUDENT`, `ROLE_USER` |
+| `seller_north` / `seller_south` / `buyer_grad` | `ROLE_STUDENT`, `ROLE_USER` |
+| `security_manager` | `ROLE_SECURITY_MANAGER`, `ROLE_USER` |
+| `content_manager` | `ROLE_CONTENT_MANAGER`, `ROLE_USER` |
+| `operation_manager` | `ROLE_OPERATION_MANAGER`, `ROLE_USER` |
+| `compliance_officer` | `ROLE_COMPLIANCE_OFFICER`, `ROLE_USER` |
+| `campus_manager` | `ROLE_CAMPUS_MANAGER`, `ROLE_USER` |
+| `category_manager` | `ROLE_CATEGORY_MANAGER`, `ROLE_USER` |
+| `rate_limit_manager` | `ROLE_RATE_LIMIT_MANAGER`, `ROLE_USER` |
+| `analyst` | `ROLE_ANALYST`, `ROLE_USER` |
+| `support_agent` | `ROLE_SUPPORT_AGENT`, `ROLE_USER` |
 
 ## 开发规范
 

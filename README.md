@@ -49,7 +49,7 @@
 ## 🚀 快速开始
 1. **克隆项目**
    ```bash
-   git clone https://github.com/your-org/campus-lite-marketplace.git
+   git clone https://github.com/BaSui01/campus-lite-marketplace.git
    cd campus-lite-marketplace
    ```
 

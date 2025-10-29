@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.12</version>
         <relativePath/>
     </parent>
 
@@ -27,7 +27,81 @@
         <flyway.version>10.15.0</flyway.version>
         <!-- 统一控制最低覆盖率门槛，可在本地/CI 通过 -Dcoverage.minimum=0.80 临时调整 -->
         <coverage.minimum>0.85</coverage.minimum>
+
+        <!-- 🚀 BaSui优化：Maven 多核并行编译配置 -->
+        <!-- 编译器线程数：自动检测可用 CPU 核心数 -->
+        <maven.compiler.threads>0</maven.compiler.threads>
+        <!-- Maven 并行模块构建线程数：1C = 1 线程/核心 -->
+        <maven.build.threads>1C</maven.build.threads>
+        <!-- 测试并行度：基于 CPU 核心数动态调整 -->
+        <surefire.forkCount>1C</surefire.forkCount>
+        <failsafe.forkCount>1</failsafe.forkCount>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- ========== 安全整改:覆盖 Spring Boot Parent 传递的高危依赖版本 ========== -->
+
+            <!-- dom4j: CVE-2020-10683 → 升级到 2.1.4（新 groupId）-->
+            <dependency>
+                <groupId>org.dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>2.1.4</version>
+            </dependency>
+
+            <!-- Bouncy Castle: CVE-2020-15522/CVE-2023-33202 → 升级到 1.78.1（新 artifactId：jdk18on）-->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.78.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>1.78.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcutil-jdk18on</artifactId>
+                <version>1.78.1</version>
+            </dependency>
+
+            <!-- Angus Mail: CVE-2025-7962 → 升级到 2.0.3 -->
+            <dependency>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
+                <version>2.0.3</version>
+            </dependency>
+
+            <!-- Logback: CVE-2023-6378 → 升级到 1.5.6 -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.5.6</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.5.6</version>
+            </dependency>
+
+            <!-- Netty: 多个 2024/2025 CVE → 升级到 4.1.113.Final -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.113.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- PostgreSQL JDBC: CVE-2024-1597 → 升级到 42.7.4 -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.4</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Spring Boot Web -->
@@ -163,10 +237,13 @@
         </dependency>
 
         <!-- Springdoc OpenAPI (Swagger UI) -->
+        <!-- ⚠️ 版本限制：2.6.x 兼容 Spring Boot 3.2.x (Spring Framework 6.1.x) -->
+        <!-- ⚠️ 安全漏洞：2.7.0 修复了 DOMPurify CVE-2024-45801，但需要 Spring Boot 3.3+ -->
+        <!-- 💡 解决方案：等待升级 Spring Boot 3.3+ 后再升级 SpringDoc 2.7.0 -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.3.0</version>
+            <version>2.6.0</version>
         </dependency>
         <!-- Dotenv (环境变量管理) -->
         <dependency>
@@ -363,13 +440,49 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>10.0.4</version>
+                <version>12.1.0</version>
                 <configuration>
-                    <format>HTML</format>
+                    <formats>
+                        <format>HTML</format>
+                        <format>JSON</format>
+                    </formats>
                     <failBuildOnCVSS>7</failBuildOnCVSS>
                     <skipProvidedScope>true</skipProvidedScope>
                     <skipSystemScope>true</skipSystemScope>
+                    <!-- 抑制文件：忽略误报和已评估的低风险漏洞 -->
+                    <suppressionFiles>
+                        <suppressionFile>.owasp/suppressions.xml</suppressionFile>
+                    </suppressionFiles>
+                    <!-- 性能优化：使用国内 NVD 数据库镜像加速（可选） -->
+                    <!-- <cveUrlModified>https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-modified.json.gz</cveUrlModified> -->
+                    <!-- <cveUrlBase>https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-%d.json.gz</cveUrlBase> -->
+                    <!-- 缓存 NVD 数据库，避免每次重新下载 -->
+                    <autoUpdate>false</autoUpdate>
+                    <!-- 并发扫描线程数（加速扫描） -->
+                    <centralAnalyzerEnabled>true</centralAnalyzerEnabled>
+                    <!-- 禁用不需要的分析器（减少扫描时间） -->
+                    <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                    <nodeAnalyzerEnabled>false</nodeAnalyzerEnabled>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.8.3.0</version>
+                <configuration>
+                    <effort>max</effort>
+                    <threshold>Low</threshold>
+                    <failOnError>true</failOnError>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>spotbugs</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- 突变测试：PIT（设门槛，低于则失败） -->
             <plugin>
@@ -490,6 +603,9 @@
                 <version>3.11.0</version>
                 <configuration>
                     <release>21</release>
+                    <!-- 🚀 BaSui优化：启用并行编译，0 = 自动检测 CPU 核心数 -->
+                    <fork>true</fork>
+                    <threads>${maven.compiler.threads}</threads>
                     <showWarnings>false</showWarnings>
                     <compilerArgs>
                         <arg>-Xlint:-options</arg>
@@ -515,14 +631,23 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <!-- 先拼接 JaCoCo 的 agent，再追加 JVM 选项（避免覆盖 JaCoCo 注入参数） -->
+                    <!-- 先拼接 JaCoCo 的 agent,再追加 JVM 选项(避免覆盖 JaCoCo 注入参数)-->
                     <argLine>${jacocoArgLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
-                    <!-- 避免控制台大量输出并降低通道干扰风险 -->
+                    <!-- ✅ BaSui修复：启用输出重定向以避免并行测试通道冲突 -->
+                    <!-- 测试日志输出到 target/surefire-reports/*.txt 文件，避免 "Corrupted channel" 警告 -->
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <!-- 单进程执行以减少通道竞争（Windows 下更稳定） -->
-                    <forkCount>1</forkCount>
+                    <!-- ✅ BaSui修复：激活 test Profile，让 DevLoggingSmsService 生效 -->
+                    <systemPropertyVariables>
+                        <spring.profiles.active>test</spring.profiles.active>
+                    </systemPropertyVariables>
+                    <!-- 🚀 BaSui优化：多核并行测试 (1C = 每个 CPU 核心 1 个 JVM 进程) -->
+                    <forkCount>${surefire.forkCount}</forkCount>
                     <reuseForks>true</reuseForks>
-                    <!-- 在本地/CI 无 Docker 环境时，排除需要 Testcontainers 的集成测试 -->
+                    <!-- 启用并行测试：类级别并行 -->
+                    <parallel>classes</parallel>
+                    <threadCount>4</threadCount>
+                    <perCoreThreadCount>true</perCoreThreadCount>
+                    <!-- 在本地/CI 无 Docker 环境时,排除需要 Testcontainers 的集成测试 -->
                     <excludes>
                         <exclude>**/*IT.java</exclude>
                         <exclude>**/*IntegrationTest.java</exclude>
@@ -538,12 +663,14 @@
                     <skipITs>${skipITs}</skipITs>
                     <!-- 先拼接 JaCoCo 的 agent，再追加 JVM 选项 -->
                     <argLine>${jacocoArgLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                    <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
                     <includes>
                         <include>**/*IT.java</include>
                         <include>**/*IntegrationTest.java</include>
                     </includes>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <forkCount>1</forkCount>
+                    <!-- 🚀 BaSui优化：集成测试保持单进程（避免 Testcontainers 资源竞争） -->
+                    <forkCount>${failsafe.forkCount}</forkCount>
                     <reuseForks>true</reuseForks>
                 </configuration>
                 <executions>

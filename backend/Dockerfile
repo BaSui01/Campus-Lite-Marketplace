@@ -1,9 +1,11 @@
 # =====================================================
 # 校园轻享集市系统 - 后端 Dockerfile（多阶段构建）
-# 
+# 说明：当前仓库仅包含后端实现，前端尚在规划中。若需启动整套服务，请结合 docker/
+#       目录下的 docker-compose 文件，或在前端落地后为其单独编写 Dockerfile。
+#
 # 构建命令：
 # docker build -t campus-marketplace-backend:latest .
-# 
+#
 # 运行命令：
 # docker run -d -p 8080:8080 --name campus-backend \
 #   -e SPRING_PROFILES_ACTIVE=prod \
@@ -49,7 +51,7 @@ RUN chown -R appuser:appuser /app
 # 切换到非 root 用户
 USER appuser
 
-# 暴露端口
+# 暴露端口（默认 8080，可通过 SERVER_PORT 环境变量覆盖）
 EXPOSE 8080
 
 # JVM 参数优化（生产环境）
