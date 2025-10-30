@@ -5,6 +5,7 @@ import com.campus.marketplace.common.component.RateLimitRuleManager;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.common.utils.SecurityUtil;
+import com.campus.marketplace.repository.UserRepository;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.AfterEach;
@@ -58,13 +59,16 @@ class RateLimitAspectTest {
 
     private RateLimitRuleManager ruleManager;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private RateLimitAspect aspect;
 
     @BeforeEach
     void setUp() {
         ruleManager = new RateLimitRuleManager();
-        aspect = new RateLimitAspect(redisTemplate, ruleManager);
+        aspect = new RateLimitAspect(redisTemplate, ruleManager, userRepository);
         org.mockito.Mockito.lenient().when(redisTemplate.opsForZSet()).thenReturn(zSetOperations);
     }
 

@@ -4,6 +4,7 @@ import com.campus.marketplace.common.entity.Goods;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.lock.DistributedLockManager;
 import com.campus.marketplace.common.utils.RedisUtil;
 import com.campus.marketplace.repository.CategoryRepository;
 import com.campus.marketplace.repository.GoodsRepository;
@@ -19,8 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
@@ -47,9 +46,9 @@ class RecommendServiceTest {
     @Mock
     private RedisUtil redis;
     @Mock
-    private RedissonClient redissonClient;
+    private DistributedLockManager lockManager;
     @Mock
-    private RLock rLock;
+    private DistributedLockManager.LockHandle lockHandle;
 
     @InjectMocks
     private RecommendServiceImpl recommendService;
@@ -58,12 +57,8 @@ class RecommendServiceTest {
 
     @BeforeEach
     void setup() {
-        org.mockito.Mockito.lenient().when(redissonClient.getLock(anyString())).thenReturn(rLock);
-        try {
-            org.mockito.Mockito.lenient().when(rLock.tryLock(anyLong(), anyLong(), any())).thenReturn(true);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        org.mockito.Mockito.lenient().when(lockManager.tryLock(anyString(), anyLong(), anyLong(), any())).thenReturn(lockHandle);
+        org.mockito.Mockito.lenient().when(lockHandle.acquired()).thenReturn(true);
     }
 
     @Test

@@ -54,8 +54,10 @@ class RoleServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        viewPermission = Permission.builder().id(1L).name("system:user:view").build();
-        editPermission = Permission.builder().id(2L).name("system:user:update").build();
+        viewPermission = Permission.builder().name("system:user:view").build();
+        viewPermission.setId(1L);
+        editPermission = Permission.builder().name("system:user:update").build();
+        editPermission.setId(2L);
     }
 
     @Test
@@ -94,11 +96,11 @@ class RoleServiceImplTest {
     @DisplayName("更新角色 - 替换权限集合")
     void updateRole_replacePermissions() {
         Role role = Role.builder()
-                .id(200L)
                 .name("ROLE_EDITOR")
                 .description("编辑员")
                 .permissions(new java.util.LinkedHashSet<>(Set.of(viewPermission)))
                 .build();
+        role.setId(200L);
 
         UpdateRoleRequest request = new UpdateRoleRequest("内容编辑员", Set.of(editPermission.getName()));
 
@@ -120,10 +122,10 @@ class RoleServiceImplTest {
     @DisplayName("删除角色 - 内置角色禁止删除")
     void deleteRole_builtinRole() {
         Role adminRole = Role.builder()
-                .id(1L)
                 .name("ROLE_ADMIN")
                 .permissions(new java.util.LinkedHashSet<>())
                 .build();
+        adminRole.setId(1L);
 
         when(roleRepository.findByIdWithPermissions(1L)).thenReturn(java.util.Optional.of(adminRole));
 
@@ -134,12 +136,16 @@ class RoleServiceImplTest {
     @Test
     @DisplayName("更新用户角色成功")
     void updateUserRoles_success() {
-        Role roleStudent = Role.builder().id(10L).name("ROLE_STUDENT").permissions(new java.util.LinkedHashSet<>()).build();
-        User user = User.builder().id(500L).username("student1").roles(new java.util.LinkedHashSet<>()).build();
+        Role roleStudent = Role.builder().name("ROLE_STUDENT").permissions(new java.util.LinkedHashSet<>()).build();
+        roleStudent.setId(10L);
+        User user = User.builder().username("student1").roles(new java.util.LinkedHashSet<>()).build();
+        user.setId(500L);
 
         when(userRepository.findByIdWithRolesAndPermissions(500L)).thenReturn(java.util.Optional.of(user));
         when(roleRepository.findByNameWithPermissions("ROLE_STUDENT")).thenReturn(java.util.Optional.of(roleStudent));
-        when(roleRepository.findByNameWithPermissions("ROLE_USER")).thenReturn(java.util.Optional.of(Role.builder().id(11L).name("ROLE_USER").permissions(new java.util.LinkedHashSet<>()).build()));
+        Role roleUser = Role.builder().name("ROLE_USER").permissions(new java.util.LinkedHashSet<>()).build();
+        roleUser.setId(11L);
+        when(roleRepository.findByNameWithPermissions("ROLE_USER")).thenReturn(java.util.Optional.of(roleUser));
 
         UpdateUserRolesRequest request = new UpdateUserRolesRequest(Set.of("role_student", "ROLE_USER"));
         roleService.updateUserRoles(500L, request);
@@ -152,16 +158,16 @@ class RoleServiceImplTest {
     @DisplayName("列出角色 - 返回概览信息")
     void listRoles_success() {
         Role roleA = Role.builder()
-                .id(1L)
                 .name("ROLE_ALPHA")
                 .description("Alpha")
                 .permissions(new java.util.LinkedHashSet<>(Set.of(viewPermission)))
                 .build();
+        roleA.setId(1L);
         Role roleB = Role.builder()
-                .id(2L)
                 .name("ROLE_BETA")
                 .permissions(new java.util.LinkedHashSet<>(Set.of(viewPermission, editPermission)))
                 .build();
+        roleB.setId(2L);
 
         when(roleRepository.findAllWithPermissions()).thenReturn(List.of(roleA, roleB));
         when(userRepository.countByRoles_Name("ROLE_ALPHA")).thenReturn(1L);

@@ -309,6 +309,13 @@ public class GoodsServiceImpl implements GoodsService {
 
         // 获取卖家信息（敏感信息脱敏）
         User seller = goods.getSeller();
+        if (seller == null && goods.getSellerId() != null) {
+            seller = userRepository.findById(goods.getSellerId())
+                    .orElse(null);
+        }
+        if (seller == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "卖家信息缺失");
+        }
         GoodsDetailResponse.SellerInfo sellerInfo = GoodsDetailResponse.SellerInfo.builder()
                 .id(seller.getId())
                 .username(seller.getUsername())

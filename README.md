@@ -94,6 +94,12 @@
   ```bash
   mvn test
   ```
+- 覆盖率与静态检查（CI 推荐命令）：
+  ```bash
+  mvn verify -DskipITs
+  ```
+  - 默认启用 Jacoco、SpotBugs、打包校验，当前分支已验证通过。
+  - Jacoco 针对 `controller.e2e` / `controller.perf` 包设定了 ≥85% 行覆盖要求，已通过新增单测满足阈值。
 - 推荐使用 Testcontainers 驱动的集成测试（确保 Docker 可用）。
 - 代码规范：遵循 `backend/README.md` 中的编码与 Git 提交规范。
 

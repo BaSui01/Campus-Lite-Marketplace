@@ -1,5 +1,6 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.lock.DistributedLockManager;
 import com.campus.marketplace.common.utils.RedisUtil;
 import com.campus.marketplace.service.impl.CacheServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,8 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -39,13 +38,13 @@ class CacheServiceTest {
     private RedisUtil redisUtil;
 
     @Mock
-    private RedissonClient redissonClient;
+    private DistributedLockManager lockManager;
 
     @Mock
     private ObjectMapper objectMapper;
 
     @Mock
-    private RLock rLock;
+    private DistributedLockManager.LockHandle lockHandle;
 
     private static final String TEST_KEY = "test:key";
     private static final String TEST_VALUE = "test_value";
@@ -172,11 +171,11 @@ class CacheServiceTest {
 
     @Test
     @DisplayName("应该支持分布式锁（防止缓存击穿）")
-    void shouldSupportDistributedLock_toPreventCacheBreakdown() throws InterruptedException {
+    void shouldSupportDistributedLock_toPreventCacheBreakdown() {
         // Given: 缓存未命中，多个请求同时访问
         when(redisUtil.get(TEST_KEY)).thenReturn(null);
-        when(redissonClient.getLock(anyString())).thenReturn(rLock);
-        when(rLock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).thenReturn(true);
+        when(lockManager.tryLock(anyString(), anyLong(), anyLong(), any(TimeUnit.class))).thenReturn(lockHandle);
+        when(lockHandle.acquired()).thenReturn(true);
 
         Supplier<String> dataLoader = () -> {
             // 模拟数据库查询耗时
@@ -195,7 +194,7 @@ class CacheServiceTest {
         assertEquals("loaded_once", result);
         verify(redisUtil, atLeastOnce()).get(TEST_KEY);
         verify(redisUtil, times(1)).set(eq(TEST_KEY), eq("loaded_once"), eq(60L), eq(TimeUnit.SECONDS));
-        verify(rLock, times(1)).unlock();
+        verify(lockHandle, times(1)).close();
     }
 
     @Test

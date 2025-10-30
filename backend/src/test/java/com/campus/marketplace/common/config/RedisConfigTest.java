@@ -44,7 +44,8 @@ class RedisConfigTest {
         assertThat(cache).isInstanceOf(org.springframework.data.redis.cache.RedisCache.class);
         RedisCacheConfiguration redisConfig =
                 ((org.springframework.data.redis.cache.RedisCache) cache).getCacheConfiguration();
-        assertThat(redisConfig.getTtl()).isEqualTo(java.time.Duration.ofMinutes(30));
+        var ttlFunction = redisConfig.getTtlFunction();
+        assertThat(ttlFunction.getTimeToLive("demo", null)).isEqualTo(java.time.Duration.ofMinutes(30));
         assertThat(redisConfig.getKeySerializationPair()).isNotNull();
         assertThat(redisConfig.getValueSerializationPair()).isNotNull();
     }

@@ -140,7 +140,6 @@ class DatabaseSeederTest {
         when(permissionRepository.findByName(anyString())).thenReturn(Optional.empty());
         when(permissionRepository.save(any(Permission.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        @SuppressWarnings("unchecked")
         Map<String, Permission> cache = ReflectionTestUtils.invokeMethod(seeder, "ensurePermissions");
 
         assertThat(cache).isNotEmpty();

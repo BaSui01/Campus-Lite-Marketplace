@@ -2,14 +2,13 @@ package com.campus.marketplace.service.impl;
 
 import com.campus.marketplace.common.entity.ScheduledTask;
 import com.campus.marketplace.common.entity.TaskExecution;
+import com.campus.marketplace.common.lock.DistributedLockManager;
 import com.campus.marketplace.repository.ScheduledTaskRepository;
 import com.campus.marketplace.repository.TaskExecutionRepository;
 import com.campus.marketplace.service.TaskService;
 import com.campus.marketplace.service.task.TaskRunner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,7 @@ public class TaskServiceImpl implements TaskService {
 
     private final ScheduledTaskRepository taskRepo;
     private final TaskExecutionRepository execRepo;
-    private final RedissonClient redissonClient;
+    private final DistributedLockManager lockManager;
 
     private final Map<String, TaskRunner> registry = new ConcurrentHashMap<>();
 
@@ -92,11 +91,8 @@ public class TaskServiceImpl implements TaskService {
         }
 
         String lockKey = "task:lock:" + name;
-        RLock lock = redissonClient.getLock(lockKey);
-        boolean locked = false;
-        try {
-            locked = lock.tryLock(0, 30, TimeUnit.MINUTES);
-            if (!locked) {
+        try (DistributedLockManager.LockHandle lock = lockManager.tryLock(lockKey, 0, 30, TimeUnit.MINUTES)) {
+            if (!lock.acquired()) {
                 finishAsFailed(exec, "Lock busy");
                 return;
             }
@@ -109,9 +105,6 @@ public class TaskServiceImpl implements TaskService {
         } finally {
             exec.setEndedAt(Instant.now());
             execRepo.save(exec);
-            if (locked) {
-                try { lock.unlock(); } catch (Exception ignored) {}
-            }
         }
     }
 

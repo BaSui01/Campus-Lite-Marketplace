@@ -47,8 +47,8 @@ class NotificationQueueConsumerTest {
 
     @BeforeEach
     void setUp() {
-        when(redisTemplate.opsForList()).thenReturn(listOperations);
-        when(redisTemplate.opsForZSet()).thenReturn(zSetOperations);
+        lenient().when(redisTemplate.opsForList()).thenReturn(listOperations);
+        lenient().when(redisTemplate.opsForZSet()).thenReturn(zSetOperations);
 
         objectMapper = new StubObjectMapper();
 

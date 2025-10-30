@@ -1,286 +1,610 @@
 package com.campus.marketplace.common.utils;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
- * Redis 工具类
- * 
- * 封装常用的 Redis 操作
- * 
+ * Redis 工具类（支持内存降级）
+ *
+ * <p>当 {@code app.redis.mode=redis} 且 Redis 可用时，转发到 {@link RedisTemplate}；
+ * 否则退化为线程安全的内存实现，保证开发/测试环境无需 Redis 也能启动。</p>
+ *
+ * <p>注意：内存模式仅用于本地开发或 CI 场景，不具备分布式能力。</p>
+ *
  * @author BaSui
  * @date 2025-10-25
  */
 @Component
-@RequiredArgsConstructor
 public class RedisUtil {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final boolean useRedis;
+
+    private final ConcurrentMap<String, ValueWrapper> store = new ConcurrentHashMap<>();
+
+    public RedisUtil(ObjectProvider<RedisTemplate<String, Object>> redisTemplateProvider,
+                     @Value("${app.redis.mode:redis}") String redisMode) {
+        this.redisTemplate = redisTemplateProvider.getIfAvailable();
+        this.useRedis = this.redisTemplate != null && "redis".equalsIgnoreCase(redisMode);
+    }
+
+    private boolean isRedisEnabled() {
+        return useRedis;
+    }
 
     // ========== String 操作 ==========
 
-    /**
-     * 设置值
-     */
     public void set(String key, Object value) {
-        redisTemplate.opsForValue().set(key, value);
+        if (isRedisEnabled()) {
+            redisTemplate.opsForValue().set(key, value);
+            return;
+        }
+        setValue(key, value, null);
     }
 
-    /**
-     * 设置值（带过期时间）
-     */
     public void set(String key, Object value, long timeout, TimeUnit unit) {
-        redisTemplate.opsForValue().set(key, value, timeout, unit);
+        if (isRedisEnabled()) {
+            redisTemplate.opsForValue().set(key, value, timeout, unit);
+            return;
+        }
+        setValue(key, value, System.currentTimeMillis() + unit.toMillis(timeout));
     }
 
-    /**
-     * 获取值
-     */
     public Object get(String key) {
-        return redisTemplate.opsForValue().get(key);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForValue().get(key);
+        }
+        ValueWrapper wrapper = getWrapper(key);
+        return wrapper == null ? null : wrapper.value;
     }
 
-    /**
-     * 删除键
-     */
     public Boolean delete(String key) {
-        return redisTemplate.delete(key);
+        if (isRedisEnabled()) {
+            return redisTemplate.delete(key);
+        }
+        return store.remove(key) != null;
     }
 
-    /**
-     * 批量删除键
-     */
     public Long delete(Collection<String> keys) {
-        return redisTemplate.delete(keys);
+        if (isRedisEnabled()) {
+            return redisTemplate.delete(keys);
+        }
+        long removed = 0;
+        for (String key : keys) {
+            if (delete(key)) {
+                removed++;
+            }
+        }
+        return removed;
     }
 
-    /**
-     * 检查键是否存在
-     */
     public Boolean hasKey(String key) {
-        return redisTemplate.hasKey(key);
+        if (isRedisEnabled()) {
+            return redisTemplate.hasKey(key);
+        }
+        return getWrapper(key) != null;
     }
 
-    /**
-     * 设置过期时间
-     */
     public Boolean expire(String key, long timeout, TimeUnit unit) {
-        return redisTemplate.expire(key, timeout, unit);
+        if (isRedisEnabled()) {
+            return redisTemplate.expire(key, timeout, unit);
+        }
+        ValueWrapper wrapper = getWrapper(key);
+        if (wrapper == null) {
+            return false;
+        }
+        wrapper.expireAt = System.currentTimeMillis() + unit.toMillis(timeout);
+        return true;
     }
 
-    /**
-     * 获取过期时间
-     */
     public Long getExpire(String key) {
-        return redisTemplate.getExpire(key);
+        if (isRedisEnabled()) {
+            return redisTemplate.getExpire(key);
+        }
+        ValueWrapper wrapper = getWrapper(key);
+        if (wrapper == null) {
+            return -2L;
+        }
+        if (wrapper.expireAt == null) {
+            return -1L;
+        }
+        long remaining = wrapper.expireAt - System.currentTimeMillis();
+        return remaining > 0 ? TimeUnit.SECONDS.convert(remaining, TimeUnit.MILLISECONDS) : -2L;
     }
 
-    /**
-     * 递增
-     */
     public Long increment(String key) {
-        return redisTemplate.opsForValue().increment(key);
+        return increment(key, 1);
     }
 
-    /**
-     * 递增指定值
-     */
     public Long increment(String key, long delta) {
-        return redisTemplate.opsForValue().increment(key, delta);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForValue().increment(key, delta);
+        }
+        ValueWrapper wrapper = getWrapper(key);
+        long current = 0;
+        Long expireAt = null;
+        if (wrapper != null && wrapper.value instanceof Number number) {
+            current = number.longValue();
+            expireAt = wrapper.expireAt;
+        }
+        current += delta;
+        setValue(key, current, expireAt);
+        return current;
     }
 
-    /**
-     * 递减
-     */
     public Long decrement(String key) {
-        return redisTemplate.opsForValue().decrement(key);
+        return increment(key, -1);
     }
 
     // ========== Hash 操作 ==========
 
-    /**
-     * Hash 设置值
-     */
     public void hSet(String key, String hashKey, Object value) {
-        redisTemplate.opsForHash().put(key, hashKey, value);
+        if (isRedisEnabled()) {
+            redisTemplate.opsForHash().put(key, hashKey, value);
+            return;
+        }
+        Map<String, Object> map = getOrCreateMap(key);
+        map.put(hashKey, value);
     }
 
-    /**
-     * Hash 批量设置
-     */
     public void hSetAll(String key, Map<String, Object> map) {
-        redisTemplate.opsForHash().putAll(key, map);
+        if (isRedisEnabled()) {
+            redisTemplate.opsForHash().putAll(key, map);
+            return;
+        }
+        Map<String, Object> data = getOrCreateMap(key);
+        data.putAll(map);
     }
 
-    /**
-     * Hash 获取值
-     */
     public Object hGet(String key, String hashKey) {
-        return redisTemplate.opsForHash().get(key, hashKey);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForHash().get(key, hashKey);
+        }
+        Map<String, Object> map = getMap(key);
+        return map == null ? null : map.get(hashKey);
     }
 
-    /**
-     * Hash 获取所有键值对
-     */
-    public Map<Object, Object> hGetAll(String key) {
-        return redisTemplate.opsForHash().entries(key);
-    }
-
-    /**
-     * Hash 删除字段
-     */
-    public Long hDelete(String key, Object... hashKeys) {
-        return redisTemplate.opsForHash().delete(key, hashKeys);
-    }
-
-    /**
-     * Hash 检查字段是否存在
-     */
     public Boolean hHasKey(String key, String hashKey) {
-        return redisTemplate.opsForHash().hasKey(key, hashKey);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForHash().hasKey(key, hashKey);
+        }
+        Map<String, Object> map = getMap(key);
+        return map != null && map.containsKey(hashKey);
+    }
+
+    public Long hDelete(String key, Object... hashKeys) {
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForHash().delete(key, hashKeys);
+        }
+        Map<String, Object> map = getMap(key);
+        if (map == null) {
+            return 0L;
+        }
+        long removed = 0;
+        for (Object hashKey : hashKeys) {
+            if (map.remove(String.valueOf(hashKey)) != null) {
+                removed++;
+            }
+        }
+        return removed;
+    }
+
+    public Map<Object, Object> hEntries(String key) {
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForHash().entries(key);
+        }
+        Map<String, Object> map = getMap(key);
+        if (map == null) {
+            return Collections.emptyMap();
+        }
+        return Collections.unmodifiableMap(map);
     }
 
     // ========== Set 操作 ==========
 
-    /**
-     * Set 添加元素
-     */
     public Long sAdd(String key, Object... values) {
-        return redisTemplate.opsForSet().add(key, values);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForSet().add(key, values);
+        }
+        Set<Object> set = getOrCreateSet(key);
+        long added = 0;
+        for (Object value : values) {
+            if (set.add(value)) {
+                added++;
+            }
+        }
+        return added;
     }
 
-    /**
-     * Set 获取所有元素
-     */
     public Set<Object> sMembers(String key) {
-        return redisTemplate.opsForSet().members(key);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForSet().members(key);
+        }
+        Set<Object> set = getSet(key);
+        return set == null ? Collections.emptySet() : Collections.unmodifiableSet(set);
     }
 
-    /**
-     * Set 检查元素是否存在
-     */
     public Boolean sIsMember(String key, Object value) {
-        return redisTemplate.opsForSet().isMember(key, value);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForSet().isMember(key, value);
+        }
+        Set<Object> set = getSet(key);
+        return set != null && set.contains(value);
     }
 
-    /**
-     * Set 移除元素
-     */
     public Long sRemove(String key, Object... values) {
-        return redisTemplate.opsForSet().remove(key, values);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForSet().remove(key, values);
+        }
+        Set<Object> set = getSet(key);
+        if (set == null) {
+            return 0L;
+        }
+        long removed = 0;
+        for (Object value : values) {
+            if (set.remove(value)) {
+                removed++;
+            }
+        }
+        return removed;
     }
 
-    /**
-     * Set 获取大小
-     */
     public Long sSize(String key) {
-        return redisTemplate.opsForSet().size(key);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForSet().size(key);
+        }
+        Set<Object> set = getSet(key);
+        return set == null ? 0L : (long) set.size();
     }
 
     // ========== Sorted Set 操作 ==========
 
-    /**
-     * ZSet 添加元素
-     */
     public Boolean zAdd(String key, Object value, double score) {
-        return redisTemplate.opsForZSet().add(key, value, score);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForZSet().add(key, value, score);
+        }
+        Map<Object, Double> map = getOrCreateZSet(key);
+        Double previous = map.put(value, score);
+        return !Objects.equals(previous, score);
     }
 
-    /**
-     * ZSet 增加分数
-     */
     public Double zIncrementScore(String key, Object value, double delta) {
-        return redisTemplate.opsForZSet().incrementScore(key, value, delta);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForZSet().incrementScore(key, value, delta);
+        }
+        Map<Object, Double> map = getOrCreateZSet(key);
+        double newScore = map.getOrDefault(value, 0.0d) + delta;
+        map.put(value, newScore);
+        return newScore;
     }
 
-    /**
-     * ZSet 获取排名范围（正序）
-     */
     public Set<Object> zRange(String key, long start, long end) {
-        return redisTemplate.opsForZSet().range(key, start, end);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForZSet().range(key, start, end);
+        }
+        return zRangeInternal(key, start, end, false);
     }
 
-    /**
-     * ZSet 获取排名范围（倒序）
-     */
     public Set<Object> zReverseRange(String key, long start, long end) {
-        return redisTemplate.opsForZSet().reverseRange(key, start, end);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForZSet().reverseRange(key, start, end);
+        }
+        return zRangeInternal(key, start, end, true);
     }
 
-    /**
-     * ZSet 移除元素
-     */
     public Long zRemove(String key, Object... values) {
-        return redisTemplate.opsForZSet().remove(key, values);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForZSet().remove(key, values);
+        }
+        Map<Object, Double> map = getZSet(key);
+        if (map == null) {
+            return 0L;
+        }
+        long removed = 0;
+        for (Object value : values) {
+            if (map.remove(value) != null) {
+                removed++;
+            }
+        }
+        return removed;
     }
 
     // ========== List 操作 ==========
 
-    /**
-     * List 右侧推入
-     */
     public Long lPush(String key, Object value) {
-        return redisTemplate.opsForList().rightPush(key, value);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForList().rightPush(key, value);
+        }
+        Deque<Object> deque = getOrCreateDeque(key);
+        deque.addLast(value);
+        return (long) deque.size();
     }
 
-    /**
-     * List 左侧推入
-     */
     public Long lLeftPush(String key, Object value) {
-        return redisTemplate.opsForList().leftPush(key, value);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForList().leftPush(key, value);
+        }
+        Deque<Object> deque = getOrCreateDeque(key);
+        deque.addFirst(value);
+        return (long) deque.size();
     }
 
-    /**
-     * List 获取范围
-     */
     public List<Object> lRange(String key, long start, long end) {
-        return redisTemplate.opsForList().range(key, start, end);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForList().range(key, start, end);
+        }
+        Deque<Object> deque = getDeque(key);
+        if (deque == null || deque.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Object> list = new ArrayList<>(deque);
+        int size = list.size();
+        int from = normalizeIndex(start, size);
+        int to = normalizeIndex(end, size);
+        if (from > to || from >= size) {
+            return Collections.emptyList();
+        }
+        to = Math.min(to, size - 1);
+        return list.subList(from, to + 1);
     }
 
-    /**
-     * List 获取大小
-     */
     public Long lSize(String key) {
-        return redisTemplate.opsForList().size(key);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForList().size(key);
+        }
+        Deque<Object> deque = getDeque(key);
+        return deque == null ? 0L : (long) deque.size();
     }
 
-    /**
-     * List 右侧弹出
-     */
     public Object lPop(String key) {
-        return redisTemplate.opsForList().rightPop(key);
+        if (isRedisEnabled()) {
+            return redisTemplate.opsForList().rightPop(key);
+        }
+        Deque<Object> deque = getDeque(key);
+        if (deque == null) {
+            return null;
+        }
+        return deque.pollLast();
     }
 
     // ========== 高级操作 ==========
 
-    /**
-     * 根据模式匹配获取所有键（使用 SCAN 命令避免阻塞）
-     *
-     * @param pattern 匹配模式（支持通配符 * 和 ?）
-     * @return 匹配的键集合
-     */
     public Set<String> scan(String pattern) {
-        return redisTemplate.keys(pattern);
+        if (isRedisEnabled()) {
+            return redisTemplate.keys(pattern);
+        }
+        Pattern regex = Pattern.compile(convertPattern(pattern));
+        return store.entrySet().stream()
+                .filter(entry -> {
+                    ValueWrapper wrapper = entry.getValue();
+                    if (wrapper == null || wrapper.expired()) {
+                        store.remove(entry.getKey(), wrapper);
+                        return false;
+                    }
+                    return true;
+                })
+                .map(Map.Entry::getKey)
+                .filter(key -> regex.matcher(key).matches())
+                .collect(Collectors.toSet());
     }
 
-    /**
-     * 根据模式批量删除键（使用 SCAN + DELETE）
-     *
-     * @param pattern 匹配模式
-     * @return 删除的键数量
-     */
     public Long deleteByPattern(String pattern) {
         Set<String> keys = scan(pattern);
         if (keys == null || keys.isEmpty()) {
             return 0L;
         }
         return delete(keys);
+    }
+
+    // ========== 内存模式辅助 ==========
+
+    private void setValue(String key, Object value, Long expireAt) {
+        ValueWrapper wrapper = new ValueWrapper();
+        wrapper.value = value;
+        wrapper.expireAt = expireAt;
+        store.put(key, wrapper);
+    }
+
+    private ValueWrapper getWrapper(String key) {
+        ValueWrapper wrapper = store.get(key);
+        if (wrapper != null && wrapper.expired()) {
+            store.remove(key, wrapper);
+            return null;
+        }
+        return wrapper;
+    }
+
+    private Map<String, Object> getMap(String key) {
+        ValueWrapper wrapper = getWrapper(key);
+        if (wrapper == null || !(wrapper.value instanceof Map<?, ?> map)) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> cast = (Map<String, Object>) map;
+        return cast;
+    }
+
+    private Map<String, Object> getOrCreateMap(String key) {
+        ValueWrapper wrapper = store.compute(key, (k, existing) -> {
+            if (existing == null || existing.expired() || !(existing.value instanceof Map<?, ?>)) {
+                ValueWrapper created = new ValueWrapper();
+                created.value = new ConcurrentHashMap<String, Object>();
+                return created;
+            }
+            return existing;
+        });
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = (Map<String, Object>) wrapper.value;
+        return map;
+    }
+
+    private Set<Object> getSet(String key) {
+        ValueWrapper wrapper = getWrapper(key);
+        if (wrapper == null || !(wrapper.value instanceof Set<?> set)) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        Set<Object> cast = (Set<Object>) set;
+        return cast;
+    }
+
+    private Set<Object> getOrCreateSet(String key) {
+        ValueWrapper wrapper = store.compute(key, (k, existing) -> {
+            if (existing == null || existing.expired() || !(existing.value instanceof Set<?>)) {
+                ValueWrapper created = new ValueWrapper();
+                created.value = Collections.synchronizedSet(new HashSet<>());
+                return created;
+            }
+            return existing;
+        });
+        @SuppressWarnings("unchecked")
+        Set<Object> set = (Set<Object>) wrapper.value;
+        return set;
+    }
+
+    private Map<Object, Double> getZSet(String key) {
+        ValueWrapper wrapper = getWrapper(key);
+        if (wrapper == null || !(wrapper.value instanceof Map<?, ?> map)) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        Map<Object, Double> cast = (Map<Object, Double>) map;
+        return cast;
+    }
+
+    private Map<Object, Double> getOrCreateZSet(String key) {
+        ValueWrapper wrapper = store.compute(key, (k, existing) -> {
+            if (existing == null || existing.expired() || !(existing.value instanceof Map<?, ?>)) {
+                ValueWrapper created = new ValueWrapper();
+                created.value = new ConcurrentHashMap<Object, Double>();
+                return created;
+            }
+            return existing;
+        });
+        @SuppressWarnings("unchecked")
+        Map<Object, Double> map = (Map<Object, Double>) wrapper.value;
+        return map;
+    }
+
+    private Deque<Object> getDeque(String key) {
+        ValueWrapper wrapper = getWrapper(key);
+        if (wrapper == null || !(wrapper.value instanceof Deque<?> deque)) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        Deque<Object> cast = (Deque<Object>) deque;
+        return cast;
+    }
+
+    private Deque<Object> getOrCreateDeque(String key) {
+        ValueWrapper wrapper = store.compute(key, (k, existing) -> {
+            if (existing == null || existing.expired() || !(existing.value instanceof Deque<?>)) {
+                ValueWrapper created = new ValueWrapper();
+                created.value = new ConcurrentLinkedDeque<>();
+                return created;
+            }
+            return existing;
+        });
+        @SuppressWarnings("unchecked")
+        Deque<Object> deque = (Deque<Object>) wrapper.value;
+        return deque;
+    }
+
+    private Set<Object> zRangeInternal(String key, long start, long end, boolean reverse) {
+        Map<Object, Double> map = getZSet(key);
+        if (map == null || map.isEmpty()) {
+            return Collections.emptySet();
+        }
+        List<Map.Entry<Object, Double>> entries = new ArrayList<>(map.entrySet());
+        entries.sort((o1, o2) -> {
+            int compare = Double.compare(o1.getValue(), o2.getValue());
+            if (compare == 0) {
+                return String.valueOf(o1.getKey()).compareTo(String.valueOf(o2.getKey()));
+            }
+            return compare;
+        });
+        if (reverse) {
+            Collections.reverse(entries);
+        }
+        int size = entries.size();
+        int from = normalizeIndex(start, size);
+        int to = normalizeIndex(end, size);
+        if (from > to || from >= size) {
+            return Collections.emptySet();
+        }
+        to = Math.min(to, size - 1);
+        LinkedHashSet<Object> result = new LinkedHashSet<>();
+        for (int i = from; i <= to; i++) {
+            result.add(entries.get(i).getKey());
+        }
+        return result;
+    }
+
+    private int normalizeIndex(long index, int size) {
+        if (index < 0) {
+            long adj = size + index;
+            return (int) Math.max(adj, 0);
+        }
+        return (int) Math.min(index, Integer.MAX_VALUE);
+    }
+
+    private String convertPattern(String pattern) {
+        StringBuilder regex = new StringBuilder();
+        char[] chars = pattern.toCharArray();
+        for (char c : chars) {
+            switch (c) {
+                case '*':
+                    regex.append(".*");
+                    break;
+                case '?':
+                    regex.append('.');
+                    break;
+                case '.':
+                case '\\':
+                case '+':
+                case '[':
+                case ']':
+                case '(':
+                case ')':
+                case '{':
+                case '}':
+                case '^':
+                case '$':
+                case '|':
+                    regex.append('\\').append(c);
+                    break;
+                default:
+                    regex.append(c);
+            }
+        }
+        return regex.toString();
+    }
+
+    private static final class ValueWrapper {
+        volatile Object value;
+        volatile Long expireAt;
+
+        boolean expired() {
+            return expireAt != null && expireAt <= System.currentTimeMillis();
+        }
     }
 }

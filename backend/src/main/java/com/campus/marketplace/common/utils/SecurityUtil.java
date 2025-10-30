@@ -1,9 +1,13 @@
 package com.campus.marketplace.common.utils;
 
+import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.support.SpringContextHolder;
+import com.campus.marketplace.repository.UserRepository;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,25 +67,28 @@ public class SecurityUtil {
     public static Long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
             log.warn("尝试获取当前用户ID，但用户未登录");
             throw new BusinessException(ErrorCode.UNAUTHORIZED, "用户未登录");
         }
 
         Object principal = authentication.getPrincipal();
 
-        // 如果使用了自定义的 UserDetails 实现（比如 CustomUserDetails）
-        // 并且包含 userId 字段，可以直接返回
-        // 示例：
-        // if (principal instanceof CustomUserDetails customUserDetails) {
-        //     return customUserDetails.getUserId();
-        // }
+        if (principal instanceof UserDetails userDetails) {
+            return resolveUserIdByUsername(userDetails.getUsername());
+        }
 
-        // 如果没有自定义 UserDetails，则抛出异常提示需要实现
-        log.error("getCurrentUserId() 方法需要自定义 UserDetails 实现，当前 Principal 类型：{}",
-                principal.getClass());
-        throw new BusinessException(ErrorCode.OPERATION_FAILED,
-                "无法直接获取用户ID，请使用 UserRepository 查询");
+        if (principal instanceof String username) {
+            return resolveUserIdByUsername(username);
+        }
+
+        if (principal instanceof Number number) {
+            return number.longValue();
+        }
+
+        log.error("无法识别的 Principal 类型：{}", principal.getClass());
+        throw new BusinessException(ErrorCode.OPERATION_FAILED, "无法直接获取用户ID，请使用 UserRepository 查询");
     }
 
     /**
@@ -132,5 +139,22 @@ public class SecurityUtil {
         }
         return authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(authority));
+    }
+
+    private static Long resolveUserIdByUsername(String username) {
+        if (username == null || username.isBlank() || "anonymousUser".equals(username)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "用户未登录");
+        }
+        try {
+            UserRepository userRepository = SpringContextHolder.getBean(UserRepository.class);
+            return userRepository.findByUsername(username)
+                    .map(User::getId)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, "用户不存在"));
+        } catch (BusinessException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            log.error("解析用户ID失败, username={}", username, ex);
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "获取用户ID失败");
+        }
     }
 }

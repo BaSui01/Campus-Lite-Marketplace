@@ -1,10 +1,9 @@
 package com.campus.marketplace.common.config;
 
-import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.StandardThreadExecutor;
 import org.apache.coyote.ProtocolHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 
 import java.util.concurrent.Executor;
 
@@ -29,11 +28,12 @@ class VirtualThreadConfigTest {
     @DisplayName("Tomcat 自定义器会注入虚拟线程执行器")
     void protocolHandlerCustomizer_shouldApplyExecutor() {
         Executor executor = command -> {};
-        var customizer = config.protocolHandlerVirtualThreadExecutorCustomizer(executor);
-        ProtocolHandler protocolHandler = mock(ProtocolHandler.class);
+        TomcatProtocolHandlerCustomizer<ProtocolHandler> customizer =
+                config.protocolHandlerVirtualThreadExecutorCustomizer(executor);
+        ProtocolHandler handler = mock(ProtocolHandler.class);
 
-        customizer.customize(protocolHandler);
+        customizer.customize(handler);
 
-        verify(protocolHandler).setExecutor(executor);
+        verify(handler).setExecutor(executor);
     }
 }

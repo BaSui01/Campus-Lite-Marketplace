@@ -1,6 +1,8 @@
 package com.campus.marketplace.concurrency;
 
 import com.campus.marketplace.integration.IntegrationTestBase;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RLock;
@@ -19,8 +21,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class RedissonLockConcurrencyIT extends IntegrationTestBase {
 
-    @Autowired
+    @Autowired(required = false)
     private RedissonClient redissonClient;
+
+    @BeforeEach
+    void ensureRedisAvailable() {
+        Assumptions.assumeTrue(redissonClient != null, "跳过：当前环境未启用 Redisson");
+    }
 
     @Test
     @DisplayName("Redisson 分布式锁在高并发下保证互斥")

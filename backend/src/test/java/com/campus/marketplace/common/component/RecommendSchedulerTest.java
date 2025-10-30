@@ -52,7 +52,7 @@ class RecommendSchedulerTest {
     @Test
     @DisplayName("刷新任务遇到异常时记录日志但不抛出")
     void refreshHotRankingJob_shouldSwallowExceptions() {
-        when(recommendService.refreshHotRanking(null, 20)).thenThrow(new IllegalStateException("redis down"));
+        doThrow(new IllegalStateException("redis down")).when(recommendService).refreshHotRanking(null, 20);
 
         scheduler.refreshHotRankingJob();
 

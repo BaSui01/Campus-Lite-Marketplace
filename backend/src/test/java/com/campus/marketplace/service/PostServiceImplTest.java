@@ -107,7 +107,8 @@ class PostServiceImplTest {
     @DisplayName("创建帖子成功应过滤内容并更新限流计数")
     void createPost_shouldFilterAndIncrementLimit() {
         setAuthentication("laowang", List.of(new SimpleGrantedAuthority("ROLE_STUDENT")));
-        User user = User.builder().id(5L).username("laowang").campusId(200L).build();
+        User user = User.builder().username("laowang").campusId(200L).build();
+        user.setId(5L);
         when(userRepository.findByUsername("laowang")).thenReturn(java.util.Optional.of(user));
         when(valueOperations.increment("post:limit:" + user.getId(), 0L)).thenReturn(3L);
         when(valueOperations.increment("post:limit:" + user.getId(), 1L)).thenReturn(4L);
@@ -142,7 +143,8 @@ class PostServiceImplTest {
     @DisplayName("超过每日发帖限额应抛出异常")
     void createPost_shouldFailWhenLimitExceeded() {
         setAuthentication("user1", List.of());
-        User user = User.builder().id(8L).username("user1").build();
+        User user = User.builder().username("user1").build();
+        user.setId(8L);
         when(userRepository.findByUsername("user1")).thenReturn(java.util.Optional.of(user));
         when(valueOperations.increment("post:limit:" + user.getId(), 0L)).thenReturn(10L);
 
@@ -159,7 +161,8 @@ class PostServiceImplTest {
     void deletePost_shouldRejectWhenNotOwnerOrAdmin() {
         setAuthentication("intruder", List.of());
         Post post = Post.builder().authorId(1L).status(GoodsStatus.APPROVED).build();
-        User user = User.builder().id(2L).username("intruder").build();
+        User user = User.builder().username("intruder").build();
+        user.setId(2L);
         when(postRepository.findById(3L)).thenReturn(java.util.Optional.of(post));
         when(userRepository.findByUsername("intruder")).thenReturn(java.util.Optional.of(user));
 
@@ -181,7 +184,8 @@ class PostServiceImplTest {
                 .status(GoodsStatus.APPROVED)
                 .build();
         post.setId(12L);
-        User user = User.builder().id(6L).username("author").build();
+        User user = User.builder().username("author").build();
+        user.setId(6L);
         when(postRepository.findById(12L)).thenReturn(java.util.Optional.of(post));
         when(userRepository.findByUsername("author")).thenReturn(java.util.Optional.of(user));
         when(complianceService.moderateText("新标题", "POST_TITLE"))
@@ -204,7 +208,8 @@ class PostServiceImplTest {
     void getPostDetail_shouldRejectCrossCampusAccess() {
         setAuthentication("userx", List.of(new SimpleGrantedAuthority("ROLE_STUDENT")));
         Post post = Post.builder().authorId(9L).campusId(100L).content("c").title("t").status(GoodsStatus.APPROVED).build();
-        User user = User.builder().id(9L).username("userx").campusId(101L).build();
+        User user = User.builder().username("userx").campusId(101L).build();
+        user.setId(9L);
         when(postRepository.findByIdWithAuthor(15L)).thenReturn(java.util.Optional.of(post));
         when(userRepository.findByUsername("userx")).thenReturn(java.util.Optional.of(user));
 
@@ -219,7 +224,8 @@ class PostServiceImplTest {
     @DisplayName("查询帖子列表应根据校区过滤")
     void listPosts_shouldFilterByCampus() {
         setAuthentication("campusUser", List.of(new SimpleGrantedAuthority("ROLE_STUDENT")));
-        User user = User.builder().id(20L).username("campusUser").campusId(300L).build();
+        User user = User.builder().username("campusUser").campusId(300L).build();
+        user.setId(20L);
         when(userRepository.findByUsername("campusUser")).thenReturn(java.util.Optional.of(user));
         Page<Post> page = new PageImpl<>(List.of());
         when(postRepository.findByStatusAndCampusId(eq(GoodsStatus.APPROVED), eq(300L), any(PageRequest.class)))

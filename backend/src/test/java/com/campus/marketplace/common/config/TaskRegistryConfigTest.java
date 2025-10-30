@@ -1,6 +1,5 @@
 package com.campus.marketplace.common.config;
 
-import com.campus.marketplace.common.config.TaskRegistryConfig;
 import com.campus.marketplace.common.entity.Campus;
 import com.campus.marketplace.common.enums.CampusStatus;
 import com.campus.marketplace.repository.CampusRepository;

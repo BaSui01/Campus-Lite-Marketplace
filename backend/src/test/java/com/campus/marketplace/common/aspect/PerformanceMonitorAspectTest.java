@@ -62,9 +62,9 @@ class PerformanceMonitorAspectTest {
         assertEquals("test result", result);
         verify(joinPoint, times(1)).proceed();
 
-        Map<String, Object> stats = performanceMonitorAspect.getPerformanceStats();
+        Map<String, Map<String, Object>> stats = performanceMonitorAspect.getPerformanceStats();
         assertThat(stats).containsKey("GoodsService.listGoods(..)");
-        Map<String, Object> methodStats = (Map<String, Object>) stats.get("GoodsService.listGoods(..)");
+        Map<String, Object> methodStats = stats.get("GoodsService.listGoods(..)");
         assertThat(methodStats.get("totalCalls")).isEqualTo(1L);
         assertThat(methodStats.get("totalErrors")).isEqualTo(0L);
     }
@@ -116,9 +116,9 @@ class PerformanceMonitorAspectTest {
         verify(joinPoint, times(5)).proceed();
         
         // 获取性能统计数据
-        Map<String, Object> stats = performanceMonitorAspect.getPerformanceStats();
+        Map<String, Map<String, Object>> stats = performanceMonitorAspect.getPerformanceStats();
         assertNotNull(stats);
-        Map<String, Object> methodStats = (Map<String, Object>) stats.get("GoodsService.listGoods(..)");
+        Map<String, Object> methodStats = stats.get("GoodsService.listGoods(..)");
         assertThat(methodStats.get("totalCalls")).isEqualTo(5L);
         assertThat((Long) methodStats.get("totalExecutionTime")).isGreaterThanOrEqualTo(0L);
     }
@@ -134,11 +134,11 @@ class PerformanceMonitorAspectTest {
         }
 
         // When: 获取性能统计报告
-        Map<String, Object> stats = performanceMonitorAspect.getPerformanceStats();
+        Map<String, Map<String, Object>> stats = performanceMonitorAspect.getPerformanceStats();
 
         // Then: 验证报告包含必要信息
         assertNotNull(stats);
-        Map<String, Object> methodStats = (Map<String, Object>) stats.get("GoodsService.listGoods(..)");
+        Map<String, Object> methodStats = stats.get("GoodsService.listGoods(..)");
         assertThat(methodStats).containsKeys("avgExecutionTime", "maxExecutionTime", "slowCount");
     }
 }

@@ -1,12 +1,11 @@
 package com.campus.marketplace.service.impl;
 
+import com.campus.marketplace.common.lock.DistributedLockManager;
 import com.campus.marketplace.common.utils.RedisUtil;
 import com.campus.marketplace.service.CacheService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -33,7 +32,7 @@ import java.util.function.Supplier;
 public class CacheServiceImpl implements CacheService {
 
     private final RedisUtil redisUtil;
-    private final RedissonClient redissonClient;
+    private final DistributedLockManager lockManager;
     private final ObjectMapper objectMapper;
 
     /**
@@ -118,40 +117,31 @@ public class CacheServiceImpl implements CacheService {
 
         // 使用分布式锁防止缓存击穿
         String lockKey = LOCK_PREFIX + key;
-        RLock lock = redissonClient.getLock(lockKey);
-
-        try {
-            // 尝试获取锁（等待 3 秒，锁定 10 秒）
-            if (lock.tryLock(3, 10, TimeUnit.SECONDS)) {
-                try {
-                    // 双重检查缓存（可能其他线程已经加载了）
-                    cachedValue = get(key, type);
-                    if (cachedValue != null) {
-                        return cachedValue;
-                    }
-
-                    // 从数据库加载
-                    T value = dataLoader.get();
-
-                    // 缓存数据
-                    if (value != null) {
-                        set(key, value, timeout, unit);
-                    } else {
-                        redisUtil.set(key, NULL_CACHE_VALUE, NULL_CACHE_TIMEOUT, TimeUnit.MINUTES);
-                    }
-
-                    return value;
-                } finally {
-                    lock.unlock();
-                }
-            } else {
+        try (DistributedLockManager.LockHandle lock = lockManager.tryLock(lockKey, 3, 10, TimeUnit.SECONDS)) {
+            if (!lock.acquired()) {
                 log.warn("⚠️ 获取分布式锁失败: key={}", key);
-                // 获取锁失败，直接查询数据库
                 return dataLoader.get();
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("❌ 分布式锁被中断: key={}", key, e);
+
+            // 双重检查缓存（可能其他线程已经加载了）
+            cachedValue = get(key, type);
+            if (cachedValue != null) {
+                return cachedValue;
+            }
+
+            // 从数据库加载
+            T value = dataLoader.get();
+
+            // 缓存数据
+            if (value != null) {
+                set(key, value, timeout, unit);
+            } else {
+                redisUtil.set(key, NULL_CACHE_VALUE, NULL_CACHE_TIMEOUT, TimeUnit.MINUTES);
+            }
+
+            return value;
+        } catch (Exception e) {
+            log.error("❌ 分布式锁执行失败: key={}, error={}", key, e.getMessage());
             return dataLoader.get();
         }
     }
@@ -215,4 +205,3 @@ public class CacheServiceImpl implements CacheService {
         return stats;
     }
 }
-

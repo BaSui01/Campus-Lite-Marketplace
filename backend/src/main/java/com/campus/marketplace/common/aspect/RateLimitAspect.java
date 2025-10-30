@@ -5,6 +5,7 @@ import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.common.component.RateLimitRuleManager;
 import com.campus.marketplace.common.utils.SecurityUtil;
+import com.campus.marketplace.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ public class RateLimitAspect {
 
     private final StringRedisTemplate redisTemplate;
     private final RateLimitRuleManager ruleManager;
+    private final UserRepository userRepository;
 
     /**
      * 限流键前缀
@@ -64,7 +66,7 @@ public class RateLimitAspect {
         HttpServletResponse response = attributes != null ? attributes.getResponse() : null;
 
         // 黑/白名单与总开关
-        Long uid = SecurityUtil.getCurrentUserId();
+        Long uid = safeGetCurrentUserId();
         String clientIp = getClientIp();
         if (!ruleManager.isEnabled()) {
             return joinPoint.proceed();
@@ -116,7 +118,7 @@ public class RateLimitAspect {
                 break;
             case USER:
                 // 用户级别限流：每个用户独立
-                Long userId = SecurityUtil.getCurrentUserId();
+                Long userId = safeGetCurrentUserId();
                 limitKey += "USER:" + (userId != null ? userId : "anonymous") + ":" + key;
                 break;
             case IP:
@@ -305,6 +307,38 @@ public class RateLimitAspect {
 
         setRateLimitHeaders(response, capacity, Math.max(0, remaining), resetSeconds);
         return joinPoint.proceed();
+    }
+
+    private Long safeGetCurrentUserId() {
+        try {
+            return SecurityUtil.getCurrentUserId();
+        } catch (BusinessException ex) {
+            Long fallbackId = resolveUserIdByUsername();
+            if (fallbackId != null) {
+                return fallbackId;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("未能获取登录用户ID，将按匿名用户处理限流: {}", ex.getMessage());
+            }
+            return null;
+        }
+    }
+
+    private Long resolveUserIdByUsername() {
+        try {
+            if (!SecurityUtil.isAuthenticated()) {
+                return null;
+            }
+            String username = SecurityUtil.getCurrentUsername();
+            return userRepository.findByUsername(username)
+                    .map(com.campus.marketplace.common.entity.User::getId)
+                    .orElse(null);
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("通过用户名解析用户ID失败，将继续按匿名处理: {}", e.getMessage());
+            }
+            return null;
+        }
     }
 
     private long tokenBucketResetSeconds(long nowMs, long lastRefillTs, long intervalMs) {

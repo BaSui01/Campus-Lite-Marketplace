@@ -4,13 +4,12 @@ import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.common.entity.RefundRequest;
 import com.campus.marketplace.common.enums.PaymentMethod;
 import com.campus.marketplace.common.enums.RefundStatus;
+import com.campus.marketplace.common.lock.DistributedLockManager;
 import com.campus.marketplace.repository.OrderRepository;
 import com.campus.marketplace.repository.RefundRequestRepository;
 import com.campus.marketplace.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -34,7 +33,7 @@ public class RefundRetryScheduler {
     private final RefundRequestRepository refundRepository;
     private final OrderRepository orderRepository;
     private final PaymentService paymentService;
-    private final RedissonClient redissonClient;
+    private final DistributedLockManager lockManager;
 
     @Value("${refund.retry.max:5}")
     private int maxRetry;
@@ -46,10 +45,10 @@ public class RefundRetryScheduler {
 
     @Scheduled(fixedDelayString = "${refund.retry.scan.interval.ms:600000}")
     public void retryFailedRefunds() {
-        RLock lock = redissonClient.getLock(LOCK_KEY);
-        try {
-            if (!lock.tryLock(2, 30, TimeUnit.SECONDS)) return;
-
+        try (DistributedLockManager.LockHandle lock = lockManager.tryLock(LOCK_KEY, 2, 30, TimeUnit.SECONDS)) {
+            if (!lock.acquired()) {
+                return;
+            }
             LocalDateTime before = LocalDateTime.now().minusMinutes(backoffMinutes);
             List<RefundRequest> candidates = refundRepository.findRetryCandidates(maxRetry, before);
             for (RefundRequest r : candidates) {
@@ -74,12 +73,8 @@ public class RefundRetryScheduler {
                     refundRepository.save(r);
                 }
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         } catch (Exception e) {
             log.error("执行退款重试任务失败", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) lock.unlock();
         }
     }
 }

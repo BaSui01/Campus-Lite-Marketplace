@@ -28,9 +28,7 @@
         <!-- 统一控制最低覆盖率门槛，可在本地/CI 通过 -Dcoverage.minimum=0.80 临时调整 -->
         <coverage.minimum>0.85</coverage.minimum>
 
-        <!-- 🚀 BaSui优化：Maven 多核并行编译配置 -->
-        <!-- 编译器线程数：自动检测可用 CPU 核心数 -->
-        <maven.compiler.threads>0</maven.compiler.threads>
+        <!-- 🚀 BaSui优化：Maven 多核并行配置 -->
         <!-- Maven 并行模块构建线程数：1C = 1 线程/核心 -->
         <maven.build.threads>1C</maven.build.threads>
         <!-- 测试并行度：基于 CPU 核心数动态调整 -->
@@ -334,7 +332,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -362,23 +360,11 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- E2E/契约/并发 辅助测试库 -->
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>5.4.0</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- 契约测试辅助库 -->
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser</artifactId>
             <version>2.1.22</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -603,9 +589,8 @@
                 <version>3.11.0</version>
                 <configuration>
                     <release>21</release>
-                    <!-- 🚀 BaSui优化：启用并行编译，0 = 自动检测 CPU 核心数 -->
+                    <!-- 🚀 BaSui优化：启用 fork 以减少编译对主 JVM 的阻塞 -->
                     <fork>true</fork>
-                    <threads>${maven.compiler.threads}</threads>
                     <showWarnings>false</showWarnings>
                     <compilerArgs>
                         <arg>-Xlint:-options</arg>

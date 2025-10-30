@@ -175,14 +175,13 @@ class OrderTimeoutPerformanceIT {
                 .hasSize(LOAD_SIZE)
                 .allMatch(g -> g.getStatus() == GoodsStatus.APPROVED);
 
-        Map<String, Object> stats = performanceMonitorAspect.getPerformanceStats();
+        Map<String, Map<String, Object>> stats = performanceMonitorAspect.getPerformanceStats();
         String signature = stats.keySet().stream()
                 .filter(key -> key.endsWith("cancelTimeoutOrders()"))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("未找到 cancelTimeoutOrders 的性能统计"));
 
-        @SuppressWarnings("unchecked")
-        Map<String, Object> methodStats = (Map<String, Object>) stats.get(signature);
+        Map<String, Object> methodStats = stats.get(signature);
         assertThat(methodStats)
                 .containsKeys("totalCalls", "totalErrors", "totalExecutionTime", "avgExecutionTime", "maxExecutionTime", "slowCount");
 

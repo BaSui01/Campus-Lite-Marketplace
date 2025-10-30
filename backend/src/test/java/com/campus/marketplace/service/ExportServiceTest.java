@@ -99,7 +99,8 @@ class ExportServiceTest {
 
         // 准备 Job 存储
         AtomicReference<ExportJob> holder = new AtomicReference<>();
-        ExportJob job = ExportJob.builder().id(1L).type("GOODS").status("PENDING").requestedBy("admin").createdAt(Instant.now()).build();
+        ExportJob job = ExportJob.builder().type("GOODS").status("PENDING").requestedBy("admin").createdAt(Instant.now()).build();
+        job.setId(1L);
         holder.set(job);
         when(jobRepo.findById(1L)).thenAnswer(inv -> Optional.of(holder.get()));
         when(jobRepo.save(any())).thenAnswer(inv -> { holder.set(inv.getArgument(0)); return holder.get(); });
@@ -151,7 +152,8 @@ class ExportServiceTest {
 
         // Job 存储
         AtomicReference<ExportJob> holder = new AtomicReference<>();
-        ExportJob job = ExportJob.builder().id(2L).type("GOODS").status("PENDING").requestedBy("admin").createdAt(Instant.now()).build();
+        ExportJob job = ExportJob.builder().type("GOODS").status("PENDING").requestedBy("admin").createdAt(Instant.now()).build();
+        job.setId(2L);
         holder.set(job);
         when(jobRepo.findById(2L)).thenAnswer(inv -> Optional.of(holder.get()));
         when(jobRepo.save(any())).thenAnswer(inv -> { holder.set(inv.getArgument(0)); return holder.get(); });
@@ -190,10 +192,10 @@ class ExportServiceTest {
     @DisplayName("download 过期 token 返回 NOT_FOUND")
     void download_expired_token() {
         ExportJob job = ExportJob.builder()
-                .id(2L)
                 .downloadToken("abc")
                 .expireAt(Instant.now().minusSeconds(10))
                 .build();
+        job.setId(2L);
         when(jobRepo.findByDownloadToken("abc")).thenReturn(Optional.of(job));
         assertThatThrownBy(() -> exportService.download("abc")).isInstanceOf(BusinessException.class);
     }
@@ -201,7 +203,8 @@ class ExportServiceTest {
     @Test
     @DisplayName("取消导出：非所有者且非管理员禁止，所有者允许")
     void cancel_rules() {
-        ExportJob job = ExportJob.builder().id(3L).requestedBy("owner").status("PENDING").build();
+        ExportJob job = ExportJob.builder().requestedBy("owner").status("PENDING").build();
+        job.setId(3L);
         when(jobRepo.findById(3L)).thenReturn(Optional.of(job));
         when(jobRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
 

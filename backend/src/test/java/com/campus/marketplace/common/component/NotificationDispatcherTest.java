@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -16,19 +19,20 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 @DisplayName("NotificationDispatcher 测试")
 class NotificationDispatcherTest {
 
+    @Mock
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
     private ListOperations<String, Object> listOperations;
+
     private NotificationDispatcher dispatcher;
 
     @BeforeEach
     void setUp() {
-        redisTemplate = mock(RedisTemplate.class);
-        listOperations = mock(ListOperations.class);
-        when(redisTemplate.opsForList()).thenReturn(listOperations);
-
         dispatcher = new NotificationDispatcher(redisTemplate, new ObjectMapper());
         ReflectionTestUtils.setField(dispatcher, "queueKey", "notifications:test");
     }
@@ -36,6 +40,8 @@ class NotificationDispatcherTest {
     @Test
     @DisplayName("入队通知时写入 Redis 列表")
     void enqueueTemplate_success() {
+        when(redisTemplate.opsForList()).thenReturn(listOperations);
+
         dispatcher.enqueueTemplate(
                 1L,
                 "WELCOME",

@@ -1,6 +1,10 @@
 package com.campus.marketplace.integration;
 
 import org.junit.jupiter.api.BeforeEach;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import org.springframework.context.annotation.Import;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -51,7 +55,15 @@ public abstract class IntegrationTestBase {
             .withDatabaseName("campus_marketplace_test")
             .withUsername("test")
             .withPassword("test")
-            .withReuse(true); // 容器复用，加速测试
+            .withExposedPorts(5432)
+            .withCreateContainerCmdModifier(cmd -> {
+                HostConfig hostConfig = cmd.getHostConfig();
+                if (hostConfig == null) {
+                    hostConfig = new HostConfig();
+                }
+                hostConfig.withPortBindings(new PortBinding(Ports.Binding.bindPort(54321), new ExposedPort(5432)));
+                cmd.withHostConfig(hostConfig);
+            }); // 固定映射：容器 5432 -> 宿主 54321，避免与开发库冲突
 
     /**
      * Redis 容器（使用最新的 7.x 版本）
@@ -60,7 +72,7 @@ public abstract class IntegrationTestBase {
     @Container
     protected static final GenericContainer<?> redisContainer = new GenericContainer<>("redis:7-alpine")
             .withExposedPorts(6379)
-            .withReuse(true); // 容器复用，加速测试
+            ;
 
     /**
      * 动态配置数据源和 Redis 连接
@@ -74,9 +86,9 @@ public abstract class IntegrationTestBase {
         registry.add("spring.datasource.username", postgresContainer::getUsername);
         registry.add("spring.datasource.password", postgresContainer::getPassword);
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "none");
         registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.PostgreSQLDialect");
-        registry.add("spring.flyway.enabled", () -> "false");
+        registry.add("spring.flyway.enabled", () -> "true");
         registry.add("spring.test.database.replace", () -> "NONE");
         registry.add("spring.datasource.hikari.maximum-pool-size", () -> "5");
         // Redis 在 TestCiOverrides 中禁用自动配置

@@ -1,11 +1,10 @@
 package com.campus.marketplace.common.component;
 
 import com.campus.marketplace.common.entity.RefundRequest;
+import com.campus.marketplace.common.lock.DistributedLockManager;
 import com.campus.marketplace.repository.RefundRequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class RefundReconcileScheduler {
 
     private final RefundRequestRepository refundRepository;
-    private final RedissonClient redissonClient;
+    private final DistributedLockManager lockManager;
 
     @Value("${refund.reconcile.stuck.hours:24}")
     private int stuckHours;
@@ -38,10 +37,10 @@ public class RefundReconcileScheduler {
     // 每日 01:10 执行
     @Scheduled(cron = "${refund.reconcile.cron:0 10 1 * * *}")
     public void generateRefundReconcileReport() {
-        RLock lock = redissonClient.getLock(LOCK_KEY);
-        try {
-            if (!lock.tryLock(2, 60, TimeUnit.SECONDS)) return;
-
+        try (DistributedLockManager.LockHandle lock = lockManager.tryLock(LOCK_KEY, 2, 60, TimeUnit.SECONDS)) {
+            if (!lock.acquired()) {
+                return;
+            }
             LocalDate today = LocalDate.now();
             LocalDateTime stuckBefore = LocalDateTime.now().minusHours(stuckHours);
             List<RefundRequest> stuck = refundRepository.findStuckProcessing(stuckBefore);
@@ -51,12 +50,8 @@ public class RefundReconcileScheduler {
                 log.warn("[REFUND-RECONCILE] STUCK refundNo={}, orderNo={}, updatedAt={}, retryCount={}, lastError={}",
                         r.getRefundNo(), r.getOrderNo(), r.getUpdatedAt(), r.getRetryCount(), r.getLastError());
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         } catch (Exception e) {
             log.error("退款对账任务失败", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) lock.unlock();
         }
     }
 }

@@ -4,6 +4,7 @@ import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.common.entity.RefundRequest;
 import com.campus.marketplace.common.enums.PaymentMethod;
 import com.campus.marketplace.common.enums.RefundStatus;
+import com.campus.marketplace.common.lock.DistributedLockManager;
 import com.campus.marketplace.repository.OrderRepository;
 import com.campus.marketplace.repository.RefundRequestRepository;
 import com.campus.marketplace.service.PaymentService;
@@ -13,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -38,18 +37,18 @@ class RefundRetrySchedulerTest {
     @Mock
     private PaymentService paymentService;
     @Mock
-    private RedissonClient redissonClient;
+    private DistributedLockManager lockManager;
     @Mock
-    private RLock rLock;
+    private DistributedLockManager.LockHandle lockHandle;
 
     private RefundRetryScheduler scheduler;
 
     @BeforeEach
     void setUp() {
-        scheduler = new RefundRetryScheduler(refundRepository, orderRepository, paymentService, redissonClient);
+        scheduler = new RefundRetryScheduler(refundRepository, orderRepository, paymentService, lockManager);
         ReflectionTestUtils.setField(scheduler, "maxRetry", 5);
         ReflectionTestUtils.setField(scheduler, "backoffMinutes", 10);
-        when(redissonClient.getLock(anyString())).thenReturn(rLock);
+        when(lockManager.tryLock(anyString(), anyLong(), anyLong(), any(TimeUnit.class))).thenReturn(lockHandle);
     }
 
     private RefundRequest refundRequest(String orderNo) {
@@ -82,15 +81,14 @@ class RefundRetrySchedulerTest {
                 .thenReturn(List.of(request));
         when(orderRepository.findByOrderNo("ORD-1")).thenReturn(Optional.of(order("ORD-1", PaymentMethod.ALIPAY)));
         when(paymentService.refund(any(Order.class), any(), any())).thenReturn(true);
-        when(rLock.tryLock(anyLong(), anyLong(), eq(TimeUnit.SECONDS))).thenReturn(true);
-        when(rLock.isHeldByCurrentThread()).thenReturn(true);
+        when(lockHandle.acquired()).thenReturn(true);
 
         scheduler.retryFailedRefunds();
 
         assertThat(request.getStatus()).isEqualTo(RefundStatus.REFUNDED);
         assertThat(request.getLastError()).isNull();
         verify(refundRepository, times(1)).save(request);
-        verify(rLock).unlock();
+        verify(lockHandle).close();
     }
 
     @Test
@@ -101,8 +99,7 @@ class RefundRetrySchedulerTest {
                 .thenReturn(List.of(request));
         when(orderRepository.findByOrderNo("ORD-2")).thenReturn(Optional.of(order("ORD-2", PaymentMethod.WECHAT)));
         when(paymentService.refund(any(Order.class), any(), any())).thenReturn(false);
-        when(rLock.tryLock(anyLong(), anyLong(), eq(TimeUnit.SECONDS))).thenReturn(true);
-        when(rLock.isHeldByCurrentThread()).thenReturn(true);
+        when(lockHandle.acquired()).thenReturn(true);
 
         scheduler.retryFailedRefunds();
 
@@ -120,8 +117,7 @@ class RefundRetrySchedulerTest {
                 .thenReturn(List.of(request));
         when(orderRepository.findByOrderNo("ORD-3")).thenReturn(Optional.of(order("ORD-3", PaymentMethod.ALIPAY)));
         when(paymentService.refund(any(Order.class), any(), any())).thenThrow(new IllegalStateException("gateway down"));
-        when(rLock.tryLock(anyLong(), anyLong(), eq(TimeUnit.SECONDS))).thenReturn(true);
-        when(rLock.isHeldByCurrentThread()).thenReturn(true);
+        when(lockHandle.acquired()).thenReturn(true);
 
         scheduler.retryFailedRefunds();
 
@@ -134,12 +130,7 @@ class RefundRetrySchedulerTest {
     @Test
     @DisplayName("未获取锁时直接返回")
     void retryFailedRefunds_lockUnavailable() throws Exception {
-        try {
-            when(rLock.tryLock(anyLong(), anyLong(), eq(TimeUnit.SECONDS))).thenReturn(false);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        when(rLock.isHeldByCurrentThread()).thenReturn(false);
+        when(lockHandle.acquired()).thenReturn(false);
 
         scheduler.retryFailedRefunds();
 

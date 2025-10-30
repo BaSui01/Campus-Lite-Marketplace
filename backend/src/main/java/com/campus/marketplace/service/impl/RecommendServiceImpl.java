@@ -7,6 +7,7 @@ import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.lock.DistributedLockManager;
 import com.campus.marketplace.common.utils.RedisUtil;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.CategoryRepository;
@@ -17,8 +18,6 @@ import com.campus.marketplace.repository.ViewLogRepository;
 import com.campus.marketplace.service.RecommendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,7 @@ public class RecommendServiceImpl implements RecommendService {
     private final ViewLogRepository viewLogRepository;
     private final FavoriteRepository favoriteRepository;
     private final RedisUtil redis;
-    private final RedissonClient redissonClient;
+    private final DistributedLockManager lockManager;
 
     private static final String HOT_KEY_PREFIX = "goods:rank:"; // goods:rank:{campus}
     private static final long BASE_HOT_TTL_SECONDS = Duration.ofMinutes(5).toSeconds();
@@ -57,46 +56,38 @@ public class RecommendServiceImpl implements RecommendService {
     public void refreshHotRanking(Long campusId, int topN) {
         String key = buildHotKey(campusId);
         String lockKey = "lock:" + key;
-        RLock lock = redissonClient.getLock(lockKey);
 
-        try {
-            if (!lock.tryLock(3, 10, TimeUnit.SECONDS)) {
+        try (DistributedLockManager.LockHandle lock = lockManager.tryLock(lockKey, 3, 10, TimeUnit.SECONDS)) {
+            if (!lock.acquired()) {
                 log.warn("获取热榜计算锁失败: campusId={}", campusId);
                 return;
             }
-            try {
-                Pageable pageable = PageRequest.of(0, Math.max(topN, 20));
-                List<Goods> goodsList = goodsRepository.findHotGoodsByCampus(GoodsStatus.APPROVED, campusId, pageable);
+            Pageable pageable = PageRequest.of(0, Math.max(topN, 20));
+            List<Goods> goodsList = goodsRepository.findHotGoodsByCampus(GoodsStatus.APPROVED, campusId, pageable);
 
-                // 使用 ZSET 写入排名：score = view*0.7 + fav*0.3
-                // 先清空旧 ZSET
-                redis.delete(key);
-                long rank = 0;
-                for (Goods g : goodsList) {
-                    // 新增时间衰减：越新权重大（简单平滑：24小时半衰）
-                    double hours = 0d;
-                    if (g.getCreatedAt() != null) {
-                        hours = java.time.Duration.between(g.getCreatedAt(), java.time.LocalDateTime.now()).toHours();
-                        if (hours < 0) hours = 0;
-                    }
-                    double timeDecay = 1.0 / (1.0 + (hours / 24.0));
-                    double score = g.getViewCount() * 0.6 + g.getFavoriteCount() * 0.3 + 100 * timeDecay;
-                    redis.zAdd(key, g.getId(), score);
-                    rank++;
-                    if (rank >= topN) break;
+            // 使用 ZSET 写入排名：score = view*0.7 + fav*0.3
+            // 先清空旧 ZSET
+            redis.delete(key);
+            long rank = 0;
+            for (Goods g : goodsList) {
+                // 新增时间衰减：越新权重大（简单平滑：24小时半衰）
+                double hours = 0d;
+                if (g.getCreatedAt() != null) {
+                    hours = java.time.Duration.between(g.getCreatedAt(), java.time.LocalDateTime.now()).toHours();
+                    if (hours < 0) hours = 0;
                 }
-                // 设置TTL
-                long recentViewTotal;
-                try { recentViewTotal = Math.max(0L, viewLogRepository.count()); } catch (Exception ignore) { recentViewTotal = 0L; }
-                long ttl = computeHotTtlSeconds(recentViewTotal);
-                redis.expire(key, ttl, TimeUnit.SECONDS);
-                log.info("热榜刷新完成: campusId={}, size={}", campusId, Math.min(goodsList.size(), topN));
-            } finally {
-                lock.unlock();
+                double timeDecay = 1.0 / (1.0 + (hours / 24.0));
+                double score = g.getViewCount() * 0.6 + g.getFavoriteCount() * 0.3 + 100 * timeDecay;
+                redis.zAdd(key, g.getId(), score);
+                rank++;
+                if (rank >= topN) break;
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("热榜刷新被中断: campusId={}", campusId, e);
+            // 设置TTL
+            long recentViewTotal;
+            try { recentViewTotal = Math.max(0L, viewLogRepository.count()); } catch (Exception ignore) { recentViewTotal = 0L; }
+            long ttl = computeHotTtlSeconds(recentViewTotal);
+            redis.expire(key, ttl, TimeUnit.SECONDS);
+            log.info("热榜刷新完成: campusId={}, size={}", campusId, Math.min(goodsList.size(), topN));
         } catch (Exception e) {
             log.error("热榜刷新失败: campusId={}", campusId, e);
         }

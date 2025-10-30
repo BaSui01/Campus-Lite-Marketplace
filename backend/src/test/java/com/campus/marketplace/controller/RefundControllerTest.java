@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,10 +17,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,10 +67,11 @@ class RefundControllerTest {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value("REF-100"));
 
-        ArgumentCaptor<Map<String, Object>> evidenceCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(refundService).applyRefund(eq("ORDER-1"), eq("质量问题"), evidenceCaptor.capture());
-        assertThat(evidenceCaptor.getValue()).containsEntry("note", "瑕疵明显");
-        assertThat(evidenceCaptor.getValue()).containsEntry("images", List.of("https://cdn/img1.png"));
+        verify(refundService).applyRefund(eq("ORDER-1"), eq("质量问题"), argThat(evidence -> {
+            assertThat(evidence).containsEntry("note", "瑕疵明显");
+            assertThat(evidence).containsEntry("images", List.of("https://cdn/img1.png"));
+            return true;
+        }));
     }
 
     @Test

@@ -89,8 +89,8 @@ public class PerformanceMonitorAspect {
     /**
      * 获取性能统计数据
      */
-    public Map<String, Object> getPerformanceStats() {
-        Map<String, Object> result = new ConcurrentHashMap<>();
+    public Map<String, Map<String, Object>> getPerformanceStats() {
+        Map<String, Map<String, Object>> result = new ConcurrentHashMap<>();
         
         performanceStats.forEach((methodName, stats) -> {
             Map<String, Object> statMap = new ConcurrentHashMap<>();
