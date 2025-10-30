@@ -2,19 +2,13 @@ package com.campus.marketplace.common.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
- * 物品分类实体
- * 
+ * 物品分类实体，支持软删除。
+ *
  * @author BaSui
- * @date 2025-10-25
+ * @date 2025-10-28
  */
 @Entity
 @Table(name = "t_category")
@@ -23,29 +17,32 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-public class Category implements Serializable {
+@SQLRestriction("deleted = false")
+public class Category extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    /**
+     * 分类名称（唯一）
+     */
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
+    /**
+     * 分类描述
+     */
     @Column(name = "description", length = 200)
     private String description;
 
+    /**
+     * 父级分类 ID
+     */
     @Column(name = "parent_id")
     private Long parentId;
 
+    /**
+     * 排序权重（数字越大越靠前）
+     */
     @Column(name = "sort_order", nullable = false)
     @Builder.Default
     private Integer sortOrder = 0;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 }

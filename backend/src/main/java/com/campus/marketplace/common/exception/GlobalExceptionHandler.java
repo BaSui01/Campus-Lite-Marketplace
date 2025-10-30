@@ -4,6 +4,9 @@ import com.campus.marketplace.common.dto.response.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -28,14 +31,34 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final MessageSource messageSource;
+
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    // 兼容部分单元测试直接 new 的场景
+    public GlobalExceptionHandler() {
+        org.springframework.context.support.ResourceBundleMessageSource ms = new org.springframework.context.support.ResourceBundleMessageSource();
+        ms.setBasename("messages");
+        ms.setDefaultEncoding("UTF-8");
+        ms.setUseCodeAsDefaultMessage(true);
+        this.messageSource = ms;
+    }
+
     /**
      * 处理业务异常
      */
     @ExceptionHandler(BusinessException.class)
-    @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<Void> handleBusinessException(BusinessException e) {
-        log.warn("业务异常: code={}, message={}", e.getCode(), e.getMessage());
-        return ApiResponse.error(e.getCode(), e.getMessage());
+    public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
+        String msg = e.getCustomMessage() != null ? e.getCustomMessage()
+                : resolveErrorMessage(e.getCode(), e.getErrorCode().getMessage());
+        log.warn("业务异常: code={}, message={}", e.getCode(), msg);
+        if (e.getErrorCode() == ErrorCode.TOO_MANY_REQUESTS) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(ApiResponse.error(e.getCode(), msg));
+        }
+        return ResponseEntity.ok(ApiResponse.error(e.getCode(), msg));
     }
 
     /**
@@ -49,7 +72,8 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         
         log.warn("参数校验失败: {}", errorMessage);
-        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(), errorMessage);
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), errorMessage));
     }
 
     /**
@@ -63,7 +87,8 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         
         log.warn("参数绑定失败: {}", errorMessage);
-        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(), errorMessage);
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), errorMessage));
     }
 
     /**
@@ -77,7 +102,8 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         
         log.warn("约束违反: {}", errorMessage);
-        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(), errorMessage);
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), errorMessage));
     }
 
     /**
@@ -87,7 +113,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<Void> handleAuthenticationException(AuthenticationException e) {
         log.warn("认证失败: {}", e.getMessage());
-        return ApiResponse.error(ErrorCode.UNAUTHORIZED.getCode(), "认证失败，请重新登录");
+        return ApiResponse.error(ErrorCode.UNAUTHORIZED.getCode(),
+                resolveErrorMessage(ErrorCode.UNAUTHORIZED.getCode(), ErrorCode.UNAUTHORIZED.getMessage()));
     }
 
     /**
@@ -97,7 +124,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<Void> handleAccessDeniedException(AccessDeniedException e) {
         log.warn("权限不足: {}", e.getMessage());
-        return ApiResponse.error(ErrorCode.PERMISSION_DENIED.getCode(), ErrorCode.PERMISSION_DENIED.getMessage());
+        return ApiResponse.error(ErrorCode.PERMISSION_DENIED.getCode(),
+                resolveErrorMessage(ErrorCode.PERMISSION_DENIED.getCode(), ErrorCode.PERMISSION_DENIED.getMessage()));
     }
 
     /**
@@ -107,7 +135,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<Void> handleIllegalArgumentException(IllegalArgumentException e) {
         log.warn("非法参数: {}", e.getMessage());
-        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(), e.getMessage());
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), e.getMessage()));
     }
 
     /**
@@ -117,7 +146,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<Void> handleNullPointerException(NullPointerException e) {
         log.error("空指针异常", e);
-        return ApiResponse.error(ErrorCode.SYSTEM_ERROR.getCode(), "系统内部错误");
+        return ApiResponse.error(ErrorCode.SYSTEM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.SYSTEM_ERROR.getCode(), ErrorCode.SYSTEM_ERROR.getMessage()));
     }
 
     /**
@@ -127,6 +157,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<Void> handleException(Exception e) {
         log.error("系统异常", e);
-        return ApiResponse.error(ErrorCode.SYSTEM_ERROR.getCode(), "系统内部错误，请联系管理员");
+        return ApiResponse.error(ErrorCode.SYSTEM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.SYSTEM_ERROR.getCode(), ErrorCode.SYSTEM_ERROR.getMessage()));
+    }
+
+    private String resolveErrorMessage(int code, String defaultMsg) {
+        String key = "error." + code;
+        return messageSource.getMessage(key, null, defaultMsg, LocaleContextHolder.getLocale());
     }
 }

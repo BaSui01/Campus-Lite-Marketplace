@@ -3,7 +3,7 @@ spring:
     name: ${APP_NAME:campus-marketplace}
   
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: ${APP_ENV:${SPRING_PROFILES_ACTIVE:dev}}
   
   # 数据源配置
   datasource:
@@ -14,34 +14,41 @@ spring:
     hikari:
       minimum-idle: ${DB_POOL_MIN_IDLE:10}
       maximum-pool-size: ${DB_POOL_MAX_SIZE:50}
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      pool-name: CampusMarketplaceHikariCP
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+      pool-name: ${DB_POOL_NAME:CampusMarketplaceHikariCP}
   
   # JPA 配置
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:update}
     show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:
-        format_sql: true
+        format_sql: ${JPA_FORMAT_SQL:true}
         # 懒加载配置
-        enable_lazy_load_no_trans: false
+        enable_lazy_load_no_trans: ${JPA_ENABLE_LAZY_NO_TRANS:false}
         # 批量操作配置
         jdbc:
-          batch_size: 50
-        order_inserts: true
-        order_updates: true
+          batch_size: ${JPA_BATCH_SIZE:50}
+        order_inserts: ${JPA_ORDER_INSERTS:true}
+        order_updates: ${JPA_ORDER_UPDATES:true}
         # 二级缓存配置
         cache:
-          use_second_level_cache: true
-          use_query_cache: true
+          use_second_level_cache: ${HIBERNATE_SECOND_LEVEL_CACHE:true}
+          use_query_cache: ${HIBERNATE_QUERY_CACHE:true}
           region:
-            factory_class: org.redisson.hibernate.RedissonRegionFactory
-  
+            factory_class: ${HIBERNATE_CACHE_FACTORY:org.redisson.hibernate.RedissonRegionFactory}
+
+  # Flyway 数据库迁移配置
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:true}
+    baseline-version: ${FLYWAY_BASELINE_VERSION:0}
+    locations: ${FLYWAY_LOCATIONS:classpath:db/migration}
+    validate-on-migrate: ${FLYWAY_VALIDATE_ON_MIGRATE:true}
+
   # Redis 配置
   data:
     redis:
@@ -49,26 +56,58 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DATABASE:0}
+      # 使用 Redisson 的独立配置文件，避免误触发哨兵模式
+      redisson:
+        file: classpath:redisson.yaml
       lettuce:
         pool:
           max-active: ${REDIS_POOL_MAX_ACTIVE:50}
           max-idle: ${REDIS_POOL_MAX_IDLE:20}
           min-idle: ${REDIS_POOL_MIN_IDLE:10}
           max-wait: 3000ms
+      repositories:
+        enabled: false
+
+  # 供 Redisson Starter 读取的旧前缀（与 Spring Boot 3 兼容）
+  redis:
+    redisson:
+      file: classpath:redisson.yaml
   
   # 文件上传配置
   servlet:
     multipart:
       max-file-size: ${FILE_MAX_SIZE:5MB}
       max-request-size: ${FILE_MAX_REQUEST_SIZE:10MB}
-      enabled: true
+      enabled: ${FILE_UPLOAD_ENABLED:true}
+
+  # 邮件配置（使用真实 SMTP）
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: ${MAIL_SSL_ENABLE:true}
+          starttls:
+            enable: ${MAIL_STARTTLS_ENABLE:false}
+    from: ${MAIL_FROM:${MAIL_USERNAME:}}
 
 # JWT 配置
 jwt:
-  secret: ${JWT_SECRET:campus-marketplace-secret-key-must-be-at-least-256-bits-long-for-hs256-algorithm}
+  secret: ${JWT_SECRET:5bwzFhN2dpPiac1wgPaFgb5iu_lEB5JrSxZqv-WIOwRiE_dQOE-fMFxy24-iOXgWm1NxybaJMrkbCXG9mY0a4Q}
   expiration: ${JWT_EXPIRATION:7200000}
-  header: Authorization
-  prefix: Bearer 
+  header: ${JWT_HEADER:Authorization}
+  prefix: ${JWT_PREFIX:Bearer }
+
+# AES 加密配置
+encrypt:
+  aes:
+    key: ${AES_KEY:JrOagghJ4Ot3e63ObB1CJtOjvwYnk1chSwXR86E_MJs}
 
 # 日志配置
 logging:
@@ -76,11 +115,11 @@ logging:
     root: ${LOG_LEVEL_ROOT:INFO}
     com.campus.marketplace: ${LOG_LEVEL_APP:DEBUG}
     org.hibernate.SQL: ${LOG_LEVEL_SQL:DEBUG}
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.security: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:TRACE}
+    org.springframework.security: ${LOG_LEVEL_SPRING_SECURITY:DEBUG}
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: ${LOG_PATTERN_FILE:"%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"}
   file:
     name: ${LOG_FILE_PATH:logs/campus-marketplace.log}
     max-size: ${LOG_FILE_MAX_SIZE:10MB}
@@ -91,17 +130,306 @@ management:
   endpoints:
     web:
       exposure:
-        include: ${ACTUATOR_ENDPOINTS:health,info,metrics}
+        # 暴露的端点（生产环境应限制）
+        include: ${ACTUATOR_ENDPOINTS:health,info,metrics,prometheus,loggers,caches,threaddump,heapdump}
+        # 排除敏感端点
+        exclude: ${ACTUATOR_EXCLUDE:shutdown}
+      base-path: ${ACTUATOR_BASE_PATH:/actuator}
   endpoint:
     health:
       show-details: ${ACTUATOR_HEALTH_SHOW_DETAILS:when-authorized}
+      # 健康检查探针
+      probes:
+        enabled: true
+    # 启用日志级别动态调整
+    loggers:
+      enabled: true
+  # Metrics 配置
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:true}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: ${METRICS_HTTP_HISTOGRAM:true}
+    tags:
+      application: ${spring.application.name}
+  # 追踪配置
+  tracing:
+    sampling:
+      probability: ${TRACING_PROBABILITY:1.0}
 
 # 服务器配置
 server:
   port: ${SERVER_PORT:8080}
   servlet:
-    context-path: /api
+    context-path: ${APP_CONTEXT_PATH:/}
   tomcat:
     threads:
-      max: 200
-      min-spare: 10
+      max: ${TOMCAT_MAX_THREADS:200}
+      min-spare: ${TOMCAT_MIN_SPARE_THREADS:10}
+
+# 通知与合规配置
+notifications:
+  email:
+    rate:
+      perMinute: ${NOTIF_EMAIL_PER_MINUTE:20}
+  webpush:
+    enabled: ${WEBPUSH_ENABLED:false}
+
+# 短信配置（阿里云）
+sms:
+  provider: ${SMS_PROVIDER:aliyun}
+  aliyun:
+    accessKeyId: ${ALIYUN_SMS_ACCESS_KEY_ID:}
+    accessKeySecret: ${ALIYUN_SMS_ACCESS_KEY_SECRET:}
+    signName: ${ALIYUN_SMS_SIGN_NAME:}
+    templateRegister: ${ALIYUN_SMS_TEMPLATE_REGISTER:SMS_0000001}
+    templateReset: ${ALIYUN_SMS_TEMPLATE_RESET:SMS_0000002}
+
+compliance:
+  text:
+    action: ${COMPLIANCE_TEXT_ACTION:REVIEW} # BLOCK/REVIEW/PASS
+  image:
+    enabled: ${COMPLIANCE_IMAGE_ENABLED:false}
+
+# 支付宝支付配置
+alipay:
+  app-id: ${ALIPAY_APP_ID:}
+  private-key: ${ALIPAY_PRIVATE_KEY:}
+  alipay-public-key: ${ALIPAY_PUBLIC_KEY:}
+  gateway-url: ${ALIPAY_GATEWAY_URL:https://openapi-sandbox.dl.alipaydev.com/gateway.do}
+  charset: ${ALIPAY_CHARSET:UTF-8}
+  format: ${ALIPAY_FORMAT:json}
+  sign-type: ${ALIPAY_SIGN_TYPE:RSA2}
+  notify-url: ${ALIPAY_NOTIFY_URL:http://localhost:8080/api/payment/alipay/notify}
+  return-url: ${ALIPAY_RETURN_URL:http://localhost:3000/payment/result}
+
+# 微信支付配置
+wechat:
+  pay:
+    # 版本选择：v2=沙箱环境（推荐开发测试），v3=正式/沙箱环境
+    version: ${WECHAT_PAY_VERSION:v3}
+    
+    # V3配置（正式环境或V3沙箱）
+    app-id: ${WECHAT_APP_ID:}
+    mch-id: ${WECHAT_MCH_ID:}
+    private-key-path: ${WECHAT_PRIVATE_KEY_PATH:}
+    merchant-serial-number: ${WECHAT_MERCHANT_SERIAL_NUMBER:}
+    api-v3-key: ${WECHAT_API_V3_KEY:}
+    notify-url: ${WECHAT_NOTIFY_URL:http://localhost:8080/api/payment/wechat/notify}
+    
+    # V2配置（沙箱环境）
+    v2:
+      app-id: ${WECHAT_V2_APP_ID:}
+      mch-id: ${WECHAT_V2_MCH_ID:}
+      mch-key: ${WECHAT_V2_MCH_KEY:}
+      key-path: ${WECHAT_V2_KEY_PATH:}
+      use-sandbox: ${WECHAT_V2_USE_SANDBOX:true}
+      notify-url: ${WECHAT_V2_NOTIFY_URL:http://localhost:8080/api/payment/wechat/notify}
+
+# 应用级自定义配置
+app:
+  redis:
+    mode: ${APP_REDIS_MODE:redis} # 可选 redis/in-memory，开发默认使用 redis
+
+# OpenAPI/Swagger 开关
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_ENABLED:true}
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:true}
+    groups-order: ASC
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    urls-primary-name: 前台接口
+  group-configs:
+    - group: 前台接口
+      paths-to-match:
+        - /api/**
+      paths-to-exclude:
+        - /api/admin/**
+    - group: 后台接口
+      paths-to-match:
+        - /api/admin/**
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    hibernate:
+      ddl-auto: ${DEV_JPA_DDL_AUTO:update}
+    properties:
+      hibernate:
+        format_sql: true
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+  cache:
+    type: ${SPRING_CACHE_TYPE:simple}
+  flyway:
+    enabled: false
+logging:
+  level:
+    org.redisson: WARN
+app:
+  redis:
+    mode: ${APP_REDIS_MODE:redis}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  autoconfigure:
+    exclude:
+      - org.redisson.spring.starter.RedissonAutoConfiguration
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
+  datasource:
+    url: jdbc:postgresql://${TEST_DB_HOST:${CI_DB_HOST:localhost}}:${TEST_DB_PORT:${CI_DB_PORT:5432}}/${TEST_DB_NAME:${CI_DB_NAME:campus_marketplace_test}}
+    username: ${TEST_DB_USERNAME:${CI_DB_USERNAME:postgres}}
+    password: ${TEST_DB_PASSWORD:${CI_DB_PASSWORD:postgres}}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: ${TEST_DB_POOL_MIN_IDLE:5}
+      maximum-pool-size: ${TEST_DB_POOL_MAX_SIZE:10}
+      connection-timeout: ${TEST_DB_CONNECTION_TIMEOUT:20000}
+  jpa:
+    hibernate:
+      ddl-auto: ${TEST_JPA_DDL_AUTO:validate}
+    show-sql: ${TEST_JPA_SHOW_SQL:false}
+    defer-datasource-initialization: true
+  data:
+    redis:
+      host: ${TEST_REDIS_HOST:${CI_REDIS_HOST:localhost}}
+      port: ${TEST_REDIS_PORT:${CI_REDIS_PORT:6379}}
+      password: ${TEST_REDIS_PASSWORD:${CI_REDIS_PASSWORD:}}
+      database: ${TEST_REDIS_DATABASE:0}
+  task:
+    scheduling:
+      enabled: false
+    execution:
+      pool:
+        core-size: ${TEST_EXECUTOR_CORE_SIZE:2}
+      shutdown:
+        await-termination: true
+  main:
+    banner-mode: "off"
+  output:
+    ansi:
+      enabled: DETECT
+  flyway:
+    enabled: true
+app:
+  redis:
+    mode: ${APP_REDIS_MODE:in-memory}
+  scheduling:
+    privacy:
+      enabled: false
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: false
+server:
+  port: ${TEST_SERVER_PORT:${SERVER_PORT:8080}}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: ${PROD_JPA_DDL_AUTO:validate}
+    show-sql: ${PROD_JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: ${PROD_HIBERNATE_FORMAT_SQL:false}
+        enable_lazy_load_no_trans: ${PROD_ENABLE_LAZY_NO_TRANS:false}
+        jdbc:
+          batch_size: ${PROD_JPA_BATCH_SIZE:100}
+        cache:
+          use_second_level_cache: ${PROD_SECOND_LEVEL_CACHE:true}
+          use_query_cache: ${PROD_QUERY_CACHE:true}
+  data:
+    redis:
+      sentinel:
+        master: ${REDIS_SENTINEL_MASTER:}
+        nodes: ${REDIS_SENTINEL_NODES:}
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      lettuce:
+        pool:
+          max-active: ${REDIS_POOL_MAX_ACTIVE:100}
+          max-idle: ${REDIS_POOL_MAX_IDLE:50}
+          min-idle: ${REDIS_POOL_MIN_IDLE:20}
+          max-wait: 3000ms
+      timeout: 3000ms
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:WARN}
+    com.campus.marketplace: ${LOG_LEVEL_APP:INFO}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:WARN}
+    org.springframework.security: ${LOG_LEVEL_SPRING_SECURITY:WARN}
+  file:
+    name: ${LOG_FILE_PATH:/var/log/campus-marketplace/campus-marketplace.log}
+    max-size: ${LOG_FILE_MAX_SIZE:50MB}
+    max-history: ${LOG_FILE_MAX_HISTORY:60}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${ACTUATOR_ENDPOINTS:health,metrics,prometheus}
+        exclude: ${ACTUATOR_EXCLUDE:shutdown,env,beans,configprops,threaddump,heapdump}
+  endpoint:
+    health:
+      show-details: ${ACTUATOR_HEALTH_SHOW_DETAILS:never}
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:true}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: ${METRICS_HTTP_HISTOGRAM:true}
+    tags:
+      environment: ${DEPLOY_ENV:prod}
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${APP_CONTEXT_PATH:/api}
+  tomcat:
+    threads:
+      max: ${TOMCAT_MAX_THREADS:400}
+      min-spare: ${TOMCAT_MIN_SPARE_THREADS:50}
+    connection-timeout: ${TOMCAT_CONNECTION_TIMEOUT:20000}
+    compression:
+      enabled: true
+      mime-types: text/html,text/xml,text/plain,text/css,application/json,application/javascript
+      min-response-size: 1024
+  ssl:
+    enabled: ${SSL_ENABLED:false}
+    key-store: ${SSL_KEY_STORE:}
+    key-store-password: ${SSL_KEY_STORE_PASSWORD:}
+    key-store-type: ${SSL_KEY_STORE_TYPE:PKCS12}
+alipay:
+  gateway-url: ${ALIPAY_GATEWAY_URL:https://openapi.alipay.com/gateway.do}
+wechat:
+  pay:
+    version: ${WECHAT_PAY_VERSION:v3}
+app:
+  redis:
+    mode: ${APP_REDIS_MODE:redis}

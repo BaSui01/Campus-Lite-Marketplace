@@ -2,6 +2,8 @@ package com.campus.marketplace.service.impl;
 
 import com.campus.marketplace.common.dto.request.LoginRequest;
 import com.campus.marketplace.common.dto.request.RegisterRequest;
+import com.campus.marketplace.common.dto.request.ResetPasswordByEmailRequest;
+import com.campus.marketplace.common.dto.request.ResetPasswordBySmsRequest;
 import com.campus.marketplace.common.dto.response.LoginResponse;
 import com.campus.marketplace.common.entity.Role;
 import com.campus.marketplace.common.entity.User;
@@ -26,10 +28,11 @@ import java.util.stream.Collectors;
 
 /**
  * 认证服务实现类
- * 
+ *
  * @author BaSui
- * @date 2025-10-25
+ * @date 2025-10-29
  */
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final com.campus.marketplace.service.VerificationCodeService verificationCodeService;
 
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
@@ -49,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void register(RegisterRequest request) {
+    public Long register(RegisterRequest request) {
         log.info("用户注册: username={}, email={}", request.username(), request.email());
 
         // 1. 检查用户名是否已存在
@@ -80,7 +84,73 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         log.info("用户注册成功: userId={}, username={}", user.getId(), user.getUsername());
+
+        // 返回用户ID
+        return user.getId();
     }
+
+    // ========== 邮箱验证码注册/重置密码 ==========
+
+    @Override
+    public void sendRegisterEmailCode(String email) {
+        verificationCodeService.sendEmailCode(email, "REGISTER");
+    }
+
+    @Override
+    @Transactional
+    public void registerByEmailCode(com.campus.marketplace.common.dto.request.ConfirmRegisterByEmailRequest request) {
+        if (!verificationCodeService.validateEmailCode(request.email(), "REGISTER", request.code())) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "验证码错误或已过期");
+        }
+        register(new RegisterRequest(request.username(), request.password(), request.email()));
+        // 成功后可删除验证码（VerificationCodeService内部有TTL，这里不强依赖删除）
+    }
+
+    @Override
+    public void sendResetEmailCode(String email) {
+        try {
+            if (userRepository.existsByEmail(email)) {
+                verificationCodeService.sendEmailCode(email, "RESET");
+            }
+        } finally {
+            log.info("请求发送重置密码邮箱验证码 email=***{}", email.substring(Math.max(0, email.length()-4)));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resetPasswordByEmailCode(ResetPasswordByEmailRequest request) {
+        if (!verificationCodeService.validateEmailCode(request.email(), "RESET", request.code())) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "验证码错误或已过期");
+        }
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+    }
+
+    // ========== 短信验证码重置密码 ==========
+
+    @Override
+    public void sendResetSmsCode(String phone) {
+        verificationCodeService.sendSmsCode(phone, "RESET");
+    }
+
+    @Override
+    @Transactional
+    public void resetPasswordBySmsCode(ResetPasswordBySmsRequest request) {
+        User user = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        if (user.getPhone() == null || !user.getPhone().equals(request.phone())) {
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "手机号与账号不匹配");
+        }
+        if (!verificationCodeService.validateSmsCode(request.phone(), "RESET", request.code())) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "验证码错误或已过期");
+        }
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+    }
+
 
     /**
      * 用户登录

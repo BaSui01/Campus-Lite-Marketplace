@@ -34,6 +34,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.campus.marketplace.repository.BanLogRepository banLogRepository;
+    private final EncryptUtil encryptUtil;
 
     /**
      * 获取用户资料
@@ -91,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
         // 更新手机号（加密存储）
         if (request.phone() != null) {
-            String encryptedPhone = EncryptUtil.aesEncrypt(request.phone());
+            String encryptedPhone = encryptUtil.aesEncrypt(request.phone());
             user.setPhone(encryptedPhone);
             log.info("更新手机号: userId={}", user.getId());
         }
@@ -146,12 +148,12 @@ public class UserServiceImpl implements UserService {
         // 解密手机号并脱敏
         String maskedPhone = null;
         if (user.getPhone() != null) {
-            String decryptedPhone = EncryptUtil.aesDecrypt(user.getPhone());
-            maskedPhone = EncryptUtil.maskPhone(decryptedPhone);
+            String decryptedPhone = encryptUtil.aesDecrypt(user.getPhone());
+            maskedPhone = encryptUtil.maskPhone(decryptedPhone);
         }
 
         // 邮箱脱敏
-        String maskedEmail = EncryptUtil.maskEmail(user.getEmail());
+        String maskedEmail = encryptUtil.maskEmail(user.getEmail());
 
         // 获取角色列表
         var roles = user.getRoles().stream()
@@ -170,5 +172,89 @@ public class UserServiceImpl implements UserService {
                 .roles(roles)
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    /**
+     * 封禁用户
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void banUser(com.campus.marketplace.common.dto.request.BanUserRequest request) {
+        log.info("封禁用户: userId={}, days={}, reason={}", request.userId(), request.days(), request.reason());
+
+        String adminUsername = SecurityUtil.getCurrentUsername();
+        User admin = userRepository.findByUsername(adminUsername)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        user.setStatus(com.campus.marketplace.common.enums.UserStatus.BANNED);
+        userRepository.save(user);
+
+        java.time.LocalDateTime unbanTime = null;
+        if (request.days() > 0) {
+            unbanTime = java.time.LocalDateTime.now().plusDays(request.days());
+        }
+
+        com.campus.marketplace.common.entity.BanLog banLog = com.campus.marketplace.common.entity.BanLog.builder()
+                .userId(user.getId())
+                .adminId(admin.getId())
+                .reason(request.reason())
+                .days(request.days())
+                .unbanTime(unbanTime)
+                .isUnbanned(false)
+                .build();
+        banLogRepository.save(banLog);
+
+        log.info("用户封禁成功: userId={}, adminId={}, days={}, unbanTime={}",
+                user.getId(), admin.getId(), request.days(), unbanTime);
+    }
+
+    /**
+     * 解封用户
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void unbanUser(Long userId) {
+        log.info("解封用户: userId={}", userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        user.setStatus(com.campus.marketplace.common.enums.UserStatus.ACTIVE);
+        userRepository.save(user);
+
+        log.info("用户解封成功: userId={}", userId);
+    }
+
+    /**
+     * 自动解封过期用户
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int autoUnbanExpiredUsers() {
+        log.info("开始自动解封过期用户");
+
+        java.util.List<com.campus.marketplace.common.entity.BanLog> expiredBans =
+                banLogRepository.findExpiredBans(java.time.LocalDateTime.now());
+
+        int count = 0;
+        for (com.campus.marketplace.common.entity.BanLog banLog : expiredBans) {
+            User user = userRepository.findById(banLog.getUserId()).orElse(null);
+            if (user != null && user.getStatus() == com.campus.marketplace.common.enums.UserStatus.BANNED) {
+                user.setStatus(com.campus.marketplace.common.enums.UserStatus.ACTIVE);
+                userRepository.save(user);
+
+                banLog.setIsUnbanned(true);
+                banLogRepository.save(banLog);
+
+                count++;
+                log.info("自动解封用户: userId={}", user.getId());
+            }
+        }
+
+        log.info("自动解封完成: count={}", count);
+        return count;
     }
 }

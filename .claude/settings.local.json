@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//f/code/**)",
+      "Bash(tasklist)",
+      "Bash(findstr postgres)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

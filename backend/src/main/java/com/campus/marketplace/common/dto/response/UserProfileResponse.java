@@ -1,5 +1,6 @@
 package com.campus.marketplace.common.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,55 +19,66 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "用户资料响应数据")
 public class UserProfileResponse {
 
     /**
      * 用户 ID
      */
+    @Schema(description = "用户唯一标识", example = "10001")
     private Long id;
 
     /**
      * 用户名
      */
+    @Schema(description = "用户名", example = "alice")
     private String username;
 
     /**
      * 邮箱（脱敏）
      */
+    @Schema(description = "邮箱（脱敏后）", example = "a***@example.com")
     private String email;
 
     /**
      * 手机号（脱敏）
      */
+    @Schema(description = "手机号（脱敏后）", example = "138****1234")
     private String phone;
 
     /**
      * 学号
      */
+    @Schema(description = "学号", example = "20240001")
     private String studentId;
 
     /**
      * 头像 URL
      */
+    @Schema(description = "头像地址", example = "https://cdn.campus.com/avatar/u001.png")
     private String avatar;
 
     /**
      * 用户状态
      */
+    @Schema(description = "用户状态", example = "ACTIVE")
     private String status;
 
     /**
      * 积分
      */
+    @Schema(description = "当前积分", example = "1200")
     private Integer points;
 
     /**
      * 角色列表
      */
+    @Schema(description = "角色列表", example = "[\"ROLE_USER\",\"ROLE_SELLER\"]")
     private List<String> roles;
 
     /**
      * 注册时间
      */
+    @Schema(description = "注册时间", example = "2024-03-01T12:00:00")
     private LocalDateTime createdAt;
 }

@@ -40,4 +40,25 @@ public interface UserService {
      * @param request 修改密码请求
      */
     void updatePassword(UpdatePasswordRequest request);
+
+    /**
+     * 封禁用户
+     * 
+     * @param request 封禁请求
+     */
+    void banUser(com.campus.marketplace.common.dto.request.BanUserRequest request);
+
+    /**
+     * 解封用户
+     * 
+     * @param userId 用户ID
+     */
+    void unbanUser(Long userId);
+
+    /**
+     * 自动解封过期用户
+     * 
+     * @return 解封的用户数量
+     */
+    int autoUnbanExpiredUsers();
 }

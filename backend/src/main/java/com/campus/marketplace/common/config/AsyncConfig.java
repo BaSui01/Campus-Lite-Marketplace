@@ -2,12 +2,11 @@ package com.campus.marketplace.common.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  * 异步任务配置
@@ -19,16 +18,21 @@ import java.util.concurrent.Executors;
  */
 @Slf4j
 @Configuration
-@EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
+
+    private final Executor virtualThreadExecutor;
+
+    public AsyncConfig(@Qualifier("virtualThreadExecutor") Executor virtualThreadExecutor) {
+        this.virtualThreadExecutor = virtualThreadExecutor;
+    }
 
     /**
      * 配置异步任务执行器（使用虚拟线程）
      */
     @Override
     public Executor getAsyncExecutor() {
-        log.info("配置异步任务使用虚拟线程执行器");
-        return Executors.newVirtualThreadPerTaskExecutor();
+        log.info("配置异步任务复用虚拟线程执行器");
+        return virtualThreadExecutor;
     }
 
     /**

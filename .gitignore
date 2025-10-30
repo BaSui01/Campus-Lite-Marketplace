@@ -221,5 +221,76 @@ gatling-results/
 
 # ============ Kiro IDE ============
 # Kiro 临时文件（保留 .kiro/steering 和 .kiro/specs）
-.kiro/
+.spec-workflow/
+.kiro/steering/
+.claude/
+# ============ 未分类 ============
+# 未分类文件
+*~
+*#*
+*.orig
+*.rej
+*.swp
+*.bak
+*.exe
+*.dll
+*.bin
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.ncb
+*.sdf
+*.suo
+*.pdb
+*.idb
+*.DS_Store
+*.class
+*.psd
+*.db
+*.sublime-workspace
+*.sublime-project
+*.aux
+*.bbl
+*.blg
+*.brf
+*.cb
+*.dvi
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.toc
+*.vrb
+*.pdf
+*.synctex.gz(busy)
+*.gz(busy)
+*.pdf(busy)
+*.synctex(busy)
+*.aux(busy)
+*.log(busy)
+*.out(busy)
+*.toc(busy)
+*.vrb(busy)
+*.nav(busy)
+*.snm(busy)
+*.fdb_latexmk(busy)
+*.fls(busy)
+*.bbl(busy)
+*.blg(busy)
+*.brf(busy)
+*.cb(busy)
+*.dvi(busy)
+*.class(busy)
+*.pdf(busy)
+*.pdf(busy)
+
+
 

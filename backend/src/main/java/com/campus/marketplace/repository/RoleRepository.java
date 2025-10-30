@@ -23,13 +23,25 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     Optional<Role> findByName(String name);
 
     /**
-     * 根据角色名称查询（包含权限）
-     */
-    @Query("SELECT r FROM Role r LEFT JOIN FETCH r.permissions WHERE r.name = :name")
-    Optional<Role> findByNameWithPermissions(@Param("name") String name);
-
-    /**
      * 检查角色名称是否存在
      */
     boolean existsByName(String name);
+
+    /**
+     * 根据角色名称查询（包含权限）
+     */
+    @Query("SELECT DISTINCT r FROM Role r LEFT JOIN FETCH r.permissions WHERE r.name = :name")
+    Optional<Role> findByNameWithPermissions(@Param("name") String name);
+
+    /**
+     * 根据角色 ID 查询（包含权限）
+     */
+    @Query("SELECT DISTINCT r FROM Role r LEFT JOIN FETCH r.permissions WHERE r.id = :id")
+    Optional<Role> findByIdWithPermissions(@Param("id") Long id);
+
+    /**
+     * 查询全部角色（包含权限）
+     */
+    @Query("SELECT DISTINCT r FROM Role r LEFT JOIN FETCH r.permissions")
+    java.util.List<Role> findAllWithPermissions();
 }

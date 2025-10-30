@@ -1,6 +1,8 @@
 package com.campus.marketplace.repository;
 
 import com.campus.marketplace.common.entity.Conversation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +21,11 @@ import java.util.Optional;
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
 
     /**
+     * 查询两个用户之间的会话（精确匹配，user1Id < user2Id）
+     */
+    Optional<Conversation> findByUser1IdAndUser2Id(Long user1Id, Long user2Id);
+
+    /**
      * 查询两个用户之间的会话
      */
     @Query("SELECT c FROM Conversation c WHERE " +
@@ -32,6 +39,12 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     @Query("SELECT c FROM Conversation c WHERE c.user1Id = :userId OR c.user2Id = :userId " +
            "ORDER BY c.lastMessageTime DESC")
     List<Conversation> findByUserId(@Param("userId") Long userId);
+
+    /**
+     * 分页查询用户的会话列表
+     */
+    @Query("SELECT c FROM Conversation c WHERE c.user1Id = :userId OR c.user2Id = :userId")
+    Page<Conversation> findByUserIdPaginated(@Param("userId") Long userId, Pageable pageable);
 
     /**
      * 统计用户的会话数量

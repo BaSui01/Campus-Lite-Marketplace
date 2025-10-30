@@ -1,0 +1,196 @@
+{
+  "timestamp": "2025-10-27T11:32:48+08:00",
+  "scanVersion": "1.0.0",
+  "project": {
+    "name": "校园轻享集市系统",
+    "description": "基于 Java 21 + Spring Boot 3.x 的企业级校园二手物品交易平台",
+    "language": "Java",
+    "framework": "Spring Boot 3.2.0",
+    "rootPath": "F:\\code\\Campus Lite Marketplace"
+  },
+  "modules": [
+    {
+      "path": "backend",
+      "name": "Backend 模块",
+      "type": "maven-java",
+      "entryPoints": [
+        "backend/src/main/java/com/campus/marketplace/MarketplaceApplication.java"
+      ],
+      "controllers": [
+        "backend/src/main/java/com/campus/marketplace/controller/AuthController.java",
+        "backend/src/main/java/com/campus/marketplace/controller/UserController.java",
+        "backend/src/main/java/com/campus/marketplace/controller/GoodsController.java",
+        "backend/src/main/java/com/campus/marketplace/controller/OrderController.java",
+        "backend/src/main/java/com/campus/marketplace/controller/FavoriteController.java"
+      ],
+      "services": [
+        "backend/src/main/java/com/campus/marketplace/service/AuthService.java",
+        "backend/src/main/java/com/campus/marketplace/service/UserService.java",
+        "backend/src/main/java/com/campus/marketplace/service/GoodsService.java",
+        "backend/src/main/java/com/campus/marketplace/service/OrderService.java",
+        "backend/src/main/java/com/campus/marketplace/service/PaymentService.java",
+        "backend/src/main/java/com/campus/marketplace/service/PointsService.java"
+      ],
+      "repositories": [
+        "backend/src/main/java/com/campus/marketplace/repository/UserRepository.java",
+        "backend/src/main/java/com/campus/marketplace/repository/GoodsRepository.java",
+        "backend/src/main/java/com/campus/marketplace/repository/OrderRepository.java",
+        "backend/src/main/java/com/campus/marketplace/repository/FavoriteRepository.java",
+        "backend/src/main/java/com/campus/marketplace/repository/ReviewRepository.java",
+        "backend/src/main/java/com/campus/marketplace/repository/PointsLogRepository.java",
+        "backend/src/main/java/com/campus/marketplace/repository/BanLogRepository.java"
+      ],
+      "entities": [
+        "backend/src/main/java/com/campus/marketplace/common/entity/User.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Role.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Permission.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Goods.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Category.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Order.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Review.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Favorite.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Conversation.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Message.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/Post.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/BanLog.java",
+        "backend/src/main/java/com/campus/marketplace/common/entity/PointsLog.java"
+      ],
+      "configs": [
+        "backend/pom.xml",
+        "backend/src/main/resources/application.yml",
+        "backend/src/main/java/com/campus/marketplace/common/config/SecurityConfig.java",
+        "backend/src/main/java/com/campus/marketplace/common/config/RedisConfig.java",
+        "backend/src/main/java/com/campus/marketplace/common/config/JpaConfig.java",
+        "backend/src/main/java/com/campus/marketplace/common/config/VirtualThreadConfig.java",
+        "backend/src/main/java/com/campus/marketplace/common/config/AsyncConfig.java",
+        "backend/src/main/java/com/campus/marketplace/common/config/OpenApiConfig.java"
+      ],
+      "tests": [
+        "backend/src/test/java/com/campus/marketplace/service/AuthServiceTest.java",
+        "backend/src/test/java/com/campus/marketplace/service/AuthServiceLoginTest.java",
+        "backend/src/test/java/com/campus/marketplace/service/AuthServiceImplTest.java",
+        "backend/src/test/java/com/campus/marketplace/service/OrderServiceTest.java",
+        "backend/src/test/java/com/campus/marketplace/service/GoodsServiceTest.java",
+        "backend/src/test/java/com/campus/marketplace/service/FavoriteServiceTest.java",
+        "backend/src/test/java/com/campus/marketplace/service/PointsServiceTest.java",
+        "backend/src/test/java/com/campus/marketplace/service/UserBanServiceTest.java",
+        "backend/src/test/java/com/campus/marketplace/PasswordEncoderTest.java"
+      ],
+      "databaseScripts": [
+        "backend/src/main/resources/db/schema.sql",
+        "backend/src/main/resources/db/data.sql"
+      ],
+      "documentation": [
+        "backend/README.md",
+        "backend/ENV-CONFIG.md",
+        "backend/CLAUDE.md"
+      ],
+      "coverage": {
+        "scanned": true,
+        "percentage": 85,
+        "gaps": [
+          "WebSocket 消息处理（未完整扫描）",
+          "部分 DTO 类（未详细扫描）",
+          "工具类细节（部分未读取）"
+        ]
+      }
+    },
+    {
+      "path": ".kiro",
+      "name": "项目规则与规范",
+      "type": "documentation",
+      "entryPoints": [
+        ".kiro/steering/agent.md",
+        ".kiro/specs/campus-marketplace-architecture/requirements.md",
+        ".kiro/specs/campus-marketplace-architecture/design.md",
+        ".kiro/specs/campus-marketplace-architecture/tasks.md"
+      ],
+      "coverage": {
+        "scanned": true,
+        "percentage": 100,
+        "gaps": []
+      }
+    }
+  ],
+  "coverage": {
+    "totalFiles": 120,
+    "scannedFiles": 102,
+    "percentage": 85,
+    "byCategory": {
+      "sourceCode": {
+        "total": 95,
+        "scanned": 80,
+        "percentage": 84
+      },
+      "tests": {
+        "total": 9,
+        "scanned": 9,
+        "percentage": 100
+      },
+      "configs": {
+        "total": 8,
+        "scanned": 8,
+        "percentage": 100
+      },
+      "documentation": {
+        "total": 8,
+        "scanned": 5,
+        "percentage": 62
+      }
+    }
+  },
+  "ignoredPatterns": [
+    "node_modules/**",
+    ".git/**",
+    ".github/**",
+    "dist/**",
+    "build/**",
+    ".next/**",
+    "__pycache__/**",
+    "*.lock",
+    "*.log",
+    "*.bin",
+    "*.pdf",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.gif",
+    "*.mp4",
+    "*.zip",
+    "*.tar",
+    "*.gz",
+    "target/**",
+    ".idea/**",
+    "*.class"
+  ],
+  "ignoredStats": {
+    "totalIgnored": 3542,
+    "topDirectories": [
+      {
+        "path": "backend/target",
+        "reason": "Maven 构建输出",
+        "fileCount": 3500
+      },
+      {
+        "path": ".git",
+        "reason": "Git 元数据",
+        "fileCount": 42
+      }
+    ]
+  },
+  "truncated": false,
+  "nextSteps": [
+    "补充扫描：backend/src/main/java/.../websocket/ （WebSocket 处理器）",
+    "补充扫描：backend/src/main/java/.../common/dto/ （详细的 DTO 定义）",
+    "补充扫描：backend/src/main/java/.../common/utils/ （工具类实现细节）",
+    "建议：为前端模块（如有）生成对应的 CLAUDE.md",
+    "建议：补充集成测试文档（Testcontainers 使用示例）"
+  ],
+  "recommendations": [
+    "优先阅读：.kiro/specs/campus-marketplace-architecture/requirements.md（了解业务需求）",
+    "优先阅读：.kiro/specs/campus-marketplace-architecture/design.md（了解技术设计）",
+    "优先阅读：backend/src/main/resources/db/schema.sql（了解数据模型）",
+    "开发新功能时，参考：.kiro/specs/campus-marketplace-architecture/tasks.md",
+    "修改代码前，检查是否有相应的单元测试（backend/src/test/）"
+  ]
+}

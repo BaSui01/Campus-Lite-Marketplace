@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 🎯 BaSui 的 commit-msg 钩子
+# 校验提交信息格式（可选）
+
+# TODO: 添加 commitlint 校验
+# npx --no -- commitlint --edit $1

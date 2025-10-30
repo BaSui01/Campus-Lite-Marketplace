@@ -3,12 +3,10 @@ package com.campus.marketplace.common.exception;
 import lombok.Getter;
 
 /**
- * 业务异常类
- * 
- * 用于抛出业务逻辑相关的异常
- * 
+ * 业务异常
+ *
  * @author BaSui
- * @date 2025-10-25
+ * @date 2025-10-27
  */
 @Getter
 public class BusinessException extends RuntimeException {
@@ -16,46 +14,64 @@ public class BusinessException extends RuntimeException {
     /**
      * 错误码
      */
-    private final Integer code;
+    private final ErrorCode errorCode;
 
     /**
-     * 错误消息
+     * 自定义错误信息
      */
-    private final String message;
+    private final String customMessage;
 
     /**
-     * 使用错误码枚举构造异常
+     * 构造函数 - 使用错误码默认信息
+     *
+     * @param errorCode 错误码
      */
     public BusinessException(ErrorCode errorCode) {
         super(errorCode.getMessage());
-        this.code = errorCode.getCode();
-        this.message = errorCode.getMessage();
+        this.errorCode = errorCode;
+        this.customMessage = null;
     }
 
     /**
-     * 使用错误码枚举和自定义消息构造异常
+     * 构造函数 - 使用自定义错误信息
+     *
+     * @param errorCode 错误码
+     * @param customMessage 自定义错误信息
      */
     public BusinessException(ErrorCode errorCode, String customMessage) {
         super(customMessage);
-        this.code = errorCode.getCode();
-        this.message = customMessage;
+        this.errorCode = errorCode;
+        this.customMessage = customMessage;
     }
 
     /**
-     * 使用自定义错误码和消息构造异常
+     * 构造函数 - 带异常原因
+     *
+     * @param errorCode 错误码
+     * @param customMessage 自定义错误信息
+     * @param cause 异常原因
      */
-    public BusinessException(Integer code, String message) {
-        super(message);
-        this.code = code;
-        this.message = message;
+    public BusinessException(ErrorCode errorCode, String customMessage, Throwable cause) {
+        super(customMessage, cause);
+        this.errorCode = errorCode;
+        this.customMessage = customMessage;
     }
 
     /**
-     * 使用错误码枚举和原因构造异常
+     * 获取最终显示的错误信息
+     *
+     * @return 错误信息
      */
-    public BusinessException(ErrorCode errorCode, Throwable cause) {
-        super(errorCode.getMessage(), cause);
-        this.code = errorCode.getCode();
-        this.message = errorCode.getMessage();
+    public String getDisplayMessage() {
+        return customMessage != null ? customMessage : errorCode.getMessage();
+    }
+
+    /**
+     * 获取错误码的数字代码（任务 GlobalExceptionHandler 遗漏 - 已补充！）
+     *
+     * @return 错误码
+     */
+    public int getCode() {
+        return errorCode.getCode();
     }
 }

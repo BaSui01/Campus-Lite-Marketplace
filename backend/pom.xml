@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.12</version>
         <relativePath/>
     </parent>
 
@@ -23,7 +23,83 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lombok.version>1.18.32</lombok.version>
+        <flyway.version>10.15.0</flyway.version>
+        <!-- 统一控制最低覆盖率门槛，可在本地/CI 通过 -Dcoverage.minimum=0.80 临时调整 -->
+        <coverage.minimum>0.85</coverage.minimum>
+
+        <!-- 🚀 BaSui优化：Maven 多核并行配置 -->
+        <!-- Maven 并行模块构建线程数：1C = 1 线程/核心 -->
+        <maven.build.threads>1C</maven.build.threads>
+        <!-- 测试并行度：基于 CPU 核心数动态调整 -->
+        <surefire.forkCount>1C</surefire.forkCount>
+        <failsafe.forkCount>1</failsafe.forkCount>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- ========== 安全整改:覆盖 Spring Boot Parent 传递的高危依赖版本 ========== -->
+
+            <!-- dom4j: CVE-2020-10683 → 升级到 2.1.4（新 groupId）-->
+            <dependency>
+                <groupId>org.dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>2.1.4</version>
+            </dependency>
+
+            <!-- Bouncy Castle: CVE-2020-15522/CVE-2023-33202 → 升级到 1.78.1（新 artifactId：jdk18on）-->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.78.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>1.78.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcutil-jdk18on</artifactId>
+                <version>1.78.1</version>
+            </dependency>
+
+            <!-- Angus Mail: CVE-2025-7962 → 升级到 2.0.3 -->
+            <dependency>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
+                <version>2.0.3</version>
+            </dependency>
+
+            <!-- Logback: CVE-2023-6378 → 升级到 1.5.6 -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.5.6</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.5.6</version>
+            </dependency>
+
+            <!-- Netty: 多个 2024/2025 CVE → 升级到 4.1.113.Final -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.113.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- PostgreSQL JDBC: CVE-2024-1597 → 升级到 42.7.4 -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.7.4</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Spring Boot Web -->
@@ -108,7 +184,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- MapStruct (对象映射) -->
@@ -137,13 +214,35 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- Micrometer Prometheus Registry (指标导出到 /actuator/prometheus) -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+        <!-- Logstash Logback Encoder (JSON 日志) -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>7.4</version>
+        </dependency>
+
+        <!-- Caffeine 本地缓存（用于 Feature Flags 等） -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.8</version>
+        </dependency>
+
         <!-- Springdoc OpenAPI (Swagger UI) -->
+        <!-- ⚠️ 版本限制：2.6.x 兼容 Spring Boot 3.2.x (Spring Framework 6.1.x) -->
+        <!-- ⚠️ 安全漏洞：2.7.0 修复了 DOMPurify CVE-2024-45801，但需要 Spring Boot 3.3+ -->
+        <!-- 💡 解决方案：等待升级 Spring Boot 3.3+ 后再升级 SpringDoc 2.7.0 -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.3.0</version>
+            <version>2.6.0</version>
         </dependency>
-
         <!-- Dotenv (环境变量管理) -->
         <dependency>
             <groupId>me.paulschwarz</groupId>
@@ -151,11 +250,89 @@
             <version>4.0.0</version>
         </dependency>
 
+        <!-- 支付宝 SDK - 官方最新版 (必须带 .ALL 后缀!) -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.40.483.ALL</version>
+        </dependency>
+
+        <!-- 微信支付 SDK - 官方APIv3 Java SDK -->
+        <dependency>
+            <groupId>com.github.wechatpay-apiv3</groupId>
+            <artifactId>wechatpay-java</artifactId>
+            <version>0.2.17</version>
+        </dependency>
+
+        <!-- 微信支付 SDK - WxJava V2 (用于沙箱测试) -->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-pay</artifactId>
+            <version>4.7.0</version>
+        </dependency>
+
+        <!-- 邮件发送 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- Flyway 数据库迁移 -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+
+        <!-- Thumbnailator (图片压缩和缩略图) -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.20</version>
+        </dependency>
+
+        <!-- Commons IO (文件操作工具) -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.15.1</version>
+        </dependency>
+
+        <!-- 阿里云 OSS SDK (可选,用于生产环境) -->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.17.4</version>
+        </dependency>
+
+        <!-- 阿里云短信 SDK -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>dysmsapi20170525</artifactId>
+            <version>2.0.24</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>tea-openapi</artifactId>
+            <version>0.2.8</version>
+        </dependency>
+
         <!-- 测试依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- H2 数据库（测试用） -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -182,10 +359,314 @@
             <version>1.19.3</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- 契约测试辅助库 -->
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
+            <version>2.1.22</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>aliyun-public</id>
+            <name>Aliyun Maven Public</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+        <repository>
+            <id>aliyun-central</id>
+            <name>Aliyun Maven Central Mirror</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <name>JitPack</name>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>springdoc</id>
+            <name>springdoc Releases</name>
+            <url>https://repo.springdoc.org/release</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>aliyun-public</id>
+            <name>Aliyun Maven Public</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>aliyun-central</id>
+            <name>Aliyun Maven Central Mirror</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jitpack.io</id>
+            <name>JitPack</name>
+            <url>https://jitpack.io</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <plugins>
+            <!-- 依赖安全扫描：OWASP Dependency-Check（按 CVSS >= 7 失败） -->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>12.1.0</version>
+                <configuration>
+                    <formats>
+                        <format>HTML</format>
+                        <format>JSON</format>
+                    </formats>
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <skipProvidedScope>true</skipProvidedScope>
+                    <skipSystemScope>true</skipSystemScope>
+                    <!-- 抑制文件：忽略误报和已评估的低风险漏洞 -->
+                    <suppressionFiles>
+                        <suppressionFile>.owasp/suppressions.xml</suppressionFile>
+                    </suppressionFiles>
+                    <!-- 性能优化：使用国内 NVD 数据库镜像加速（可选） -->
+                    <!-- <cveUrlModified>https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-modified.json.gz</cveUrlModified> -->
+                    <!-- <cveUrlBase>https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-%d.json.gz</cveUrlBase> -->
+                    <!-- 缓存 NVD 数据库，避免每次重新下载 -->
+                    <autoUpdate>false</autoUpdate>
+                    <!-- 并发扫描线程数（加速扫描） -->
+                    <centralAnalyzerEnabled>true</centralAnalyzerEnabled>
+                    <!-- 禁用不需要的分析器（减少扫描时间） -->
+                    <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                    <nodeAnalyzerEnabled>false</nodeAnalyzerEnabled>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.8.3.0</version>
+                <configuration>
+                    <effort>max</effort>
+                    <threshold>Low</threshold>
+                    <failOnError>true</failOnError>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>spotbugs</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 突变测试：PIT（设门槛，低于则失败） -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.15.5</version>
+                <configuration>
+                    <targetClasses>
+                        <param>com.campus.marketplace.service.*</param>
+                        <param>com.campus.marketplace.common.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.campus.marketplace.service.*</param>
+                        <param>com.campus.marketplace.common.*</param>
+                    </targetTests>
+                    <mutators>
+                        <mutator>STRONGER</mutator>
+                    </mutators>
+                    <threads>2</threads>
+                    <mutationThreshold>60</mutationThreshold>
+                    <timeoutConst>8000</timeoutConst>
+                    <failWhenNoMutations>false</failWhenNoMutations>
+                </configuration>
+            </plugin>
+            <!-- JaCoCo 覆盖率：为 surefire/failsafe 注入 agent，verify 阶段生成报告并校验门槛 -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <configuration>
+                    <append>true</append>
+                    <!-- 与 surefire/failsafe 协同：将 agent 参数注入到 ${jacocoArgLine} 变量 -->
+                    <propertyName>jacocoArgLine</propertyName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <!-- Controller 必须 85% -->
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <includes>
+                                        <include>com.campus.marketplace.controller.*</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${coverage.minimum}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <!-- AOP 必须 85% -->
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <includes>
+                                        <include>com.campus.marketplace.common.aspect.*</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${coverage.minimum}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <!-- Service 实现先设为 60%，后续逐步提升至 85% -->
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <includes>
+                                        <include>com.campus.marketplace.service.impl.*</include>
+                                    </includes>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.60</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                            <!-- 排除不计入覆盖率的样板代码/配置/实体/DTO/启动类等 -->
+                            <excludes>
+                                <exclude>**/*Application.class</exclude>
+                                <exclude>com/campus/marketplace/common/config/**</exclude>
+                                <exclude>com/campus/marketplace/common/dto/**</exclude>
+                                <exclude>com/campus/marketplace/common/entity/**</exclude>
+                                <exclude>com/campus/marketplace/common/mail/**</exclude>
+                                <exclude>com/campus/marketplace/common/annotation/**</exclude>
+                                <exclude>com/campus/marketplace/common/utils/**</exclude>
+                                <exclude>com/campus/marketplace/websocket/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <release>21</release>
+                    <!-- 🚀 BaSui优化：启用 fork 以减少编译对主 JVM 的阻塞 -->
+                    <fork>true</fork>
+                    <showWarnings>false</showWarnings>
+                    <compilerArgs>
+                        <arg>-Xlint:-options</arg>
+                        <arg>-Xlint:-unchecked</arg>
+                        <arg>-Xlint:-deprecation</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.5.5.Final</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <!-- 先拼接 JaCoCo 的 agent,再追加 JVM 选项(避免覆盖 JaCoCo 注入参数)-->
+                    <argLine>${jacocoArgLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                    <!-- ✅ BaSui修复：启用输出重定向以避免并行测试通道冲突 -->
+                    <!-- 测试日志输出到 target/surefire-reports/*.txt 文件，避免 "Corrupted channel" 警告 -->
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <!-- ✅ BaSui修复：激活 test Profile，让 DevLoggingSmsService 生效 -->
+                    <systemPropertyVariables>
+                        <spring.profiles.active>test</spring.profiles.active>
+                    </systemPropertyVariables>
+                    <!-- 🚀 BaSui优化：多核并行测试 (1C = 每个 CPU 核心 1 个 JVM 进程) -->
+                    <forkCount>${surefire.forkCount}</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <!-- 启用并行测试：类级别并行 -->
+                    <parallel>classes</parallel>
+                    <threadCount>4</threadCount>
+                    <perCoreThreadCount>true</perCoreThreadCount>
+                    <!-- 在本地/CI 无 Docker 环境时,排除需要 Testcontainers 的集成测试 -->
+                    <excludes>
+                        <exclude>**/*IT.java</exclude>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!-- 在 verify 阶段运行集成测试（使用 Failsafe），可通过 -DskipITs=true 跳过 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <skipITs>${skipITs}</skipITs>
+                    <!-- 先拼接 JaCoCo 的 agent，再追加 JVM 选项 -->
+                    <argLine>${jacocoArgLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                    <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+                    <includes>
+                        <include>**/*IT.java</include>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <!-- 🚀 BaSui优化：集成测试保持单进程（避免 Testcontainers 资源竞争） -->
+                    <forkCount>${failsafe.forkCount}</forkCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -200,5 +681,35 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>openapi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>openapi-generator-maven-plugin</artifactId>
+                        <version>7.6.0</version>
+                        <configuration>
+                            <generatorName>typescript-axios</generatorName>
+                            <inputSpec>${project.build.directory}/openapi-frontend.json</inputSpec>
+                            <!-- 🎯 BaSui修改：输出到 Monorepo 公共层 -->
+                            <output>${project.basedir}/../frontend/packages/shared/src/api</output>
+                            <apiPackage>api</apiPackage>
+                            <modelPackage>models</modelPackage>
+                            <skipValidateSpec>true</skipValidateSpec>
+                            <configOptions>
+                                <withInterfaces>true</withInterfaces>
+                                <useSingleRequestParameter>true</useSingleRequestParameter>
+                                <supportsES6>true</supportsES6>
+                                <withSeparateModelsAndApi>true</withSeparateModelsAndApi>
+                            </configOptions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

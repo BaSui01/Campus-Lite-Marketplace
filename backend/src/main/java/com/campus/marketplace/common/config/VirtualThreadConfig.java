@@ -2,6 +2,7 @@ package com.campus.marketplace.common.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.ProtocolHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,13 +44,11 @@ public class VirtualThreadConfig {
      * 大幅提升并发处理能力
      */
     @Bean
-    public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
-        return new TomcatProtocolHandlerCustomizer<ProtocolHandler>() {
-            @Override
-            public void customize(ProtocolHandler protocolHandler) {
-                log.info("配置 Tomcat 使用虚拟线程处理请求");
-                protocolHandler.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
-            }
+    public TomcatProtocolHandlerCustomizer<ProtocolHandler> protocolHandlerVirtualThreadExecutorCustomizer(
+            @Qualifier("virtualThreadExecutor") Executor virtualThreadExecutor) {
+        return protocolHandler -> {
+            log.info("配置 Tomcat 使用虚拟线程处理请求");
+            protocolHandler.setExecutor(virtualThreadExecutor);
         };
     }
 }

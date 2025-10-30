@@ -19,14 +19,14 @@ import java.util.*;
 public class SensitiveWordFilter {
 
     /**
-     * 敏感词库（DFA 树）
+     * DFA 根节点（类型安全实现，避免不受检转换）
      */
-    private final Map<String, Object> sensitiveWordMap = new HashMap<>();
+    private final Node root = new Node();
 
-    /**
-     * 是否为敏感词结尾的标识
-     */
-    private static final String IS_END = "isEnd";
+    private static final class Node {
+        final Map<Character, Node> children = new HashMap<>();
+        boolean isEnd;
+    }
 
     /**
      * 替换字符
@@ -68,25 +68,17 @@ public class SensitiveWordFilter {
         if (word == null || word.isEmpty()) {
             return;
         }
-
-        Map<String, Object> currentMap = sensitiveWordMap;
+        Node curr = root;
         
         for (int i = 0; i < word.length(); i++) {
-            String key = String.valueOf(word.charAt(i));
-            
-            // 如果当前字符不存在，创建新节点
-            Map<String, Object> nextMap = (Map<String, Object>) currentMap.get(key);
-            if (nextMap == null) {
-                nextMap = new HashMap<>();
-                currentMap.put(key, nextMap);
+            char ch = word.charAt(i);
+            Node next = curr.children.get(ch);
+            if (next == null) {
+                next = new Node();
+                curr.children.put(ch, next);
             }
-            
-            currentMap = nextMap;
-            
-            // 最后一个字符，标记为结尾
-            if (i == word.length() - 1) {
-                currentMap.put(IS_END, true);
-            }
+            curr = next;
+            if (i == word.length() - 1) curr.isEnd = true;
         }
     }
 
@@ -161,44 +153,28 @@ public class SensitiveWordFilter {
      * @return 敏感词长度，0 表示不存在
      */
     private int checkSensitiveWord(String text, int beginIndex) {
-        boolean isEnd = false;
-        int matchLength = 0;
-        
-        Map<String, Object> currentMap = sensitiveWordMap;
-        
+        boolean end = false;
+        int len = 0;
+
+        Node curr = root;
         for (int i = beginIndex; i < text.length(); i++) {
-            String key = String.valueOf(text.charAt(i));
-            
-            // 获取下一个节点
-            currentMap = (Map<String, Object>) currentMap.get(key);
-            
-            if (currentMap == null) {
-                // 没有匹配到，退出
-                break;
-            }
-            
-            matchLength++;
-            
-            // 检查是否到达敏感词结尾
-            if (Boolean.TRUE.equals(currentMap.get(IS_END))) {
-                isEnd = true;
-                break;
-            }
+            char ch = text.charAt(i);
+            Node next = curr.children.get(ch);
+            if (next == null) break;
+            len++;
+            if (next.isEnd) { end = true; break; }
+            curr = next;
         }
-        
-        // 如果没有到达结尾，说明不是完整的敏感词
-        if (!isEnd) {
-            matchLength = 0;
-        }
-        
-        return matchLength;
+
+        return end ? len : 0;
     }
 
     /**
      * 清空敏感词库
      */
     public void clear() {
-        sensitiveWordMap.clear();
+        root.children.clear();
+        root.isEnd = false;
         log.info("敏感词库已清空");
     }
 }

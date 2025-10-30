@@ -1,0 +1,291 @@
+version: '3.8'
+
+services:
+  # ==================== PostgreSQL 主库（Bitnami） ====================
+  postgres-master:
+    image: bitnami/postgresql:16
+    container_name: campus-postgres-master
+    restart: always
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRESQL_USERNAME=${DB_USERNAME}
+      - POSTGRESQL_PASSWORD=${DB_PASSWORD}
+      - POSTGRESQL_DATABASE=${DB_NAME:-campus_marketplace_prod}
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=replicator
+      - POSTGRESQL_REPLICATION_PASSWORD=${REPLICATION_PASSWORD:-replicator}
+    volumes:
+      - postgres_primary_data:/bitnami/postgresql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    networks:
+      - campus
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== PostgreSQL 只读从库 1 ====================
+  postgresql-replica-1:
+    image: bitnami/postgresql:16
+    container_name: campus-postgresql-replica-1
+    restart: always
+    environment:
+      - POSTGRESQL_USERNAME=${DB_USERNAME}
+      - POSTGRESQL_PASSWORD=${DB_PASSWORD}
+      - POSTGRESQL_DATABASE=${DB_NAME:-campus_marketplace_prod}
+      - POSTGRESQL_REPLICATION_MODE=replica
+      - POSTGRESQL_PRIMARY_HOST=postgres-master
+      - POSTGRESQL_PRIMARY_PORT_NUMBER=5432
+      - POSTGRESQL_REPLICATION_USER=replicator
+      - POSTGRESQL_REPLICATION_PASSWORD=${REPLICATION_PASSWORD:-replicator}
+    volumes:
+      - postgres_replica1_data:/bitnami/postgresql
+    depends_on:
+      - postgres-master
+    networks:
+      - campus
+
+  # ==================== PostgreSQL 只读从库 2 ====================
+  postgresql-replica-2:
+    image: bitnami/postgresql:16
+    container_name: campus-postgresql-replica-2
+    restart: always
+    environment:
+      - POSTGRESQL_USERNAME=${DB_USERNAME}
+      - POSTGRESQL_PASSWORD=${DB_PASSWORD}
+      - POSTGRESQL_DATABASE=${DB_NAME:-campus_marketplace_prod}
+      - POSTGRESQL_REPLICATION_MODE=replica
+      - POSTGRESQL_PRIMARY_HOST=postgres-master
+      - POSTGRESQL_PRIMARY_PORT_NUMBER=5432
+      - POSTGRESQL_REPLICATION_USER=replicator
+      - POSTGRESQL_REPLICATION_PASSWORD=${REPLICATION_PASSWORD:-replicator}
+    volumes:
+      - postgres_replica2_data:/bitnami/postgresql
+    depends_on:
+      - postgres-master
+    networks:
+      - campus
+
+  # ==================== Redis 主节点 ====================
+  redis-master:
+    image: redis:7-alpine
+    container_name: campus-redis-master
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_master_data:/data
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    networks:
+      - campus
+
+  # ==================== Redis 从节点 1 ====================
+  redis-replica-1:
+    image: redis:7-alpine
+    container_name: campus-redis-replica-1
+    restart: always
+    command: redis-server --replicaof redis-master 6379 --requirepass ${REDIS_PASSWORD} --masterauth ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - redis_replica1_data:/data
+    depends_on:
+      - redis-master
+    networks:
+      - campus
+
+  # ==================== Redis 从节点 2 ====================
+  redis-replica-2:
+    image: redis:7-alpine
+    container_name: campus-redis-replica-2
+    restart: always
+    command: redis-server --replicaof redis-master 6379 --requirepass ${REDIS_PASSWORD} --masterauth ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - redis_replica2_data:/data
+    depends_on:
+      - redis-master
+    networks:
+      - campus
+
+  # ==================== Redis Sentinel 1 ====================
+  redis-sentinel-1:
+    image: redis:7-alpine
+    container_name: campus-redis-sentinel-1
+    restart: always
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: sh -c "sed -e 's/<REDIS_PASSWORD>/'\"$${REDIS_PASSWORD}\"'/g' /etc/redis/sentinel.conf > /tmp/sentinel.conf && exec redis-sentinel /tmp/sentinel.conf"
+    volumes:
+      - ./redis/sentinel.conf:/etc/redis/sentinel.conf:ro
+    depends_on:
+      - redis-master
+    networks:
+      - campus
+
+  # ==================== Redis Sentinel 2 ====================
+  redis-sentinel-2:
+    image: redis:7-alpine
+    container_name: campus-redis-sentinel-2
+    restart: always
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: sh -c "sed -e 's/<REDIS_PASSWORD>/'\"$${REDIS_PASSWORD}\"'/g' /etc/redis/sentinel.conf > /tmp/sentinel.conf && exec redis-sentinel /tmp/sentinel.conf"
+    volumes:
+      - ./redis/sentinel.conf:/etc/redis/sentinel.conf:ro
+    depends_on:
+      - redis-master
+    networks:
+      - campus
+
+  # ==================== Redis Sentinel 3 ====================
+  redis-sentinel-3:
+    image: redis:7-alpine
+    container_name: campus-redis-sentinel-3
+    restart: always
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: sh -c "sed -e 's/<REDIS_PASSWORD>/'\"$${REDIS_PASSWORD}\"'/g' /etc/redis/sentinel.conf > /tmp/sentinel.conf && exec redis-sentinel /tmp/sentinel.conf"
+    volumes:
+      - ./redis/sentinel.conf:/etc/redis/sentinel.conf:ro
+    depends_on:
+      - redis-master
+    networks:
+      - campus
+
+  # ==================== 后端应用 实例 1 ====================
+  app-1:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: campus-app-1
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${DB_HOST:-postgres-master}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-campus_marketplace_prod}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST:-redis-master}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_SENTINEL_MASTER: ${REDIS_SENTINEL_MASTER:-mymaster}
+      REDIS_SENTINEL_NODES: ${REDIS_SENTINEL_NODES:-redis-sentinel-1:26379,redis-sentinel-2:26379,redis-sentinel-3:26379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - postgres-master
+      - redis-master
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    networks:
+      - campus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== 后端应用 实例 2 ====================
+  app-2:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: campus-app-2
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: ${DB_HOST:-postgres-master}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-campus_marketplace_prod}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST:-redis-master}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_SENTINEL_MASTER: ${REDIS_SENTINEL_MASTER:-mymaster}
+      REDIS_SENTINEL_NODES: ${REDIS_SENTINEL_NODES:-redis-sentinel-1:26379,redis-sentinel-2:26379,redis-sentinel-3:26379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - postgres-master
+      - redis-master
+      - redis-sentinel-1
+      - redis-sentinel-2
+      - redis-sentinel-3
+    networks:
+      - campus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== Nginx 反向代理 ====================
+  nginx:
+    image: nginx:alpine
+    container_name: campus-nginx
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app-1
+      - app-2
+    networks:
+      - campus
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==================== Prometheus ====================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: campus-prometheus
+    restart: always
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - campus
+
+  # ==================== Grafana ====================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: campus-grafana
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - campus
+
+networks:
+  campus:
+    driver: bridge
+
+volumes:
+  postgres_primary_data:
+  postgres_replica1_data:
+  postgres_replica2_data:
+  redis_master_data:
+  redis_replica1_data:
+  redis_replica2_data:
+  prometheus_data:
+  grafana_data:
