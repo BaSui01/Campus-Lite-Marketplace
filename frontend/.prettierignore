@@ -1,0 +1,37 @@
+# 🎨 BaSui 的 Prettier 忽略配置
+# 不需要格式化的文件
+
+# 依赖
+node_modules
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# 构建产物
+dist
+build
+.next
+out
+
+# 生成的 API 代码（OpenAPI Generator）
+packages/shared/src/api
+
+# 日志
+*.log
+logs
+
+# 环境变量
+.env
+.env.*
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# 其他
+coverage
+.DS_Store
+*.min.js
+*.min.css

@@ -15,15 +15,30 @@
     "lint": "pnpm -r lint",
     "type-check": "pnpm -r type-check",
     "clean": "pnpm -r clean && rm -rf node_modules",
-    "api:generate": "cd ../backend && mvn clean && mvn -Dspring-boot.run.arguments=\"--openapi.export.enabled=true,--openapi.export.path=target/openapi-frontend.json\" spring-boot:run && mvn -P openapi openapi-generator:generate"
+    "api:generate": "cd ../backend && mvn clean && mvn -Dspring-boot.run.arguments=\"--openapi.export.enabled=true,--openapi.export.path=target/openapi-frontend.json\" spring-boot:run && mvn -P openapi openapi-generator:generate",
+    "format": "prettier --write \"packages/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
+    "format:check": "prettier --check \"packages/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "prettier": "^3.3.3",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10"
   },
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
   },
-  "packageManager": "pnpm@8.15.0"
+  "packageManager": "pnpm@8.15.0",
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,css,scss,md}": [
+      "prettier --write"
+    ]
+  }
 }

@@ -696,6 +696,8 @@
                             <inputSpec>${project.build.directory}/openapi-frontend.json</inputSpec>
                             <!-- 🎯 BaSui修改：输出到 Monorepo 公共层 -->
                             <output>${project.basedir}/../frontend/packages/shared/src/api</output>
+                            <apiPackage>api</apiPackage>
+                            <modelPackage>models</modelPackage>
                             <skipValidateSpec>true</skipValidateSpec>
                             <configOptions>
                                 <withInterfaces>true</withInterfaces>

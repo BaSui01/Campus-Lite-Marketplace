@@ -229,6 +229,12 @@ pnpm run lint
 # 类型检查（TypeScript）
 pnpm run type-check
 
+# 代码格式化（Prettier）
+pnpm run format
+
+# 检查代码格式
+pnpm run format:check
+
 # 清理所有构建产物
 pnpm run clean
 ```
@@ -238,6 +244,18 @@ pnpm run clean
 ```bash
 # 重新生成 API 客户端
 pnpm run api:generate
+```
+
+### Git 钩子
+
+项目已配置 Husky + lint-staged，在提交代码时会自动：
+- ✅ 格式化代码（Prettier）
+- ✅ 检查代码规范（ESLint）
+
+```bash
+# 提交代码会自动触发
+git add .
+git commit -m "feat: 新功能"
 ```
 
 ---
@@ -250,21 +268,165 @@ pnpm run api:generate
 - [x] 配置公共层 @campus/shared 基础框架
 - [x] 更新后端 pom.xml 的 API 生成路径
 - [x] 搭建公共层目录结构（api、components、utils、types...）
+- [x] 重新生成 API 到公共层（130+ TypeScript 文件）
+- [x] 配置根目录统一环境变量管理（.env）
+- [x] 更新 Vite 配置读取根目录环境变量
+- [x] 完善 Axios 封装（拦截器 + JWT + 自动刷新）
+- [x] 完善公共层工具函数（format、validator、storage）
+- [x] 完善公共层类型定义（通用类型、枚举）
+- [x] 配置 Tailwind CSS（Portal 端）
+- [x] 配置 Prettier + Husky + lint-staged
+- [x] 初始化管理端 @campus/admin 项目
+- [x] 初始化用户端 @campus/portal 项目
 
 ### 🚀 进行中
 
-- [ ] 重新生成 API 到公共层
-- [ ] 初始化管理端 @campus/admin 项目
-- [ ] 初始化用户端 @campus/portal 项目
+- [ ] 公共组件库开发（Button、Form、Table、Modal...）
+- [ ] 自定义 Hooks 开发（useAuth、useRequest、useWebSocket...）
+- [ ] 管理端功能开发
+- [ ] 用户端功能开发
 
 ### 📋 待开发
 
-- [ ] 公共组件库开发（Button、Form、Table、Modal...）
-- [ ] 工具函数库开发（format、validator、storage、upload...）
-- [ ] 自定义 Hooks 开发（useAuth、useRequest、useWebSocket...）
 - [ ] 配置 Turborepo 增量构建（可选）
-- [ ] 管理端功能开发
-- [ ] 用户端功能开发
+- [ ] 添加单元测试（Jest + React Testing Library）
+- [ ] 添加 E2E 测试（Playwright）
+- [ ] 性能优化（代码分割、懒加载）
+- [ ] SEO 优化（Portal 端）
+
+---
+
+## 🌍 环境变量配置
+
+**位置**：项目根目录 `.env` 文件
+
+项目使用统一的环境变量管理，前端和后端共享同一个 `.env` 文件。
+
+### 前端环境变量（需要 VITE_ 前缀）
+
+```bash
+# API 基础 URL（指向后端服务）
+VITE_API_BASE_URL=http://localhost:8200/api
+
+# WebSocket URL（实时通讯）
+VITE_WS_URL=ws://localhost:8200/ws
+
+# 应用标题
+VITE_APP_TITLE_ADMIN=校园轻享集市 - 管理端
+VITE_APP_TITLE_PORTAL=校园轻享集市
+
+# 开发服务器端口
+VITE_ADMIN_PORT=3000
+VITE_PORTAL_PORT=3001
+```
+
+### 使用方式
+
+```typescript
+// 在代码中访问环境变量
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
+const wsUrl = import.meta.env.VITE_WS_URL;
+const appTitle = import.meta.env.VITE_APP_TITLE_ADMIN;
+```
+
+---
+
+## 💡 使用示例
+
+### 1. 调用后端 API
+
+```typescript
+import { api } from '@campus/shared';
+
+// 登录
+const loginResponse = await api.login({
+  loginRequest: {
+    username: 'admin',
+    password: '123456',
+  },
+});
+
+// 获取当前用户信息
+const userProfile = await api.getCurrentUserProfile();
+
+// 获取物品列表（分页）
+const goodsList = await api.listGoods({
+  page: 0,
+  size: 10,
+  sort: 'createdAt,desc',
+});
+
+// 创建订单
+const order = await api.createOrder({
+  createOrderRequest: {
+    goodsId: 123,
+    paymentMethod: 'WECHAT',
+  },
+});
+```
+
+### 2. 使用工具函数
+
+```typescript
+import {
+  formatDate,
+  formatMoney,
+  formatPhone,
+  isValidEmail,
+  isValidPhone,
+  storage,
+  tokenStorage,
+} from '@campus/shared';
+
+// 格式化日期
+const dateStr = formatDate(new Date(), 'YYYY-MM-DD HH:mm:ss');
+
+// 格式化金额
+const priceStr = formatMoney(12345.67); // ¥12,345.67
+
+// 格式化手机号（隐藏中间4位）
+const phoneStr = formatPhone('13800138000'); // 138****8000
+
+// 验证邮箱
+const isValid = isValidEmail('admin@example.com'); // true
+
+// 验证手机号
+const isPhoneValid = isValidPhone('13800138000'); // true
+
+// 存储数据（支持过期时间）
+storage.set('user', { name: 'BaSui' }, 30); // 30分钟后过期
+const user = storage.get('user');
+
+// Token 管理
+tokenStorage.setTokens('access_token', 'refresh_token');
+const token = tokenStorage.getAccessToken();
+```
+
+### 3. 使用类型定义
+
+```typescript
+import type {
+  PageParams,
+  PageResponse,
+  UserStatus,
+  GoodsStatus,
+  OrderStatus,
+} from '@campus/shared';
+
+// 分页参数
+const params: PageParams = {
+  page: 0,
+  size: 10,
+  sort: 'createdAt',
+  direction: 'DESC',
+};
+
+// 分页响应
+const response: PageResponse<Goods> = await api.listGoods(params);
+
+// 枚举类型
+const status: GoodsStatus = GoodsStatus.APPROVED;
+```
 
 ---
 
@@ -303,6 +465,39 @@ import { authApi } from '@campus/shared/api';
 3. 检查 `backend/pom.xml` 的 `<output>` 路径是否正确
 4. 查看生成日志，定位错误原因
 
+### Q4: 如何添加新的工具函数？
+
+**A:**
+1. 在 `packages/shared/src/utils/` 创建文件（如 `upload.ts`）
+2. 编写工具函数并导出
+3. 在 `packages/shared/src/utils/index.ts` 中导出
+4. 在其他项目中使用：`import { upload } from '@campus/shared';`
+
+### Q5: Husky 钩子不生效怎么办？
+
+**A:**
+1. 确保已执行 `pnpm install`（会自动运行 `husky install`）
+2. 检查 `.husky/pre-commit` 文件是否存在
+3. 在 Windows 上，确保 Git Bash 已安装
+4. 如果仍不生效，手动运行：
+   ```bash
+   cd frontend
+   pnpm format
+   pnpm lint
+   ```
+
+### Q6: Tailwind CSS 样式不生效怎么办？
+
+**A:**
+1. 确保 `src/index.css` 中引入了 Tailwind 指令：
+   ```css
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+   ```
+2. 检查 `tailwind.config.js` 的 `content` 配置是否包含所有组件文件
+3. 重启开发服务器：`pnpm run dev:portal`
+
 ---
 
 ## 🎉 总结
@@ -324,6 +519,6 @@ import { authApi } from '@campus/shared/api';
 
 **文档维护**：
 - 创建时间：2025-10-29
-- 最后更新：2025-10-29
+- 最后更新：2025-10-31
 - 作者：BaSui 😎
-- 状态：🚧 开发中
+- 状态：✅ 基础架构完成，进入功能开发阶段
