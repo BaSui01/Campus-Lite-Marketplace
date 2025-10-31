@@ -1,7 +1,7 @@
 /**
  * 校园轻享集市 - 公共层入口文件
  * @author BaSui 😎
- * @description 导出所有公共模块：API、组件、工具、类型、常量
+ * @description 导出所有公共模块：API、组件、工具、类型、常量、Services
  */
 
 // 导出 API 层（OpenAPI 自动生成）
@@ -21,3 +21,6 @@ export * from './constants';
 
 // 导出自定义 Hooks
 export * from './hooks';
+
+// 导出 API 服务（新增）
+export * from './services';
