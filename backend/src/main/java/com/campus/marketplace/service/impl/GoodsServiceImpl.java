@@ -253,8 +253,13 @@ public class GoodsServiceImpl implements GoodsService {
         if (SecurityUtil.isAuthenticated() && !SecurityUtil.hasAuthority(PermissionCodes.SYSTEM_CAMPUS_CROSS)) {
             String username = SecurityUtil.getCurrentUsername();
             User current = userRepository.findByUsername(username).orElse(null);
+            Long goodsCampusId = goods.getCampusId();
+            Long userCampusId = current != null ? current.getCampusId() : null;
+            log.debug("跨校访问校验: username={}, goodsCampus={}, userCampus={}", username, goodsCampusId, userCampusId);
             if (current != null && goods.getCampusId() != null && current.getCampusId() != null
                     && !goods.getCampusId().equals(current.getCampusId())) {
+                log.info("跨校访问被拒绝: username={}, goodsId={}, goodsCampus={}, userCampus={}",
+                        username, goods.getId(), goods.getCampusId(), current.getCampusId());
                 throw new BusinessException(ErrorCode.FORBIDDEN, "跨校区访问被禁止");
             }
         }

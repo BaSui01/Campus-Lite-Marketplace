@@ -55,7 +55,10 @@ class CacheWarmerTest {
 
         cacheWarmer.warmUpCacheOnStartup();
 
-        verify(cacheService, times(3)).set(anyString(), any(), eq(1L), eq(TimeUnit.HOURS));
+        // ✅ 验证 setGoodsList() 被调用了 1 次（热门商品）
+        verify(cacheService, times(1)).setGoodsList(anyString(), anyList(), eq(1L), eq(TimeUnit.HOURS));
+        // ✅ 验证 setCategoryList() 被调用了 2 次（分类列表 + 分类树）
+        verify(cacheService, times(2)).setCategoryList(anyString(), anyList(), eq(1L), eq(TimeUnit.HOURS));
     }
 
     @Test

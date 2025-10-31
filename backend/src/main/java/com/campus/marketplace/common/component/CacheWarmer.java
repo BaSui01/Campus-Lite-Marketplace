@@ -100,7 +100,7 @@ public class CacheWarmer {
 
     /**
      * 预热热门物品列表
-     * 
+     *
      * 查询浏览量最高的 100 个已审核物品
      */
     private void warmUpHotGoods() {
@@ -109,8 +109,8 @@ public class CacheWarmer {
             PageRequest pageRequest = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "viewCount"));
             List<Goods> hotGoods = goodsRepository.findByStatus(GoodsStatus.APPROVED, pageRequest).getContent();
 
-            // 缓存到 Redis
-            cacheService.set(HOT_GOODS_CACHE_KEY, hotGoods, CACHE_TIMEOUT, CACHE_TIMEOUT_UNIT);
+            // 🎯 使用专门的方法缓存 Goods 列表（自动转换为 DTO）
+            cacheService.setGoodsList(HOT_GOODS_CACHE_KEY, hotGoods, CACHE_TIMEOUT, CACHE_TIMEOUT_UNIT);
 
             log.info("✅ 预热热门物品列表成功: {}条", hotGoods.size());
         } catch (Exception e) {
@@ -120,18 +120,20 @@ public class CacheWarmer {
 
     /**
      * 预热分类列表
-     * 
+     *
      * 查询所有分类并缓存
      */
     private void warmUpCategories() {
         try {
             // 查询所有分类
             List<Category> allCategories = categoryRepository.findAll();
-            cacheService.set(CATEGORY_LIST_CACHE_KEY, allCategories, CACHE_TIMEOUT, CACHE_TIMEOUT_UNIT);
+            // 🎯 使用专门的方法缓存 Category 列表（自动转换为 DTO）
+            cacheService.setCategoryList(CATEGORY_LIST_CACHE_KEY, allCategories, CACHE_TIMEOUT, CACHE_TIMEOUT_UNIT);
 
             // 查询顶级分类（用于前端菜单渲染）
             List<Category> topCategories = categoryRepository.findByParentIdIsNullOrderBySortOrder();
-            cacheService.set(CATEGORY_TREE_CACHE_KEY, topCategories, CACHE_TIMEOUT, CACHE_TIMEOUT_UNIT);
+            // 🎯 使用专门的方法缓存 Category 列表（自动转换为 DTO）
+            cacheService.setCategoryList(CATEGORY_TREE_CACHE_KEY, topCategories, CACHE_TIMEOUT, CACHE_TIMEOUT_UNIT);
 
             log.info("✅ 预热分类列表成功: 总计{}条，顶级{}条", allCategories.size(), topCategories.size());
         } catch (Exception e) {

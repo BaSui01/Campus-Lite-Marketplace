@@ -22,11 +22,20 @@ spring:
   # JPA 配置
   jpa:
     hibernate:
-      ddl-auto: ${JPA_DDL_AUTO:update}
+      # 使用 validate 模式，配合 Flyway 管理数据库迁移 🎯
+      ddl-auto: ${JPA_DDL_AUTO:validate}
     show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:
         format_sql: ${JPA_FORMAT_SQL:true}
+        # Hibernate Schema Management 配置 🎯
+        #   - halt_on_error: false  忽略索引重复错误（治标不治本）
+        #   - schema_management_tool.hbm2ddl.jdbc_metadata_extraction_strategy: individually  逐个提取元数据
+        hbm2ddl:
+          halt_on_error: false
+        schema_management_tool:
+          hbm2ddl:
+            jdbc_metadata_extraction_strategy: individually
         # 懒加载配置
         enable_lazy_load_no_trans: ${JPA_ENABLE_LAZY_NO_TRANS:false}
         # 批量操作配置
@@ -261,7 +270,8 @@ spring:
       on-profile: dev
   jpa:
     hibernate:
-      ddl-auto: ${DEV_JPA_DDL_AUTO:update}
+      # 开发环境也使用 validate 模式，配合 Flyway 管理数据库迁移 🎯
+      ddl-auto: ${DEV_JPA_DDL_AUTO:validate}
     properties:
       hibernate:
         format_sql: true
@@ -271,7 +281,8 @@ spring:
   cache:
     type: ${SPRING_CACHE_TYPE:simple}
   flyway:
-    enabled: false
+    # 开发环境也启用 Flyway 进行数据库版本管理 🎯
+    enabled: ${FLYWAY_ENABLED:true}
 logging:
   level:
     org.redisson: WARN

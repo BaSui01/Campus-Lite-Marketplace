@@ -19,6 +19,9 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.lifecycle.Startables;
+
+import java.util.stream.Stream;
 
 /**
  * 集成测试基类
@@ -41,10 +44,24 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Transactional
 @Import(TestCiOverrides.class)
 @EntityScan(basePackages = "com.campus.marketplace.common.entity")
+@org.junit.jupiter.api.TestInstance(org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS)
 public abstract class IntegrationTestBase {
 
     @Autowired
     protected MockMvc mockMvc;
+
+    @Autowired(required = false)
+    private org.flywaydb.core.Flyway flyway;
+
+    private static final java.util.concurrent.atomic.AtomicBoolean MIGRATED = new java.util.concurrent.atomic.AtomicBoolean(false);
+
+    @org.junit.jupiter.api.BeforeAll
+    void ensureSchema() {
+        if (flyway != null && MIGRATED.compareAndSet(false, true)) {
+            startInfraIfNecessary();
+            flyway.migrate();
+        }
+    }
 
     /**
      * PostgreSQL 容器（使用最新的 16 版本）
@@ -74,18 +91,23 @@ public abstract class IntegrationTestBase {
             .withExposedPorts(6379)
             ;
 
+static {
+    startInfraIfNecessary();
+}
+
     /**
      * 动态配置数据源和 Redis 连接
      * 
      * 从 Testcontainers 获取容器的动态端口和地址，
      * 覆盖 application-test.yml 中的配置
      */
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgresContainer::getUsername);
-        registry.add("spring.datasource.password", postgresContainer::getPassword);
-        registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+@DynamicPropertySource
+static void configureProperties(DynamicPropertyRegistry registry) {
+    startInfraIfNecessary();
+    registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+    registry.add("spring.datasource.username", postgresContainer::getUsername);
+    registry.add("spring.datasource.password", postgresContainer::getPassword);
+    registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "none");
         registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.PostgreSQLDialect");
         registry.add("spring.flyway.enabled", () -> "true");
@@ -102,6 +124,16 @@ public abstract class IntegrationTestBase {
     @BeforeEach
     protected void setUp() {
         // 子类可选择性覆盖
+    }
+
+    /**
+     * 确保底层容器已启动，避免属性绑定阶段访问端口映射时报错
+     */
+    private static void startInfraIfNecessary() {
+        Startables.deepStart(
+                Stream.of(postgresContainer, redisContainer)
+                        .filter(container -> !container.isRunning())
+        ).join();
     }
 }
 

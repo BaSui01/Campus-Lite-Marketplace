@@ -2,13 +2,18 @@ package com.campus.marketplace.integration;
 
 import com.campus.marketplace.common.dto.request.LoginRequest;
 import com.campus.marketplace.common.dto.request.RegisterRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisCallback;
+
+import com.campus.marketplace.common.component.RateLimitRuleManager;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,6 +38,30 @@ public class AuthIntegrationTest extends IntegrationTestBase {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private RateLimitRuleManager rateLimitRuleManager;
+
+    @Override
+    @BeforeEach
+    protected void setUp() {
+        super.setUp();
+        if (stringRedisTemplate != null) {
+            stringRedisTemplate.execute((RedisCallback<Void>) connection -> {
+                connection.serverCommands().flushDb();
+                return null;
+            });
+        }
+        rateLimitRuleManager.setEnabled(false);
+    }
+
+    @org.junit.jupiter.api.AfterEach
+    void tearDown() {
+        rateLimitRuleManager.setEnabled(true);
+    }
+
     @Test
     @DisplayName("完整注册登录流程测试")
     void testCompleteRegistrationAndLoginFlow() throws Exception {
@@ -45,11 +74,11 @@ public class AuthIntegrationTest extends IntegrationTestBase {
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(registerRequest)))
+                .content(objectMapper.writeValueAsString(registerRequest)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("操作成功"))
+                .andExpect(jsonPath("$.message").value("注册成功"))
                 .andExpect(jsonPath("$.data").isNumber());
 
         // ========== 2. 用户登录 ==========
@@ -62,8 +91,8 @@ public class AuthIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.token").isNotEmpty())
-                .andExpect(jsonPath("$.data.userId").isNumber())
-                .andExpect(jsonPath("$.data.username").value("testuser"))
+                .andExpect(jsonPath("$.data.userInfo.id").isNumber())
+                .andExpect(jsonPath("$.data.userInfo.username").value("testuser"))
                 .andReturn();
 
         // 提取并断言 Token（使用响应体，避免未使用变量告警）
@@ -145,7 +174,8 @@ public class AuthIntegrationTest extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(400)); // PARAM_ERROR
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("请求参数错误")); // PARAM_ERROR
     }
 }

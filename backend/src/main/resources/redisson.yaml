@@ -16,6 +16,3 @@ singleServerConfig:
 # 线程池配置
 threads: 16
 nettyThreads: 32
-
-# 编码方式
-codec: !<org.redisson.codec.JsonJacksonCodec> {}

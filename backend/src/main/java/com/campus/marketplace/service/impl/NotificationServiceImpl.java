@@ -20,6 +20,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -221,8 +224,17 @@ public class NotificationServiceImpl implements NotificationService {
                 pageable
         );
 
-        // 🎯 转换为DTO
-        return page.map(this::convertToResponse);
+        // 🎯 转换为DTO并按优先级排序（系统公告、封禁等高优通知优先展示，其次按时间倒序）
+        List<NotificationResponse> responses = new ArrayList<>(page.getNumberOfElements());
+        page.forEach(notification -> responses.add(convertToResponse(notification)));
+
+        responses.sort(
+                Comparator.comparingInt((NotificationResponse resp) -> resolvePriority(resp.getType()))
+                        .thenComparing(NotificationResponse::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(NotificationResponse::getId, Comparator.nullsLast(Comparator.reverseOrder()))
+        );
+
+        return new PageImpl<>(responses, pageable, page.getTotalElements());
     }
 
     @Override
@@ -333,5 +345,19 @@ public class NotificationServiceImpl implements NotificationService {
         var rendered = templateService.render(templateCode, locale, params == null ? Map.of() : params);
         // 站内 + 邮件 + WebPush 联动
         sendNotificationWithEmail(receiverId, type, rendered.title(), rendered.content(), relatedId, relatedType, link);
+    }
+
+    private int resolvePriority(NotificationType type) {
+        if (type == null) {
+            return 100;
+        }
+        return switch (type) {
+            case SYSTEM_ANNOUNCEMENT, USER_BANNED, USER_UNBANNED -> 0;
+            case ORDER_CANCELLED, ORDER_COMPLETED, ORDER_PAID -> 10;
+            case ORDER_CREATED, GOODS_SOLD -> 20;
+            case GOODS_APPROVED, GOODS_REJECTED -> 30;
+            case MESSAGE_RECEIVED, POST_MENTIONED, POST_REPLIED -> 40;
+            default -> 50;
+        };
     }
 }

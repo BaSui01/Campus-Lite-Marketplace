@@ -683,6 +683,17 @@
     </build>
 
     <profiles>
+        <!-- 🎯 BaSui Profile: 只运行集成测试（跳过单元测试） -->
+        <profile>
+            <id>integration-test-only</id>
+            <properties>
+                <!-- 跳过 Surefire 的单元测试 -->
+                <maven.test.skip>true</maven.test.skip>
+                <!-- 确保集成测试正常运行 -->
+                <skipITs>false</skipITs>
+            </properties>
+        </profile>
+
         <profile>
             <id>openapi</id>
             <build>

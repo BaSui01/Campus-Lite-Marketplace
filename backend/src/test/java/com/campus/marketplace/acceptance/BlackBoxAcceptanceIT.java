@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.context.transaction.TestTransaction;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -70,6 +71,9 @@ class BlackBoxAcceptanceIT extends IntegrationTestBase {
     private OrderRepository orderRepository;
 
     @Autowired
+    private com.campus.marketplace.repository.CampusRepository campusRepository;
+
+    @Autowired
     private RefundRequestRepository refundRepository;
 
     @Autowired
@@ -80,6 +84,12 @@ class BlackBoxAcceptanceIT extends IntegrationTestBase {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private com.campus.marketplace.repository.GoodsRepository goodsRepository;
+
+    @Autowired
+    private com.campus.marketplace.service.GoodsService goodsService;
 
     private Long defaultCategoryId;
 
@@ -113,6 +123,38 @@ class BlackBoxAcceptanceIT extends IntegrationTestBase {
     void shouldRejectCrossCampusAccessWithoutPermission() throws Exception {
         Long goodsId = publishGoodsAs("seller_north");
         approveGoodsAsAdmin(goodsId);
+
+        // 确保跨校权限校验生效：student1 所属校区设置为 default（与 north 不同）
+        var defaultCampus = campusRepository.findByCode("default")
+                .orElseThrow(() -> new IllegalStateException("预置校区 default 缺失"));
+        assertThat(campusRepository.findByCode("north")).as("预置校区 north").isPresent();
+        userRepository.findByUsername("student1").ifPresent(user -> {
+            user.setCampusId(defaultCampus.getId());
+            userRepository.save(user);
+            entityManager.flush();
+        });
+
+        boolean restartedTransaction = false;
+        if (TestTransaction.isActive()) {
+            TestTransaction.flagForCommit();
+            TestTransaction.end();
+            restartedTransaction = true;
+        }
+        entityManager.clear();
+
+        var student = userRepository.findByUsername("student1").orElseThrow();
+        var goods = goodsRepository.findById(goodsId).orElseThrow();
+        assertThat(student.getCampusId()).isNotNull();
+        assertThat(goods.getCampusId()).isNotNull();
+        assertThat(goods.getCampusId()).isNotEqualTo(student.getCampusId());
+        var goodsForCheck = goodsRepository.findByIdWithDetails(goodsId).orElseThrow();
+        assertThat(goodsForCheck.getCampusId()).isNotNull();
+        assertThat(goodsForCheck.getCampusId()).isEqualTo(goods.getCampusId());
+        assertThat(goodsForCheck.getCampusId()).isNotEqualTo(student.getCampusId());
+
+        if (restartedTransaction && !TestTransaction.isActive()) {
+            TestTransaction.start();
+        }
 
         mockMvc.perform(get("/api/goods/{id}", goodsId)
                         .with(user("student1").roles("STUDENT")))
@@ -286,6 +328,19 @@ class BlackBoxAcceptanceIT extends IntegrationTestBase {
                 List.of(SAMPLE_IMAGE),
                 List.of()
         );
+
+        userRepository.findByUsername(username).ifPresent(user -> {
+            if (user.getCampusId() == null) {
+                String campusCode = username.contains("north") ? "north" : "default";
+                campusRepository.findByCode(campusCode)
+                        .or(() -> campusRepository.findAll().stream().findFirst())
+                        .ifPresent(campus -> {
+                            user.setCampusId(campus.getId());
+                            userRepository.save(user);
+                            entityManager.flush();
+                        });
+            }
+        });
 
         MvcResult result = mockMvc.perform(post("/api/goods")
                         .with(user(username).roles("STUDENT"))
