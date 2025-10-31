@@ -1,0 +1,157 @@
+/**
+ * Loading 组件样式
+ * @author BaSui 😎
+ * @description 加载动画样式，支持 Spinner 和 Skeleton 两种模式
+ */
+
+/* ==================== 基础容器 ==================== */
+.campus-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100px;
+}
+
+/* 全屏加载 */
+.campus-loading--fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 9999;
+}
+
+/* 加载内容容器 */
+.campus-loading__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 加载提示文字 */
+.campus-loading__tip {
+  font-size: 14px;
+  color: #00000073;
+  line-height: 1.5;
+}
+
+/* ==================== Spinner 加载动画 ==================== */
+.campus-loading-spinner {
+  display: inline-block;
+  position: relative;
+}
+
+/* Spinner 圆圈 */
+.campus-loading-spinner__circle {
+  width: 100%;
+  height: 100%;
+  border: 3px solid #f0f0f0;
+  border-top-color: #1890ff;
+  border-radius: 50%;
+  animation: campus-loading-spin 0.8s linear infinite;
+}
+
+/* Spinner 尺寸 */
+.campus-loading-spinner--large {
+  width: 48px;
+  height: 48px;
+}
+
+.campus-loading-spinner--medium {
+  width: 32px;
+  height: 32px;
+}
+
+.campus-loading-spinner--small {
+  width: 20px;
+  height: 20px;
+}
+
+.campus-loading-spinner--small .campus-loading-spinner__circle {
+  border-width: 2px;
+}
+
+/* Spinner 旋转动画 */
+@keyframes campus-loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== Skeleton 骨架屏 ==================== */
+.campus-loading-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Skeleton 线条 */
+.campus-loading-skeleton__line {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e6e6e6 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: campus-loading-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* 短线条 */
+.campus-loading-skeleton__line--short {
+  width: 60%;
+}
+
+/* Skeleton 尺寸 */
+.campus-loading-skeleton--large .campus-loading-skeleton__line {
+  height: 24px;
+}
+
+.campus-loading-skeleton--medium .campus-loading-skeleton__line {
+  height: 16px;
+}
+
+.campus-loading-skeleton--small .campus-loading-skeleton__line {
+  height: 12px;
+}
+
+/* Skeleton 闪烁动画 */
+@keyframes campus-loading-skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-loading {
+    min-height: 80px;
+  }
+
+  .campus-loading__tip {
+    font-size: 13px;
+  }
+
+  .campus-loading-skeleton {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+}

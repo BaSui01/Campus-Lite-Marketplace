@@ -1,0 +1,155 @@
+/**
+ * Form 组件样式
+ * @author BaSui 😎
+ * @description 表单样式，支持多种布局模式
+ */
+
+/* ==================== Form 容器 ==================== */
+.campus-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+/* ==================== Form 布局模式 ==================== */
+
+/* 垂直布局（默认） */
+.campus-form--vertical .campus-form-item {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.campus-form--vertical .campus-form-item__label {
+  margin-bottom: 8px;
+}
+
+/* 水平布局 */
+.campus-form--horizontal .campus-form-item {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.campus-form--horizontal .campus-form-item__label {
+  width: 120px;
+  flex-shrink: 0;
+  padding-top: 8px;
+  text-align: right;
+  margin-right: 16px;
+}
+
+.campus-form--horizontal .campus-form-item__control {
+  flex: 1;
+}
+
+/* 行内布局 */
+.campus-form--inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.campus-form--inline .campus-form-item {
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+}
+
+.campus-form--inline .campus-form-item__label {
+  margin-right: 8px;
+}
+
+.campus-form--inline .campus-form-item__control {
+  width: auto;
+}
+
+/* ==================== FormItem 容器 ==================== */
+.campus-form-item {
+  display: flex;
+  width: 100%;
+}
+
+/* 错误状态 */
+.campus-form-item--error .campus-form-item__label {
+  color: #ff4d4f;
+}
+
+/* ==================== FormItem 标签 ==================== */
+.campus-form-item__label {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000d9;
+  line-height: 1.5;
+}
+
+/* 必填标记 */
+.campus-form-item__required {
+  color: #ff4d4f;
+  margin-right: 4px;
+  font-weight: bold;
+}
+
+/* ==================== FormItem 控件 ==================== */
+.campus-form-item__control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+/* ==================== FormItem 错误提示 ==================== */
+.campus-form-item__error {
+  font-size: 12px;
+  color: #ff4d4f;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* ==================== FormItem 帮助提示 ==================== */
+.campus-form-item__help {
+  font-size: 12px;
+  color: #00000073;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  /* 水平布局在移动端变为垂直布局 */
+  .campus-form--horizontal .campus-form-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .campus-form--horizontal .campus-form-item__label {
+    width: 100%;
+    text-align: left;
+    margin-right: 0;
+    margin-bottom: 8px;
+    padding-top: 0;
+  }
+
+  /* 行内布局在移动端变为垂直布局 */
+  .campus-form--inline {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .campus-form--inline .campus-form-item {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .campus-form--inline .campus-form-item__label {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+
+  .campus-form--inline .campus-form-item__control {
+    width: 100%;
+  }
+}

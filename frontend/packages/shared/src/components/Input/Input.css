@@ -1,0 +1,179 @@
+/**
+ * Input 组件样式
+ * @author BaSui 😎
+ * @description 输入框样式，支持多种类型和尺寸
+ */
+
+/* ==================== 容器样式 ==================== */
+.campus-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+/* ==================== 输入框包装器 ==================== */
+.campus-input-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+/* 获得焦点状态 */
+.campus-input-wrapper--focused {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 错误状态 */
+.campus-input-wrapper--error {
+  border-color: #ff4d4f;
+}
+
+.campus-input-wrapper--error.campus-input-wrapper--focused {
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+/* 禁用状态 */
+.campus-input-wrapper--disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* ==================== 输入框尺寸 ==================== */
+
+/* 大号输入框 */
+.campus-input-wrapper--large {
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+.campus-input-wrapper--large .campus-input {
+  font-size: 16px;
+}
+
+/* 中号输入框（默认） */
+.campus-input-wrapper--medium {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.campus-input-wrapper--medium .campus-input {
+  font-size: 14px;
+}
+
+/* 小号输入框 */
+.campus-input-wrapper--small {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.campus-input-wrapper--small .campus-input {
+  font-size: 12px;
+}
+
+/* ==================== 输入框本体 ==================== */
+.campus-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: #000000d9;
+  line-height: 1.5;
+  padding: 0;
+  width: 100%;
+}
+
+.campus-input::placeholder {
+  color: #bfbfbf;
+}
+
+.campus-input:disabled {
+  cursor: not-allowed;
+  color: #00000040;
+}
+
+/* ==================== 前缀/后缀图标 ==================== */
+.campus-input__prefix,
+.campus-input__suffix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #00000073;
+  flex-shrink: 0;
+}
+
+/* ==================== 清除按钮 ==================== */
+.campus-input__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  color: #00000073;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.campus-input__clear:hover {
+  background-color: #f5f5f5;
+  color: #000000d9;
+}
+
+/* ==================== 密码显示/隐藏按钮 ==================== */
+.campus-input__password-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.campus-input__password-toggle:hover {
+  opacity: 0.8;
+}
+
+/* ==================== 错误提示信息 ==================== */
+.campus-input__error-message {
+  font-size: 12px;
+  color: #ff4d4f;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-input-wrapper {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .campus-input-wrapper--large {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  .campus-input-wrapper--small {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}

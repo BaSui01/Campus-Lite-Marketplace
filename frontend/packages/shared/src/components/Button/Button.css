@@ -1,0 +1,185 @@
+/**
+ * Button 组件样式
+ * @author BaSui 😎
+ * @description 按钮样式，支持多种类型和尺寸
+ */
+
+/* ==================== 基础样式 ==================== */
+.campus-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* ==================== 按钮类型 ==================== */
+
+/* 主要按钮（蓝色） */
+.campus-button--primary {
+  background-color: #1890ff;
+  color: #ffffff;
+  border-color: #1890ff;
+}
+
+.campus-button--primary:hover:not(:disabled) {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.campus-button--primary:active:not(:disabled) {
+  background-color: #096dd9;
+  border-color: #096dd9;
+}
+
+/* 默认按钮（灰色） */
+.campus-button--default {
+  background-color: #ffffff;
+  color: #000000d9;
+  border-color: #d9d9d9;
+}
+
+.campus-button--default:hover:not(:disabled) {
+  color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.campus-button--default:active:not(:disabled) {
+  color: #096dd9;
+  border-color: #096dd9;
+}
+
+/* 危险按钮（红色） */
+.campus-button--danger {
+  background-color: #ff4d4f;
+  color: #ffffff;
+  border-color: #ff4d4f;
+}
+
+.campus-button--danger:hover:not(:disabled) {
+  background-color: #ff7875;
+  border-color: #ff7875;
+}
+
+.campus-button--danger:active:not(:disabled) {
+  background-color: #d9363e;
+  border-color: #d9363e;
+}
+
+/* 链接按钮 */
+.campus-button--link {
+  background-color: transparent;
+  color: #1890ff;
+  border-color: transparent;
+  padding: 4px 8px;
+}
+
+.campus-button--link:hover:not(:disabled) {
+  color: #40a9ff;
+}
+
+.campus-button--link:active:not(:disabled) {
+  color: #096dd9;
+}
+
+/* ==================== 按钮尺寸 ==================== */
+
+/* 大号按钮 */
+.campus-button--large {
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+/* 中号按钮（默认） */
+.campus-button--medium {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* 小号按钮 */
+.campus-button--small {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+/* ==================== 按钮状态 ==================== */
+
+/* 禁用状态 */
+.campus-button--disabled,
+.campus-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 加载状态 */
+.campus-button--loading {
+  cursor: wait;
+}
+
+/* 块级按钮（占满宽度） */
+.campus-button--block {
+  display: flex;
+  width: 100%;
+}
+
+/* ==================== 按钮内部元素 ==================== */
+
+/* 加载动画 */
+.campus-button__spinner {
+  display: inline-block;
+  animation: campus-button-spin 1s linear infinite;
+}
+
+@keyframes campus-button-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 图标 */
+.campus-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 按钮文字 */
+.campus-button__text {
+  display: inline-block;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-button {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .campus-button--large {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+
+  .campus-button--small {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

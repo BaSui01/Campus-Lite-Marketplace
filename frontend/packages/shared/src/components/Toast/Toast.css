@@ -1,0 +1,179 @@
+/**
+ * Toast 组件样式
+ * @author BaSui 😎
+ * @description 消息提示样式，支持多种类型和位置
+ */
+
+/* ==================== Toast 容器 ==================== */
+.campus-toast-container {
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+  max-width: 400px;
+}
+
+/* 顶部居中 */
+.campus-toast-container--top {
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* 顶部左侧 */
+.campus-toast-container--top-left {
+  top: 24px;
+  left: 24px;
+}
+
+/* 顶部右侧 */
+.campus-toast-container--top-right {
+  top: 24px;
+  right: 24px;
+}
+
+/* 底部居中 */
+.campus-toast-container--bottom {
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* 底部左侧 */
+.campus-toast-container--bottom-left {
+  bottom: 24px;
+  left: 24px;
+}
+
+/* 底部右侧 */
+.campus-toast-container--bottom-right {
+  bottom: 24px;
+  right: 24px;
+}
+
+/* ==================== Toast 本体 ==================== */
+.campus-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  min-width: 280px;
+  max-width: 400px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Toast 可见状态 */
+.campus-toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Toast 隐藏状态 */
+.campus-toast--hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* ==================== Toast 类型 ==================== */
+
+/* 成功提示（绿色） */
+.campus-toast--success {
+  border-left: 4px solid #52c41a;
+}
+
+/* 错误提示（红色） */
+.campus-toast--error {
+  border-left: 4px solid #ff4d4f;
+}
+
+/* 警告提示（橙色） */
+.campus-toast--warning {
+  border-left: 4px solid #faad14;
+}
+
+/* 信息提示（蓝色） */
+.campus-toast--info {
+  border-left: 4px solid #1890ff;
+}
+
+/* ==================== Toast 内部元素 ==================== */
+
+/* Toast 图标 */
+.campus-toast__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Toast 消息 */
+.campus-toast__message {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #000000d9;
+  word-break: break-word;
+}
+
+/* Toast 关闭按钮 */
+.campus-toast__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  color: #00000073;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.campus-toast__close:hover {
+  background-color: #f5f5f5;
+  color: #000000d9;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-toast-container {
+    max-width: calc(100vw - 32px);
+    left: 16px !important;
+    right: 16px !important;
+    transform: none !important;
+  }
+
+  .campus-toast-container--top,
+  .campus-toast-container--top-left,
+  .campus-toast-container--top-right {
+    top: 16px;
+  }
+
+  .campus-toast-container--bottom,
+  .campus-toast-container--bottom-left,
+  .campus-toast-container--bottom-right {
+    bottom: 16px;
+  }
+
+  .campus-toast {
+    min-width: auto;
+    width: 100%;
+    padding: 10px 14px;
+  }
+
+  .campus-toast__message {
+    font-size: 13px;
+  }
+}
