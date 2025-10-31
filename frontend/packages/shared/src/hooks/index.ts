@@ -86,3 +86,46 @@ export { useWebSocket, WebSocketReadyState, type UseWebSocketOptions, type UseWe
  * @description 封装文件上传，支持进度跟踪、多文件上传、错误处理
  */
 export { useUpload, type UseUploadOptions, type UseUploadResult, type UploadFile } from './useUpload';
+
+// ==================== P2 业务 Hooks（新增）====================
+
+/**
+ * useWebSocketService - WebSocket 服务管理 Hook
+ * @description 封装 websocketService，管理 WebSocket 连接生命周期
+ */
+export {
+  useWebSocketService,
+  type UseWebSocketServiceOptions,
+  type UseWebSocketServiceResult,
+} from './useWebSocketService';
+
+/**
+ * useChatMessage - 聊天消息订阅 Hook
+ * @description 订阅 WebSocket 聊天消息，提供消息列表和发送功能
+ */
+export {
+  useChatMessage,
+  type UseChatMessageOptions,
+  type UseChatMessageResult,
+} from './useChatMessage';
+
+/**
+ * useNotification - 系统通知订阅 Hook
+ * @description 订阅 WebSocket 系统通知，提供通知列表和管理功能
+ */
+export {
+  useNotification,
+  type UseNotificationOptions,
+  type UseNotificationResult,
+} from './useNotification';
+
+/**
+ * useOrderUpdate - 订单状态更新订阅 Hook
+ * @description 订阅 WebSocket 订单状态更新，实时跟踪订单变化
+ */
+export {
+  useOrderUpdate,
+  type UseOrderUpdateOptions,
+  type UseOrderUpdateResult,
+  type OrderUpdateRecord,
+} from './useOrderUpdate';

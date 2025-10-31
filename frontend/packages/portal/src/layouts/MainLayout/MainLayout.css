@@ -1,0 +1,265 @@
+/**
+ * 主布局样式
+ * @author BaSui 😎
+ */
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* ==================== 顶部导航栏 ==================== */
+
+.main-layout__header {
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.main-layout__header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+
+.main-layout__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  font-size: 20px;
+  transition: opacity 0.2s;
+}
+
+.main-layout__logo:hover {
+  opacity: 0.8;
+}
+
+.main-layout__logo-icon {
+  font-size: 32px;
+}
+
+.main-layout__logo-text {
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 导航菜单 */
+
+.main-layout__nav {
+  display: flex;
+  gap: 32px;
+  margin-left: 64px;
+}
+
+.main-layout__nav-item {
+  color: #666;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.2s;
+  position: relative;
+  padding: 4px 0;
+}
+
+.main-layout__nav-item:hover {
+  color: #667eea;
+}
+
+.main-layout__nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #667eea;
+  transition: width 0.3s;
+}
+
+.main-layout__nav-item:hover::after {
+  width: 100%;
+}
+
+/* 右侧操作区 */
+
+.main-layout__actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.main-layout__action-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.main-layout__action-btn:hover {
+  background-color: #f5f5f5;
+}
+
+/* 用户菜单 */
+
+.main-layout__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.main-layout__user:hover {
+  background-color: #f5f5f5;
+}
+
+.main-layout__username {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 认证按钮 */
+
+.main-layout__auth-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.main-layout__btn {
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.main-layout__btn--outline {
+  background-color: transparent;
+  color: #667eea;
+  border: 1px solid #667eea;
+}
+
+.main-layout__btn--outline:hover {
+  background-color: #667eea;
+  color: #ffffff;
+}
+
+.main-layout__btn--primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+}
+
+.main-layout__btn--primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* ==================== 主内容区 ==================== */
+
+.main-layout__main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+
+/* ==================== 底部栏 ==================== */
+
+.main-layout__footer {
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  padding: 32px 24px;
+  margin-top: auto;
+}
+
+.main-layout__footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.main-layout__footer-text {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.main-layout__footer-links {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.main-layout__footer-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.main-layout__footer-link:hover {
+  color: #667eea;
+}
+
+.main-layout__footer-divider {
+  color: #ccc;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+@media (max-width: 768px) {
+  .main-layout__header-content {
+    padding: 0 16px;
+  }
+
+  .main-layout__nav {
+    display: none;
+  }
+
+  .main-layout__logo-text {
+    display: none;
+  }
+
+  .main-layout__username {
+    display: none;
+  }
+
+  .main-layout__main {
+    padding: 0 16px;
+  }
+
+  .main-layout__footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}

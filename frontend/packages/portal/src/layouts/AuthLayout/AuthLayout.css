@@ -1,0 +1,175 @@
+/**
+ * 认证布局样式
+ * @author BaSui 😎
+ */
+
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+}
+
+/* ==================== 背景装饰 ==================== */
+
+.auth-layout__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.auth-layout__bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  animation: float 20s infinite ease-in-out;
+}
+
+.auth-layout__bg-circle--1 {
+  width: 400px;
+  height: 400px;
+  top: -200px;
+  left: -200px;
+  animation-delay: 0s;
+}
+
+.auth-layout__bg-circle--2 {
+  width: 300px;
+  height: 300px;
+  bottom: -150px;
+  right: -150px;
+  animation-delay: 5s;
+}
+
+.auth-layout__bg-circle--3 {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  right: 10%;
+  animation-delay: 10s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -20px) scale(1.05);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  75% {
+    transform: translate(20px, 20px) scale(1.02);
+  }
+}
+
+/* ==================== 内容区 ==================== */
+
+.auth-layout__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Logo */
+
+.auth-layout__logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.auth-layout__logo-icon {
+  font-size: 48px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.auth-layout__logo-text {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 表单区域 */
+
+.auth-layout__form-wrapper {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  padding: 48px;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 底部信息 */
+
+.auth-layout__footer {
+  margin-top: 24px;
+}
+
+.auth-layout__footer-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin: 0;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+@media (max-width: 640px) {
+  .auth-layout {
+    padding: 16px;
+  }
+
+  .auth-layout__logo-icon {
+    font-size: 36px;
+  }
+
+  .auth-layout__logo-text {
+    font-size: 22px;
+  }
+
+  .auth-layout__form-wrapper {
+    padding: 32px 24px;
+  }
+
+  .auth-layout__bg-circle--1 {
+    width: 300px;
+    height: 300px;
+  }
+
+  .auth-layout__bg-circle--2 {
+    width: 200px;
+    height: 200px;
+  }
+
+  .auth-layout__bg-circle--3 {
+    display: none;
+  }
+}

@@ -1,30 +1,71 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+/**
+ * 应用根组件
+ * @author BaSui 😎
+ * @description Portal 应用入口组件
+ */
+
+import { useEffect } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toast, useWebSocketService } from '@campus/shared';
+import { useAuthStore, useNotificationStore } from './store';
+import { router } from './router';
 import './App.css';
 
+// 创建 React Query 客户端
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 分钟
+    },
+  },
+});
+
+/**
+ * 应用根组件
+ */
 function App() {
-  const [count, setCount] = useState(0);
+  const { init: initAuth } = useAuthStore();
+  const { notifications, remove } = useNotificationStore();
+
+  // 初始化 WebSocket 服务
+  useWebSocketService({
+    autoConnect: true,
+    onOpen: () => {
+      console.log('✅ WebSocket 已连接');
+    },
+    onClose: () => {
+      console.warn('⚠️ WebSocket 已断开');
+    },
+    onError: (error) => {
+      console.error('❌ WebSocket 错误:', error);
+    },
+  });
+
+  // 初始化认证状态
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+
+      {/* 全局通知组件 */}
+      <div className="toast-container">
+        {notifications.map((notification) => (
+          <Toast
+            key={notification.id}
+            type={notification.type}
+            message={notification.message}
+            duration={notification.duration}
+            onClose={() => remove(notification.id)}
+          />
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount(count => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-    </>
+    </QueryClientProvider>
   );
 }
 

@@ -36,6 +36,28 @@ export type { default as PostService } from './post';
 export { uploadService } from './upload';
 export type { default as UploadService } from './upload';
 
+// ==================== WebSocket 服务 ====================
+export { websocketService } from './websocket';
+export type { default as WebSocketService } from './websocket';
+
+// ==================== WebSocket 客户端 ====================
+export {
+  WebSocketClient,
+  WebSocketReadyState,
+  WebSocketMessageType,
+} from './WebSocketClient';
+export type {
+  WebSocketMessage,
+  WebSocketClientOptions,
+} from './WebSocketClient';
+
+// ==================== WebSocket 服务类型 ====================
+export type {
+  ChatMessageData,
+  OrderUpdateData,
+  UserOnlineStatusData,
+} from './websocket';
+
 // ==================== 便捷导出（默认导出对象）====================
 
 /**
@@ -50,6 +72,7 @@ export const services = {
   notification: notificationService,
   post: postService,
   upload: uploadService,
+  websocket: websocketService,
 } as const;
 
 /**
