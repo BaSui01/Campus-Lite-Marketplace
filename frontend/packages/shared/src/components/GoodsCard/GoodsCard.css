@@ -1,0 +1,245 @@
+/**
+ * GoodsCard 组件样式
+ * @author BaSui 😎
+ * @description 商品卡片组件样式
+ */
+
+/* ==================== GoodsCard 容器 ==================== */
+.campus-goods-card {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* ==================== 图片区域 ==================== */
+.campus-goods-card__image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background-color: #f5f5f5;
+}
+
+.campus-goods-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 状态标签 */
+.campus-goods-card__status {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+}
+
+/* 折扣标签 */
+.campus-goods-card__discount {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+}
+
+/* ==================== 内容区域 ==================== */
+.campus-goods-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 商品名称 */
+.campus-goods-card__name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #000000d9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 商品描述 */
+.campus-goods-card__description {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #00000073;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ==================== 价格区域 ==================== */
+.campus-goods-card__price-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.campus-goods-card__price {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ff4d4f;
+  line-height: 1;
+}
+
+.campus-goods-card__original-price {
+  font-size: 14px;
+  color: #00000073;
+  text-decoration: line-through;
+  line-height: 1;
+}
+
+/* ==================== 标签区域 ==================== */
+.campus-goods-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ==================== 底部信息 ==================== */
+.campus-goods-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 卖家信息 */
+.campus-goods-card__seller {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.campus-goods-card__seller:hover {
+  opacity: 0.8;
+}
+
+.campus-goods-card__seller-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.campus-goods-card__seller-name {
+  font-size: 12px;
+  color: #00000073;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 已售数量 */
+.campus-goods-card__sold-count {
+  font-size: 12px;
+  color: #00000073;
+}
+
+/* ==================== 操作按钮 ==================== */
+.campus-goods-card__action-btn {
+  flex: 1;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.campus-goods-card__action-btn--primary {
+  background-color: #1890ff;
+  color: #ffffff;
+}
+
+.campus-goods-card__action-btn--primary:hover {
+  background-color: #40a9ff;
+}
+
+.campus-goods-card__action-btn--primary:active {
+  background-color: #096dd9;
+}
+
+.campus-goods-card__action-btn--secondary {
+  background-color: #ffffff;
+  color: #1890ff;
+  border: 1px solid #1890ff;
+}
+
+.campus-goods-card__action-btn--secondary:hover {
+  background-color: #f0f7ff;
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.campus-goods-card__action-btn--secondary:active {
+  background-color: #e6f4ff;
+  border-color: #096dd9;
+  color: #096dd9;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 平板适配 */
+@media (max-width: 1024px) {
+  .campus-goods-card {
+    max-width: 280px;
+  }
+
+  .campus-goods-card__image-wrapper {
+    height: 180px;
+  }
+
+  .campus-goods-card__name {
+    font-size: 15px;
+  }
+
+  .campus-goods-card__price {
+    font-size: 18px;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-goods-card {
+    max-width: 100%;
+  }
+
+  .campus-goods-card__image-wrapper {
+    height: 160px;
+  }
+
+  .campus-goods-card__name {
+    font-size: 14px;
+  }
+
+  .campus-goods-card__description {
+    font-size: 12px;
+    -webkit-line-clamp: 1;
+  }
+
+  .campus-goods-card__price {
+    font-size: 16px;
+  }
+
+  .campus-goods-card__original-price {
+    font-size: 12px;
+  }
+
+  .campus-goods-card__action-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}

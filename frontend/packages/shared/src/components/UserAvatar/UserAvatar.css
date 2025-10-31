@@ -1,0 +1,103 @@
+/**
+ * UserAvatar 组件样式
+ * @author BaSui 😎
+ * @description 用户头像组件样式
+ */
+
+/* ==================== UserAvatar 容器 ==================== */
+.campus-user-avatar {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 用户名在上方 */
+.campus-user-avatar--username-top {
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 用户名在右侧 */
+.campus-user-avatar--username-right {
+  flex-direction: row;
+  gap: 8px;
+}
+
+/* 用户名在下方 */
+.campus-user-avatar--username-bottom {
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 用户名在左侧 */
+.campus-user-avatar--username-left {
+  flex-direction: row-reverse;
+  gap: 8px;
+}
+
+/* ==================== 头像容器 ==================== */
+.campus-user-avatar__avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+/* ==================== 认证标识 ==================== */
+.campus-user-avatar__verified {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1890ff;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.campus-user-avatar__verified-icon {
+  width: 10px;
+  height: 10px;
+}
+
+/* ==================== 用户名 ==================== */
+.campus-user-avatar__username {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #000000d9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.campus-user-avatar__username--clickable {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.campus-user-avatar__username--clickable:hover {
+  color: #1890ff;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-user-avatar__username {
+    font-size: 13px;
+    max-width: 100px;
+  }
+
+  .campus-user-avatar__verified {
+    width: 14px;
+    height: 14px;
+  }
+
+  .campus-user-avatar__verified-icon {
+    width: 9px;
+    height: 9px;
+  }
+}

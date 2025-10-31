@@ -96,9 +96,34 @@ export { Avatar, type AvatarProps, type AvatarSize, type AvatarShape } from './A
  */
 export { Tag, type TagProps, type TagColor, type TagSize } from './Tag';
 
-// ==================== P2 业务组件（待开发）====================
-// export { GoodsCard } from './GoodsCard';
-// export { OrderCard } from './OrderCard';
-// export { UserAvatar } from './UserAvatar';
-// export { ImageUpload } from './ImageUpload';
-// export { RichTextEditor } from './RichTextEditor';
+// ==================== P2 业务组件（已完成）====================
+
+/**
+ * GoodsCard - 商品卡片组件
+ * @description 用于展示商品信息，支持价格、标签、卖家信息、状态徽标
+ */
+export { GoodsCard, type GoodsCardProps, type GoodsData, type GoodsStatus } from './GoodsCard';
+
+/**
+ * OrderCard - 订单卡片组件
+ * @description 用于展示订单信息，支持订单状态、商品列表、买卖家信息、操作按钮
+ */
+export { OrderCard, type OrderCardProps, type OrderData, type OrderItem, type OrderStatus } from './OrderCard';
+
+/**
+ * UserAvatar - 用户头像组件
+ * @description 增强版头像组件，支持在线状态、认证徽标、用户名显示
+ */
+export { UserAvatar, type UserAvatarProps, type UserOnlineStatus } from './UserAvatar';
+
+/**
+ * ImageUpload - 图片上传组件
+ * @description 支持单图/多图上传、拖拽上传、预览、删除、进度显示
+ */
+export { ImageUpload, type ImageUploadProps } from './ImageUpload';
+
+/**
+ * RichTextEditor - 富文本编辑器组件
+ * @description 基于 contentEditable 实现，支持基础格式化功能（粗体、斜体、对齐、列表等）
+ */
+export { RichTextEditor, type RichTextEditorProps } from './RichTextEditor';

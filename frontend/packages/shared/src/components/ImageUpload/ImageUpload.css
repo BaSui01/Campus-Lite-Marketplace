@@ -1,0 +1,222 @@
+/**
+ * ImageUpload 组件样式
+ * @author BaSui 😎
+ * @description 图片上传组件样式
+ */
+
+/* ==================== ImageUpload 容器 ==================== */
+.campus-image-upload {
+  width: 100%;
+}
+
+/* 禁用状态 */
+.campus-image-upload--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==================== 图片列表 ==================== */
+.campus-image-upload__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ==================== 图片项 ==================== */
+.campus-image-upload__item {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #fafafa;
+}
+
+.campus-image-upload__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ==================== 遮罩层 ==================== */
+.campus-image-upload__mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.2s ease;
+  opacity: 0;
+}
+
+.campus-image-upload__item:hover .campus-image-upload__mask {
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 1;
+}
+
+/* 删除按钮 */
+.campus-image-upload__remove-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 300;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.campus-image-upload__remove-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* ==================== 上传进度 ==================== */
+.campus-image-upload__progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+}
+
+.campus-image-upload__progress-text {
+  font-size: 12px;
+}
+
+/* ==================== 上传错误 ==================== */
+.campus-image-upload__error {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #ffffff;
+  background-color: rgba(255, 77, 79, 0.8);
+  border-radius: 4px;
+}
+
+/* ==================== 上传按钮 ==================== */
+.campus-image-upload__upload-btn {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 4px;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #00000073;
+}
+
+.campus-image-upload__upload-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+  background-color: #f0f7ff;
+}
+
+.campus-image-upload--disabled .campus-image-upload__upload-btn {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.campus-image-upload--disabled .campus-image-upload__upload-btn:hover {
+  border-color: #d9d9d9;
+  color: #00000073;
+  background-color: #fafafa;
+}
+
+/* 隐藏的文件输入框 */
+.campus-image-upload__input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 上传图标 */
+.campus-image-upload__icon {
+  width: 32px;
+  height: 32px;
+}
+
+/* 上传文本 */
+.campus-image-upload__text {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ==================== 提示文本 ==================== */
+.campus-image-upload__tip {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #00000073;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 平板适配 */
+@media (max-width: 1024px) {
+  .campus-image-upload__item,
+  .campus-image-upload__upload-btn {
+    width: 100px;
+    height: 100px;
+  }
+
+  .campus-image-upload__icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .campus-image-upload__text {
+    font-size: 13px;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-image-upload__list {
+    gap: 8px;
+  }
+
+  .campus-image-upload__item,
+  .campus-image-upload__upload-btn {
+    width: 80px;
+    height: 80px;
+  }
+
+  .campus-image-upload__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .campus-image-upload__text {
+    font-size: 12px;
+  }
+
+  .campus-image-upload__remove-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+  }
+
+  .campus-image-upload__tip {
+    font-size: 11px;
+  }
+}
