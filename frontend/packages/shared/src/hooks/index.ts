@@ -55,9 +55,34 @@ export {
   type UseFormResult,
 } from './useForm';
 
-// ==================== P1 高级 Hooks（待开发）====================
-// export { useDebounce } from './useDebounce';
-// export { useThrottle } from './useThrottle';
-// export { useLocalStorage } from './useLocalStorage';
-// export { useWebSocket } from './useWebSocket';
-// export { useUpload } from './useUpload';
+// ==================== P1 高级 Hooks（已完成）====================
+
+/**
+ * useDebounce - 防抖 Hook
+ * @description 延迟更新值直到停止变化一段时间，常用于搜索输入框
+ */
+export { useDebounce } from './useDebounce';
+
+/**
+ * useThrottle - 节流 Hook
+ * @description 限制值更新的频率，常用于滚动事件、鼠标移动等高频场景
+ */
+export { useThrottle } from './useThrottle';
+
+/**
+ * useLocalStorage - 本地存储 Hook
+ * @description 封装 LocalStorage，支持自动序列化、跨标签页同步
+ */
+export { useLocalStorage } from './useLocalStorage';
+
+/**
+ * useWebSocket - WebSocket 连接 Hook
+ * @description 封装 WebSocket，支持自动重连、心跳检测
+ */
+export { useWebSocket, WebSocketReadyState, type UseWebSocketOptions, type UseWebSocketResult } from './useWebSocket';
+
+/**
+ * useUpload - 文件上传 Hook
+ * @description 封装文件上传，支持进度跟踪、多文件上传、错误处理
+ */
+export { useUpload, type UseUploadOptions, type UseUploadResult, type UploadFile } from './useUpload';

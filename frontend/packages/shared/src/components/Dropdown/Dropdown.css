@@ -1,0 +1,242 @@
+/**
+ * Dropdown 组件样式
+ * @author BaSui 😎
+ * @description 下拉菜单组件样式，支持多级菜单、多种位置
+ */
+
+/* ==================== Dropdown 容器 ==================== */
+.campus-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* 禁用状态 */
+.campus-dropdown--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.campus-dropdown--disabled .campus-dropdown__trigger {
+  pointer-events: none;
+}
+
+/* ==================== 触发器 ==================== */
+.campus-dropdown__trigger {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ==================== 下拉菜单 ==================== */
+.campus-dropdown__menu {
+  position: absolute;
+  z-index: 1000;
+  min-width: 160px;
+  max-width: 300px;
+  margin-top: 4px;
+  padding: 4px 0;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  animation: campus-dropdown-slide-in 0.2s ease-out;
+}
+
+/* 菜单位置变体 */
+.campus-dropdown--bottom-left .campus-dropdown__menu {
+  top: 100%;
+  left: 0;
+}
+
+.campus-dropdown--bottom-right .campus-dropdown__menu {
+  top: 100%;
+  right: 0;
+}
+
+.campus-dropdown--top-left .campus-dropdown__menu {
+  bottom: 100%;
+  left: 0;
+  margin-top: 0;
+  margin-bottom: 4px;
+}
+
+.campus-dropdown--top-right .campus-dropdown__menu {
+  bottom: 100%;
+  right: 0;
+  margin-top: 0;
+  margin-bottom: 4px;
+}
+
+/* ==================== 菜单项容器 ==================== */
+.campus-dropdown__item-wrapper {
+  position: relative;
+}
+
+/* ==================== 菜单项 ==================== */
+.campus-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #000000d9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.campus-dropdown__item:hover:not(.campus-dropdown__item--disabled) {
+  background-color: #f5f5f5;
+}
+
+.campus-dropdown__item:active:not(.campus-dropdown__item--disabled) {
+  background-color: #e8e8e8;
+}
+
+/* 禁用状态 */
+.campus-dropdown__item--disabled {
+  color: #00000040;
+  cursor: not-allowed;
+  background-color: transparent !important;
+}
+
+/* 有子菜单的菜单项 */
+.campus-dropdown__item--has-children {
+  position: relative;
+}
+
+/* ==================== 菜单项元素 ==================== */
+
+/* 图标 */
+.campus-dropdown__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* 标签 */
+.campus-dropdown__item-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 箭头 */
+.campus-dropdown__item-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #00000073;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ==================== 分割线 ==================== */
+.campus-dropdown__divider {
+  height: 1px;
+  margin: 4px 0;
+  background-color: #f0f0f0;
+}
+
+/* ==================== 子菜单 ==================== */
+.campus-dropdown__submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 160px;
+  max-width: 300px;
+  margin-left: 4px;
+  padding: 4px 0;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+}
+
+.campus-dropdown__item--has-children:hover > .campus-dropdown__submenu {
+  display: block;
+  animation: campus-dropdown-submenu-slide-in 0.2s ease-out;
+}
+
+/* ==================== 动画 ==================== */
+@keyframes campus-dropdown-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes campus-dropdown-submenu-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-dropdown__menu {
+    min-width: 140px;
+    max-width: 280px;
+  }
+
+  .campus-dropdown__item {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  .campus-dropdown__item-icon {
+    font-size: 18px;
+  }
+
+  /* 移动端子菜单改为向下展开 */
+  .campus-dropdown__submenu {
+    position: static;
+    margin-left: 0;
+    margin-top: 4px;
+    box-shadow: none;
+    border: none;
+    border-left: 2px solid #1890ff;
+    background-color: #fafafa;
+  }
+
+  .campus-dropdown__item--has-children:hover > .campus-dropdown__submenu {
+    animation: none;
+  }
+
+  /* 移动端隐藏子菜单箭头 */
+  .campus-dropdown__item--has-children .campus-dropdown__item-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 480px) {
+  .campus-dropdown__menu {
+    min-width: 120px;
+    max-width: 240px;
+  }
+
+  .campus-dropdown__item {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+}

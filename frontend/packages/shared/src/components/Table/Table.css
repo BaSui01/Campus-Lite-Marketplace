@@ -1,0 +1,343 @@
+/**
+ * Table 组件样式
+ * @author BaSui 😎
+ * @description 数据表格组件样式，支持排序、选择、分页
+ */
+
+/* ==================== Table 容器 ==================== */
+.campus-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.campus-table {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+/* 边框样式 */
+.campus-table--bordered {
+  border: 1px solid #d9d9d9;
+}
+
+/* 加载状态 */
+.campus-table--loading {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ==================== 表格 ==================== */
+.campus-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: auto;
+}
+
+/* ==================== 表头 ==================== */
+.campus-table__thead {
+  background-color: #fafafa;
+}
+
+.campus-table__th {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #000000d9;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.campus-table--bordered .campus-table__th {
+  border-right: 1px solid #f0f0f0;
+}
+
+.campus-table--bordered .campus-table__th:last-child {
+  border-right: none;
+}
+
+/* 表头对齐方式 */
+.campus-table__th--left {
+  text-align: left;
+}
+
+.campus-table__th--center {
+  text-align: center;
+}
+
+.campus-table__th--right {
+  text-align: right;
+}
+
+/* 可排序表头 */
+.campus-table__th--sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.campus-table__th--sortable:hover {
+  background-color: #f0f0f0;
+}
+
+/* 选择列 */
+.campus-table__th--selection {
+  width: 48px;
+  text-align: center;
+}
+
+/* 固定列 */
+.campus-table__th--fixed-left {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: #fafafa;
+}
+
+.campus-table__th--fixed-right {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background-color: #fafafa;
+}
+
+/* ==================== 表头内容 ==================== */
+.campus-table__th-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 排序图标 */
+.campus-table__sort-icon {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  color: #00000040;
+}
+
+.campus-table__sort-arrow {
+  display: block;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.campus-table__sort-arrow--active {
+  color: #1890ff;
+}
+
+/* ==================== 表体 ==================== */
+.campus-table__tbody {
+  background-color: #ffffff;
+}
+
+.campus-table__tr {
+  transition: background-color 0.2s ease;
+}
+
+/* 悬浮效果 */
+.campus-table--hover .campus-table__tr:hover {
+  background-color: #fafafa;
+  cursor: pointer;
+}
+
+/* 斑马纹 */
+.campus-table--striped .campus-table__tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* 选中行 */
+.campus-table__tr--selected {
+  background-color: #e6f7ff !important;
+}
+
+/* ==================== 表格单元格 ==================== */
+.campus-table__td {
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #000000d9;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.campus-table--bordered .campus-table__td {
+  border-right: 1px solid #f0f0f0;
+}
+
+.campus-table--bordered .campus-table__td:last-child {
+  border-right: none;
+}
+
+/* 单元格对齐方式 */
+.campus-table__td--left {
+  text-align: left;
+}
+
+.campus-table__td--center {
+  text-align: center;
+}
+
+.campus-table__td--right {
+  text-align: right;
+}
+
+/* 选择列 */
+.campus-table__td--selection {
+  width: 48px;
+  text-align: center;
+}
+
+/* 固定列 */
+.campus-table__td--fixed-left {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: #ffffff;
+}
+
+.campus-table__td--fixed-right {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background-color: #ffffff;
+}
+
+/* ==================== 复选框/单选框 ==================== */
+.campus-table__checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ==================== 空数据 ==================== */
+.campus-table__empty {
+  padding: 48px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #00000073;
+}
+
+/* ==================== 加载蒙层 ==================== */
+.campus-table__loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+
+.campus-table__loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #1890ff;
+  border-radius: 50%;
+  animation: campus-table-spin 0.8s linear infinite;
+}
+
+@keyframes campus-table-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== 分页器 ==================== */
+.campus-table__pagination {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 0;
+}
+
+/* ==================== 尺寸变体 ==================== */
+
+/* 小号 */
+.campus-table--small .campus-table__th,
+.campus-table--small .campus-table__td {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* 大号 */
+.campus-table--large .campus-table__th,
+.campus-table--large .campus-table__td {
+  padding: 16px 20px;
+  font-size: 15px;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 平板适配 */
+@media (max-width: 1024px) {
+  .campus-table {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .campus-table__table {
+    min-width: 800px;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-table-wrapper {
+    gap: 12px;
+  }
+
+  .campus-table__table {
+    min-width: 600px;
+  }
+
+  .campus-table__th,
+  .campus-table__td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .campus-table__th--selection,
+  .campus-table__td--selection {
+    width: 40px;
+  }
+
+  .campus-table__checkbox {
+    width: 14px;
+    height: 14px;
+  }
+
+  .campus-table__pagination {
+    justify-content: center;
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 480px) {
+  .campus-table__table {
+    min-width: 500px;
+  }
+
+  .campus-table__th,
+  .campus-table__td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .campus-table__empty {
+    padding: 32px 16px;
+  }
+}

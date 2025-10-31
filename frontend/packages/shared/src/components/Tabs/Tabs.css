@@ -1,0 +1,253 @@
+/**
+ * Tabs 组件样式
+ * @author BaSui 😎
+ * @description 标签页组件样式，支持水平/垂直布局
+ */
+
+/* ==================== Tabs 容器 ==================== */
+.campus-tabs {
+  display: flex;
+  background-color: #ffffff;
+}
+
+/* 水平布局 */
+.campus-tabs--horizontal {
+  flex-direction: column;
+}
+
+/* 垂直布局 */
+.campus-tabs--vertical {
+  flex-direction: row;
+}
+
+/* ==================== 标签页导航 ==================== */
+.campus-tabs__nav {
+  position: relative;
+  display: flex;
+}
+
+/* 水平布局导航 */
+.campus-tabs--horizontal .campus-tabs__nav {
+  flex-direction: row;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 垂直布局导航 */
+.campus-tabs--vertical .campus-tabs__nav {
+  flex-direction: column;
+  border-right: 1px solid #f0f0f0;
+  min-width: 120px;
+}
+
+/* ==================== 标签页项 ==================== */
+.campus-tabs__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #00000073;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.campus-tabs__tab:hover:not(.campus-tabs__tab--disabled) {
+  color: #1890ff;
+}
+
+/* 激活状态 */
+.campus-tabs__tab--active {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+/* 禁用状态 */
+.campus-tabs__tab--disabled {
+  color: #00000040;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==================== 标签页元素 ==================== */
+
+/* 图标 */
+.campus-tabs__tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+/* 标签 */
+.campus-tabs__tab-label {
+  flex: 1;
+}
+
+/* 徽标 */
+.campus-tabs__tab-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+}
+
+/* ==================== 激活指示器 ==================== */
+.campus-tabs__indicator {
+  position: absolute;
+  background-color: #1890ff;
+  transition: all 0.3s ease;
+}
+
+/* 水平布局指示器 */
+.campus-tabs--horizontal .campus-tabs__indicator {
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: calc(100% / var(--tabs-count, 1));
+}
+
+/* 垂直布局指示器 */
+.campus-tabs--vertical .campus-tabs__indicator {
+  right: 0;
+  top: 0;
+  width: 2px;
+  height: calc(100% / var(--tabs-count, 1));
+}
+
+/* ==================== 标签页内容 ==================== */
+.campus-tabs__content {
+  flex: 1;
+  padding: 16px 0;
+}
+
+.campus-tabs--vertical .campus-tabs__content {
+  padding: 0 16px;
+}
+
+.campus-tabs__pane {
+  animation: campus-tabs-fade-in 0.3s ease;
+}
+
+@keyframes campus-tabs-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 尺寸变体 ==================== */
+
+/* 小号 */
+.campus-tabs--small .campus-tabs__tab {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.campus-tabs--small .campus-tabs__tab-icon {
+  font-size: 14px;
+}
+
+.campus-tabs--small .campus-tabs__content {
+  padding: 12px 0;
+}
+
+.campus-tabs--small.campus-tabs--vertical .campus-tabs__content {
+  padding: 0 12px;
+}
+
+/* 大号 */
+.campus-tabs--large .campus-tabs__tab {
+  padding: 16px 24px;
+  font-size: 15px;
+}
+
+.campus-tabs--large .campus-tabs__tab-icon {
+  font-size: 18px;
+}
+
+.campus-tabs--large .campus-tabs__content {
+  padding: 20px 0;
+}
+
+.campus-tabs--large.campus-tabs--vertical .campus-tabs__content {
+  padding: 0 20px;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 平板适配 */
+@media (max-width: 1024px) {
+  .campus-tabs__tab {
+    padding: 10px 14px;
+  }
+
+  .campus-tabs--vertical .campus-tabs__nav {
+    min-width: 100px;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  /* 垂直布局在移动端改为水平布局 */
+  .campus-tabs--vertical {
+    flex-direction: column;
+  }
+
+  .campus-tabs--vertical .campus-tabs__nav {
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+    min-width: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .campus-tabs--vertical .campus-tabs__indicator {
+    right: auto;
+    bottom: 0;
+    top: auto;
+    width: calc(100% / var(--tabs-count, 1));
+    height: 2px;
+  }
+
+  .campus-tabs--vertical .campus-tabs__content {
+    padding: 16px 0;
+  }
+
+  .campus-tabs__tab {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .campus-tabs__tab-icon {
+    font-size: 15px;
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 480px) {
+  .campus-tabs__tab {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .campus-tabs__tab-icon {
+    font-size: 14px;
+  }
+
+  .campus-tabs__content {
+    padding: 12px 0;
+  }
+
+  /* 隐藏徽标以节省空间 */
+  .campus-tabs__tab-badge {
+    display: none;
+  }
+}

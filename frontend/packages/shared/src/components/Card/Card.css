@@ -1,0 +1,275 @@
+/**
+ * Card 组件样式
+ * @author BaSui 😎
+ * @description 卡片组件样式，支持封面、标题、操作按钮
+ */
+
+/* ==================== Card 容器 ==================== */
+.campus-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* 边框样式 */
+.campus-card--bordered {
+  border: 1px solid #d9d9d9;
+}
+
+/* 悬浮效果 */
+.campus-card--hoverable:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 可点击 */
+.campus-card--clickable {
+  cursor: pointer;
+}
+
+/* 加载状态 */
+.campus-card--loading {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ==================== 封面 ==================== */
+.campus-card__cover {
+  width: 100%;
+  overflow: hidden;
+  background-color: #f5f5f5;
+}
+
+.campus-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.campus-card--hoverable:hover .campus-card__cover img {
+  transform: scale(1.05);
+}
+
+/* ==================== 头部 ==================== */
+.campus-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.campus-card__header-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.campus-card__title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #000000d9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.campus-card__subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #00000073;
+}
+
+.campus-card__extra {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: #00000073;
+}
+
+/* ==================== 主体内容 ==================== */
+.campus-card__body {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #000000d9;
+}
+
+/* 内边距变体 */
+.campus-card__body--padding-none {
+  padding: 0;
+}
+
+.campus-card__body--padding-small {
+  padding: 12px 16px;
+}
+
+.campus-card__body--padding-default {
+  padding: 16px 20px;
+}
+
+.campus-card__body--padding-large {
+  padding: 24px 28px;
+}
+
+/* ==================== 加载状态 ==================== */
+.campus-card__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 20px;
+}
+
+.campus-card__loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #1890ff;
+  border-radius: 50%;
+  animation: campus-card-spin 0.8s linear infinite;
+}
+
+@keyframes campus-card-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.campus-card__loading-text {
+  font-size: 14px;
+  color: #00000073;
+}
+
+/* ==================== 操作按钮区域 ==================== */
+.campus-card__actions {
+  display: flex;
+  border-top: 1px solid #f0f0f0;
+}
+
+.campus-card__action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #00000073;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-right: 1px solid #f0f0f0;
+}
+
+.campus-card__action:last-child {
+  border-right: none;
+}
+
+.campus-card__action:hover {
+  color: #1890ff;
+  background-color: #fafafa;
+}
+
+.campus-card__action:active {
+  background-color: #f0f0f0;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 平板适配 */
+@media (max-width: 1024px) {
+  .campus-card__header {
+    padding: 14px 18px;
+  }
+
+  .campus-card__body--padding-default {
+    padding: 14px 18px;
+  }
+
+  .campus-card__body--padding-large {
+    padding: 20px 24px;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-card {
+    border-radius: 6px;
+  }
+
+  .campus-card__header {
+    padding: 12px 16px;
+  }
+
+  .campus-card__title {
+    font-size: 15px;
+  }
+
+  .campus-card__subtitle {
+    font-size: 13px;
+  }
+
+  .campus-card__body--padding-default {
+    padding: 12px 16px;
+  }
+
+  .campus-card__body--padding-large {
+    padding: 16px 20px;
+  }
+
+  .campus-card__actions {
+    flex-direction: column;
+  }
+
+  .campus-card__action {
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .campus-card__action:last-child {
+    border-bottom: none;
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 480px) {
+  .campus-card__header {
+    padding: 10px 14px;
+    gap: 12px;
+  }
+
+  .campus-card__title {
+    font-size: 14px;
+  }
+
+  .campus-card__subtitle,
+  .campus-card__extra {
+    font-size: 12px;
+  }
+
+  .campus-card__body--padding-small {
+    padding: 10px 14px;
+  }
+
+  .campus-card__body--padding-default {
+    padding: 10px 14px;
+  }
+
+  .campus-card__body--padding-large {
+    padding: 14px 18px;
+  }
+
+  .campus-card__action {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}

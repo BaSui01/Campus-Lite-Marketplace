@@ -46,15 +46,55 @@ export { Modal, type ModalProps, type ModalSize } from './Modal';
  */
 export { Form, FormItem, type FormProps, type FormItemProps, type FormLayout } from './Form';
 
-// ==================== P1 高级组件（待开发）====================
-// export { Dropdown } from './Dropdown';
-// export { Table } from './Table';
-// export { Pagination } from './Pagination';
-// export { Card } from './Card';
-// export { Tabs } from './Tabs';
-// export { Badge } from './Badge';
-// export { Avatar } from './Avatar';
-// export { Tag } from './Tag';
+// ==================== P1 高级组件（已完成）====================
+
+/**
+ * Dropdown - 下拉菜单组件
+ * @description 支持多级菜单、禁用项、自定义触发器、多种位置
+ */
+export { Dropdown, type DropdownProps, type DropdownMenuItem, type DropdownTrigger, type DropdownPlacement } from './Dropdown';
+
+/**
+ * Table - 数据表格组件
+ * @description 支持排序、选择、分页、自定义渲染、固定列
+ */
+export { Table, type TableProps, type TableColumn, type TableRowSelection, type SortInfo, type SortDirection } from './Table';
+
+/**
+ * Pagination - 分页组件
+ * @description 支持页码跳转、每页条数选择、总数显示、快速跳转
+ */
+export { Pagination, type PaginationProps, type PaginationSize } from './Pagination';
+
+/**
+ * Card - 卡片组件
+ * @description 支持标题、封面、操作按钮、悬浮效果
+ */
+export { Card, type CardProps } from './Card';
+
+/**
+ * Tabs - 标签页组件
+ * @description 支持水平/垂直布局、图标、徽标、禁用状态
+ */
+export { Tabs, type TabsProps, type TabItem, type TabsLayout, type TabsSize } from './Tabs';
+
+/**
+ * Badge - 徽标组件
+ * @description 支持数字徽标、小红点、状态点
+ */
+export { Badge, type BadgeProps, type BadgeStatus } from './Badge';
+
+/**
+ * Avatar - 头像组件
+ * @description 支持图片、文字、图标、多种尺寸和形状
+ */
+export { Avatar, type AvatarProps, type AvatarSize, type AvatarShape } from './Avatar';
+
+/**
+ * Tag - 标签组件
+ * @description 支持多种颜色、尺寸、可关闭、带图标
+ */
+export { Tag, type TagProps, type TagColor, type TagSize } from './Tag';
 
 // ==================== P2 业务组件（待开发）====================
 // export { GoodsCard } from './GoodsCard';

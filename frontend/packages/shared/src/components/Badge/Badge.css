@@ -1,0 +1,207 @@
+/**
+ * Badge 组件样式
+ * @author BaSui 😎
+ * @description 徽标组件样式，支持数字、小红点、状态点
+ */
+
+/* ==================== Badge 容器 ==================== */
+.campus-badge {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* ==================== 徽标内容 ==================== */
+.campus-badge__content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #ffffff;
+  background-color: #ff4d4f;
+  border: 2px solid #ffffff;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: 0 0 0 1px #ffffff;
+}
+
+/* 小红点模式 */
+.campus-badge__content--dot {
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* ==================== 状态点颜色 ==================== */
+
+/* 成功 */
+.campus-badge__content--success {
+  background-color: #52c41a;
+}
+
+/* 错误 */
+.campus-badge__content--error {
+  background-color: #ff4d4f;
+}
+
+/* 警告 */
+.campus-badge__content--warning {
+  background-color: #faad14;
+}
+
+/* 进行中 */
+.campus-badge__content--processing {
+  background-color: #1890ff;
+  animation: campus-badge-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes campus-badge-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: translate(50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate(50%, -50%) scale(1.2);
+  }
+}
+
+/* 默认 */
+.campus-badge__content--default {
+  background-color: #d9d9d9;
+  color: #00000073;
+}
+
+/* ==================== 独立徽标 ==================== */
+.campus-badge-standalone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  color: #ffffff;
+  background-color: #ff4d4f;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* 独立徽标小红点模式 */
+.campus-badge-standalone--dot {
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* ==================== 状态点模式 ==================== */
+.campus-badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.5;
+}
+
+.campus-badge-status__dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* 状态点颜色 */
+.campus-badge-status__dot--success {
+  background-color: #52c41a;
+}
+
+.campus-badge-status__dot--error {
+  background-color: #ff4d4f;
+}
+
+.campus-badge-status__dot--warning {
+  background-color: #faad14;
+}
+
+.campus-badge-status__dot--processing {
+  background-color: #1890ff;
+  animation: campus-badge-status-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes campus-badge-status-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.5);
+  }
+}
+
+.campus-badge-status__dot--default {
+  background-color: #d9d9d9;
+}
+
+.campus-badge-status__text {
+  font-size: 14px;
+  color: #000000d9;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-badge__content {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 11px;
+    line-height: 18px;
+    border-radius: 9px;
+  }
+
+  .campus-badge__content--dot {
+    min-width: 7px;
+    width: 7px;
+    height: 7px;
+  }
+
+  .campus-badge-standalone {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 11px;
+    line-height: 18px;
+    border-radius: 9px;
+  }
+
+  .campus-badge-standalone--dot {
+    min-width: 7px;
+    width: 7px;
+    height: 7px;
+  }
+
+  .campus-badge-status__dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .campus-badge-status__text {
+    font-size: 13px;
+  }
+}

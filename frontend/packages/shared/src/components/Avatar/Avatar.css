@@ -1,0 +1,122 @@
+/**
+ * Avatar 组件样式
+ * @author BaSui 😎
+ * @description 头像组件样式，支持多种尺寸和形状
+ */
+
+/* ==================== Avatar 容器 ==================== */
+.campus-avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  vertical-align: middle;
+  background-color: #d9d9d9;
+  color: #ffffff;
+  font-weight: 500;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+/* 形状 */
+.campus-avatar--circle {
+  border-radius: 50%;
+}
+
+.campus-avatar--square {
+  border-radius: 4px;
+}
+
+/* 可点击 */
+.campus-avatar--clickable {
+  cursor: pointer;
+}
+
+.campus-avatar--clickable:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+/* ==================== 尺寸变体 ==================== */
+
+/* 小号 */
+.campus-avatar--small {
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+/* 中号 */
+.campus-avatar--medium {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+}
+
+/* 大号 */
+.campus-avatar--large {
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+}
+
+/* ==================== 头像内容 ==================== */
+
+/* 图片 */
+.campus-avatar__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 图标 */
+.campus-avatar__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  height: 60%;
+}
+
+.campus-avatar__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 文字 */
+.campus-avatar__text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .campus-avatar--small {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .campus-avatar--medium {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .campus-avatar--large {
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+  }
+
+  .campus-avatar--square {
+    border-radius: 3px;
+  }
+}
