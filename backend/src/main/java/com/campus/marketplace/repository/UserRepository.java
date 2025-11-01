@@ -72,9 +72,27 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     /**
-     * 根据邮箱查询用户
+     * 根据邮箱查询用户（连同角色一起查询 - JOIN FETCH 优化！）
+     *
+     * BaSui 修复：添加 JOIN FETCH 避免 N+1 查询问题！📧
+     *
+     * @param email 邮箱
+     * @return 用户及其角色（可能为空）
      */
-    Optional<User> findByEmail(String email);
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :email")
+    Optional<User> findByEmail(@Param("email") String email);
+
+    /**
+     * 根据手机号查询用户（连同角色一起查询 - JOIN FETCH 优化！）
+     *
+     * BaSui 新增：支持手机号登录 📱
+     * 使用 JOIN FETCH 避免 N+1 查询问题！
+     *
+     * @param phone 手机号
+     * @return 用户及其角色（可能为空）
+     */
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.phone = :phone")
+    Optional<User> findByPhone(@Param("phone") String phone);
 
     /**
      * 统计校区下用户数量

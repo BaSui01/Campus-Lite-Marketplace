@@ -41,8 +41,10 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
     List<Goods> findByStatusWithSeller(@Param("status") GoodsStatus status);
 
     /**
-     * 根据状态分页查询物品
+     * 根据状态分页查询物品（包含卖家、分类、校区信息）
+     * 🔧 使用 EntityGraph 避免懒加载异常
      */
+    @EntityGraph(attributePaths = {"seller", "category", "campus"})
     Page<Goods> findByStatus(GoodsStatus status, Pageable pageable);
 
     /**

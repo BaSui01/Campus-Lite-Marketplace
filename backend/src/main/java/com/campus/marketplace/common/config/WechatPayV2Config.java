@@ -72,11 +72,24 @@ public class WechatPayV2Config {
     /**
      * 创建微信支付V2服务 Bean 🎯
      *
+     * 只有在必填配置项都存在时才初始化 Bean
+     * 必填项：appId, mchId, mchKey
+     *
      * @return WxPayService 实例
      */
     @Bean
+    @ConditionalOnProperty(name = "wechat.pay.v2.app-id")
     public WxPayService wxPayService() {
         log.info("🚀 初始化微信支付V2配置（沙箱环境）: merchantId={}, useSandbox={}", mchId, useSandbox);
+
+        // ✅ BaSui：添加配置校验，避免空值导致启动失败
+        if (appId == null || appId.trim().isEmpty() ||
+            mchId == null || mchId.trim().isEmpty() ||
+            mchKey == null || mchKey.trim().isEmpty()) {
+            log.warn("⚠️ 微信支付V2配置不完整，跳过初始化。请检查 appId、mchId、mchKey 配置。");
+            log.info("💡 开发环境推荐使用支付宝沙箱进行支付测试。");
+            return null;
+        }
 
         WxPayConfig payConfig = new WxPayConfig();
         payConfig.setAppId(appId);

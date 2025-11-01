@@ -158,17 +158,94 @@ public class AuthController {
 
     /**
      * 刷新 Token
-     * 
+     *
      * POST /api/auth/refresh
      */
     @PostMapping("/refresh")
     public ApiResponse<LoginResponse> refresh(@RequestHeader("Authorization") String authorization) {
         log.info("收到刷新 Token 请求");
-        
+
         // 提取 Token（去掉 "Bearer " 前缀）
         String token = authorization.substring(7);
         LoginResponse response = authService.refreshToken(token);
-        
+
         return ApiResponse.success(response);
+    }
+
+    // ========== BaSui 新增：注册实时校验接口 🎯 ==========
+
+    /**
+     * 校验用户名是否已存在
+     *
+     * GET /api/auth/check-username?username=xxx
+     *
+     * @param username 用户名
+     * @return true-已存在（不可注册），false-可用（可以注册）
+     */
+    @Operation(
+            summary = "校验用户名是否已存在",
+            description = "注册时实时校验用户名是否已被占用"
+    )
+    @GetMapping("/check-username")
+    public ApiResponse<Boolean> checkUsername(
+            @io.swagger.v3.oas.annotations.Parameter(
+                    description = "用户名",
+                    required = true,
+                    example = "basui"
+            )
+            @RequestParam String username) {
+
+        log.debug("校验用户名: {}", username);
+
+        // 参数校验
+        if (username == null || username.trim().isEmpty()) {
+            return ApiResponse.error(40000, "用户名不能为空");
+        }
+
+        // 查询用户名是否存在
+        boolean exists = authService.existsByUsername(username);
+
+        String message = exists ? "用户名已存在" : "用户名可用";
+        return ApiResponse.success(message, exists);
+    }
+
+    /**
+     * 校验邮箱是否已存在
+     *
+     * GET /api/auth/check-email?email=xxx@campus.edu
+     *
+     * @param email 邮箱
+     * @return true-已存在（不可注册），false-可用（可以注册）
+     */
+    @Operation(
+            summary = "校验邮箱是否已存在",
+            description = "注册时实时校验邮箱是否已被注册"
+    )
+    @GetMapping("/check-email")
+    public ApiResponse<Boolean> checkEmail(
+            @io.swagger.v3.oas.annotations.Parameter(
+                    description = "邮箱地址",
+                    required = true,
+                    example = "basui@campus.edu"
+            )
+            @RequestParam String email) {
+
+        log.debug("校验邮箱: {}", email);
+
+        // 参数校验
+        if (email == null || email.trim().isEmpty()) {
+            return ApiResponse.error(40000, "邮箱不能为空");
+        }
+
+        // 简单的邮箱格式校验（必须包含 @）
+        if (!email.contains("@")) {
+            return ApiResponse.error(40000, "邮箱格式不正确");
+        }
+
+        // 查询邮箱是否存在
+        boolean exists = authService.existsByEmail(email);
+
+        String message = exists ? "邮箱已被注册" : "邮箱可用";
+        return ApiResponse.success(message, exists);
     }
 }

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -153,15 +154,21 @@ public class AuthServiceImpl implements AuthService {
 
 
     /**
-     * 用户登录
+     * 用户登录（支持邮箱/手机号/用户名三种方式 🎯）
+     *
+     * BaSui 新增：多方式登录支持！
+     * - 邮箱登录：包含 @ 符号 → findByEmail
+     * - 手机号登录：11位纯数字 → findByPhone
+     * - 用户名登录：其他格式 → findByUsernameWithRoles
      */
     @Override
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
-        log.info("用户登录: username={}", request.username());
+        String credential = request.username();
+        log.info("用户登录: credential={}", credential);
 
-        // 1. 查询用户（包含角色和权限）
-        User user = userRepository.findByUsernameWithRoles(request.username())
+        // 1. 🔍 自动识别凭证类型并查询用户（包含角色和权限）
+        User user = findUserByCredential(credential)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PASSWORD_ERROR));
 
         // 2. 验证密码
@@ -210,6 +217,39 @@ public class AuthServiceImpl implements AuthService {
                         .permissions(permissions)
                         .build())
                 .build();
+    }
+
+    /**
+     * 🔍 根据凭证自动识别查询方式
+     *
+     * 识别规则：
+     * - 包含 @ → 邮箱登录
+     * - 11位纯数字 → 手机号登录
+     * - 其他 → 用户名登录
+     *
+     * @param credential 登录凭证（邮箱/手机号/用户名）
+     * @return 用户（可能为空）
+     */
+    private Optional<User> findUserByCredential(String credential) {
+        if (credential == null || credential.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // 邮箱登录：包含 @
+        if (credential.contains("@")) {
+            log.debug("识别为邮箱登录: {}", credential);
+            return userRepository.findByEmail(credential);
+        }
+
+        // 手机号登录：11位纯数字
+        if (credential.matches("^\\d{11}$")) {
+            log.debug("识别为手机号登录: {}", credential);
+            return userRepository.findByPhone(credential);
+        }
+
+        // 用户名登录：其他格式（包括中文用户名）
+        log.debug("识别为用户名登录: {}", credential);
+        return userRepository.findByUsernameWithRoles(credential);
     }
 
     /**
@@ -286,5 +326,23 @@ public class AuthServiceImpl implements AuthService {
                         .permissions(permissions)
                         .build())
                 .build();
+    }
+
+    // ========== BaSui 新增：实时校验方法实现 🎯 ==========
+
+    /**
+     * 检查用户名是否已存在
+     */
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    /**
+     * 检查邮箱是否已存在
+     */
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

@@ -89,12 +89,26 @@ public class WechatPayConfig {
      * 创建微信支付配置 Bean 🎯
      *
      * 使用RSAAutoCertificateConfig自动更新平台证书
+     * 只有在必填配置项都存在时才初始化 Bean
+     * 必填项：appId, mchId, privateKeyPath, merchantSerialNumber, apiV3Key
      *
      * @return Config 实例
      */
     @Bean(name = "wechatPayV3Config")
+    @ConditionalOnProperty(name = "wechat.pay.app-id")
     public Config wechatPayV3Config() {
         log.info("🚀 初始化微信支付V3配置: merchantId={}", mchId);
+
+        // ✅ BaSui：添加配置校验，避免空值导致启动失败
+        if (appId == null || appId.trim().isEmpty() ||
+            mchId == null || mchId.trim().isEmpty() ||
+            privateKeyPath == null || privateKeyPath.trim().isEmpty() ||
+            merchantSerialNumber == null || merchantSerialNumber.trim().isEmpty() ||
+            apiV3Key == null || apiV3Key.trim().isEmpty()) {
+            log.warn("⚠️ 微信支付V3配置不完整，跳过初始化。请检查 appId、mchId、privateKeyPath、merchantSerialNumber、apiV3Key 配置。");
+            log.info("💡 开发环境推荐使用支付宝沙箱进行支付测试。");
+            return null;
+        }
 
         try {
             Config config = new RSAAutoCertificateConfig.Builder()
@@ -116,11 +130,18 @@ public class WechatPayConfig {
     /**
      * 创建Native支付服务 Bean 🎯
      *
-     * @param config 微信支付配置
+     * 依赖 wechatPayV3Config，如果配置不存在则不创建此 Bean
+     *
+     * @param config 微信支付配置（可能为 null）
      * @return NativePayService 实例
      */
     @Bean
+    @ConditionalOnProperty(name = "wechat.pay.app-id")
     public NativePayService nativePayService(Config config) {
+        if (config == null) {
+            log.warn("⚠️ 微信支付配置为空，跳过 NativePayService 初始化");
+            return null;
+        }
         log.info("🚀 初始化微信支付Native服务");
         return new NativePayService.Builder().config(config).build();
     }

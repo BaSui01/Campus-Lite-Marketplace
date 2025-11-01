@@ -48,16 +48,34 @@ public interface AuthService {
 
     /**
      * 用户登出
-     * 
+     *
      * @param token JWT Token
      */
     void logout(String token);
 
     /**
      * 刷新 Token
-     * 
+     *
      * @param token 旧 Token
      * @return 新 Token
      */
     LoginResponse refreshToken(String token);
+
+    // ========== BaSui 新增：实时校验方法 🎯 ==========
+
+    /**
+     * 检查用户名是否已存在
+     *
+     * @param username 用户名
+     * @return true-已存在，false-可用
+     */
+    boolean existsByUsername(String username);
+
+    /**
+     * 检查邮箱是否已存在
+     *
+     * @param email 邮箱
+     * @return true-已存在，false-可用
+     */
+    boolean existsByEmail(String email);
 }
