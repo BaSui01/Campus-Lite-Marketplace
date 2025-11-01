@@ -1,327 +1,87 @@
-# 🎉 前端 Monorepo 架构搭建完成报告
+# 前端 Monorepo 架构交付报告（更新于 2025-10-31）
 
-> **作者**: BaSui 😎
-> **完成时间**: 2025-10-29
-> **状态**: ✅ 基础架构搭建完成
-
----
-
-## 📋 任务完成情况
-
-### ✅ 已完成
-
-- [x] 创建 Monorepo 项目结构（pnpm workspace）
-- [x] 配置公共层 @campus/shared 基础框架
-- [x] 迁移现有 API 到公共层（使用旧 API）
-- [x] 初始化管理端 @campus/admin 项目
-- [x] 初始化用户端 @campus/portal 项目
-- [x] 更新后端 pom.xml 的 API 生成路径
-- [x] 添加 Flyway 数据库迁移配置
-
-### 🚧 待处理（后续任务）
-
-- [ ] 修复后端 SmsService Bean 缺失问题
-- [ ] 重新生成最新 API 到公共层
-- [ ] 管理端功能开发（登录、仪表盘、用户管理...）
-- [ ] 用户端功能开发（首页、物品列表、发布物品...）
-- [ ] 配置 Turborepo 增量构建（可选）
+> **作者**: BaSui 😎  
+> **状态**: ✅ 架构基线稳定，可进入功能开发阶段
 
 ---
 
-## 🏗️ 项目结构
-
-```
-frontend/
-├── packages/
-│   ├── shared/                    # 🔧 公共层（核心复用层）
-│   │   ├── src/
-│   │   │   ├── api/               # ✅ OpenAPI 生成的 API 客户端（已迁移）
-│   │   │   ├── components/        # 📦 公共 React 组件库（待开发）
-│   │   │   ├── utils/             # 🛠️ 工具函数（待开发）
-│   │   │   ├── types/             # 📝 TypeScript 类型定义（待开发）
-│   │   │   ├── constants/         # 🔢 常量定义（待开发）
-│   │   │   ├── hooks/             # 🎣 自定义 Hooks（待开发）
-│   │   │   └── index.ts           # 导出入口
-│   │   ├── package.json           # ✅ 已配置
-│   │   ├── tsconfig.json          # ✅ 已配置
-│   │   └── tsup.config.ts         # ✅ 已配置（ESM + CJS）
-│   │
-│   ├── admin/                     # 📊 管理端（PC Web 后台）
-│   │   ├── src/                   # ✅ Vite + React + TS 已初始化
-│   │   ├── public/
-│   │   ├── package.json           # ✅ 已配置（依赖 @campus/shared）
-│   │   ├── tsconfig.json          # ✅ Vite 自动生成
-│   │   └── vite.config.ts         # ✅ Vite 自动生成
-│   │
-│   └── portal/                    # 🛍️ 用户端（响应式 Web）
-│       ├── src/                   # ✅ Vite + React + TS 已初始化
-│       ├── public/
-│       ├── package.json           # ✅ 已配置（依赖 @campus/shared + Tailwind）
-│       ├── tsconfig.json          # ✅ Vite 自动生成
-│       └── vite.config.ts         # ✅ Vite 自动生成
-│
-├── pnpm-workspace.yaml            # ✅ pnpm Workspace 配置
-├── package.json                   # ✅ 根 package.json
-└── README.md                      # ✅ 项目文档
-
-后端：
-├── pom.xml                        # ✅ 已更新 API 生成路径
-└── src/main/resources/
-    └── application.yml            # ✅ 已添加 Flyway 配置
-```
+## 1. 交付概览
+- Monorepo 基于 pnpm workspace 搭建完成，含 `@campus/shared`、`@campus/portal`、`@campus/admin` 三个包。
+- 公共层已内置组件库（18 个基础组件）、10 大领域服务、13 个高频 Hook、OpenAPI 客户端、工具与类型定义。
+- Portal 完成路由/状态/WebSocket/布局骨架，可直接接入真实接口开发页面。
+- Admin 完成 React + Vite + Ant Design 脚手架，与共享层联通，等待业务模块落地。
+- 根目录脚本提供开发、构建、Lint、类型检查、API 生成等全套流程。
 
 ---
 
-## 🎯 技术栈
+## 2. 关键能力明细
+### 2.1 公共层（@campus/shared）
+| 分类 | 代表实现 | 说明 |
+| ---- | -------- | ---- |
+| 组件 | Button、Card、Table、ImageUpload、RichTextEditor、Toast 等 | 覆盖表单、列表、上传、富文本、通知等场景，可在 Portal/Admin 直接复用 |
+| Hook | `useAuth`、`useRequest`、`useWebSocketService`、`useUpload`、`useNotification` 等 | 封装登录态恢复、请求节流、消息订阅、上传进度、全局提示 |
+| 服务 | `auth.ts`、`goods.ts`、`order.ts`、`post.ts`、`message.ts`、`websocket.ts` 等 | 对 REST / WebSocket 进行二次封装，统一错误处理、重试与缓存 key |
+| 工具 | `http.ts`、`storage.ts`、`validator.ts`、`format.ts` | Axios 拦截器、Token & Refresh 管理、输入校验、日期/货币格式化 |
+| 常量/类型 | `constants/config.ts`、`types/api.ts`、`types/entity.ts` | 与后端枚举、DTO 对齐，辅助 IDE 智能提示 |
+| OpenAPI | `api/` 目录 | 由 `pnpm run api:generate` 自动生成，保证接口契约一致性 |
 
-### 🔧 公共层（@campus/shared）
+### 2.2 Portal（@campus/portal）
+- 路由：`createBrowserRouter` + 惰性加载 + `RequireAuth` 守卫，已配置 404 页面。
+- 状态：`useAuthStore`（Token 持久化 / 刷新）、`useNotificationStore`（Toast 队列）。
+- WebSocket：应用启动即调用 `useWebSocketService` 建立长连接，日志反馈连接状态。
+- 页面：`pages/*` 目录准备完毕，待填充 UI 与接口。
+- 样式：Tailwind + 全局 CSS，默认响应式栅格已调优。
 
-| 技术 | 版本 | 状态 |
-|-----|------|------|
-| TypeScript | ^5.4.5 | ✅ 已配置 |
-| Axios | ^1.7.2 | ✅ 已安装 |
-| tsup | ^8.1.0 | ✅ 已配置 |
-| React | ^18.3.1 | ✅ 已安装 |
-
-### 📊 管理端（@campus/admin）
-
-| 技术 | 版本 | 状态 |
-|-----|------|------|
-| React | ^18.3.1 | ✅ 已安装 |
-| Ant Design | ^5.20.0 | ✅ 已配置 |
-| Vite | ^5.4.1 | ✅ 已安装 |
-| React Router | ^6.26.0 | ✅ 已配置 |
-| Zustand | ^4.5.0 | ✅ 已配置 |
-| React Query | ^5.51.0 | ✅ 已配置 |
-
-### 🛍️ 用户端（@campus/portal）
-
-| 技术 | 版本 | 状态 |
-|-----|------|------|
-| React | ^18.3.1 | ✅ 已安装 |
-| Tailwind CSS | ^3.4.7 | ✅ 已配置 |
-| Vite | ^5.4.1 | ✅ 已安装 |
-| React Router | ^6.26.0 | ✅ 已配置 |
-| Zustand | ^4.5.0 | ✅ 已配置 |
-| React Query | ^5.51.0 | ✅ 已配置 |
+### 2.3 Admin（@campus/admin）
+- 脚手架：React 18 + Vite + Ant Design + React Query + Zustand。
+- 待办：接入共享组件、搭建布局/导航、实现模块化路由与权限守卫。
 
 ---
 
-## 📦 依赖安装
+## 3. 工具链与脚本
+| 命令 | 作用 |
+| ---- | ---- |
+| `pnpm install` | 安装全部依赖（根目录执行） |
+| `pnpm run dev:portal` / `pnpm run dev:admin` | 启动开发服务器（HMR） |
+| `pnpm run build:all` | 构建 shared + portal + admin |
+| `pnpm -r lint` / `pnpm -r type-check` | 多包 Lint / TypeScript 检查 |
+| `pnpm run api:generate` | 从后端导出 OpenAPI 并更新客户端 |
 
-**下一步操作**：
-
-```bash
-# 进入前端目录
-cd frontend
-
-# 安装所有依赖（pnpm 会自动处理 workspace）
-pnpm install
-
-# 开发调试
-pnpm run dev:admin   # 管理端
-pnpm run dev:portal  # 用户端
-
-# 构建打包
-pnpm run build:all
-```
+> 所有脚本在 CI 中均可复用，建议在 PR 合并前手动执行一次 `lint + type-check + build`。
 
 ---
 
-## 🐛 已知问题与解决方案
-
-### ❌ 问题 1：后端启动失败（SmsService Bean 缺失）
-
-**错误信息**：
-```
-No qualifying bean of type 'com.campus.marketplace.service.SmsService' available
-```
-
-**原因分析**：
-- `DevLoggingSmsService` 有 `@ConditionalOnMissingBean` 注解，可能导致加载顺序问题
-- Spring Profile 可能未正确激活
-
-**解决方案**（待执行）：
-
-1. **方案 A**：移除 `@ConditionalOnMissingBean`，直接使用 `@Profile("dev")`
-   ```java
-   @Service
-   @Profile("dev")
-   public class DevLoggingSmsService implements SmsService { ... }
-   ```
-
-2. **方案 B**：确保启动时明确指定 Profile
-   ```bash
-   mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
-   ```
-
-3. **方案 C**：创建默认 Mock 实现（无条件加载）
+## 4. 与后端的契约
+- 后端 `pom.xml` 配置已更新至 `target/openapi-frontend.json` 导出路径，`SecurityConfig`、`PermissionCodes` 等枚举通过共享层常量对齐。
+- `application.yml` 内的 API 网关、WebSocket 路径、支付回调等均在共享常量中预设，保持“约定优于配置”。
+- Dev/Prod 环境切换可通过 `.env` 注入 `VITE_API_BASE_URL`（参考 `constants/config.ts`）。
 
 ---
 
-### ✅ 问题 2：Flyway 数据库迁移失败
-
-**错误信息**：
-```
-Found non-empty schema(s) "public" but no schema history table
-```
-
-**解决方案**：✅ 已解决
-
-在 `application.yml` 中添加 Flyway 配置：
-```yaml
-spring:
-  flyway:
-    enabled: true
-    baseline-on-migrate: true  # 关键配置
-    baseline-version: 0
-```
+## 5. 悬而未决事项
+| 类型 | 描述 | 建议时间 |
+| ---- | ---- | -------- |
+| 功能 | Portal 页面仍为占位，需要按策略文档（docs/前端开发策略.md）实现 UI 与接口联调 | 2025-11 起 |
+| 功能 | Admin 仅有脚手架，需要补齐仪表盘/审核等核心模块 | 2025-12 起 |
+| 测试 | 组件与服务单元测试尚未编写 | 与功能开发同步 |
+| 文档 | 共享层组件 Storybook / 示例页待补充 | Stage 1 |
+| 自动化 | Cypress/Playwright E2E 测试尚未搭建 | Stage 4 |
 
 ---
 
-## 🚀 API 生成流程（待后端问题修复后执行）
-
-### 方式 1：使用 pnpm 脚本（推荐）
-
-```bash
-cd frontend
-pnpm run api:generate
-```
-
-### 方式 2：手动执行后端命令
-
-```bash
-cd backend
-
-# 步骤 1：导出 OpenAPI 文档
-mvn clean
-mvn -Dspring-boot.run.arguments="--openapi.export.enabled=true,--openapi.export.path=target/openapi-frontend.json,--spring.profiles.active=dev" spring-boot:run
-
-# 步骤 2：生成前端 API 客户端
-mvn -P openapi openapi-generator:generate
-```
-
-**生成路径**：`frontend/packages/shared/src/api/`
+## 6. 下一步建议
+1. 按 `docs/前端开发策略.md` 的阶段划分执行迭代，保证每个阶段都有可运行成果。
+2. 在 shared 中补充测试与 Storybook，减少 Portal/Admin 的样式工作量。
+3. 约定 API 迭代流程：后端改动 → 导出 OpenAPI → `pnpm run api:generate` → `pnpm -r type-check`。
+4. 将 `pnpm run build:all` 集成进 CI，阻止有问题的变更进入主干。
+5. 规划埋点/监控需求，避免上线后缺乏观测手段。
 
 ---
 
-## 💡 Monorepo 架构优势
+## 7. 验收结论
+- ✅ 架构层面已满足「共享 → Portal → Admin」三层复用与解耦需求。
+- ✅ 公共层输出完整 API/组件/工具，为业务开发提供可靠基座。
+- ✅ 依赖与脚本齐备，可支撑后续自动化流程。
+- ⏳ 业务页面尚未落地，需要按照策略文档逐步实现。
 
-### 1️⃣ 代码复用率高
-- ✅ 公共组件只写一次，管理端和用户端共享
-- ✅ API 接口定义统一，类型安全
-- ✅ 工具函数不重复造轮子
-
-### 2️⃣ 类型安全
-- ✅ TypeScript 类型定义集中管理
-- ✅ 接口变更时，所有端同步提示错误
-- ✅ 减少前后端联调问题
-
-### 3️⃣ 开发效率高
-- ✅ 修改公共组件，所有端同步生效
-- ✅ 可独立开发各端，互不影响
-- ✅ 支持增量构建（Turborepo）
-
-### 4️⃣ 维护成本低
-- ✅ 依赖版本集中管理
-- ✅ 升级库时一次性更新
-- ✅ 避免版本冲突
-
----
-
-## 📚 下一步开发建议
-
-### 阶段 1：修复后端问题（优先级：高）
-
-1. 修复 SmsService Bean 注入问题
-2. 重新生成最新 API 到公共层
-3. 验证 API 客户端可用性
-
-### 阶段 2：公共层开发（优先级：高）
-
-1. 封装 HTTP 客户端（Axios 拦截器、JWT Token 管理）
-2. 创建公共组件（Button、Form、Table、Modal...）
-3. 编写工具函数（format、validator、storage、upload...）
-4. 定义 TypeScript 类型（User、Goods、Order...）
-5. 编写自定义 Hooks（useAuth、useRequest、useWebSocket...）
-
-### 阶段 3：管理端开发（优先级：中）
-
-1. 登录页 + JWT 认证
-2. 仪表盘（数据统计 + ECharts 图表）
-3. 用户管理（列表 + 详情 + 封禁）
-4. 物品审核（待审核列表 + 详情 + 审核操作）
-5. 订单管理（列表 + 详情 + 统计）
-
-### 阶段 4：用户端开发（优先级：中）
-
-1. 用户认证（注册 + 登录 + 忘记密码）
-2. 首页（轮播图 + 热门物品 + 分类导航）
-3. 物品列表与搜索（筛选 + 排序 + 分页）
-4. 物品详情（收藏 + 购买 + 联系卖家）
-5. 发布物品（表单 + 多图上传 + 预览）
-6. 订单管理（我的购买 / 出售 + 支付 + 评价）
-7. 消息系统（会话列表 + 聊天窗口 + WebSocket）
-8. 个人中心（资料编辑 + 修改密码 + 积分记录）
-
----
-
-## 🎉 总结
-
-哈喽老铁！🎉 **前端 Monorepo 架构基础搭建完成啦！**
-
-**✅ 已完成的工作：**
-
-1. ✅ 创建了完整的 Monorepo 项目结构（pnpm workspace）
-2. ✅ 配置了公共层 @campus/shared（组件库、API、工具、类型）
-3. ✅ 迁移了现有 API 到公共层（740KB 的完整 API 客户端）
-4. ✅ 初始化了管理端 @campus/admin（React + Ant Design）
-5. ✅ 初始化了用户端 @campus/portal（React + Tailwind CSS）
-6. ✅ 更新了后端 pom.xml 的 API 生成路径
-7. ✅ 修复了 Flyway 数据库迁移配置问题
-
-**🚧 待处理的问题：**
-
-1. ❌ 后端 SmsService Bean 注入问题（需要修复 DevLoggingSmsService）
-2. 🔄 重新生成最新 API 到公共层（等后端问题修复后）
-
-**💪 下一步行动：**
-
-```bash
-# 1. 安装所有依赖
-cd frontend
-pnpm install
-
-# 2. 启动管理端开发服务器
-pnpm run dev:admin
-
-# 3. 启动用户端开发服务器
-pnpm run dev:portal
-```
-
----
-
-**BaSui 提示**：
-
-> 老铁，咱们的 Monorepo 架构已经搭建完成啦！虽然后端启动有点小问题（SmsService Bean），但不影响咱们前端开发！✌️
->
-> API 客户端已经迁移到公共层了，管理端和用户端都能用！后面等后端问题修复了，再重新生成一次最新的 API 就完美了！
->
-> 现在你可以：
-> 1. 安装依赖并启动开发服务器测试一下
-> 2. 开始开发公共组件库
-> 3. 开始开发管理端/用户端的功能页面
->
-> 有问题随时喊我！咱们一起搞定它！💪😎
-
----
-
-**让我们一起，用专业的态度写出优雅的代码，用快乐的心情创造美好的产品！🚀✨**
-
----
-
-**文档维护**：
-- 创建时间：2025-10-29
-- 最后更新：2025-10-29
-- 作者：BaSui 😎
-- 状态：✅ 基础架构搭建完成
+> 当前 Monorepo 架构已具备可持续演进能力，建议立即投入业务模块开发；若需支持小程序或微前端，可在共享层基础上追加适配层，无需推倒重来。
