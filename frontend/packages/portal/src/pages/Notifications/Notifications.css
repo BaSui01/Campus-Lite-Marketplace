@@ -1,0 +1,276 @@
+/**
+ * 通知页面样式 - 不错过任何重要消息！🔔
+ * @author BaSui 😎
+ * @description 美观的通知界面设计（黄橙主题）
+ */
+
+.notifications-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.notifications-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.notifications-header__title {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==================== 标签切换 ==================== */
+
+.notifications-tabs {
+  margin-bottom: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ==================== 通知列表 ==================== */
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notifications-empty {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.notifications-empty .empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.notifications-empty .empty-text {
+  font-size: 18px;
+  color: #595959;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.notifications-empty .empty-tip {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* ==================== 通知卡片 ==================== */
+
+.notification-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+.notification-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.notification-card.unread {
+  background: #fff9f0;
+  border-left: 4px solid #ffa940;
+}
+
+.notification-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.notification-card__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.notification-card__title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notification-card__time {
+  font-size: 12px;
+  color: #8c8c8c;
+  flex-shrink: 0;
+}
+
+.notification-card__text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #595959;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.notification-card__delete {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
+  padding: 4px;
+}
+
+.notification-card:hover .notification-card__delete {
+  opacity: 1;
+}
+
+.notification-card__delete:hover {
+  transform: scale(1.2);
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .notifications-page {
+    padding: 10px 0;
+  }
+
+  .notifications-container {
+    padding: 0 10px;
+  }
+
+  .notifications-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 20px;
+  }
+
+  .notifications-header__title {
+    font-size: 24px;
+  }
+
+  .notifications-header button {
+    width: 100%;
+  }
+
+  .notifications-tabs {
+    padding: 12px 16px;
+  }
+
+  .notification-card {
+    padding: 16px 20px;
+  }
+
+  .notification-card__icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .notification-card__delete {
+    opacity: 1;
+    right: 16px;
+    top: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notifications-container {
+    padding: 0 5px;
+  }
+
+  .notifications-header {
+    padding: 12px 16px;
+  }
+
+  .notifications-header__title {
+    font-size: 20px;
+  }
+
+  .notifications-tabs {
+    padding: 10px 12px;
+  }
+
+  .notification-card {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .notification-card__icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .notification-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .notification-card__title {
+    font-size: 15px;
+  }
+
+  .notification-card__text {
+    font-size: 13px;
+  }
+
+  .notification-card__delete {
+    font-size: 16px;
+    right: 12px;
+    top: 12px;
+  }
+}

@@ -1,0 +1,579 @@
+/**
+ * 订单列表页样式 - 让订单管理更清晰！🎨
+ * @author BaSui 😎
+ */
+
+.orders-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24px 0;
+}
+
+/* ==================== 加载和错误状态 ==================== */
+
+.orders-loading,
+.orders-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  background: #ffffff;
+  border-radius: 8px;
+  margin: 0 20px;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.orders-loading p {
+  font-size: 16px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+.error-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.orders-error p {
+  font-size: 16px;
+  color: #595959;
+  margin: 0 0 24px 0;
+}
+
+.btn-retry {
+  padding: 12px 32px;
+  background: #1890ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-retry:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+/* ==================== 主容器 ==================== */
+
+.orders-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.orders-page-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 24px 0;
+}
+
+/* ==================== Tab 切换 ==================== */
+
+.orders-tabs {
+  display: flex;
+  gap: 4px;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.tab-item {
+  flex: 1;
+  padding: 12px 24px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #595959;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-item:hover {
+  color: #1890ff;
+  background: #f0f9ff;
+}
+
+.tab-item.active {
+  color: #1890ff;
+  background: #e6f7ff;
+  box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+}
+
+/* ==================== 筛选栏 ==================== */
+
+.orders-filter {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.filter-status {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-btn {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.status-btn:hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.status-btn.active {
+  border-color: #1890ff;
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: bold;
+}
+
+.filter-search {
+  display: flex;
+  gap: 12px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #262626;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.search-input::placeholder {
+  color: #bfbfbf;
+}
+
+.search-btn {
+  padding: 10px 24px;
+  background: #1890ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+/* ==================== 订单列表 ==================== */
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.order-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* 订单头部 */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-no {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.order-status {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.order-status.status-pending {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.order-status.status-processing {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.order-status.status-completed {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.order-status.status-cancelled {
+  background: #f0f0f0;
+  color: #8c8c8c;
+}
+
+.order-status.status-refunding {
+  background: #fff2f0;
+  color: #ff4d4f;
+}
+
+/* 订单主体 */
+.order-body {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.goods-image {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goods-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  font-size: 48px;
+}
+
+.goods-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goods-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goods-desc {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.order-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: auto;
+}
+
+.order-time,
+.order-user {
+  display: flex;
+  align-items: center;
+}
+
+.order-price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff4d4f;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* 订单底部 */
+.order-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-view-detail {
+  padding: 8px 24px;
+  background: #ffffff;
+  color: #1890ff;
+  border: 1px solid #1890ff;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-view-detail:hover {
+  background: #e6f7ff;
+}
+
+/* ==================== 空状态 ==================== */
+
+.orders-empty {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.empty-text {
+  font-size: 18px;
+  color: #595959;
+  margin: 0 0 8px 0;
+}
+
+.empty-tip {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0 0 24px 0;
+}
+
+.btn-go-home {
+  padding: 12px 32px;
+  background: #1890ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-go-home:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+/* ==================== 加载更多 ==================== */
+
+.orders-load-more {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.btn-load-more {
+  padding: 12px 48px;
+  background: #ffffff;
+  color: #1890ff;
+  border: 1px solid #1890ff;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-load-more:hover:not(:disabled) {
+  background: #e6f7ff;
+}
+
+.btn-load-more:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==================== 分页信息 ==================== */
+
+.orders-pagination-info {
+  text-align: center;
+  padding: 20px 0;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.orders-pagination-info .count {
+  color: #1890ff;
+  font-weight: bold;
+}
+
+.orders-pagination-info .all-loaded {
+  color: #52c41a;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .orders-container {
+    padding: 0 10px;
+  }
+
+  .orders-page-title {
+    font-size: 24px;
+  }
+
+  .orders-tabs {
+    flex-direction: column;
+  }
+
+  .tab-item {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .orders-filter {
+    padding: 16px;
+  }
+
+  .filter-status {
+    gap: 8px;
+  }
+
+  .status-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .filter-search {
+    flex-direction: column;
+  }
+
+  .search-btn {
+    width: 100%;
+  }
+
+  .order-card {
+    padding: 16px;
+  }
+
+  .order-body {
+    flex-direction: column;
+  }
+
+  .goods-image {
+    width: 100%;
+    height: 200px;
+  }
+
+  .order-price {
+    align-self: flex-start;
+    margin-top: 8px;
+  }
+
+  .order-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .orders-page {
+    padding: 12px 0;
+  }
+
+  .orders-page-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .orders-filter {
+    padding: 12px;
+  }
+
+  .filter-status {
+    gap: 6px;
+  }
+
+  .status-btn {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .order-card {
+    padding: 12px;
+  }
+
+  .goods-title {
+    font-size: 14px;
+  }
+
+  .goods-desc {
+    font-size: 12px;
+  }
+
+  .order-price {
+    font-size: 18px;
+  }
+}

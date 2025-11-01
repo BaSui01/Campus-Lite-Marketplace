@@ -7,9 +7,10 @@
 import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toast, useWebSocketService } from '@campus/shared';
+import { toast, useWebSocketService } from '@campus/shared';
 import { useAuthStore, useNotificationStore } from './store';
 import { router } from './router';
+import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
 // 创建 React Query 客户端
@@ -27,12 +28,17 @@ const queryClient = new QueryClient({
  * 应用根组件
  */
 function App() {
-  const { init: initAuth } = useAuthStore();
+  const { init: initAuth, isAuthenticated } = useAuthStore();
   const { notifications, remove } = useNotificationStore();
 
-  // 初始化 WebSocket 服务
+  // 初始化认证状态
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
+  // 初始化 WebSocket 服务（只有登录后才连接！🎯）
   useWebSocketService({
-    autoConnect: true,
+    autoConnect: isAuthenticated, // ✅ 改为根据登录状态决定是否连接
     onOpen: () => {
       console.log('✅ WebSocket 已连接');
     },
@@ -44,28 +50,38 @@ function App() {
     },
   });
 
-  // 初始化认证状态
-  useEffect(() => {
-    initAuth();
-  }, [initAuth]);
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        // 可选:将错误发送到错误监控服务（如 Sentry）
+        console.error('🚨 全局错误捕获:', error);
+        console.error('📍 错误详情:', errorInfo);
+        // TODO: 集成 Sentry 或其他错误追踪服务
+        // 示例: Sentry.captureException(error, { extra: errorInfo });
+      }}
+    >
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider
+          router={router}
+          future={{
+            v7_startTransition: true
+          }}
+        />
 
-      {/* 全局通知组件 */}
-      <div className="toast-container">
-        {notifications.map((notification) => (
-          <Toast
-            key={notification.id}
-            type={notification.type}
-            message={notification.message}
-            duration={notification.duration}
-            onClose={() => remove(notification.id)}
-          />
-        ))}
-      </div>
-    </QueryClientProvider>
+        {/* 全局通知组件 */}
+        <div className="toast-container">
+          {notifications.map((notification) => (
+            <Toast
+              key={notification.id}
+              type={notification.type}
+              message={notification.message}
+              duration={notification.duration}
+              onClose={() => remove(notification.id)}
+            />
+          ))}
+        </div>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

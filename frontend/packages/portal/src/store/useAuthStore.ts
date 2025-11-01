@@ -90,22 +90,22 @@ export const useAuthStore = create<AuthState>()(
           const response = await authService.login(data);
 
           if (response.code === 200 && response.data) {
-            const { user, accessToken, refreshToken } = response.data;
+            // ✅ 适配后端实际返回的数据结构
+            const { token, userInfo } = response.data;
 
             // 保存到 LocalStorage
-            setItem(TOKEN_KEY, accessToken);
-            setItem(REFRESH_TOKEN_KEY, refreshToken);
+            setItem(TOKEN_KEY, token || '');
 
             // 更新状态
             set({
-              user,
-              accessToken,
-              refreshToken,
+              user: userInfo as any, // 将 UserInfo 转换为 User
+              accessToken: token,
+              refreshToken: null, // 后端暂不返回 refreshToken
               isAuthenticated: true,
               isLoading: false,
             });
 
-            console.log('✅ 登录成功:', user.username);
+            console.log('✅ 登录成功:', userInfo?.username);
           } else {
             throw new Error(response.message || '登录失败');
           }

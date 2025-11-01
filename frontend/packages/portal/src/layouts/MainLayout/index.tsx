@@ -124,7 +124,7 @@ const MainLayout = () => {
 
             {/* 用户菜单 */}
             {isAuthenticated ? (
-              <Dropdown items={userMenuItems} trigger="click">
+              <Dropdown menu={userMenuItems} trigger="click">
                 <div className="main-layout__user">
                   <UserAvatar
                     userId={user?.id.toString() || ''}

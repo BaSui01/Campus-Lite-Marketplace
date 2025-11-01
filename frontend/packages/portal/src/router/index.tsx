@@ -16,6 +16,7 @@ import { useAuthStore } from '../store';
 // 认证页面
 const Login = lazy(() => import('../pages/Login'));
 const Register = lazy(() => import('../pages/Register'));
+const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
 
 // 主要页面
 const Home = lazy(() => import('../pages/Home'));
@@ -23,8 +24,12 @@ const GoodsDetail = lazy(() => import('../pages/GoodsDetail'));
 const Publish = lazy(() => import('../pages/Publish'));
 const Chat = lazy(() => import('../pages/Chat'));
 const Orders = lazy(() => import('../pages/Orders'));
+const OrderDetail = lazy(() => import('../pages/OrderDetail'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Community = lazy(() => import('../pages/Community'));
+const Search = lazy(() => import('../pages/Search'));
+const Settings = lazy(() => import('../pages/Settings'));
+const Notifications = lazy(() => import('../pages/Notifications'));
 
 // ==================== 路由守卫组件 ====================
 
@@ -78,25 +83,26 @@ const LazyLoadWrapper = ({ children }: { children: React.ReactNode }) => {
 /**
  * 应用路由配置
  */
-export const router = createBrowserRouter([
-  // ==================== 主布局路由 ====================
-  {
-    path: '/',
-    element: <MainLayout />,
-    children: [
-      {
-        index: true,
-        element: (
-          <LazyLoadWrapper>
-            <Home />
-          </LazyLoadWrapper>
-        ),
-      },
-      {
-        path: 'goods/:id',
-        element: (
-          <LazyLoadWrapper>
-            <GoodsDetail />
+export const router = createBrowserRouter(
+  [
+    // ==================== 主布局路由 ====================
+    {
+      path: '/',
+      element: <MainLayout />,
+      children: [
+        {
+          index: true,
+          element: (
+            <LazyLoadWrapper>
+              <Home />
+            </LazyLoadWrapper>
+          ),
+        },
+        {
+          path: 'goods/:id',
+          element: (
+            <LazyLoadWrapper>
+              <GoodsDetail />
           </LazyLoadWrapper>
         ),
       },
@@ -131,6 +137,16 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'orders/:orderNo',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <OrderDetail />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
         path: 'profile',
         element: (
           <RequireAuth>
@@ -146,6 +162,34 @@ export const router = createBrowserRouter([
           <LazyLoadWrapper>
             <Community />
           </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'search',
+        element: (
+          <LazyLoadWrapper>
+            <Search />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'settings',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <Settings />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'notifications',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <Notifications />
+            </LazyLoadWrapper>
+          </RequireAuth>
         ),
       },
     ],
@@ -176,6 +220,16 @@ export const router = createBrowserRouter([
           </RedirectIfAuth>
         ),
       },
+      {
+        path: 'forgot-password',
+        element: (
+          <RedirectIfAuth>
+            <LazyLoadWrapper>
+              <ForgotPassword />
+            </LazyLoadWrapper>
+          </RedirectIfAuth>
+        ),
+      },
     ],
   },
 
@@ -192,6 +246,14 @@ export const router = createBrowserRouter([
       </div>
     ),
   },
-]);
+],
+  // ==================== React Router v7 兼容性配置 ====================
+  {
+    future: {
+      // ✅ 启用 v7 的 React.startTransition 包裹状态更新
+      v7_startTransition: true,
+    },
+  }
+);
 
 export default router;

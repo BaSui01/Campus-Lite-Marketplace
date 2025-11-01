@@ -1,0 +1,410 @@
+/**
+ * 首页样式 - 让商品列表变得美观！🎨
+ * @author BaSui 😎
+ */
+
+.home-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+/* ==================== 搜索栏 ==================== */
+
+.home-search {
+  background: #ffffff;
+  padding: 24px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.home-search__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 16px;
+}
+
+.home-search__container > div {
+  flex: 1;
+}
+
+/* ==================== 主内容区 ==================== */
+
+.home-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 24px;
+}
+
+/* ==================== 左侧推荐 ==================== */
+
+.home-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+}
+
+.home-recommend {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 20px;
+}
+
+.home-recommend__title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 16px 0;
+}
+
+.home-recommend__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-recommend__item {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.home-recommend__item:hover {
+  background: #f5f5f5;
+}
+
+.home-recommend__item-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.home-recommend__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-recommend__item-title {
+  font-size: 14px;
+  color: #262626;
+  margin: 0 0 8px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-recommend__item-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ff4d4f;
+  margin: 0;
+}
+
+.home-recommend__empty {
+  text-align: center;
+  color: #8c8c8c;
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+/* ==================== 右侧商品列表 ==================== */
+
+.home-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 筛选栏 */
+.home-filter {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.home-filter__sort {
+  display: flex;
+  gap: 16px;
+}
+
+.home-filter__sort-item {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.home-filter__sort-item:hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.home-filter__sort-item.active {
+  border-color: #1890ff;
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: bold;
+}
+
+.home-filter__info {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.home-filter__count {
+  color: #1890ff;
+  font-weight: bold;
+}
+
+/* 加载状态 */
+.home-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.home-loading p {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+/* 商品网格 */
+.home-goods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* 商品卡片 */
+.home-goods-card {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.home-goods-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.home-goods-card__image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-goods-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-goods-card__placeholder {
+  font-size: 48px;
+}
+
+.home-goods-card__info {
+  padding: 16px;
+}
+
+.home-goods-card__title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 8px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-goods-card__desc {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0 0 12px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.5;
+  min-height: 42px;
+}
+
+.home-goods-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.home-goods-card__tag {
+  padding: 2px 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #595959;
+}
+
+.home-goods-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  margin-bottom: 8px;
+}
+
+.home-goods-card__price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff4d4f;
+}
+
+.home-goods-card__meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.home-goods-card__seller {
+  font-size: 12px;
+  color: #8c8c8c;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 加载更多 */
+.home-load-more {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.home-pagination-info {
+  text-align: center;
+  padding: 20px 0;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+/* 空状态 */
+.home-empty {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.home-empty__icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.home-empty__text {
+  font-size: 18px;
+  color: #595959;
+  margin: 0 0 8px 0;
+}
+
+.home-empty__tip {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 1024px) {
+  .home-content {
+    flex-direction: column;
+  }
+
+  .home-sidebar {
+    width: 100%;
+  }
+
+  .home-recommend {
+    position: static;
+  }
+
+  .home-recommend__list {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .home-recommend__item {
+    flex-direction: column;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-search__container {
+    flex-direction: column;
+  }
+
+  .home-filter {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .home-filter__sort {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .home-goods-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .home-goods-card__image {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-content {
+    padding: 0 10px;
+  }
+
+  .home-goods-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-goods-card__image {
+    height: 200px;
+  }
+}

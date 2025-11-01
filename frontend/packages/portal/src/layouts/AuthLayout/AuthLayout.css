@@ -1,6 +1,7 @@
 /**
- * 认证布局样式
+ * 认证布局样式 - 炫酷黑色动态背景 + 流星雨效果
  * @author BaSui 😎
+ * @updated 2025-11-01 - 全新黑色动态渐变背景
  */
 
 .auth-layout {
@@ -8,65 +9,104 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* 🌌 深邃黑色动态渐变背景 */
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
   position: relative;
   overflow: hidden;
   padding: 24px;
 }
 
-/* ==================== 背景装饰 ==================== */
+/* 🌊 渐变动画 */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ==================== 流星雨背景装饰 ==================== */
 
 .auth-layout__bg {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
-.auth-layout__bg-circle {
+/* 🌠 流星雨效果 */
+.auth-layout__bg::before,
+.auth-layout__bg::after {
+  content: '';
   position: absolute;
+  width: 2px;
+  height: 100px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  animation: float 20s infinite ease-in-out;
+  animation: meteor 8s linear infinite;
+  opacity: 0;
 }
 
-.auth-layout__bg-circle--1 {
-  width: 400px;
-  height: 400px;
-  top: -200px;
-  left: -200px;
+.auth-layout__bg::before {
+  top: -100px;
+  left: 20%;
   animation-delay: 0s;
 }
 
-.auth-layout__bg-circle--2 {
-  width: 300px;
-  height: 300px;
-  bottom: -150px;
-  right: -150px;
-  animation-delay: 5s;
+.auth-layout__bg::after {
+  top: -100px;
+  left: 60%;
+  animation-delay: 4s;
 }
 
-.auth-layout__bg-circle--3 {
-  width: 200px;
-  height: 200px;
-  top: 50%;
-  right: 10%;
-  animation-delay: 10s;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
+@keyframes meteor {
+  0% {
+    transform: translate(0, 0) rotate(45deg);
+    opacity: 0;
   }
-  25% {
-    transform: translate(20px, -20px) scale(1.05);
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(300px, calc(100vh + 200px)) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* 🌟 星星点点背景 */
+.auth-layout__bg-stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, white, transparent),
+    radial-gradient(2px 2px at 60% 70%, white, transparent),
+    radial-gradient(1px 1px at 50% 50%, white, transparent),
+    radial-gradient(1px 1px at 80% 10%, white, transparent),
+    radial-gradient(2px 2px at 90% 60%, white, transparent),
+    radial-gradient(1px 1px at 33% 80%, white, transparent),
+    radial-gradient(1px 1px at 15% 90%, white, transparent);
+  background-size: 200% 200%;
+  background-position: 0% 0%;
+  animation: stars 20s ease infinite;
+  opacity: 0.6;
+}
+
+@keyframes stars {
+  0%, 100% {
+    background-position: 0% 0%;
   }
   50% {
-    transform: translate(-20px, 20px) scale(0.95);
-  }
-  75% {
-    transform: translate(20px, 20px) scale(1.02);
+    background-position: 100% 100%;
   }
 }
 
@@ -76,7 +116,8 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 480px;
+  /* 📐 PC端自适应宽度，移动端限制480px */
+  max-width: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -86,7 +127,8 @@
 /* Logo */
 
 .auth-layout__logo {
-  display: flex;
+  /* 🖥️ PC端隐藏，移动端显示 */
+  display: none;
   align-items: center;
   gap: 16px;
   margin-bottom: 16px;
@@ -108,10 +150,12 @@
 
 .auth-layout__form-wrapper {
   width: 100%;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  padding: 48px;
+  /* 🎨 PC端：透明背景，不添加额外样式（由子页面控制）*/
+  /* 📱 移动端：白色背景 + 圆角卡片 */
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
   animation: slideIn 0.5s ease-out;
 }
 
@@ -147,16 +191,30 @@
     padding: 16px;
   }
 
+  /* 📱 移动端限制最大宽度 */
+  .auth-layout__content {
+    max-width: 480px;
+  }
+
+  /* 📱 移动端显示 Logo */
+  .auth-layout__logo {
+    display: flex;
+  }
+
+  /* 📱 移动端使用卡片样式 */
+  .auth-layout__form-wrapper {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    padding: 32px 24px;
+  }
+
   .auth-layout__logo-icon {
     font-size: 36px;
   }
 
   .auth-layout__logo-text {
     font-size: 22px;
-  }
-
-  .auth-layout__form-wrapper {
-    padding: 32px 24px;
   }
 
   .auth-layout__bg-circle--1 {

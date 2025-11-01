@@ -1,0 +1,459 @@
+/**
+ * 搜索结果页面样式 - 快速找到想要的！🔍
+ * @author BaSui 😎
+ * @description 美观的搜索结果界面设计（橙色主题）
+ */
+
+.search-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 搜索栏 ==================== */
+
+.search-header {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+}
+
+.search-header__input {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.search-header__input > div {
+  flex: 1;
+}
+
+.search-header__input button {
+  flex-shrink: 0;
+  min-width: 100px;
+}
+
+/* ==================== 搜索类型切换 ==================== */
+
+.search-tabs {
+  background: #ffffff;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 16px;
+}
+
+/* ==================== 排序栏 ==================== */
+
+.search-sort {
+  background: #ffffff;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-sort__label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #595959;
+  flex-shrink: 0;
+}
+
+.search-sort__options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-sort__option {
+  padding: 6px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-sort__option:hover {
+  border-color: #ff6b35;
+  color: #ff6b35;
+}
+
+.search-sort__option.active {
+  border-color: #ff6b35;
+  background: #fff5f0;
+  color: #ff6b35;
+  font-weight: bold;
+}
+
+/* ==================== 搜索结果 ==================== */
+
+.search-results {
+  min-height: 400px;
+}
+
+.search-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.search-empty {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.search-empty .empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.search-empty .empty-text {
+  font-size: 18px;
+  color: #595959;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.search-empty .empty-tip {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* ==================== 商品结果列表 ==================== */
+
+.search-goods-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.goods-result-card {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.goods-result-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.goods-result-card__image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goods-result-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.goods-result-card__image .image-placeholder {
+  font-size: 48px;
+}
+
+.goods-result-card__info {
+  padding: 16px;
+}
+
+.goods-result-card__title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 8px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goods-result-card__desc {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0 0 12px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.5;
+  min-height: 42px;
+}
+
+.goods-result-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.goods-result-card__price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff4d4f;
+}
+
+.goods-result-card__seller {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+/* ==================== 用户结果列表 ==================== */
+
+.search-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-result-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.user-result-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.user-result-card__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.user-result-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-result-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-result-card__name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 6px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-result-card__bio {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0 0 8px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-result-card__stats {
+  font-size: 13px;
+  color: #595959;
+}
+
+/* ==================== 帖子结果列表 ==================== */
+
+.search-post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.post-result-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.post-result-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.post-result-card__header {
+  margin-bottom: 12px;
+}
+
+.post-result-card__author {
+  font-size: 14px;
+  font-weight: bold;
+  color: #595959;
+}
+
+.post-result-card__content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #262626;
+  margin-bottom: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.post-result-card__footer {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #8c8c8c;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 1024px) {
+  .search-goods-list {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .search-page {
+    padding: 10px 0;
+  }
+
+  .search-container {
+    padding: 0 10px;
+  }
+
+  .search-header {
+    padding: 16px 20px;
+  }
+
+  .search-header__input {
+    flex-direction: column;
+  }
+
+  .search-header__input button {
+    width: 100%;
+  }
+
+  .search-tabs {
+    padding: 12px 16px;
+  }
+
+  .search-sort {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 16px;
+  }
+
+  .search-sort__options {
+    width: 100%;
+  }
+
+  .search-goods-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .goods-result-card__image {
+    height: 150px;
+  }
+
+  .user-result-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px 20px;
+  }
+
+  .user-result-card button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-container {
+    padding: 0 5px;
+  }
+
+  .search-header {
+    padding: 12px 16px;
+  }
+
+  .search-tabs {
+    padding: 10px 12px;
+  }
+
+  .search-sort {
+    padding: 10px 12px;
+  }
+
+  .search-sort__option {
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+
+  .search-goods-list {
+    grid-template-columns: 1fr;
+  }
+
+  .goods-result-card__image {
+    height: 200px;
+  }
+
+  .user-result-card {
+    padding: 12px 16px;
+  }
+
+  .user-result-card__avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .post-result-card {
+    padding: 16px 20px;
+  }
+}

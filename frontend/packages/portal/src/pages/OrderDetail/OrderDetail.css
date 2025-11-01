@@ -1,0 +1,622 @@
+/**
+ * 订单详情页样式 - 让订单管理更清晰！🎨
+ * @author BaSui 😎
+ */
+
+.order-detail-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24px 0;
+}
+
+/* ==================== 加载和错误状态 ==================== */
+
+.order-detail-loading,
+.order-detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  background: #ffffff;
+  border-radius: 8px;
+  margin: 0 20px;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.order-detail-loading p {
+  font-size: 16px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+.error-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.order-detail-error h2 {
+  font-size: 20px;
+  color: #595959;
+  margin: 0 0 24px 0;
+}
+
+.btn-back {
+  padding: 12px 32px;
+  background: #1890ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+/* ==================== 主容器 ==================== */
+
+.order-detail-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ==================== 订单状态区域 ==================== */
+
+.order-status-section {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.status-badge.status-pending {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-badge.status-processing {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-badge.status-completed {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-badge.status-cancelled {
+  background: #f0f0f0;
+  color: #8c8c8c;
+}
+
+.status-badge.status-refunding {
+  background: #fff2f0;
+  color: #ff4d4f;
+}
+
+.order-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 8px 0;
+}
+
+.order-no {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* ==================== 商品信息区域 ==================== */
+
+.order-goods-section,
+.order-info-section,
+.users-info-section {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.goods-card {
+  display: flex;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.goods-card:hover {
+  background: #f5f5f5;
+}
+
+.goods-image {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goods-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  font-size: 48px;
+}
+
+.goods-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goods-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0;
+}
+
+.goods-desc {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.goods-price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff4d4f;
+  margin-top: auto;
+}
+
+/* ==================== 订单信息区域 ==================== */
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #262626;
+}
+
+.info-value.price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4d4f;
+}
+
+/* ==================== 买卖双方区域 ==================== */
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.user-card {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.user-label {
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-bottom: 12px;
+}
+
+.user-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.user-contact {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+/* ==================== 操作按钮区域 ==================== */
+
+.order-actions {
+  display: flex;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.order-actions button {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.order-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #1890ff;
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.btn-success {
+  background: #52c41a;
+  color: #ffffff;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #73d13d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+}
+
+.btn-warning {
+  background: #fa8c16;
+  color: #ffffff;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #ffa940;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(250, 140, 22, 0.3);
+}
+
+.btn-danger {
+  background: #ff4d4f;
+  color: #ffffff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #ff7875;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #595959;
+  border: 1px solid #d9d9d9;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+/* ==================== 弹窗样式 ==================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 20px 0;
+}
+
+/* 支付方式选择 */
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.payment-method {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 2px solid #d9d9d9;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.payment-method:hover {
+  border-color: #40a9ff;
+  background: #f0f9ff;
+}
+
+.payment-method.active {
+  border-color: #1890ff;
+  background: #e6f7ff;
+}
+
+.method-icon {
+  font-size: 32px;
+}
+
+.method-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+}
+
+/* 原因输入框 */
+.reason-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #262626;
+  resize: vertical;
+  margin-bottom: 20px;
+  font-family: inherit;
+}
+
+.reason-input:focus {
+  outline: none;
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.reason-input::placeholder {
+  color: #bfbfbf;
+}
+
+/* 弹窗底部按钮 */
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.modal-footer button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel {
+  background: #ffffff;
+  color: #595959;
+  border: 1px solid #d9d9d9;
+}
+
+.btn-cancel:hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.btn-confirm {
+  background: #1890ff;
+  color: #ffffff;
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background: #40a9ff;
+}
+
+.btn-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .order-detail-container {
+    padding: 0 10px;
+  }
+
+  .order-status-section,
+  .order-goods-section,
+  .order-info-section,
+  .users-info-section,
+  .order-actions {
+    padding: 16px;
+  }
+
+  .order-title {
+    font-size: 20px;
+  }
+
+  .users-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .order-actions {
+    flex-direction: column;
+  }
+
+  .order-actions button {
+    width: 100%;
+  }
+
+  .goods-card {
+    flex-direction: column;
+  }
+
+  .goods-image {
+    width: 100%;
+    height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-detail-page {
+    padding: 12px 0;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 16px;
+  }
+
+  .payment-method {
+    padding: 12px;
+  }
+
+  .method-icon {
+    font-size: 24px;
+  }
+
+  .method-name {
+    font-size: 14px;
+  }
+}

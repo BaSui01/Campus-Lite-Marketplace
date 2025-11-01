@@ -1,0 +1,611 @@
+/**
+ * 个人中心页样式 - 让个人资料更美观！🎨
+ * @author BaSui 😎
+ */
+
+.profile-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24px 0;
+}
+
+/* ==================== 加载和错误状态 ==================== */
+
+.profile-loading,
+.profile-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  background: #ffffff;
+  border-radius: 8px;
+  margin: 0 20px;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.profile-loading p {
+  font-size: 16px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+.error-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.profile-error h2 {
+  font-size: 20px;
+  color: #595959;
+  margin: 0 0 24px 0;
+}
+
+.btn-retry {
+  padding: 12px 32px;
+  background: #1890ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-retry:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+/* ==================== 主容器 ==================== */
+
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ==================== 用户信息卡片 ==================== */
+
+.user-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  color: #ffffff;
+}
+
+.user-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  font-size: 48px;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.user-username {
+  font-size: 16px;
+  opacity: 0.9;
+  margin: 0 0 12px 0;
+}
+
+.user-email,
+.user-phone {
+  font-size: 14px;
+  opacity: 0.85;
+  margin: 4px 0;
+}
+
+.user-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.stat-item {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 16px 24px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ==================== Tab 切换 ==================== */
+
+.profile-tabs {
+  display: flex;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.tab-item {
+  flex: 1;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #595959;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.tab-item:hover {
+  background: #f5f5f5;
+  color: #262626;
+}
+
+.tab-item.active {
+  background: #1890ff;
+  color: #ffffff;
+}
+
+/* ==================== Tab 内容 ==================== */
+
+.tab-content {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-height: 400px;
+}
+
+/* ==================== 基本信息 ==================== */
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #8c8c8c;
+  font-weight: bold;
+}
+
+.info-value {
+  font-size: 16px;
+  color: #262626;
+}
+
+.info-value.points {
+  font-size: 20px;
+  font-weight: bold;
+  color: #faad14;
+}
+
+.info-value.status {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.info-value.status.active {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.info-value.status.banned {
+  background: #fff2f0;
+  color: #ff4d4f;
+}
+
+/* ==================== 快捷操作 ==================== */
+
+.quick-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 12px 24px;
+  background: #1890ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-action:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+/* ==================== 空状态 ==================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.empty-icon {
+  font-size: 80px;
+  margin-bottom: 16px;
+}
+
+.empty-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #595959;
+  margin: 0 0 8px 0;
+}
+
+.empty-tip {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0 0 24px 0;
+}
+
+.btn-publish,
+.btn-browse {
+  padding: 12px 32px;
+  background: #1890ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-publish:hover,
+.btn-browse:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+/* ==================== 商品网格 ==================== */
+
+.goods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.goods-card {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.goods-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #1890ff;
+}
+
+.goods-image {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.goods-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+}
+
+.goods-status {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  backdrop-filter: blur(10px);
+}
+
+.goods-status.status-pending {
+  background: rgba(250, 173, 20, 0.9);
+  color: #ffffff;
+}
+
+.goods-status.status-approved {
+  background: rgba(82, 196, 26, 0.9);
+  color: #ffffff;
+}
+
+.goods-status.status-rejected {
+  background: rgba(255, 77, 79, 0.9);
+  color: #ffffff;
+}
+
+.goods-status.status-sold {
+  background: rgba(140, 140, 140, 0.9);
+  color: #ffffff;
+}
+
+.goods-status.status-off-shelf {
+  background: rgba(191, 191, 191, 0.9);
+  color: #ffffff;
+}
+
+.goods-info {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goods-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goods-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4d4f;
+  margin: 0;
+}
+
+.goods-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.goods-views,
+.goods-favorites {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==================== 收藏卡片 ==================== */
+
+.goods-card.favorite-card {
+  position: relative;
+}
+
+.btn-unfavorite {
+  width: 100%;
+  padding: 10px;
+  background: #ffffff;
+  color: #ff4d4f;
+  border: 1px solid #ff4d4f;
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-unfavorite:hover {
+  background: #ff4d4f;
+  color: #ffffff;
+}
+
+/* ==================== 加载更多 ==================== */
+
+.load-more-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.btn-load-more {
+  padding: 12px 32px;
+  background: #ffffff;
+  color: #1890ff;
+  border: 1px solid #1890ff;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-load-more:hover:not(:disabled) {
+  background: #1890ff;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.btn-load-more:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 0 10px;
+  }
+
+  .user-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .user-info {
+    width: 100%;
+  }
+
+  .user-stats {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-tabs {
+    flex-direction: column;
+  }
+
+  .tab-item {
+    width: 100%;
+  }
+
+  .tab-content {
+    padding: 16px;
+  }
+
+  .goods-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+  }
+
+  .btn-action {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-page {
+    padding: 12px 0;
+  }
+
+  .user-card {
+    padding: 16px;
+  }
+
+  .user-name {
+    font-size: 24px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .goods-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,240 @@
+/**
+ * 错误边界样式 - 让错误页面也很美观！🎨
+ * @author BaSui 😎
+ */
+
+.error-boundary {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px;
+}
+
+.error-boundary__container {
+  max-width: 600px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 48px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 错误图标 ==================== */
+
+.error-boundary__icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateX(10px) rotate(5deg);
+  }
+}
+
+/* ==================== 错误标题 ==================== */
+
+.error-boundary__title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 16px 0;
+}
+
+/* ==================== 错误描述 ==================== */
+
+.error-boundary__description {
+  font-size: 16px;
+  color: #595959;
+  margin: 0 0 32px 0;
+  line-height: 1.6;
+}
+
+/* ==================== 错误详情 ==================== */
+
+.error-boundary__details {
+  margin: 24px 0;
+  text-align: left;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.error-boundary__summary {
+  font-size: 14px;
+  font-weight: bold;
+  color: #595959;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.error-boundary__summary:hover {
+  background-color: #f0f0f0;
+}
+
+.error-boundary__error-info {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.error-boundary__error-message,
+.error-boundary__error-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.error-boundary__error-message strong,
+.error-boundary__error-stack strong {
+  font-size: 14px;
+  color: #262626;
+}
+
+.error-boundary__error-info pre {
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 12px;
+  color: #ff4d4f;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ==================== 操作按钮 ==================== */
+
+.error-boundary__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.error-boundary__btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-boundary__btn--primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+}
+
+.error-boundary__btn--primary:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.error-boundary__btn--secondary {
+  background: #52c41a;
+  color: #ffffff;
+}
+
+.error-boundary__btn--secondary:hover {
+  background: #73d13d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+}
+
+.error-boundary__btn--outline {
+  background: transparent;
+  color: #595959;
+  border: 1px solid #d9d9d9;
+}
+
+.error-boundary__btn--outline:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+/* ==================== 提示信息 ==================== */
+
+.error-boundary__tip {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+@media (max-width: 768px) {
+  .error-boundary__container {
+    padding: 32px 24px;
+  }
+
+  .error-boundary__icon {
+    font-size: 64px;
+  }
+
+  .error-boundary__title {
+    font-size: 24px;
+  }
+
+  .error-boundary__description {
+    font-size: 14px;
+  }
+
+  .error-boundary__actions {
+    flex-direction: column;
+  }
+
+  .error-boundary__btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .error-boundary {
+    padding: 12px;
+  }
+
+  .error-boundary__container {
+    padding: 24px 16px;
+  }
+
+  .error-boundary__icon {
+    font-size: 48px;
+  }
+
+  .error-boundary__title {
+    font-size: 20px;
+  }
+}

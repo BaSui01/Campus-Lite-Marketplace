@@ -1,0 +1,479 @@
+/**
+ * 社区页面样式 - 精彩生活分享！🌐
+ * @author BaSui 😎
+ * @description 美观的社区界面设计（蓝绿主题）
+ */
+
+.community-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.community-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 顶部操作栏 ==================== */
+
+.community-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.community-header__title {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==================== 标签筛选 ==================== */
+
+.community-tabs {
+  margin-bottom: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ==================== 帖子列表 ==================== */
+
+.community-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.community-empty {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.community-empty .empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.community-empty .empty-text {
+  font-size: 18px;
+  color: #595959;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.community-empty .empty-tip {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* 帖子卡片 */
+.post-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.post-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.post-card__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.post-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-card__info {
+  flex: 1;
+}
+
+.post-card__name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.post-card__time {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.post-card__content {
+  margin-bottom: 16px;
+}
+
+.post-card__content p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #262626;
+  margin: 0;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.post-card__images {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.post-card__images img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.post-card__images img:hover {
+  transform: scale(1.05);
+}
+
+.post-card__actions {
+  display: flex;
+  gap: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.post-card__action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #595959;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.post-card__action:hover {
+  background: #f5f5f5;
+  color: #262626;
+}
+
+.post-card__action.active {
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+/* 加载更多 */
+.community-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.community-no-more {
+  text-align: center;
+  padding: 20px 0;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.community-no-more p {
+  margin: 0;
+}
+
+/* ==================== 发布动态弹窗 ==================== */
+
+.publish-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.publish-modal__textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.publish-modal__textarea:focus {
+  outline: none;
+  border-color: #11998e;
+  box-shadow: 0 0 0 2px rgba(17, 153, 142, 0.1);
+}
+
+.publish-modal__textarea::placeholder {
+  color: #bfbfbf;
+}
+
+.publish-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ==================== 评论弹窗 ==================== */
+
+.comment-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 300px;
+  max-height: 500px;
+}
+
+.comment-modal__list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 4px;
+}
+
+.comment-modal__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.comment-item {
+  display: flex;
+  gap: 12px;
+}
+
+.comment-item__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.comment-item__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.comment-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.comment-item__name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #262626;
+}
+
+.comment-item__time {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.comment-item__text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #595959;
+  margin: 0;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.comment-modal__input {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.comment-modal__input > div {
+  flex: 1;
+}
+
+.comment-modal__input button {
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .community-page {
+    padding: 10px 0;
+  }
+
+  .community-container {
+    padding: 0 10px;
+  }
+
+  .community-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 20px;
+  }
+
+  .community-header__title {
+    font-size: 24px;
+  }
+
+  .community-header button {
+    width: 100%;
+  }
+
+  .community-tabs {
+    padding: 12px 16px;
+  }
+
+  .post-card {
+    padding: 16px 20px;
+  }
+
+  .post-card__images {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .post-card__images img {
+    height: 120px;
+  }
+
+  .post-card__actions {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .community-container {
+    padding: 0 5px;
+  }
+
+  .community-header {
+    padding: 12px 16px;
+  }
+
+  .community-header__title {
+    font-size: 20px;
+  }
+
+  .community-tabs {
+    padding: 10px 12px;
+  }
+
+  .post-card {
+    padding: 12px 16px;
+  }
+
+  .post-card__header {
+    margin-bottom: 12px;
+  }
+
+  .post-card__avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .post-card__name {
+    font-size: 14px;
+  }
+
+  .post-card__content p {
+    font-size: 14px;
+  }
+
+  .post-card__images {
+    grid-template-columns: 1fr;
+  }
+
+  .post-card__images img {
+    height: 200px;
+  }
+
+  .post-card__actions {
+    gap: 12px;
+  }
+
+  .post-card__action {
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+
+  .comment-modal {
+    max-height: 400px;
+  }
+
+  .comment-item__avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+
+  .comment-modal__input {
+    flex-direction: column;
+  }
+
+  .comment-modal__input button {
+    width: 100%;
+  }
+}

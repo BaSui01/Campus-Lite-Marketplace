@@ -1,0 +1,267 @@
+/**
+ * 设置页面样式 - 个性化你的账户！⚙️
+ * @author BaSui 😎
+ * @description 美观的设置界面设计（灰蓝主题）
+ */
+
+.settings-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.settings-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.settings-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 24px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==================== 标签切换 ==================== */
+
+.settings-tabs {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ==================== 内容区域 ==================== */
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settings-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.settings-section__title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.settings-section__content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ==================== 设置项 ==================== */
+
+.settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.settings-item__label {
+  flex: 1;
+}
+
+.settings-item__label > div:first-child {
+  font-size: 16px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.settings-item__desc {
+  font-size: 13px;
+  color: #8c8c8c;
+}
+
+.settings-item__value {
+  font-size: 15px;
+  color: #595959;
+}
+
+/* ==================== 表单字段 ==================== */
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-field__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+}
+
+/* ==================== 下拉选择 ==================== */
+
+.settings-select {
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #262626;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.settings-select:hover {
+  border-color: #667eea;
+}
+
+.settings-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* ==================== 开关按钮 ==================== */
+
+.settings-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  cursor: pointer;
+}
+
+.settings-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.settings-switch__slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 26px;
+  transition: all 0.3s ease;
+}
+
+.settings-switch__slider::before {
+  position: absolute;
+  content: '';
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.settings-switch input:checked + .settings-switch__slider {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.settings-switch input:checked + .settings-switch__slider::before {
+  transform: translateX(22px);
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 10px 0;
+  }
+
+  .settings-container {
+    padding: 0 10px;
+  }
+
+  .settings-title {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+
+  .settings-tabs {
+    padding: 12px 16px;
+  }
+
+  .settings-section {
+    padding: 20px;
+  }
+
+  .settings-section__title {
+    font-size: 18px;
+  }
+
+  .settings-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .settings-item__label {
+    width: 100%;
+  }
+
+  .settings-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-container {
+    padding: 0 5px;
+  }
+
+  .settings-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .settings-tabs {
+    padding: 10px 12px;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+
+  .settings-section__title {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .settings-section__content {
+    gap: 16px;
+  }
+
+  .settings-item {
+    padding: 12px 0;
+  }
+
+  .settings-field__label {
+    font-size: 13px;
+  }
+}
