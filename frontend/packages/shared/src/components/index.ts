@@ -25,6 +25,12 @@ export { Input, type InputProps, type InputType, type InputSize } from './Input'
 export { Loading, type LoadingProps, type LoadingType, type LoadingSize } from './Loading';
 
 /**
+ * Skeleton - 骨架屏组件
+ * @description 更专业的骨架屏组件，支持多种预设布局（文本、头像、图片、卡片、列表、表单等）
+ */
+export { Skeleton, type SkeletonProps, type SkeletonType, type AvatarShape, type AnimationType } from './Skeleton';
+
+/**
  * Toast - 消息提示组件
  * @description 轻量级消息提示，支持 success、error、warning、info 四种类型
  * @example

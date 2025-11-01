@@ -30,7 +30,8 @@ export interface RequestConfig extends AxiosRequestConfig {
 
 // ==================== 常量配置 ====================
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8200/api';
+// ⚠️ 注意：不要在这里加 /api，因为 OpenAPI 生成的代码已经包含了 /api 前缀
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8200';
 const REQUEST_TIMEOUT = 30000; // 30秒超时
 const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -153,8 +154,8 @@ axiosInstance.interceptors.response.use(
         requestConfig._retry = true;
 
         try {
-          // 🔄 刷新 Token
-          const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+          // 🔄 刷新 Token（注意：这里需要加 /api 前缀）
+          const { data } = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
             refreshToken,
           });
 
@@ -167,16 +168,17 @@ axiosInstance.interceptors.response.use(
             return axiosInstance.request(config);
           }
         } catch (refreshError) {
-          // 刷新失败，清除 Token 并跳转登录
+          // 刷新失败，清除 Token（⚠️ 不再强制跳转！由业务层决定如何处理）
           console.error('[Axios] 🚨 Token刷新失败，清除认证信息');
           clearTokens();
-          window.location.href = '/login';
+          // ❌ 删除强制跳转：window.location.href = '/login';
           return Promise.reject(refreshError);
         }
       } else {
-        // 无 Refresh Token 或已重试，跳转登录
+        // 无 Refresh Token 或已重试（⚠️ 不再强制跳转！由业务层决定如何处理）
+        console.warn('[Axios] ⚠️ 未登录或 Token 已过期（401），请登录后重试');
         clearTokens();
-        window.location.href = '/login';
+        // ❌ 删除强制跳转：window.location.href = '/login';
       }
     }
 
@@ -219,6 +221,11 @@ export const createApiConfig = (): Configuration => {
 
 export default axiosInstance;
 export { axiosInstance };
+
+/**
+ * http 别名（兼容旧API）
+ */
+export const http = axiosInstance;
 
 /**
  * 🎯 使用示例：

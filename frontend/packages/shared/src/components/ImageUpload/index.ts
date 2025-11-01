@@ -4,4 +4,4 @@
  */
 
 export { ImageUpload, type ImageUploadProps } from './ImageUpload';
-export default ImageUpload;
+export { default } from './ImageUpload';

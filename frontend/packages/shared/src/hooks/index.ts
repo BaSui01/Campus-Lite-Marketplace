@@ -121,7 +121,7 @@ export {
 
 /**
  * useOrderUpdate - 订单状态更新订阅 Hook
- * @description 订阅 WebSocket 订单状态更新，实时跟踪订单变化
+ * @description 订阅 WebSocket 订单状态更新,实时跟踪订单变化
  */
 export {
   useOrderUpdate,
@@ -129,3 +129,12 @@ export {
   type UseOrderUpdateResult,
   type OrderUpdateRecord,
 } from './useOrderUpdate';
+
+/**
+ * useAuthGuard - 权限守卫 Hook
+ * @description 检查登录状态，未登录时友好提示并引导用户登录
+ */
+export {
+  useAuthGuard,
+  type UseAuthGuardResult,
+} from './useAuthGuard';

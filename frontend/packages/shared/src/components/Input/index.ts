@@ -4,4 +4,4 @@
  */
 
 export { Input, type InputProps, type InputType, type InputSize } from './Input';
-export default Input;
+export { default } from './Input';

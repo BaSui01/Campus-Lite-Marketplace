@@ -4,4 +4,4 @@
  */
 
 export { Button, type ButtonProps, type ButtonType, type ButtonSize } from './Button';
-export default Button;
+export { default } from './Button';

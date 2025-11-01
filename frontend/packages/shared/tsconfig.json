@@ -16,7 +16,7 @@
     // 类型声明
     "declaration": true,
     "declarationMap": true,
-    "emitDeclarationOnly": false,
+    "emitDeclarationOnly": true,
 
     // 输出配置
     "outDir": "./dist",

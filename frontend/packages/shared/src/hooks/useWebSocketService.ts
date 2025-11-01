@@ -189,9 +189,18 @@ export const useWebSocketService = (
       websocketService.onReconnect(updateReadyState);
     }
 
-    // 自动连接
-    if (autoConnect && !websocketService.isConnected()) {
-      connect();
+    // 自动连接（响应 autoConnect 变化！🎯）
+    if (autoConnect) {
+      if (!websocketService.isConnected()) {
+        console.log('🔌 [useWebSocketService] 自动连接 WebSocket...');
+        connect();
+      }
+    } else {
+      // autoConnect 为 false 时断开连接
+      if (websocketService.isConnected()) {
+        console.log('⚠️ [useWebSocketService] 自动断开 WebSocket...');
+        disconnect();
+      }
     }
 
     // 清理函数（组件卸载时断开连接）

@@ -4,4 +4,4 @@
  */
 
 export { Loading, type LoadingProps, type LoadingType, type LoadingSize } from './Loading';
-export default Loading;
+export { default } from './Loading';

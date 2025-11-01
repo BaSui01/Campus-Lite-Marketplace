@@ -4,4 +4,4 @@
  */
 
 export { RichTextEditor, type RichTextEditorProps } from './RichTextEditor';
-export default RichTextEditor;
+export { default } from './RichTextEditor';

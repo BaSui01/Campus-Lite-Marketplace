@@ -4,4 +4,4 @@
  */
 
 export { GoodsCard, type GoodsCardProps, type GoodsData, type GoodsStatus } from './GoodsCard';
-export default GoodsCard;
+export { default } from './GoodsCard';

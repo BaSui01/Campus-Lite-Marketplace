@@ -4,4 +4,4 @@
  */
 
 export { Form, FormItem, type FormProps, type FormItemProps, type FormLayout } from './Form';
-export default Form;
+export { default } from './Form';

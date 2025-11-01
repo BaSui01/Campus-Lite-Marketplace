@@ -4,4 +4,4 @@
  */
 
 export { UserAvatar, type UserAvatarProps, type UserOnlineStatus } from './UserAvatar';
-export default UserAvatar;
+export { default } from './UserAvatar';

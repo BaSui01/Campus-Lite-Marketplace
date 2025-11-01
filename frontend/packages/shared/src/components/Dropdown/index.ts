@@ -4,4 +4,4 @@
  */
 
 export { Dropdown, type DropdownProps, type DropdownMenuItem, type DropdownTrigger, type DropdownPlacement } from './Dropdown';
-export default Dropdown;
+export { default } from './Dropdown';

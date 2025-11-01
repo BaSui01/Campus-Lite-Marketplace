@@ -8,8 +8,9 @@
 
 /**
  * API 基础URL（从环境变量读取，默认为本地开发地址）
+ * ⚠️ 注意：不要加 /api 后缀，因为 OpenAPI 生成的代码已包含路径前缀
  */
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8200';
 
 /**
  * API 请求超时时间（毫秒）
@@ -27,9 +28,9 @@ export const API_RETRY_COUNT = 3;
 export const API_RETRY_DELAY = 1000;
 
 /**
- * WebSocket 连接URL
+ * WebSocket 连接URL（从环境变量读取）
  */
-export const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:8080/ws';
+export const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8200/ws';
 
 /**
  * WebSocket 心跳间隔（毫秒）

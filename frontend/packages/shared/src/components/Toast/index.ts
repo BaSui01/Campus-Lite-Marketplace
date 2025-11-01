@@ -4,4 +4,4 @@
  */
 
 export { toast, type ToastOptions, type ToastType, type ToastPosition } from './Toast';
-export default toast;
+export { default } from './Toast';

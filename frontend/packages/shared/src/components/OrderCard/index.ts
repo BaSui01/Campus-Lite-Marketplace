@@ -4,4 +4,4 @@
  */
 
 export { OrderCard, type OrderCardProps, type OrderData, type OrderItem, type OrderStatus } from './OrderCard';
-export default OrderCard;
+export { default } from './OrderCard';

@@ -4,4 +4,4 @@
  */
 
 export { Tag, type TagProps, type TagColor, type TagSize } from './Tag';
-export default Tag;
+export { default } from './Tag';

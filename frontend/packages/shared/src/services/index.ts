@@ -58,21 +58,21 @@ export type {
   UserOnlineStatusData,
 } from './websocket';
 
-// ==================== 便捷导出（默认导出对象）====================
+// ==================== 便捷导出（默认导出对象 - 延迟初始化）====================
 
 /**
- * 所有 API 服务集合
+ * 所有 API 服务集合（使用 getter 延迟初始化）
  */
 export const services = {
-  auth: authService,
-  user: userService,
-  goods: goodsService,
-  order: orderService,
-  message: messageService,
-  notification: notificationService,
-  post: postService,
-  upload: uploadService,
-  websocket: websocketService,
+  get auth() { return authService; },
+  get user() { return userService; },
+  get goods() { return goodsService; },
+  get order() { return orderService; },
+  get message() { return messageService; },
+  get notification() { return notificationService; },
+  get post() { return postService; },
+  get upload() { return uploadService; },
+  get websocket() { return websocketService; },
 } as const;
 
 /**

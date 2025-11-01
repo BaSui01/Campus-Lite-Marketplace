@@ -1,148 +1,182 @@
 /**
- * 物品 API 服务
+ * 商品 API 服务
  * @author BaSui 😎
- * @description 物品发布、查询、更新、删除、审核等接口
+ * @description 商品发布、查询、更新、删除、收藏等接口（对接 OpenAPI 生成的类型）
  */
 
-import { http } from '../utils/http';
+import { DefaultApi } from '../api';
+import { createApiConfig, axiosInstance } from '../utils/http';
 import type {
-  ApiResponse,
-  PageInfo,
-  Goods,
-  Category,
-  Tag,
-  Favorite,
-  PublishGoodsRequest,
-  UpdateGoodsRequest,
-  GoodsListQuery,
-  AuditGoodsRequest,
-  FavoriteListQuery,
-} from '../types';
+  GoodsResponse,
+  CreateGoodsRequest,
+  PageGoodsResponse,
+  ApiResponsePageGoodsResponse,
+  ApiResponseGoodsDetailResponse,
+  ApiResponseListGoodsResponse,
+  ApiResponseListCategoryNodeResponse,
+  ApiResponseListTagResponse,
+  ApiResponseVoid,
+  GoodsDetailResponse,
+} from '../api/models';
 
 /**
- * 物品 API 服务类
+ * 商品列表查询参数
+ */
+export interface GoodsListParams {
+  keyword?: string;        // 搜索关键词
+  categoryId?: number;     // 分类 ID
+  minPrice?: number;       // 最低价格
+  maxPrice?: number;       // 最高价格
+  page?: number;           // 页码（从 0 开始）
+  size?: number;           // 每页大小
+  sortBy?: string;         // 排序字段
+  sortDirection?: string;  // 排序方向（asc/desc）
+  tags?: number[];         // 标签 ID 列表
+}
+
+/**
+ * 商品 API 服务类
  */
 class GoodsService {
-  // ==================== 物品相关接口 ====================
+  private api: DefaultApi;
 
-  /**
-   * 发布物品
-   * @param data 发布物品请求参数
-   * @returns 发布后的物品信息
-   */
-  async publishGoods(data: PublishGoodsRequest): Promise<ApiResponse<Goods>> {
-    return http.post('/goods', data);
+  constructor() {
+    // 使用生成的 OpenAPI 客户端
+    this.api = new DefaultApi(createApiConfig(), undefined, axiosInstance);
   }
 
-  /**
-   * 更新物品
-   * @param data 更新物品请求参数
-   * @returns 更新后的物品信息
-   */
-  async updateGoods(data: UpdateGoodsRequest): Promise<ApiResponse<Goods>> {
-    return http.put(`/goods/${data.id}`, data);
-  }
+  // ==================== 商品相关接口 ====================
 
   /**
-   * 删除物品
-   * @param goodsId 物品ID
-   * @returns 删除结果
-   */
-  async deleteGoods(goodsId: number): Promise<ApiResponse<void>> {
-    return http.delete(`/goods/${goodsId}`);
-  }
-
-  /**
-   * 获取物品详情
-   * @param goodsId 物品ID
-   * @returns 物品详情
-   */
-  async getGoodsById(goodsId: number): Promise<ApiResponse<Goods>> {
-    return http.get(`/goods/${goodsId}`);
-  }
-
-  /**
-   * 获取物品列表
+   * 获取商品列表（分页）
    * @param params 查询参数
-   * @returns 物品列表
+   * @returns 商品列表（分页）
    */
-  async getGoodsList(params: GoodsListQuery): Promise<ApiResponse<PageInfo<Goods>>> {
-    return http.get('/goods', { params });
+  async listGoods(params?: GoodsListParams): Promise<PageGoodsResponse> {
+    const response = await this.api.listGoods(
+      params?.keyword,
+      params?.categoryId,
+      params?.minPrice,
+      params?.maxPrice,
+      params?.page,
+      params?.size,
+      params?.sortBy,
+      params?.sortDirection,
+      params?.tags
+    );
+    return response.data.data as PageGoodsResponse;
   }
 
   /**
-   * 获取我发布的物品
+   * 获取商品详情
+   * @param id 商品 ID
+   * @returns 商品详情
+   */
+  async getGoodsDetail(id: number): Promise<GoodsDetailResponse> {
+    const response = await this.api.getGoodsDetail(id);
+    return response.data.data as GoodsDetailResponse;
+  }
+
+  /**
+   * 获取推荐商品（热门榜单）
+   * @param limit 数量限制
+   * @returns 推荐商品列表
+   */
+  async getRecommendGoods(limit?: number): Promise<GoodsResponse[]> {
+    // 使用 hot 接口获取热门商品（无需校区ID,后端会自动推断）
+    const response = await this.api.hot(undefined, limit);
+    return response.data.data as GoodsResponse[];
+  }
+
+  /**
+   * 发布商品
+   * @param data 商品信息
+   * @returns 创建的商品 ID
+   */
+  async createGoods(data: CreateGoodsRequest): Promise<number> {
+    const response = await this.api.createGoods(data);
+    return response.data.data as number;
+  }
+
+  /**
+   * 获取我发布的商品
    * @param params 查询参数
-   * @returns 物品列表
+   * @returns 我的商品列表（分页）
    */
-  async getMyGoods(params?: { page?: number; pageSize?: number }): Promise<ApiResponse<PageInfo<Goods>>> {
-    return http.get('/goods/my', { params });
+  async getMyGoods(params?: {
+    status?: string;
+    page?: number;
+    size?: number;
+  }): Promise<PageGoodsResponse> {
+    const response = await this.api.getMyGoods(
+      params?.status,
+      params?.page,
+      params?.size
+    );
+    return response.data.data as PageGoodsResponse;
   }
 
   /**
-   * 获取待审核物品列表（管理员）
-   * @param params 查询参数
-   * @returns 待审核物品列表
+   * 搜索商品
+   * @param keyword 搜索关键词
+   * @param page 页码
+   * @param size 每页大小
+   * @returns 搜索结果（分页）
    */
-  async getPendingGoods(params?: { page?: number; pageSize?: number }): Promise<ApiResponse<PageInfo<Goods>>> {
-    return http.get('/goods/pending', { params });
+  async searchGoods(keyword: string, page?: number, size?: number): Promise<PageGoodsResponse> {
+    return this.listGoods({ keyword, page, size });
+  }
+
+  // ==================== 收藏相关接口 ====================
+
+  /**
+   * 收藏商品
+   * @param goodsId 商品 ID
+   * @returns 操作结果
+   */
+  async favoriteGoods(goodsId: number): Promise<void> {
+    await this.api.favoriteGoods(goodsId);
   }
 
   /**
-   * 审核物品（管理员）
-   * @param data 审核请求参数
-   * @returns 审核结果
+   * 取消收藏商品
+   * @param goodsId 商品 ID
+   * @returns 操作结果
    */
-  async auditGoods(data: AuditGoodsRequest): Promise<ApiResponse<void>> {
-    return http.post(`/goods/${data.id}/audit`, {
-      approved: data.approved,
-      reason: data.reason,
-    });
+  async unfavoriteGoods(goodsId: number): Promise<void> {
+    await this.api.unfavoriteGoods(goodsId);
   }
 
   /**
-   * 上架物品
-   * @param goodsId 物品ID
-   * @returns 上架结果
+   * 检查是否已收藏
+   * @param goodsId 商品 ID
+   * @returns 是否已收藏
    */
-  async onShelfGoods(goodsId: number): Promise<ApiResponse<void>> {
-    return http.post(`/goods/${goodsId}/on-shelf`);
+  async isFavorited(goodsId: number): Promise<boolean> {
+    const response = await this.api.isFavorited(goodsId);
+    return response.data.data as boolean;
   }
 
   /**
-   * 下架物品
-   * @param goodsId 物品ID
-   * @returns 下架结果
+   * 获取我的收藏列表
+   * @param page 页码
+   * @param size 每页大小
+   * @returns 收藏列表（分页）
    */
-  async offShelfGoods(goodsId: number): Promise<ApiResponse<void>> {
-    return http.post(`/goods/${goodsId}/off-shelf`);
+  async getMyFavorites(page?: number, size?: number): Promise<PageGoodsResponse> {
+    const response = await this.api.getMyFavorites(page, size);
+    return response.data.data as PageGoodsResponse;
   }
 
   // ==================== 分类相关接口 ====================
 
   /**
-   * 获取所有分类（树形结构）
-   * @returns 分类树
+   * 获取分类树
+   * @returns 分类树列表
    */
-  async getCategoryTree(): Promise<ApiResponse<Category[]>> {
-    return http.get('/categories/tree');
-  }
-
-  /**
-   * 获取分类列表（扁平结构）
-   * @returns 分类列表
-   */
-  async getCategoryList(): Promise<ApiResponse<Category[]>> {
-    return http.get('/categories');
-  }
-
-  /**
-   * 获取分类详情
-   * @param categoryId 分类ID
-   * @returns 分类详情
-   */
-  async getCategoryById(categoryId: number): Promise<ApiResponse<Category>> {
-    return http.get(`/categories/${categoryId}`);
+  async getCategoryTree(): Promise<any[]> {
+    const response = await this.api.getCategoryTree();
+    return response.data.data as any[];
   }
 
   // ==================== 标签相关接口 ====================
@@ -152,55 +186,9 @@ class GoodsService {
    * @param limit 数量限制
    * @returns 标签列表
    */
-  async getHotTags(limit = 20): Promise<ApiResponse<Tag[]>> {
-    return http.get('/tags/hot', { params: { limit } });
-  }
-
-  /**
-   * 搜索标签
-   * @param keyword 关键词
-   * @returns 标签列表
-   */
-  async searchTags(keyword: string): Promise<ApiResponse<Tag[]>> {
-    return http.get('/tags/search', { params: { keyword } });
-  }
-
-  // ==================== 收藏相关接口 ====================
-
-  /**
-   * 添加收藏
-   * @param goodsId 物品ID
-   * @returns 收藏结果
-   */
-  async addFavorite(goodsId: number): Promise<ApiResponse<Favorite>> {
-    return http.post(`/favorites/${goodsId}`);
-  }
-
-  /**
-   * 取消收藏
-   * @param goodsId 物品ID
-   * @returns 取消结果
-   */
-  async removeFavorite(goodsId: number): Promise<ApiResponse<void>> {
-    return http.delete(`/favorites/${goodsId}`);
-  }
-
-  /**
-   * 检查是否已收藏
-   * @param goodsId 物品ID
-   * @returns 是否已收藏
-   */
-  async checkFavorite(goodsId: number): Promise<ApiResponse<boolean>> {
-    return http.get(`/favorites/${goodsId}/check`);
-  }
-
-  /**
-   * 获取我的收藏列表
-   * @param params 查询参数
-   * @returns 收藏列表
-   */
-  async getMyFavorites(params?: FavoriteListQuery): Promise<ApiResponse<PageInfo<Favorite>>> {
-    return http.get('/favorites', { params });
+  async getHotTags(limit?: number): Promise<any[]> {
+    const response = await this.api.getPopularTags(limit);
+    return response.data.data as any[];
   }
 }
 

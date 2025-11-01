@@ -1,0 +1,301 @@
+/**
+ * Skeleton 骨架屏样式 - 让加载也很优雅！✨
+ * @author BaSui 😎
+ * @description 支持多种预设布局和动画效果的骨架屏样式
+ */
+
+/* ==================== 基础容器 ==================== */
+.campus-skeleton {
+  width: 100%;
+}
+
+/* ==================== 动画定义 ==================== */
+
+/* 波浪动画（Wave） */
+@keyframes campus-skeleton-wave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 脉冲动画（Pulse） */
+@keyframes campus-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ==================== 文本骨架 ==================== */
+.campus-skeleton-text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.campus-skeleton-text__line {
+  height: 16px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+/* 最后一行短一点 */
+.campus-skeleton-text__line--last {
+  width: 60%;
+}
+
+/* 波浪动画 */
+.campus-skeleton-text__line--wave {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e6e6e6 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: campus-skeleton-wave 1.5s ease-in-out infinite;
+}
+
+/* 脉冲动画 */
+.campus-skeleton-text__line--pulse {
+  animation: campus-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ==================== 头像骨架 ==================== */
+.campus-skeleton-avatar {
+  background-color: #f0f0f0;
+  flex-shrink: 0;
+}
+
+/* 圆形头像 */
+.campus-skeleton-avatar--circle {
+  border-radius: 50%;
+}
+
+/* 方形头像 */
+.campus-skeleton-avatar--square {
+  border-radius: 8px;
+}
+
+/* 波浪动画 */
+.campus-skeleton-avatar--wave {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e6e6e6 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: campus-skeleton-wave 1.5s ease-in-out infinite;
+}
+
+/* 脉冲动画 */
+.campus-skeleton-avatar--pulse {
+  animation: campus-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ==================== 图片骨架 ==================== */
+.campus-skeleton-image {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 添加图片图标 */
+.campus-skeleton-image::before {
+  content: '🖼️';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+/* 波浪动画 */
+.campus-skeleton-image--wave {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e6e6e6 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: campus-skeleton-wave 1.5s ease-in-out infinite;
+}
+
+/* 脉冲动画 */
+.campus-skeleton-image--pulse {
+  animation: campus-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ==================== 按钮骨架 ==================== */
+.campus-skeleton-button {
+  height: 40px;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+}
+
+/* 波浪动画 */
+.campus-skeleton-button--wave {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e6e6e6 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: campus-skeleton-wave 1.5s ease-in-out infinite;
+}
+
+/* 脉冲动画 */
+.campus-skeleton-button--pulse {
+  animation: campus-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ==================== 卡片骨架 ==================== */
+.campus-skeleton-card {
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.campus-skeleton-card__content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.campus-skeleton-card__title {
+  height: 24px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  width: 70%;
+}
+
+/* 波浪动画 */
+.campus-skeleton-card__title--wave {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e6e6e6 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: campus-skeleton-wave 1.5s ease-in-out infinite;
+}
+
+/* 脉冲动画 */
+.campus-skeleton-card__title--pulse {
+  animation: campus-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ==================== 列表骨架 ==================== */
+.campus-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.campus-skeleton-list__item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.campus-skeleton-list__content {
+  flex: 1;
+}
+
+/* ==================== 表单骨架 ==================== */
+.campus-skeleton-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.campus-skeleton-form__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campus-skeleton-form__label {
+  width: 100px;
+  height: 16px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+.campus-skeleton-form__input {
+  height: 40px;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+}
+
+/* 波浪动画 */
+.campus-skeleton-form__label--wave,
+.campus-skeleton-form__input--wave {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e6e6e6 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: campus-skeleton-wave 1.5s ease-in-out infinite;
+}
+
+/* 脉冲动画 */
+.campus-skeleton-form__label--pulse,
+.campus-skeleton-form__input--pulse {
+  animation: campus-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+@media (max-width: 768px) {
+  .campus-skeleton-text__line {
+    height: 14px;
+  }
+
+  .campus-skeleton-list {
+    gap: 12px;
+  }
+
+  .campus-skeleton-list__item {
+    gap: 12px;
+  }
+
+  .campus-skeleton-card__content {
+    padding: 12px;
+  }
+
+  .campus-skeleton-form {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .campus-skeleton-image::before {
+    font-size: 32px;
+  }
+
+  .campus-skeleton-card__content {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .campus-skeleton-form {
+    gap: 16px;
+  }
+}

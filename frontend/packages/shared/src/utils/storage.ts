@@ -3,6 +3,8 @@
  * @description 封装 localStorage 和 sessionStorage，支持过期时间
  */
 
+import { TOKEN_KEY, REFRESH_TOKEN_KEY, USER_INFO_KEY } from '../constants/config';
+
 // ==================== 类型定义 ====================
 
 interface StorageItem<T> {
@@ -142,11 +144,6 @@ export const sessionStorage_ = {
 
 // ==================== 业务快捷方法 ====================
 
-/** 用户 Token 键名 */
-const TOKEN_KEY = 'auth_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
-const USER_INFO_KEY = 'user_info';
-
 /**
  * Token 管理
  */
@@ -199,4 +196,39 @@ export const userStorage = {
   clearUserInfo: (): void => {
     storage.remove(USER_INFO_KEY);
   },
+};
+
+// ==================== 独立导出（兼容旧API）====================
+
+/**
+ * 保存数据到 LocalStorage
+ * @param key 键名
+ * @param value 值
+ * @param expireInMinutes 过期时间（分钟）
+ */
+export const setItem = <T>(key: string, value: T, expireInMinutes?: number): void => {
+  storage.set(key, value, expireInMinutes);
+};
+
+/**
+ * 从 LocalStorage 获取数据
+ * @param key 键名
+ */
+export const getItem = <T>(key: string): T | null => {
+  return storage.get<T>(key);
+};
+
+/**
+ * 从 LocalStorage 删除数据
+ * @param key 键名
+ */
+export const removeItem = (key: string): void => {
+  storage.remove(key);
+};
+
+/**
+ * 清空 LocalStorage
+ */
+export const clearAll = (): void => {
+  storage.clear();
 };
