@@ -832,6 +832,88 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 注册时实时校验邮箱是否已被注册
+         * @summary 校验邮箱是否已存在
+         * @param {string} email 邮箱地址
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        checkEmail: async (email: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'email' is not null or undefined
+            assertParamExists('checkEmail', 'email', email)
+            const localVarPath = `/api/auth/check-email`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (email !== undefined) {
+                localVarQueryParameter['email'] = email;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 注册时实时校验用户名是否已被占用
+         * @summary 校验用户名是否已存在
+         * @param {string} username 用户名
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        checkUsername: async (username: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'username' is not null or undefined
+            assertParamExists('checkUsername', 'username', username)
+            const localVarPath = `/api/auth/check-username`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (username !== undefined) {
+                localVarQueryParameter['username'] = username;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 管理员处理完成后上传结果路径
          * @summary 标记隐私请求完成
          * @param {number} id 请求ID
@@ -6640,6 +6722,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 注册时实时校验邮箱是否已被注册
+         * @summary 校验邮箱是否已存在
+         * @param {string} email 邮箱地址
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async checkEmail(email: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBoolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.checkEmail(email, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.checkEmail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 注册时实时校验用户名是否已被占用
+         * @summary 校验用户名是否已存在
+         * @param {string} username 用户名
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async checkUsername(username: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBoolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.checkUsername(username, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.checkUsername']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 管理员处理完成后上传结果路径
          * @summary 标记隐私请求完成
          * @param {number} id 请求ID
@@ -8629,6 +8737,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.cancelOrder(requestParameters.orderNo, options).then((request) => request(axios, basePath));
         },
         /**
+         * 注册时实时校验邮箱是否已被注册
+         * @summary 校验邮箱是否已存在
+         * @param {DefaultApiCheckEmailRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        checkEmail(requestParameters: DefaultApiCheckEmailRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
+            return localVarFp.checkEmail(requestParameters.email, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 注册时实时校验用户名是否已被占用
+         * @summary 校验用户名是否已存在
+         * @param {DefaultApiCheckUsernameRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        checkUsername(requestParameters: DefaultApiCheckUsernameRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
+            return localVarFp.checkUsername(requestParameters.username, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 管理员处理完成后上传结果路径
          * @summary 标记隐私请求完成
          * @param {DefaultApiCompleteRequestRequest} requestParameters Request parameters.
@@ -10144,6 +10272,26 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     cancelOrder(orderNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 注册时实时校验邮箱是否已被注册
+     * @summary 校验邮箱是否已存在
+     * @param {string} email 邮箱地址
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    checkEmail(email: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
+
+    /**
+     * 注册时实时校验用户名是否已被占用
+     * @summary 校验用户名是否已存在
+     * @param {string} username 用户名
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    checkUsername(username: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
 
     /**
      * 管理员处理完成后上传结果路径
@@ -11801,6 +11949,34 @@ export interface DefaultApiCancelOrderRequest {
      * @memberof DefaultApiCancelOrder
      */
     readonly orderNo: string
+}
+
+/**
+ * Request parameters for checkEmail operation in DefaultApi.
+ * @export
+ * @interface DefaultApiCheckEmailRequest
+ */
+export interface DefaultApiCheckEmailRequest {
+    /**
+     * 邮箱地址
+     * @type {string}
+     * @memberof DefaultApiCheckEmail
+     */
+    readonly email: string
+}
+
+/**
+ * Request parameters for checkUsername operation in DefaultApi.
+ * @export
+ * @interface DefaultApiCheckUsernameRequest
+ */
+export interface DefaultApiCheckUsernameRequest {
+    /**
+     * 用户名
+     * @type {string}
+     * @memberof DefaultApiCheckUsername
+     */
+    readonly username: string
 }
 
 /**
@@ -13996,6 +14172,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public cancelOrder(requestParameters: DefaultApiCancelOrderRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).cancelOrder(requestParameters.orderNo, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 注册时实时校验邮箱是否已被注册
+     * @summary 校验邮箱是否已存在
+     * @param {DefaultApiCheckEmailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public checkEmail(requestParameters: DefaultApiCheckEmailRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).checkEmail(requestParameters.email, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 注册时实时校验用户名是否已被占用
+     * @summary 校验用户名是否已存在
+     * @param {DefaultApiCheckUsernameRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public checkUsername(requestParameters: DefaultApiCheckUsernameRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).checkUsername(requestParameters.username, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
