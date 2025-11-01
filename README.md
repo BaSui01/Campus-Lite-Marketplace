@@ -14,25 +14,40 @@
 - **后端**：Java 21、Spring Boot 3.2、Spring Data JPA、Spring Security、MapStruct、Lombok、Redisson、Testcontainers。
 - **基础设施**：PostgreSQL 16、Redis 7、Nginx、Prometheus、Grafana、Docker / Docker Compose。
 - **构建工具**：Maven 3.8+、Docker BuildKit。
-- **前端**：预留 `frontend/` 目录（需求文档详见 `docs/frontend-architecture-requirements.md`，当前未包含实现）。
+- **前端**：React 18 + TypeScript + Vite，基于 pnpm Workspace 的 Monorepo（`packages/shared` 公共层、`packages/portal` 用户端、`packages/admin` 管理端）。
 
 ## 📁 目录结构
 ```
-├── backend/                     # 后端服务（Spring Boot）
+├── backend/                     # 后端服务（Spring Boot 单体）
 │   ├── src/main/java/com/campus/marketplace/
-│   │   ├── common/              # 公共配置、异常、DTO、工具
-│   │   ├── controller/          # REST 控制器
-│   │   ├── service/             # 服务接口与实现（包含支付、消息等）
-│   │   ├── repository/          # JPA Repository
+│   │   ├── common/              # 公共配置、DTO、异常、工具、切面
+│   │   ├── controller/          # REST 控制器（含 e2e / perf 专用子包）
+│   │   ├── service/             # 业务服务接口与实现
+│   │   ├── repository/          # JPA Repository & QueryDSL 扩展
 │   │   └── websocket/           # WebSocket 处理
-│   └── src/main/resources/      # 应用配置、日志、SQL 等
-├── docker/                      # 生产部署 compose 文件与配置模板
-│   ├── docker-compose.dev.yml        # 本地开发依赖（PostgreSQL / Redis / Mailhog）
-│   ├── docker-compose.prod.min.yml   # 最小部署：PostgreSQL + Redis + 双实例后端 + Nginx
-│   └── docker-compose.prod.ha.yml    # 高可用部署（含监控、哨兵等）
-├── docs/                        # 运维/需求文档（部署指南、支付指南等）
-├── db/, grafana/, nginx/, prometheus/, redis/  # 容器挂载配置
-├── .env*.example                # 环境变量模板
+│   └── src/main/resources/      # 应用配置、日志、Flyway、Redisson 等
+├── frontend/                    # 前端 Monorepo（pnpm workspace）
+│   ├── packages/
+│   │   ├── shared/              # 公共组件、OpenAPI 客户端、工具、类型
+│   │   ├── portal/              # 用户端（React + Tailwind + React Query + Zustand）
+│   │   └── admin/               # 管理端（React + Ant Design，待完善）
+│   ├── package.json             # 根脚本（dev/build/lint 等）
+│   └── pnpm-workspace.yaml      # Workspace 配置
+├── docker/                      # 部署模板与运维配置
+│   ├── docker-compose.dev.yml        # 本地依赖：PostgreSQL / Redis / Mailhog
+│   ├── docker-compose.prod.min.yml   # 最小生产集（PostgreSQL + Redis + 2×App + Nginx）
+│   ├── docker-compose.prod.ha.yml    # 高可用集群（Redis Sentinel、监控等）
+│   └── nginx/, prometheus/, grafana/ # 反向代理与监控配置
+├── docs/                        # 项目文档（安全、部署、前端策略、支付指南等）
+│   ├── 安全扫描使用指南.md
+│   ├── 生产环境部署指南.md
+│   ├── 前端Monorepo架构搭建完成报告.md
+│   ├── 前端架构需求分析文档.md
+│   ├── 前端开发策略.md
+│   ├── 提示词.md
+│   └── 支付宝沙箱配置指南.md
+├── db/, grafana/, nginx/, prometheus/, redis/  # 数据初始化与监控仪表模板
+├── .env*.example                # 环境变量模板（默认 / 生产）
 └── README.md                    # 本自述文件
 ```
 
@@ -79,6 +94,26 @@
    - API 根路径：`http://localhost:8080/api`
    - 健康检查：`http://localhost:8080/api/actuator/health`
 
+### 前端 Monorepo 快速启动（可选）
+
+1. 安装依赖
+   ```bash
+   cd frontend
+   pnpm install
+   ```
+2. 启动开发服务器
+   ```bash
+   pnpm run dev:portal   # 用户端
+   pnpm run dev:admin    # 管理端（基础脚手架，待补充业务）
+   ```
+3. 构建产物
+   ```bash
+   pnpm run build:all    # shared + portal + admin 一次性构建
+   ```
+4. 复用公共层
+   - `packages/shared` 暴露组件、hooks、服务、类型，其他包通过 `import { ... } from '@campus/shared'` 引用。
+   - OpenAPI 客户端更新：在仓库根目录执行 `pnpm run api:generate`（或在 `backend` 目录按文档运行）。
+
 ## 🔐 常用配置说明
 | 分类 | 变量 | 说明 |
 |------|------|------|
@@ -107,13 +142,16 @@
 - **开发依赖**：`docker/docker-compose.dev.yml`，一键拉起 PostgreSQL / Redis / Mailhog。
 - **最小部署**：`docker/docker-compose.prod.min.yml`，适合单节点环境。
 - **高可用部署**：`docker/docker-compose.prod.ha.yml`，包含 App 集群、Nginx、Redis Sentinel、Prometheus、Grafana 等。
-- 详细步骤、数据备份与故障排查请参考 `docs/DEPLOYMENT.md`。
+- 详细步骤、数据备份与故障排查请参考 `docs/生产环境部署指南.md`。
 
 ## 📚 文档与资源
-- `backend/README.md`：后端服务详细说明。
-- `docs/DEPLOYMENT.md`：生产部署、监控、备份。
-- `docs/frontend-architecture-requirements.md`：前端规划需求。
-- `docs/支付宝沙箱配置指南.md`：支付接入配置流程。
+- `backend/README.md`：后端服务结构、构建与测试说明。
+- `docs/生产环境部署指南.md`：Compose 方案、环境硬件、备份/监控实践。
+- `docs/安全扫描使用指南.md`：OWASP Dependency-Check、CI 守门、抑制策略。
+- `docs/前端架构需求分析文档.md`：前端技术决策、模块职责、非功能指标。
+- `docs/前端Monorepo架构搭建完成报告.md`：已交付内容与后续迭代计划。
+- `docs/前端开发策略.md`：阶段性开发顺序与重点。
+- `docs/支付宝沙箱配置指南.md`：支付沙箱账号、密钥配置、回调调试。
 
 ## 🤝 贡献指南
 1. Fork & 创建分支：`feat/xxx`、`fix/xxx`。
