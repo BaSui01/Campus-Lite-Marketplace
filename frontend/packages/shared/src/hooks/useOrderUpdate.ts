@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { websocketService, type OrderUpdateData } from '../services/websocket';
+import { websocketService, type OrderUpdateData } from '../utils/websocket';
 import type { OrderStatus } from '../types';
 
 /**

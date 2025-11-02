@@ -19,7 +19,7 @@ import type {
 /**
  * 消息 API 服务类
  */
-class MessageService {
+export class MessageService {
   // ==================== 会话相关接口 ====================
 
   /**

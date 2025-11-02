@@ -1,0 +1,220 @@
+/**
+ * 退款列表页面样式
+ * @author BaSui 😎
+ */
+
+.refund-list-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.refund-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ==================== 头部 ==================== */
+.refund-list-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.refund-list-header__title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.refund-list-header__subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ==================== 筛选栏 ==================== */
+.refund-list-filters {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-item label {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* ==================== 加载状态 ==================== */
+.refund-list-loading {
+  background: white;
+  padding: 80px 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #6b7280;
+}
+
+/* ==================== 退款列表 ==================== */
+.refund-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.refund-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.refund-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 退款卡片头部 */
+.refund-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.refund-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.refund-no {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.refund-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+}
+
+.refund-card-time {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* 退款卡片主体 */
+.refund-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.refund-info-item {
+  display: flex;
+  font-size: 14px;
+}
+
+.refund-info-item .label {
+  color: #6b7280;
+  min-width: 100px;
+}
+
+.refund-info-item .value {
+  color: #111827;
+  flex: 1;
+}
+
+.refund-info-item .value.price {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.refund-info-item.error .value {
+  color: #dc2626;
+}
+
+/* 退款卡片底部 */
+.refund-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ==================== 分页 ==================== */
+.refund-list-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+  padding: 20px 0;
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  .refund-list-page {
+    padding: 16px;
+  }
+
+  .refund-list-header__title {
+    font-size: 24px;
+  }
+
+  .refund-list-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-item {
+    width: 100%;
+  }
+
+  .refund-card {
+    padding: 16px;
+  }
+
+  .refund-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .refund-card-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .refund-info-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .refund-info-item .label {
+    min-width: auto;
+  }
+}

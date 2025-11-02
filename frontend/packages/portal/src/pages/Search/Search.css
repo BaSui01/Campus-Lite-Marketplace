@@ -24,6 +24,7 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   margin-bottom: 20px;
+  position: relative; /* 为搜索建议定位 */
 }
 
 .search-header__input {
@@ -39,6 +40,125 @@
 .search-header__input button {
   flex-shrink: 0;
   min-width: 100px;
+}
+
+/* 🌟 搜索建议（历史 + 热门） */
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 24px;
+  right: 24px;
+  margin-top: 8px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.search-suggestions__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-suggestions__title {
+  font-size: 15px;
+  font-weight: bold;
+  color: #262626;
+}
+
+.search-suggestions__clear {
+  font-size: 13px;
+  color: #ff4d4f;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.search-suggestions__clear:hover {
+  opacity: 0.7;
+}
+
+.search-suggestions__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.search-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.search-suggestion-item:hover {
+  background: #fff5f0;
+}
+
+.search-suggestion-item.hot:hover {
+  background: #fff1f0;
+}
+
+.suggestion-icon {
+  font-size: 16px;
+  color: #8c8c8c;
+  flex-shrink: 0;
+}
+
+.suggestion-rank {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.search-suggestion-item:nth-child(1) .suggestion-rank {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+}
+
+.search-suggestion-item:nth-child(2) .suggestion-rank {
+  background: linear-gradient(135deg, #ff7a45 0%, #ffa940 100%);
+}
+
+.search-suggestion-item:nth-child(3) .suggestion-rank {
+  background: linear-gradient(135deg, #ffa940 0%, #ffc53d 100%);
+}
+
+.suggestion-text {
+  flex: 1;
+  font-size: 14px;
+  color: #595959;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-history {
+  border-bottom: 8px solid #f5f5f5;
+}
+
+.search-hot {
+  padding-bottom: 8px;
 }
 
 /* ==================== 搜索类型切换 ==================== */
@@ -62,6 +182,99 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
+}
+
+.search-sort__category {
+  flex-shrink: 0;
+}
+
+.search-sort__category .category-select {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.search-sort__category .category-select:hover {
+  border-color: #ff6b35;
+}
+
+.search-sort__category .category-select:focus {
+  border-color: #ff6b35;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+}
+
+.search-sort__price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.search-sort__price .price-input {
+  width: 90px;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #595959;
+  transition: all 0.3s ease;
+}
+
+.search-sort__price .price-input:hover {
+  border-color: #ff6b35;
+}
+
+.search-sort__price .price-input:focus {
+  border-color: #ff6b35;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+}
+
+.search-sort__price .price-separator {
+  color: #8c8c8c;
+  font-weight: bold;
+}
+
+.search-sort__price .price-apply-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #ff6b35;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-sort__price .price-apply-btn:hover {
+  background: #ff8555;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+.search-sort__price .price-clear-btn {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-sort__price .price-clear-btn:hover {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
 }
 
 .search-sort__label {
@@ -75,6 +288,7 @@
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  flex: 1;
 }
 
 .search-sort__option {
@@ -98,6 +312,80 @@
   background: #fff5f0;
   color: #ff6b35;
   font-weight: bold;
+}
+
+/* ==================== 标签筛选栏 ==================== */
+
+.search-tags {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.search-tags__label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #595959;
+  flex-shrink: 0;
+}
+
+.search-tags__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.search-tags__item {
+  padding: 6px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.search-tags__item:hover {
+  border-color: #ff6b35;
+  color: #ff6b35;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+}
+
+.search-tags__item.active {
+  border-color: #ff6b35;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8555 100%);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.search-tags__clear {
+  padding: 6px 14px;
+  border: 1px solid #ff4d4f;
+  border-radius: 16px;
+  background: #fff1f0;
+  color: #ff4d4f;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.search-tags__clear:hover {
+  background: #ff4d4f;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
 }
 
 /* ==================== 搜索结果 ==================== */
@@ -389,7 +677,27 @@
     padding: 12px 16px;
   }
 
+  .search-sort__price {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .search-sort__price .price-input {
+    flex: 1;
+    min-width: 80px;
+  }
+
   .search-sort__options {
+    width: 100%;
+  }
+
+  .search-tags {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 16px;
+  }
+
+  .search-tags__list {
     width: 100%;
   }
 
@@ -456,4 +764,25 @@
   .post-result-card {
     padding: 16px 20px;
   }
+}
+
+/* ==================== 搜索高亮样式 ==================== */
+
+/**
+ * 关键词高亮效果
+ * @author BaSui 😎
+ * @description 让搜索结果中的关键词更醒目！✨
+ */
+.highlight {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  color: #2d3436;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.highlight:hover {
+  background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
+  transform: scale(1.05);
 }

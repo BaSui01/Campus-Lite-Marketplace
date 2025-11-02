@@ -1,0 +1,216 @@
+/**
+ * 收藏页面样式 - 珍藏每一个心动瞬间!🌟
+ * @author BaSui 😎
+ * @description 美观的收藏列表界面设计(金黄主题)
+ */
+
+.favorites-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.favorites-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.favorites-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(253, 203, 110, 0.3);
+}
+
+.favorites-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+  color: #2d3436;
+}
+
+.favorites-header__subtitle {
+  font-size: 16px;
+  color: #636e72;
+  margin: 0;
+}
+
+/* ==================== 内容区域 ==================== */
+
+.favorites-content {
+  min-height: 400px;
+}
+
+.favorites-loading {
+  padding: 20px 0;
+}
+
+.favorites-empty {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.favorites-empty .empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.favorites-empty .empty-text {
+  font-size: 24px;
+  color: #2d3436;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+}
+
+.favorites-empty .empty-tip {
+  font-size: 16px;
+  color: #636e72;
+  margin: 0 0 32px 0;
+}
+
+/* ==================== 收藏网格 ==================== */
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.favorite-item {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.favorite-item:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+.favorite-item__actions {
+  padding: 12px 16px;
+  display: flex;
+  gap: 8px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+}
+
+.favorite-item__actions button {
+  flex: 1;
+}
+
+/* ==================== 分页 ==================== */
+
+.favorites-pagination {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 1024px) {
+  .favorites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .favorites-page {
+    padding: 10px 0;
+  }
+
+  .favorites-container {
+    padding: 0 10px;
+  }
+
+  .favorites-header {
+    padding: 24px 20px;
+    margin-bottom: 24px;
+  }
+
+  .favorites-header__title {
+    font-size: 28px;
+  }
+
+  .favorites-header__subtitle {
+    font-size: 14px;
+  }
+
+  .favorites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .favorite-item__actions {
+    flex-direction: column;
+  }
+
+  .favorites-empty .empty-icon {
+    font-size: 64px;
+  }
+
+  .favorites-empty .empty-text {
+    font-size: 20px;
+  }
+
+  .favorites-empty .empty-tip {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .favorites-header {
+    padding: 20px 16px;
+  }
+
+  .favorites-header__title {
+    font-size: 24px;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .favorite-item__actions {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .favorites-empty {
+    padding: 60px 16px;
+  }
+
+  .favorites-empty .empty-icon {
+    font-size: 56px;
+  }
+
+  .favorites-empty .empty-text {
+    font-size: 18px;
+  }
+}

@@ -1,21 +1,14 @@
 /**
  * 商品 API 服务
  * @author BaSui 😎
- * @description 商品发布、查询、更新、删除、收藏等接口（对接 OpenAPI 生成的类型）
+ * @description 商品发布、查询、更新、删除、收藏等接口（基于 OpenAPI 生成代码）
  */
 
-import { DefaultApi } from '../api';
-import { createApiConfig, axiosInstance } from '../utils/http';
+import { getApi } from '../utils/apiClient';
 import type {
   GoodsResponse,
   CreateGoodsRequest,
   PageGoodsResponse,
-  ApiResponsePageGoodsResponse,
-  ApiResponseGoodsDetailResponse,
-  ApiResponseListGoodsResponse,
-  ApiResponseListCategoryNodeResponse,
-  ApiResponseListTagResponse,
-  ApiResponseVoid,
   GoodsDetailResponse,
 } from '../api/models';
 
@@ -37,23 +30,15 @@ export interface GoodsListParams {
 /**
  * 商品 API 服务类
  */
-class GoodsService {
-  private api: DefaultApi;
-
-  constructor() {
-    // 使用生成的 OpenAPI 客户端
-    this.api = new DefaultApi(createApiConfig(), undefined, axiosInstance);
-  }
-
-  // ==================== 商品相关接口 ====================
-
+export class GoodsService {
   /**
    * 获取商品列表（分页）
    * @param params 查询参数
    * @returns 商品列表（分页）
    */
   async listGoods(params?: GoodsListParams): Promise<PageGoodsResponse> {
-    const response = await this.api.listGoods(
+    const api = getApi();
+    const response = await api.listGoods(
       params?.keyword,
       params?.categoryId,
       params?.minPrice,
@@ -73,7 +58,8 @@ class GoodsService {
    * @returns 商品详情
    */
   async getGoodsDetail(id: number): Promise<GoodsDetailResponse> {
-    const response = await this.api.getGoodsDetail(id);
+    const api = getApi();
+    const response = await api.getGoodsDetail(id);
     return response.data.data as GoodsDetailResponse;
   }
 
@@ -83,8 +69,19 @@ class GoodsService {
    * @returns 推荐商品列表
    */
   async getRecommendGoods(limit?: number): Promise<GoodsResponse[]> {
-    // 使用 hot 接口获取热门商品（无需校区ID,后端会自动推断）
-    const response = await this.api.hot(undefined, limit);
+    const api = getApi();
+    const response = await api.hot(undefined, limit);
+    return response.data.data as GoodsResponse[];
+  }
+
+  /**
+   * 获取个性化推荐商品（需登录）
+   * @param limit 数量限制
+   * @returns 个性化推荐商品列表
+   */
+  async getPersonalRecommendations(limit?: number): Promise<GoodsResponse[]> {
+    const api = getApi();
+    const response = await api.personal(limit);
     return response.data.data as GoodsResponse[];
   }
 
@@ -94,7 +91,8 @@ class GoodsService {
    * @returns 创建的商品 ID
    */
   async createGoods(data: CreateGoodsRequest): Promise<number> {
-    const response = await this.api.createGoods(data);
+    const api = getApi();
+    const response = await api.createGoods(data);
     return response.data.data as number;
   }
 
@@ -108,7 +106,8 @@ class GoodsService {
     page?: number;
     size?: number;
   }): Promise<PageGoodsResponse> {
-    const response = await this.api.getMyGoods(
+    const api = getApi();
+    const response = await api.getMyGoods(
       params?.status,
       params?.page,
       params?.size
@@ -135,7 +134,8 @@ class GoodsService {
    * @returns 操作结果
    */
   async favoriteGoods(goodsId: number): Promise<void> {
-    await this.api.favoriteGoods(goodsId);
+    const api = getApi();
+    await api.favoriteGoods(goodsId);
   }
 
   /**
@@ -144,7 +144,8 @@ class GoodsService {
    * @returns 操作结果
    */
   async unfavoriteGoods(goodsId: number): Promise<void> {
-    await this.api.unfavoriteGoods(goodsId);
+    const api = getApi();
+    await api.unfavoriteGoods(goodsId);
   }
 
   /**
@@ -153,7 +154,8 @@ class GoodsService {
    * @returns 是否已收藏
    */
   async isFavorited(goodsId: number): Promise<boolean> {
-    const response = await this.api.isFavorited(goodsId);
+    const api = getApi();
+    const response = await api.isFavorited(goodsId);
     return response.data.data as boolean;
   }
 
@@ -164,7 +166,8 @@ class GoodsService {
    * @returns 收藏列表（分页）
    */
   async getMyFavorites(page?: number, size?: number): Promise<PageGoodsResponse> {
-    const response = await this.api.getMyFavorites(page, size);
+    const api = getApi();
+    const response = await api.getMyFavorites(page, size);
     return response.data.data as PageGoodsResponse;
   }
 
@@ -175,7 +178,8 @@ class GoodsService {
    * @returns 分类树列表
    */
   async getCategoryTree(): Promise<any[]> {
-    const response = await this.api.getCategoryTree();
+    const api = getApi();
+    const response = await api.getCategoryTree();
     return response.data.data as any[];
   }
 
@@ -187,8 +191,11 @@ class GoodsService {
    * @returns 标签列表
    */
   async getHotTags(limit?: number): Promise<any[]> {
-    const response = await this.api.getPopularTags(limit);
-    return response.data.data as any[];
+    const api = getApi();
+    const response = await api.listTags();
+    const tags = response.data.data || [];
+    // 如果有限制，返回前 N 个
+    return limit ? tags.slice(0, limit) : tags;
   }
 }
 

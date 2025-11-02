@@ -231,31 +231,21 @@ const Community: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 获取评论列表
-      // TODO: 集成真实 API
-      // const response = await communityService.listComments(post.postId);
-      // setComments(response.data);
+      const response = await postService.getReplies(Number(post.postId), { page: 0, pageSize: 50 });
 
-      // 临时模拟数据
-      const mockComments: Comment[] = [
-        {
-          commentId: '1',
+      if (response.success && response.data) {
+        const apiComments: Comment[] = response.data.content.map((c: any) => ({
+          commentId: String(c.id),
           postId: post.postId,
-          authorId: '104',
-          authorName: '赵六',
-          content: '看起来不错！👍',
-          createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-        },
-        {
-          commentId: '2',
-          postId: post.postId,
-          authorId: '105',
-          authorName: '孙七',
-          content: '确实很棒！',
-          createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-        },
-      ];
+          authorId: String(c.userId),
+          authorName: c.userName || '未知用户',
+          authorAvatar: c.userAvatar,
+          content: c.content,
+          createdAt: c.createTime,
+        }));
 
-      setComments(mockComments);
+        setComments(apiComments);
+      }
     } catch (err: any) {
       console.error('加载评论失败：', err);
       toast.error(err.response?.data?.message || '加载评论失败！😭');
@@ -287,8 +277,10 @@ const Community: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 发布评论
-      // TODO: 集成真实 API
-      // await communityService.createComment({ postId: currentPost.postId, content: commentContent });
+      await postService.createReply({
+        postId: Number(currentPost.postId),
+        content: commentContent,
+      });
 
       toast.success('评论成功！💬');
       setCommentContent('');

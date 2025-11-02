@@ -1,187 +1,126 @@
 package com.campus.marketplace.integration;
 
-import org.junit.jupiter.api.BeforeEach;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
-import org.springframework.context.annotation.Import;
+import com.campus.marketplace.common.config.TestSecurityConfig;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.utility.DockerImageName;
 
-import java.util.stream.Stream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
- * 集成测试基类
- * 
- * 功能：
- * 1. 使用 Testcontainers 启动 PostgreSQL 和 Redis 容器
- * 2. 提供 MockMvc 用于 HTTP 请求测试
- * 3. 每个测试方法使用事务，测试后自动回滚
- * 
- * 使用方式：
- * 继承此类即可获得完整的集成测试环境
- * 
- * @author BaSui 😎
- * @date 2025-10-27
+ * 集成测试基类：负责启动 Testcontainers（PostgreSQL + Redis），
+ * 并将容器连接信息注入 Spring Boot 测试上下文，提供 {@link MockMvc}。
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = com.campus.marketplace.MarketplaceApplication.class)
+@Testcontainers
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
-@ActiveProfiles("test-ci")
-@Testcontainers(disabledWithoutDocker = true)
-@Transactional
-@Import(TestCiOverrides.class)
-@EntityScan(basePackages = "com.campus.marketplace.common.entity")
-@org.junit.jupiter.api.TestInstance(org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@Import(TestSecurityConfig.class)
+@ExtendWith(SpringExtension.class)
 public abstract class IntegrationTestBase {
+
+    private static final String POSTGRES_IMAGE = System.getProperty(
+            "campus.testcontainers.postgres",
+            "postgres:16.4-alpine"
+    );
+
+    private static final String REDIS_IMAGE = System.getProperty(
+            "campus.testcontainers.redis",
+            "redis:7.4.1-alpine"
+    );
+
+    private static final PostgreSQLContainer<?> POSTGRES_CONTAINER = new PostgreSQLContainer<>(
+            DockerImageName.parse(POSTGRES_IMAGE)
+                    .asCompatibleSubstituteFor("postgres")
+    )
+            .withDatabaseName("campus_marketplace_test")
+            .withUsername("campus_test")
+            .withPassword("campus_test")
+            .withReuse(true);
+
+    private static final GenericContainer<?> REDIS_CONTAINER = new GenericContainer<>(
+            DockerImageName.parse(REDIS_IMAGE)
+                    .asCompatibleSubstituteFor("redis")
+    )
+            .withExposedPorts(6379)
+            .withReuse(true);
+
+    private static final Path REDISSON_CONFIG_FILE;
+    private static final String REDISSON_CONFIG_URI;
+
+    static {
+        POSTGRES_CONTAINER.start();
+        REDIS_CONTAINER.start();
+        REDISSON_CONFIG_FILE = createRedissonConfigFile();
+        REDISSON_CONFIG_URI = REDISSON_CONFIG_FILE.toUri().toString();
+    }
 
     @Autowired
     protected MockMvc mockMvc;
 
-    @Autowired(required = false)
-    private org.flywaydb.core.Flyway flyway;
+    @DynamicPropertySource
+    static void registerDynamicProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", POSTGRES_CONTAINER::getJdbcUrl);
+        registry.add("spring.datasource.username", POSTGRES_CONTAINER::getUsername);
+        registry.add("spring.datasource.password", POSTGRES_CONTAINER::getPassword);
+        registry.add("spring.datasource.driver-class-name", POSTGRES_CONTAINER::getDriverClassName);
+        registry.add("spring.datasource.hikari.maximum-pool-size", () -> 10);
+        registry.add("spring.datasource.hikari.minimum-idle", () -> 2);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
+        registry.add("spring.flyway.enabled", () -> true);
+        registry.add("app.init.seed", () -> true);
 
-    private static final java.util.concurrent.atomic.AtomicBoolean MIGRATED = new java.util.concurrent.atomic.AtomicBoolean(false);
+        registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
+        registry.add("spring.data.redis.port", REDIS_CONTAINER::getFirstMappedPort);
+        registry.add("spring.data.redis.redisson.file", () -> REDISSON_CONFIG_URI);
+        registry.add("spring.redis.redisson.file", () -> REDISSON_CONFIG_URI);
+        registry.add("notifications.webpush.enabled", () -> false);
+        registry.add("sms.provider", () -> "logging");
+        registry.add("spring.mail.host", () -> "localhost");
+        registry.add("spring.mail.port", () -> 2525);
+        registry.add("spring.mail.username", () -> "test");
+        registry.add("spring.mail.password", () -> "test");
+    }
 
-    @org.junit.jupiter.api.BeforeAll
-    void ensureSchema() {
-        if (flyway != null && MIGRATED.compareAndSet(false, true)) {
-            startInfraIfNecessary();
-            flyway.migrate();
+    private static Path createRedissonConfigFile() {
+        try {
+            Path temp = Files.createTempFile("redisson-test-", ".yaml");
+            String yaml = """
+                    singleServerConfig:
+                      address: \"redis://%s:%d\"
+                      database: 0
+                      connectionPoolSize: 16
+                      connectionMinimumIdleSize: 2
+                      idleConnectionTimeout: 10000
+                      connectTimeout: 10000
+                      timeout: 3000
+                      retryAttempts: 3
+                      retryInterval: 1500
+                    threads: 4
+                    nettyThreads: 4
+                    """.formatted(
+                    REDIS_CONTAINER.getHost(),
+                    REDIS_CONTAINER.getFirstMappedPort()
+            );
+            Files.writeString(temp, yaml, StandardCharsets.UTF_8);
+            temp.toFile().deleteOnExit();
+            return temp;
+        } catch (IOException ex) {
+            throw new IllegalStateException("无法创建测试环境 Redisson 配置文件", ex);
         }
-    }
-
-    /**
-     * PostgreSQL 容器（使用最新的 16 版本）
-     */
-    @SuppressWarnings("resource")
-    @Container
-    protected static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:16-alpine")
-            .withDatabaseName("campus_marketplace_test")
-            .withUsername("test")
-            .withPassword("test")
-            .withExposedPorts(5432)
-            .withCreateContainerCmdModifier(cmd -> {
-                HostConfig hostConfig = cmd.getHostConfig();
-                if (hostConfig == null) {
-                    hostConfig = new HostConfig();
-                }
-                hostConfig.withPortBindings(new PortBinding(Ports.Binding.bindPort(54321), new ExposedPort(5432)));
-                cmd.withHostConfig(hostConfig);
-            }); // 固定映射：容器 5432 -> 宿主 54321，避免与开发库冲突
-
-    /**
-     * Redis 容器（使用最新的 7.x 版本）
-     */
-    @SuppressWarnings("resource")
-    @Container
-    protected static final GenericContainer<?> redisContainer = new GenericContainer<>("redis:7-alpine")
-            .withExposedPorts(6379)
-            ;
-
-static {
-    startInfraIfNecessary();
-}
-
-    /**
-     * 动态配置数据源和 Redis 连接
-     * 
-     * 从 Testcontainers 获取容器的动态端口和地址，
-     * 覆盖 application-test.yml 中的配置
-     */
-@DynamicPropertySource
-static void configureProperties(DynamicPropertyRegistry registry) {
-    startInfraIfNecessary();
-    registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
-    registry.add("spring.datasource.username", postgresContainer::getUsername);
-    registry.add("spring.datasource.password", postgresContainer::getPassword);
-    registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "none");
-        registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.PostgreSQLDialect");
-        registry.add("spring.flyway.enabled", () -> "true");
-        registry.add("spring.test.database.replace", () -> "NONE");
-        registry.add("spring.datasource.hikari.maximum-pool-size", () -> "5");
-        // Redis 在 TestCiOverrides 中禁用自动配置
-    }
-
-    /**
-     * 每个测试方法执行前的初始化
-     * 
-     * 子类可以覆盖此方法添加自定义初始化逻辑
-     */
-    @BeforeEach
-    protected void setUp() {
-        // 子类可选择性覆盖
-    }
-
-    /**
-     * 确保底层容器已启动，避免属性绑定阶段访问端口映射时报错
-     */
-    private static void startInfraIfNecessary() {
-        Startables.deepStart(
-                Stream.of(postgresContainer, redisContainer)
-                        .filter(container -> !container.isRunning())
-        ).join();
-    }
-}
-
-@org.springframework.boot.test.context.TestConfiguration
-@org.springframework.boot.autoconfigure.ImportAutoConfiguration(exclude = {
-        org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class
-})
-class TestCiOverrides {
-    @org.springframework.context.annotation.Bean
-    @org.springframework.context.annotation.Primary
-    public com.campus.marketplace.service.SmsService testSmsService() {
-        return (phone, templateCode, params) -> { };
-    }
-
-    /**
-     * Mock PaymentService for testing 💳
-     *
-     * 在测试环境下，退款操作直接返回成功，避免调用真实支付宝沙箱API
-     */
-    @org.springframework.context.annotation.Bean
-    @org.springframework.context.annotation.Primary
-    public com.campus.marketplace.service.PaymentService testPaymentService(
-            com.campus.marketplace.service.impl.AlipayPaymentService alipayPaymentService) {
-        return new com.campus.marketplace.service.PaymentService() {
-            @Override
-            public com.campus.marketplace.common.dto.response.PaymentResponse createPayment(
-                    com.campus.marketplace.common.entity.Order order,
-                    com.campus.marketplace.common.enums.PaymentMethod paymentMethod) {
-                // 使用真实的支付宝沙箱创建支付
-                return alipayPaymentService.createPayment(order);
-            }
-
-            @Override
-            public boolean refund(
-                    com.campus.marketplace.common.entity.Order order,
-                    java.math.BigDecimal amount,
-                    com.campus.marketplace.common.enums.PaymentMethod paymentMethod) {
-                // ✅ 测试环境退款直接返回成功（避免调用真实沙箱API）
-                return true;
-            }
-        };
-    }
-
-    @org.springframework.context.annotation.Bean
-    @org.springframework.core.annotation.Order(0)
-    public org.springframework.security.web.SecurityFilterChain testSecurityChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-        return http.build();
     }
 }

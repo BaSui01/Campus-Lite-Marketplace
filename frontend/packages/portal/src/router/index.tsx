@@ -30,6 +30,14 @@ const Community = lazy(() => import('../pages/Community'));
 const Search = lazy(() => import('../pages/Search'));
 const Settings = lazy(() => import('../pages/Settings'));
 const Notifications = lazy(() => import('../pages/Notifications'));
+const Favorites = lazy(() => import('../pages/Favorites'));
+const Following = lazy(() => import('../pages/Following'));
+const Report = lazy(() => import('../pages/Report'));
+const UserProfile = lazy(() => import('../pages/UserProfile'));
+const RefundApply = lazy(() => import('../pages/RefundApply'));
+const RefundList = lazy(() => import('../pages/RefundList'));
+const RefundDetail = lazy(() => import('../pages/RefundDetail'));
+const Subscriptions = lazy(() => import('../pages/Subscriptions'));
 
 // ==================== 路由守卫组件 ====================
 
@@ -188,6 +196,84 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <Notifications />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'favorites',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <Favorites />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'following',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <Following />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'report',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <Report />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'users/:userId',
+        element: (
+          <LazyLoadWrapper>
+            <UserProfile />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'refunds/apply/:orderNo',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <RefundApply />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'refunds',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <RefundList />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'refunds/:refundNo',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <RefundDetail />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'subscriptions',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <Subscriptions />
             </LazyLoadWrapper>
           </RequireAuth>
         ),

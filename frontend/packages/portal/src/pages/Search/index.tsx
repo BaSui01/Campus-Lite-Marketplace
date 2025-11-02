@@ -8,8 +8,9 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Input, Button, Skeleton, Tabs } from '@campus/shared/components';
 import { goodsService } from '@campus/shared/services';
+import { highlightText } from '@campus/shared/utils/highlight';
 import { useNotificationStore } from '../../store';
-import type { GoodsResponse } from '@campus/shared/api/models';
+import type { GoodsResponse, CategoryNodeResponse, TagResponse } from '@campus/shared/api/models';
 import './Search.css';
 
 // ==================== 类型定义 ====================
@@ -46,6 +47,19 @@ const Search: React.FC = () => {
   const [searchType, setSearchType] = useState<SearchType>('goods');
   const [keyword, setKeyword] = useState(searchParams.get('q') || '');
   const [sortType, setSortType] = useState<SortType>('relevance');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>();
+  const [selectedTags, setSelectedTags] = useState<number[]>([]);
+  const [minPrice, setMinPrice] = useState<number | undefined>();
+  const [maxPrice, setMaxPrice] = useState<number | undefined>();
+  const [minPriceInput, setMinPriceInput] = useState<string>('');
+  const [maxPriceInput, setMaxPriceInput] = useState<string>('');
+  const [categoryTree, setCategoryTree] = useState<CategoryNodeResponse[]>([]);
+  const [hotTags, setHotTags] = useState<TagResponse[]>([]);
+
+  // 🌟 搜索历史和热门搜索
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [hotSearches] = useState<string[]>(['二手电脑', '自行车', '教材', '吉他', '台灯']);
+  const [showHistory, setShowHistory] = useState(false);
 
   // 商品搜索结果
   const [goodsResults, setGoodsResults] = useState<GoodsResponse[]>([]);
@@ -82,15 +96,20 @@ const Search: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 搜索商品
-      const response = await goodsService.searchGoods({
+      const response = await goodsService.listGoods({
         keyword: keyword.trim(),
+        categoryId: selectedCategoryId,
+        tags: selectedTags.length > 0 ? selectedTags : undefined,
+        minPrice,
+        maxPrice,
         page,
         size: pageSize,
-        sort: sortType === 'newest' ? 'createdAt,desc' : sortType === 'price_asc' ? 'price,asc' : sortType === 'price_desc' ? 'price,desc' : undefined,
+        sortBy: sortType === 'newest' ? 'createdAt' : sortType === 'price_asc' ? 'price' : sortType === 'price_desc' ? 'price' : undefined,
+        sortDirection: sortType === 'price_asc' ? 'asc' : 'desc',
       });
 
-      setGoodsResults(response.data?.content || []);
-      setGoodsTotal(response.data?.totalElements || 0);
+      setGoodsResults(response.content || []);
+      setGoodsTotal(response.totalElements || 0);
     } catch (err: any) {
       console.error('搜索商品失败：', err);
       toast.error(err.response?.data?.message || '搜索失败！😭');
@@ -212,6 +231,71 @@ const Search: React.FC = () => {
     }
   };
 
+  /**
+   * 📂 加载分类树
+   */
+  const loadCategoryTree = async () => {
+    try {
+      console.log('[Search] 📂 加载分类树');
+      const response = await goodsService.getCategoryTree();
+      console.log('[Search] ✅ 分类树加载成功:', response);
+      setCategoryTree(response);
+    } catch (error) {
+      console.error('[Search] ❌ 加载分类树失败:', error);
+    }
+  };
+
+  /**
+   * 🏷️ 加载热门标签
+   */
+  const loadHotTags = async () => {
+    try {
+      console.log('[Search] 🏷️ 加载热门标签');
+      const response = await goodsService.getHotTags(20);
+      console.log('[Search] ✅ 热门标签加载成功:', response);
+      setHotTags(response);
+    } catch (error) {
+      console.error('[Search] ❌ 加载热门标签失败:', error);
+    }
+  };
+
+  // 🌟 加载搜索历史 (localStorage 持久化)
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('campus_search_history');
+    if (savedHistory) {
+      try {
+        const parsed = JSON.parse(savedHistory);
+        setSearchHistory(Array.isArray(parsed) ? parsed : []);
+      } catch (err) {
+        console.error('解析搜索历史失败:', err);
+      }
+    }
+
+    // 📂 初始加载分类树
+    loadCategoryTree();
+    loadHotTags();
+  }, []);
+
+  // 🌟 点击外部关闭搜索建议
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const searchHeader = document.querySelector('.search-header');
+
+      if (searchHeader && !searchHeader.contains(target)) {
+        setShowHistory(false);
+      }
+    };
+
+    if (showHistory) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showHistory]);
+
   useEffect(() => {
     const urlKeyword = searchParams.get('q');
     const urlType = searchParams.get('type') as SearchType;
@@ -229,15 +313,61 @@ const Search: React.FC = () => {
     if (keyword.trim()) {
       performSearch();
     }
-  }, [searchType, sortType, page]);
+  }, [searchType, sortType, page, selectedCategoryId, selectedTags, minPrice, maxPrice]);
 
   // ==================== 事件处理 ====================
+
+  /**
+   * 保存搜索到历史记录（去重 + 限制10条）
+   */
+  const saveToHistory = (searchKeyword: string) => {
+    if (!searchKeyword.trim()) return;
+
+    const trimmed = searchKeyword.trim();
+    const updatedHistory = [trimmed, ...searchHistory.filter((k) => k !== trimmed)].slice(0, 10);
+
+    setSearchHistory(updatedHistory);
+    localStorage.setItem('campus_search_history', JSON.stringify(updatedHistory));
+  };
+
+  /**
+   * 清空搜索历史
+   */
+  const handleClearHistory = () => {
+    setSearchHistory([]);
+    localStorage.removeItem('campus_search_history');
+    toast.success('搜索历史已清空！🗑️');
+  };
+
+  /**
+   * 点击历史记录或热门搜索
+   */
+  const handleClickHistoryOrHot = (text: string) => {
+    setKeyword(text);
+    setShowHistory(false);
+    setPage(1);
+    setSearchParams({ q: text, type: searchType });
+
+    // 触发搜索
+    if (searchType === 'goods') {
+      searchGoods();
+    } else if (searchType === 'users') {
+      searchUsers();
+    } else if (searchType === 'posts') {
+      searchPosts();
+    }
+
+    // 保存到历史
+    saveToHistory(text);
+  };
 
   /**
    * 处理搜索输入
    */
   const handleSearch = () => {
     setPage(1);
+    setShowHistory(false);
+    saveToHistory(keyword); // 🌟 保存搜索历史
     performSearch();
   };
 
@@ -263,6 +393,72 @@ const Search: React.FC = () => {
    */
   const handleSortChange = (type: SortType) => {
     setSortType(type);
+    setPage(1);
+  };
+
+  /**
+   * 📂 处理分类选择
+   */
+  const handleCategorySelect = (categoryId?: number) => {
+    console.log('[Search] 📂 选择分类:', categoryId);
+    setSelectedCategoryId(categoryId);
+    setPage(1);
+  };
+
+  /**
+   * 🏷️ 处理标签点击（多选切换）
+   */
+  const handleTagToggle = (tagId: number) => {
+    setSelectedTags(prev => {
+      if (prev.includes(tagId)) {
+        // 已选中 → 取消选中
+        console.log('[Search] 🏷️ 取消标签:', tagId);
+        return prev.filter(id => id !== tagId);
+      } else {
+        // 未选中 → 选中
+        console.log('[Search] 🏷️ 选中标签:', tagId);
+        return [...prev, tagId];
+      }
+    });
+    setPage(1);
+  };
+
+  /**
+   * 💰 应用价格筛选
+   */
+  const handleApplyPriceFilter = () => {
+    const min = minPriceInput.trim() ? parseFloat(minPriceInput) : undefined;
+    const max = maxPriceInput.trim() ? parseFloat(maxPriceInput) : undefined;
+
+    // 验证价格输入
+    if (min !== undefined && (isNaN(min) || min < 0)) {
+      console.warn('[Search] 💰 最低价格无效:', minPriceInput);
+      return;
+    }
+    if (max !== undefined && (isNaN(max) || max < 0)) {
+      console.warn('[Search] 💰 最高价格无效:', maxPriceInput);
+      return;
+    }
+    if (min !== undefined && max !== undefined && min > max) {
+      console.warn('[Search] 💰 最低价格不能大于最高价格');
+      return;
+    }
+
+    console.log('[Search] 💰 应用价格筛选:', { min, max });
+    setMinPrice(min);
+    setMaxPrice(max);
+    setPage(1);
+  };
+
+  /**
+   * 💰 清除价格筛选
+   */
+  const handleClearPriceFilter = () => {
+    console.log('[Search] 💰 清除价格筛选');
+    setMinPriceInput('');
+    setMaxPriceInput('');
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
     setPage(1);
   };
 
@@ -306,6 +502,7 @@ const Search: React.FC = () => {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               onKeyPress={handleKeyPress}
+              onFocus={() => setShowHistory(true)}
               prefix={<span>🔍</span>}
               allowClear
             />
@@ -313,6 +510,54 @@ const Search: React.FC = () => {
               搜索
             </Button>
           </div>
+
+          {/* 🌟 搜索历史和热门搜索 */}
+          {showHistory && !keyword && (
+            <div className="search-suggestions">
+              {/* 搜索历史 */}
+              {searchHistory.length > 0 && (
+                <div className="search-history">
+                  <div className="search-suggestions__header">
+                    <span className="search-suggestions__title">🕒 搜索历史</span>
+                    <button className="search-suggestions__clear" onClick={handleClearHistory}>
+                      清空
+                    </button>
+                  </div>
+                  <div className="search-suggestions__list">
+                    {searchHistory.map((item, index) => (
+                      <div
+                        key={index}
+                        className="search-suggestion-item"
+                        onClick={() => handleClickHistoryOrHot(item)}
+                      >
+                        <span className="suggestion-icon">🔍</span>
+                        <span className="suggestion-text">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 热门搜索 */}
+              <div className="search-hot">
+                <div className="search-suggestions__header">
+                  <span className="search-suggestions__title">🔥 热门搜索</span>
+                </div>
+                <div className="search-suggestions__list">
+                  {hotSearches.map((item, index) => (
+                    <div
+                      key={index}
+                      className="search-suggestion-item hot"
+                      onClick={() => handleClickHistoryOrHot(item)}
+                    >
+                      <span className="suggestion-rank">{index + 1}</span>
+                      <span className="suggestion-text">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ==================== 搜索类型切换 ==================== */}
@@ -332,6 +577,61 @@ const Search: React.FC = () => {
         {/* ==================== 排序栏（仅商品） ==================== */}
         {searchType === 'goods' && (
           <div className="search-sort">
+            {/* 分类筛选 */}
+            <div className="search-sort__category">
+              <select
+                className="category-select"
+                value={selectedCategoryId || ''}
+                onChange={(e) => handleCategorySelect(e.target.value ? Number(e.target.value) : undefined)}
+              >
+                <option value="">📂 全部分类</option>
+                {categoryTree.map((category) => (
+                  <React.Fragment key={category.id}>
+                    <option value={category.id}>{category.name}</option>
+                    {category.children?.map((child) => (
+                      <option key={child.id} value={child.id}>
+                        &nbsp;&nbsp;└─ {child.name}
+                      </option>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </select>
+            </div>
+
+            {/* 价格筛选 */}
+            <div className="search-sort__price">
+              <input
+                type="number"
+                className="price-input"
+                placeholder="最低价"
+                value={minPriceInput}
+                onChange={(e) => setMinPriceInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleApplyPriceFilter()}
+                min="0"
+                step="0.01"
+              />
+              <span className="price-separator">-</span>
+              <input
+                type="number"
+                className="price-input"
+                placeholder="最高价"
+                value={maxPriceInput}
+                onChange={(e) => setMaxPriceInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleApplyPriceFilter()}
+                min="0"
+                step="0.01"
+              />
+              <button className="price-apply-btn" onClick={handleApplyPriceFilter}>
+                应用
+              </button>
+              {(minPrice !== undefined || maxPrice !== undefined) && (
+                <button className="price-clear-btn" onClick={handleClearPriceFilter}>
+                  清除
+                </button>
+              )}
+            </div>
+
+            {/* 排序选项 */}
             <div className="search-sort__label">排序：</div>
             <div className="search-sort__options">
               {[
@@ -349,6 +649,32 @@ const Search: React.FC = () => {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ==================== 标签筛选栏（仅商品） ==================== */}
+        {searchType === 'goods' && hotTags.length > 0 && (
+          <div className="search-tags">
+            <div className="search-tags__label">🏷️ 热门标签：</div>
+            <div className="search-tags__list">
+              {hotTags.map(tag => (
+                <button
+                  key={tag.id}
+                  className={`search-tags__item ${selectedTags.includes(tag.id!) ? 'active' : ''}`}
+                  onClick={() => handleTagToggle(tag.id!)}
+                >
+                  #{tag.name}
+                </button>
+              ))}
+            </div>
+            {selectedTags.length > 0 && (
+              <button
+                className="search-tags__clear"
+                onClick={() => setSelectedTags([])}
+              >
+                清除筛选
+              </button>
+            )}
           </div>
         )}
 
@@ -396,8 +722,18 @@ const Search: React.FC = () => {
                     )}
                   </div>
                   <div className="goods-result-card__info">
-                    <h3 className="goods-result-card__title">{goods.title}</h3>
-                    <p className="goods-result-card__desc">{goods.description}</p>
+                    <h3
+                      className="goods-result-card__title"
+                      dangerouslySetInnerHTML={{
+                        __html: highlightText(goods.title || '', keyword),
+                      }}
+                    />
+                    <p
+                      className="goods-result-card__desc"
+                      dangerouslySetInnerHTML={{
+                        __html: highlightText(goods.description || '', keyword),
+                      }}
+                    />
                     <div className="goods-result-card__footer">
                       <div className="goods-result-card__price">{formatPrice(goods.price)}</div>
                       <div className="goods-result-card__seller">

@@ -19,7 +19,7 @@ import type {
 /**
  * 帖子 API 服务类
  */
-class PostService {
+export class PostService {
   // ==================== 帖子相关接口 ====================
 
   /**

@@ -88,8 +88,6 @@ class BlackBoxAcceptanceIT extends IntegrationTestBase {
     @Autowired
     private com.campus.marketplace.repository.GoodsRepository goodsRepository;
 
-    @Autowired
-    private com.campus.marketplace.service.GoodsService goodsService;
 
     private Long defaultCategoryId;
 

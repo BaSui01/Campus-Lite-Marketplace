@@ -1,0 +1,605 @@
+# ==========================================================
+# 校园轻享集市系统 - Docker Compose 配置文件
+# ==========================================================
+# 📝 作者: BaSui 😎
+# 📅 更新: 2025-10-25
+# 🎯 用途: 一键启动完整的应用栈
+#
+# 🚀 快速启动:
+#   1. 基础服务（推荐）:
+#      docker compose --project-directory . -f docker/docker-compose.yml up -d
+#
+#   2. 包含开发工具（MailHog）:
+#      docker compose --project-directory . -f docker/docker-compose.yml --profile devtools up -d
+#
+#   3. 包含监控套件（Prometheus + Grafana）:
+#      docker compose --project-directory . -f docker/docker-compose.yml --profile observability up -d
+#
+#   4. 完整启动（所有服务）:
+#      docker compose --project-directory . -f docker/docker-compose.yml --profile devtools --profile observability up -d
+#
+# 📦 默认启动的服务:
+#   - PostgreSQL 16（主数据库）
+#   - Redis 7.4（缓存 + 会话）
+#
+# 🔧 可选服务（通过 profiles 启用或取消注释）:
+#   - Backend（Spring Boot 后端）→ 取消注释相关配置（推荐本地运行）
+#   - Nginx（反向代理）→ 取消注释相关配置（生产部署时需要）
+#   - MailHog（邮件测试工具）→ --profile devtools
+#   - Prometheus + Grafana（监控）→ --profile observability
+#   - PostgreSQL Replica（读写分离）→ 取消注释相关配置
+#   - Redis Sentinel（高可用）→ 取消注释相关配置
+#
+# 📖 环境变量说明:
+#   - 环境变量从项目根目录的 .env 文件读取
+#   - 语法: ${变量名:-默认值} → 如果未设置则使用默认值
+#   - 语法: ${变量名:?错误信息} → 必须设置，否则报错
+# ==========================================================
+
+# ==========================================================
+# 🎨 可复用配置块（YAML Anchors）
+# ==========================================================
+# 📝 说明: 使用 &backend-env 定义可复用的环境变量块
+#         在 backend 服务中通过 <<: *backend-env 引用
+# 💡 好处: 避免重复，统一管理后端环境变量
+# ==========================================================
+x-backend-env: &backend-env
+  # Spring Boot 运行环境
+  # 可选值: dev（开发）、test（测试）、prod（生产）
+  SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+
+  # 数据库连接配置
+  DB_HOST: ${DB_HOST:-postgres}              # 数据库主机名（默认: postgres 服务名）
+  DB_PORT: ${DB_PORT:-5432}                  # 数据库端口（PostgreSQL 默认 5432）
+  DB_NAME: ${DB_NAME:-campus_marketplace}    # 数据库名称
+  DB_USERNAME: ${DB_USERNAME:-postgres}      # 数据库用户名
+  DB_PASSWORD: ${DB_PASSWORD:-123456}        # 数据库密码（⚠️ 生产环境务必修改！）
+
+  # Redis 连接配置
+  REDIS_HOST: ${REDIS_HOST:-redis}           # Redis 主机名（默认: redis 服务名）
+  REDIS_PORT: ${REDIS_PORT:-6379}            # Redis 端口（默认 6379）
+  REDIS_PASSWORD: ${REDIS_PASSWORD:-}        # Redis 密码（留空表示无密码）
+
+  # Redis Sentinel 高可用配置（可选）
+  REDIS_SENTINEL_MASTER: ${REDIS_SENTINEL_MASTER:-}  # Sentinel 主节点名称（留空则不启用）
+  REDIS_SENTINEL_NODES: ${REDIS_SENTINEL_NODES:-}    # Sentinel 节点列表（逗号分隔，如: sentinel1:26379,sentinel2:26379）
+
+  # JWT 密钥配置
+  # ⚠️ 必须设置！未设置会导致启动失败
+  # 🔐 生成方式: python -c "import secrets; print(secrets.token_urlsafe(64))"
+  JWT_SECRET: ${JWT_SECRET:?请在 .env 中设置 JWT_SECRET}
+
+# ==========================================================
+# 🐳 服务定义
+# ==========================================================
+services:
+  # ========================================
+  # 📊 PostgreSQL 16（主数据库）
+  # ========================================
+  postgres:
+    # Docker 镜像
+    # 可选版本: postgres:16, postgres:15, postgres:14
+    image: postgres:16
+
+    # 容器名称（方便查看和管理）
+    container_name: campus-postgres
+
+    # 重启策略
+    # 可选值:
+    #   - no: 不自动重启
+    #   - always: 总是重启
+    #   - on-failure: 失败时重启
+    #   - unless-stopped: 除非手动停止，否则总是重启（推荐）
+    restart: unless-stopped
+
+    # 环境变量
+    environment:
+      POSTGRES_DB: ${DB_NAME:-campus_marketplace}     # 初始化时创建的数据库名
+      POSTGRES_USER: ${DB_USERNAME:-postgres}         # 数据库超级用户名
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-123456}       # 数据库超级用户密码
+      POSTGRES_INITDB_ARGS: "-E UTF8"                 # 初始化参数（UTF8 编码）
+
+    # 数据卷挂载
+    # 💾 持久化数据到 Docker Volume，避免容器删除后数据丢失
+    volumes:
+      - postgres_data:/var/lib/postgresql/data             # 数据库文件存储
+      # - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro  # 📝 可选: 初始化 SQL 脚本（Flyway 已负责迁移，通常不需要）
+
+    # 端口映射
+    # 格式: "主机端口:容器端口"
+    # 💡 可以改成 "5433:5432" 避免与本地 PostgreSQL 冲突
+    ports:
+      - "${DB_PORT:-5432}:5432"
+
+    # 健康检查
+    # 🏥 用于确保服务完全启动后再启动依赖它的服务
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]  # 检查命令
+      interval: 10s        # 每 10 秒检查一次
+      timeout: 5s          # 超时时间 5 秒
+      retries: 5           # 失败 5 次后标记为 unhealthy
+
+    # 网络配置
+    # 📡 加入 campus 网络，与其他服务互联
+    networks:
+      - campus
+
+  # ========================================
+  # 🔴 Redis 7.4（缓存 + 会话存储）
+  # ========================================
+  redis:
+    # Docker 镜像
+    # 可选版本: redis:7.4, redis:7.2, redis:7.0, redis:6.2
+    image: redis:7.4
+
+    # 容器名称
+    container_name: campus-redis
+
+    # 重启策略
+    restart: unless-stopped
+
+    # 启动命令
+    # 💡 根据是否设置密码来决定启动参数
+    # 📝 参数说明:
+    #   - appendonly yes: 启用 AOF 持久化
+    #   - maxmemory 512mb: 最大内存 512MB（可改成 1gb, 2gb 等）
+    #   - maxmemory-policy allkeys-lru: 内存满时淘汰最少使用的键
+    #     其他策略: allkeys-lfu（最少频率）、volatile-lru（仅淘汰过期键）
+    #   - requirepass: 设置密码（如果有）
+    command: >
+      sh -c "if [ -z \"${REDIS_PASSWORD}\" ]; then
+        exec redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru;
+      else
+        exec redis-server --appendonly yes --requirepass ${REDIS_PASSWORD} --maxmemory 512mb --maxmemory-policy allkeys-lru;
+      fi"
+
+    # 数据卷挂载
+    volumes:
+      - redis_data:/data   # Redis 数据持久化
+
+    # 端口映射
+    # 💡 可以改成 "6380:6379" 避免与本地 Redis 冲突
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+    # 健康检查
+    # 🏥 根据是否设置密码来决定检查命令
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          if [ -z "${REDIS_PASSWORD}" ]; then
+            redis-cli ping;
+          else
+            redis-cli -a "${REDIS_PASSWORD}" ping;
+          fi
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    # 网络配置
+    networks:
+      - campus
+
+  # ========================================
+  # ☕ Backend（Spring Boot 后端服务）
+  # ========================================
+  # 🎯 默认注释状态：推荐在本地 IDE 中运行后端，方便调试
+  #
+  # 💡 如何启用 Docker 中的后端？
+  #   1. 取消下方所有 backend 相关注释（把 # 删掉）
+  #   2. 确保 backend/Dockerfile 文件存在
+  #   3. 执行启动命令：
+  #      docker compose --project-directory . -f docker/docker-compose.yml up -d
+  #
+  # ⚠️ 注意事项：
+  #   - 启用后会占用 8080 端口（可通过 BACKEND_PORT 环境变量修改）
+  #   - 构建镜像需要几分钟时间（首次启动较慢）
+  #   - 建议开发时在本地运行，生产部署时再启用 Docker
+  # ========================================
+  # backend:
+  #   # 构建配置
+  #   # 📦 从本地 Dockerfile 构建镜像
+  #   build:
+  #     context: ./backend           # 构建上下文（项目根目录的 backend 文件夹）
+  #     dockerfile: Dockerfile       # Dockerfile 名称
+  #     # 💡 可选参数:
+  #     # target: production         # 多阶段构建时指定目标阶段
+  #     # args:                      # 构建参数
+  #     #   - JAR_FILE=app.jar
+  #
+  #   # 容器名称
+  #   container_name: campus-backend
+  #
+  #   # 重启策略
+  #   restart: unless-stopped
+  #
+  #   # 依赖关系
+  #   # ⚠️ 等待 postgres 和 redis 健康检查通过后再启动
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #
+  #   # 环境变量
+  #   # 📝 使用 <<: *backend-env 引用前面定义的可复用配置块
+  #   environment:
+  #     <<: *backend-env
+  #
+  #   # 端口映射
+  #   # 💡 可以改成 "8081:8080" 避免端口冲突
+  #   ports:
+  #     - "${BACKEND_PORT:-8080}:8080"
+  #
+  #   # 健康检查
+  #   # 🏥 检查 Spring Boot Actuator 健康端点
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/actuator/health"]
+  #     interval: 30s        # 每 30 秒检查一次（后端启动较慢）
+  #     timeout: 10s         # 超时时间 10 秒
+  #     retries: 3           # 失败 3 次后标记为 unhealthy
+  #
+  #   # 网络配置
+  #   networks:
+  #     - campus
+
+  # ========================================
+  # 🌐 Nginx（反向代理 + 静态资源服务器）
+  # ========================================
+  # 🎯 默认注释状态：本地开发不需要 Nginx
+  #
+  # 💡 Nginx 的作用（生产环境）：
+  #   1. 反向代理：将请求转发到后端服务（负载均衡）
+  #   2. 静态资源：托管前端打包后的静态文件（dist/）
+  #   3. SSL 终止：处理 HTTPS 证书
+  #   4. Gzip 压缩：减少传输数据量
+  #
+  # 💡 本地开发为什么不需要？
+  #   - 前端：Vite 开发服务器（8210/8220 端口）提供热更新
+  #   - 后端：Spring Boot（8200 端口）直接访问
+  #   - 静态资源：存放在 backend/src/main/resources/static/
+  #
+  # 💡 如何启用 Nginx（生产部署）？
+  #   1. 取消下方所有 nginx 相关注释
+  #   2. 确保前端已打包（npm run build）
+  #   3. 修改 volumes 挂载前端 dist 目录
+  #   4. 执行启动命令：
+  #      docker compose --project-directory . -f docker/docker-compose.yml up -d
+  # ========================================
+  # nginx:
+  #   # Docker 镜像
+  #   # 💡 alpine 版本体积小（~40MB），适合生产环境
+  #   # 可选版本: nginx:1.27-alpine, nginx:1.26-alpine, nginx:latest
+  #   image: nginx:1.27-alpine
+  #
+  #   # 容器名称
+  #   container_name: campus-nginx
+  #
+  #   # 重启策略
+  #   restart: unless-stopped
+  #
+  #   # 依赖关系
+  #   # ⚠️ 如果启用了 backend 服务，取消下方注释以等待 backend 启动
+  #   # depends_on:
+  #   #   - backend
+  #
+  #   # 端口映射
+  #   # 📝 80 端口用于 HTTP 访问
+  #   # 💡 HTTPS 需要改成 "443:443" 并挂载证书
+  #   ports:
+  #     - "80:80"
+  #     # - "443:443"  # 💡 可选: HTTPS 端口
+  #
+  #   # 数据卷挂载
+  #   # 📝 :ro 表示只读挂载，避免容器修改配置文件
+  #   volumes:
+  #     - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro           # Nginx 主配置文件
+  #     - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro                   # 虚拟主机配置目录
+  #     # - ./ssl:/etc/nginx/ssl:ro                             # 💡 可选: SSL 证书目录
+  #     # - ./frontend/packages/portal/dist:/usr/share/nginx/html:ro           # 💡 生产环境：前端静态资源
+  #
+  #   # 健康检查
+  #   # 🏥 检查 Nginx 健康端点
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "wget -q -O - http://localhost/health || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #
+  #   # 网络配置
+  #   networks:
+  #     - campus
+
+  # ========================================
+  # 📧 MailHog（开发环境邮件测试工具）
+  # ========================================
+  # 🎯 用途: 拦截所有发送的邮件，提供 Web 界面查看
+  # 🔧 启用方式: docker compose --profile devtools up -d
+  # 🌐 访问地址: http://localhost:8025
+  # ========================================
+  mailhog:
+    # Docker 镜像
+    image: mailhog/mailhog:v1.0.1
+
+    # 容器名称
+    container_name: campus-mailhog
+
+    # 重启策略
+    restart: unless-stopped
+
+    # 配置文件分组（Profiles）
+    # 💡 只有使用 --profile devtools 时才会启动
+    profiles: ["devtools"]
+
+    # 端口映射
+    ports:
+      - "1025:1025"   # SMTP 端口（后端连接此端口发邮件）
+      - "8025:8025"   # Web UI 端口（浏览器访问此端口查看邮件）
+
+    # 网络配置
+    networks:
+      - campus
+
+  # ========================================
+  # 📊 Prometheus（监控数据收集）
+  # ========================================
+  # 🎯 用途: 收集应用指标数据（CPU、内存、请求量等）
+  # 🔧 启用方式: docker compose --profile observability up -d
+  # 🌐 访问地址: http://localhost:9090
+  # ========================================
+  prometheus:
+    # Docker 镜像
+    image: prom/prometheus:v2.53.0
+
+    # 容器名称
+    container_name: campus-prometheus
+
+    # 重启策略
+    restart: unless-stopped
+
+    # 配置文件分组
+    profiles: ["observability"]
+
+    # 启动命令参数
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"    # 配置文件路径
+      - "--storage.tsdb.path=/prometheus"                 # 数据存储路径
+      # - "--storage.tsdb.retention.time=30d"             # 💡 可选: 数据保留时间（默认 15 天）
+      # - "--web.enable-admin-api"                        # 💡 可选: 启用管理 API
+
+    # 数据卷挂载
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro  # Prometheus 配置文件
+      - prometheus_data:/prometheus                                     # 时序数据库存储
+
+    # 端口映射
+    ports:
+      - "9090:9090"
+
+    # 网络配置
+    networks:
+      - campus
+
+  # ========================================
+  # 📈 Grafana（监控数据可视化）
+  # ========================================
+  # 🎯 用途: 展示 Prometheus 收集的监控数据
+  # 🔧 启用方式: docker compose --profile observability up -d
+  # 🌐 访问地址: http://localhost:3000
+  # 🔑 默认账号: admin / admin（首次登录需修改密码）
+  # ========================================
+  grafana:
+    # Docker 镜像
+    image: grafana/grafana:11.1.0
+
+    # 容器名称
+    container_name: campus-grafana
+
+    # 重启策略
+    restart: unless-stopped
+
+    # 配置文件分组
+    profiles: ["observability"]
+
+    # 环境变量
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}         # 管理员用户名
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin} # 管理员密码（⚠️ 生产环境务必修改！）
+      # 💡 其他可选配置:
+      # GF_SECURITY_ALLOW_EMBEDDING: "true"                         # 允许嵌入 iframe
+      # GF_AUTH_ANONYMOUS_ENABLED: "true"                           # 允许匿名访问
+      # GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"  # 安装插件
+
+    # 端口映射
+    ports:
+      - "3000:3000"
+
+    # 数据卷挂载
+    volumes:
+      - grafana_data:/var/lib/grafana                                           # Grafana 数据存储
+      - ./docker/grafana/datasources:/etc/grafana/provisioning/datasources:ro          # 数据源配置
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro            # 仪表板配置
+
+    # 依赖关系
+    depends_on:
+      - prometheus
+
+    # 网络配置
+    networks:
+      - campus
+
+  # ==========================================================
+  # 🚀 可选扩展服务（注释形式保留，按需启用）
+  # ==========================================================
+
+  # ========================================
+  # 📊 PostgreSQL 只读从库（读写分离）
+  # ========================================
+  # 🎯 用途: 分担主库读压力，提升查询性能
+  # 🔧 启用方式:
+  #   1. 取消以下注释
+  #   2. 在 .env 中设置 REPLICATION_PASSWORD
+  #   3. 修改后端代码实现读写分离逻辑
+  # 📝 说明: 从库自动同步主库数据，只能读取，不能写入
+  # ========================================
+  # postgres-replica-1:
+  #   image: postgres:16
+  #   container_name: campus-postgres-replica-1
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: ${DB_USERNAME:-postgres}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+  #     POSTGRES_DB: ${DB_NAME:-campus_marketplace_prod}
+  #     PRIMARY_HOST: postgres                                          # 主库主机名
+  #     PRIMARY_PORT: 5432                                              # 主库端口
+  #     REPLICATION_USER: replicator                                    # 复制用户名
+  #     REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:-replicator}       # 复制密码（⚠️ 务必修改！）
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - campus
+
+  # ========================================
+  # 🔴 Redis Sentinel（高可用集群）
+  # ========================================
+  # 🎯 用途: Redis 主从自动故障转移
+  # 🔧 启用方式:
+  #   1. 取消以下注释（需要 3 个 Sentinel 节点）
+  #   2. 在 .env 中设置 REDIS_SENTINEL_MASTER 和 REDIS_SENTINEL_NODES
+  #   3. 修改后端 Redis 配置为 Sentinel 模式
+  # 📝 说明: Sentinel 监控 Redis 主从，主节点宕机时自动切换
+  # ========================================
+  # redis-sentinel-1:
+  #   image: redis:7.4
+  #   container_name: campus-redis-sentinel-1
+  #   restart: unless-stopped
+  #   command: >
+  #     sh -c "sed -e 's/<REDIS_PASSWORD>/'\"$${REDIS_PASSWORD}\"'/g' /etc/redis/sentinel.conf > /tmp/sentinel.conf
+  #     && exec redis-sentinel /tmp/sentinel.conf"
+  #   volumes:
+  #     - ./redis/sentinel.conf:/etc/redis/sentinel.conf:ro
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - campus
+  #
+  # redis-sentinel-2:
+  #   image: redis:7.4
+  #   container_name: campus-redis-sentinel-2
+  #   restart: unless-stopped
+  #   command: >
+  #     sh -c "sed -e 's/<REDIS_PASSWORD>/'\"$${REDIS_PASSWORD}\"'/g' /etc/redis/sentinel.conf > /tmp/sentinel.conf
+  #     && exec redis-sentinel /tmp/sentinel.conf"
+  #   volumes:
+  #     - ./redis/sentinel.conf:/etc/redis/sentinel.conf:ro
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - campus
+  #
+  # redis-sentinel-3:
+  #   image: redis:7.4
+  #   container_name: campus-redis-sentinel-3
+  #   restart: unless-stopped
+  #   command: >
+  #     sh -c "sed -e 's/<REDIS_PASSWORD>/'\"$${REDIS_PASSWORD}\"'/g' /etc/redis/sentinel.conf > /tmp/sentinel.conf
+  #     && exec redis-sentinel /tmp/sentinel.conf"
+  #   volumes:
+  #     - ./redis/sentinel.conf:/etc/redis/sentinel.conf:ro
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - campus
+
+  # ==========================================================
+  # 🚀 横向扩容（负载均衡）
+  # ==========================================================
+  # 💡 后端可以通过以下命令快速扩容为多实例:
+  #    docker compose up --scale backend=3
+  #
+  # ⚠️ 注意事项:
+  #   1. 需要修改 Nginx 配置为 upstream 负载均衡模式
+  #   2. 扩容前确保应用是无状态的（会话存储在 Redis）
+  #   3. 数据库连接池需要根据实例数量调整
+  #
+  # 📝 Nginx upstream 配置示例:
+  #    upstream backend {
+  #        server backend:8080 weight=1;
+  #        # Docker Compose 会自动为扩容的实例分配端口
+  #    }
+  # ==========================================================
+
+# ==========================================================
+# 📡 网络配置
+# ==========================================================
+# 💡 所有服务都在同一个 bridge 网络中，可以通过服务名互相访问
+# 📝 例如: 后端连接数据库使用 postgres:5432
+# ==========================================================
+networks:
+  campus:
+    driver: bridge
+    # 💡 可选配置:
+    # driver_opts:
+    #   com.docker.network.bridge.name: campus-bridge  # 自定义网桥名称
+    # ipam:                                            # 自定义 IP 地址管理
+    #   driver: default
+    #   config:
+    #     - subnet: 172.28.0.0/16
+    #       gateway: 172.28.0.1
+
+# ==========================================================
+# 💾 数据卷配置（持久化存储）
+# ==========================================================
+# 💡 Docker Volume 自动管理，数据存储在 Docker 目录
+# 📝 查看数据卷: docker volume ls
+# 📝 查看路径: docker volume inspect campus-lite-marketplace_postgres_data
+# 📝 备份数据: docker run --rm -v postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres_backup.tar.gz /data
+# ==========================================================
+volumes:
+  postgres_data:
+    # driver: local                                    # 默认驱动
+    # driver_opts:                                     # 💡 可选: 挂载到宿主机指定目录
+    #   type: none
+    #   o: bind
+    #   device: /data/postgres
+
+  redis_data:
+    # driver: local
+
+  prometheus_data:
+    # driver: local
+
+  grafana_data:
+    # driver: local
+
+# ==========================================================
+# 📚 常用命令速查
+# ==========================================================
+# 🚀 启动服务:
+#   docker compose --project-directory . -f docker/docker-compose.yml up -d
+#
+# 🛑 停止服务:
+#   docker compose --project-directory . -f docker/docker-compose.yml down
+#
+# 🔄 重启服务:
+#   docker compose --project-directory . -f docker/docker-compose.yml restart
+#
+# 📋 查看日志:
+#   docker compose --project-directory . -f docker/docker-compose.yml logs -f [服务名]
+#
+# 📊 查看状态:
+#   docker compose --project-directory . -f docker/docker-compose.yml ps
+#
+# 🗑️ 删除服务和数据卷:
+#   docker compose --project-directory . -f docker/docker-compose.yml down -v
+#
+# 🔧 进入容器:
+#   docker exec -it campus-backend sh
+#
+# 📦 重新构建镜像:
+#   docker compose --project-directory . -f docker/docker-compose.yml build --no-cache
+#
+# 🚀 扩容后端:
+#   docker compose --project-directory . -f docker/docker-compose.yml up -d --scale backend=3
+# ==========================================================

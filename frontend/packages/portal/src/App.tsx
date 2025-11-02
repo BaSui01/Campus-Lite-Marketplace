@@ -7,8 +7,8 @@
 import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { toast, useWebSocketService } from '@campus/shared';
-import { useAuthStore, useNotificationStore } from './store';
+import { useWebSocketService } from '@campus/shared';
+import { useAuthStore } from './store';
 import { router } from './router';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
@@ -29,7 +29,6 @@ const queryClient = new QueryClient({
  */
 function App() {
   const { init: initAuth, isAuthenticated } = useAuthStore();
-  const { notifications, remove } = useNotificationStore();
 
   // 初始化认证状态
   useEffect(() => {
@@ -67,19 +66,6 @@ function App() {
             v7_startTransition: true
           }}
         />
-
-        {/* 全局通知组件 */}
-        <div className="toast-container">
-          {notifications.map((notification) => (
-            <Toast
-              key={notification.id}
-              type={notification.type}
-              message={notification.message}
-              duration={notification.duration}
-              onClose={() => remove(notification.id)}
-            />
-          ))}
-        </div>
       </QueryClientProvider>
     </ErrorBoundary>
   );

@@ -1,0 +1,297 @@
+/**
+ * 退款申请页面样式 - 维护你的权益！💰
+ * @author BaSui 😎
+ * @description 蓝绿主题的退款申请界面设计
+ */
+
+.refund-apply-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.refund-apply-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.refund-apply-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 180, 219, 0.3);
+}
+
+.refund-apply-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+  color: #ffffff;
+}
+
+.refund-apply-header__subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+/* ==================== 订单信息 ==================== */
+
+.refund-section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 16px 0;
+}
+
+.refund-order-info {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.refund-order-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.refund-order-item {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+}
+
+.refund-order-item .label {
+  color: #8c8c8c;
+  min-width: 100px;
+}
+
+.refund-order-item .value {
+  color: #262626;
+  font-weight: 500;
+}
+
+.refund-order-item .value.price {
+  color: #ff4d4f;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* ==================== 退款表单 ==================== */
+
+.refund-form {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin-bottom: 12px;
+}
+
+.form-label .required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+.form-tip {
+  font-size: 13px;
+  color: #8c8c8c;
+  margin: 0 0 12px 0;
+}
+
+.reason-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reason-tag {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reason-tag:hover {
+  border-color: #00b4db;
+  color: #00b4db;
+}
+
+.reason-tag.active {
+  border-color: #00b4db;
+  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.form-textarea:focus {
+  border-color: #00b4db;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 180, 219, 0.2);
+}
+
+.char-count {
+  text-align: right;
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: 4px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.form-actions button {
+  min-width: 140px;
+}
+
+/* ==================== 温馨提示 ==================== */
+
+.refund-tips {
+  background: #fff7e6;
+  border-radius: 12px;
+  padding: 24px;
+  border-left: 4px solid #faad14;
+}
+
+.tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tips-list li {
+  font-size: 14px;
+  color: #595959;
+  line-height: 1.8;
+  margin-bottom: 8px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.tips-list li:before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #faad14;
+  font-weight: bold;
+}
+
+.tips-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* ==================== 加载状态 ==================== */
+
+.loading-text {
+  text-align: center;
+  padding: 80px 20px;
+  font-size: 18px;
+  color: #8c8c8c;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .refund-apply-page {
+    padding: 10px 0;
+  }
+
+  .refund-apply-container {
+    padding: 0 10px;
+  }
+
+  .refund-apply-header {
+    padding: 24px 20px;
+  }
+
+  .refund-apply-header__title {
+    font-size: 28px;
+  }
+
+  .refund-order-info,
+  .refund-form,
+  .refund-tips {
+    padding: 20px;
+  }
+
+  .reason-tags {
+    gap: 8px;
+  }
+
+  .reason-tag {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .refund-apply-header {
+    padding: 20px 16px;
+  }
+
+  .refund-apply-header__title {
+    font-size: 24px;
+  }
+
+  .refund-order-info,
+  .refund-form,
+  .refund-tips {
+    padding: 16px;
+  }
+
+  .refund-order-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .refund-order-item .label {
+    margin-bottom: 4px;
+  }
+}

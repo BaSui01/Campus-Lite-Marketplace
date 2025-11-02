@@ -6,76 +6,64 @@
 
 // ==================== 认证服务 ====================
 export { authService } from './auth';
-export type { default as AuthService } from './auth';
+export type { AuthService } from './auth';
 
 // ==================== 用户服务 ====================
 export { userService } from './user';
-export type { default as UserService } from './user';
+export type { UserService } from './user';
 
 // ==================== 物品服务 ====================
 export { goodsService } from './goods';
-export type { default as GoodsService } from './goods';
+export type { GoodsService } from './goods';
 
 // ==================== 订单服务 ====================
 export { orderService } from './order';
-export type { default as OrderService } from './order';
+export type { OrderService } from './order';
+
+// ==================== 退款服务 ====================
+export { refundService, RefundStatus } from './refund';
+export type { RefundService, RefundRequest, ApplyRefundRequest, RefundListQuery } from './refund';
 
 // ==================== 消息服务 ====================
 export { messageService } from './message';
-export type { default as MessageService } from './message';
-
-// ==================== 通知服务 ====================
-export { notificationService } from './notification';
-export type { default as NotificationService } from './notification';
+export type { MessageService } from './message';
 
 // ==================== 帖子服务 ====================
 export { postService } from './post';
-export type { default as PostService } from './post';
+export type { PostService } from './post';
 
 // ==================== 文件上传服务 ====================
 export { uploadService } from './upload';
-export type { default as UploadService } from './upload';
+export type { UploadService } from './upload';
 
-// ==================== WebSocket 服务 ====================
-export { websocketService } from './websocket';
-export type { default as WebSocketService } from './websocket';
+// ==================== 管理端统计服务 ====================
+export { statisticsService } from './statistics';
+export type { StatisticsService } from './statistics';
 
-// ==================== WebSocket 客户端 ====================
-export {
-  WebSocketClient,
-  WebSocketReadyState,
-  WebSocketMessageType,
-} from './WebSocketClient';
-export type {
-  WebSocketMessage,
-  WebSocketClientOptions,
-} from './WebSocketClient';
+// ==================== 举报管理服务 ====================
+export { reportService } from './report';
+export type { ReportService } from './report';
 
-// ==================== WebSocket 服务类型 ====================
-export type {
-  ChatMessageData,
-  OrderUpdateData,
-  UserOnlineStatusData,
-} from './websocket';
+// ==================== 角色权限服务 ====================
+export { roleService } from './role';
+export type { RoleService } from './role';
 
-// ==================== 便捷导出（默认导出对象 - 延迟初始化）====================
+// ==================== 限流管理服务 ====================
+export { rateLimitService } from './rateLimit';
+export type { RateLimitService } from './rateLimit';
 
-/**
- * 所有 API 服务集合（使用 getter 延迟初始化）
- */
-export const services = {
-  get auth() { return authService; },
-  get user() { return userService; },
-  get goods() { return goodsService; },
-  get order() { return orderService; },
-  get message() { return messageService; },
-  get notification() { return notificationService; },
-  get post() { return postService; },
-  get upload() { return uploadService; },
-  get websocket() { return websocketService; },
-} as const;
+// ==================== 通知模板服务 ====================
+export { notificationTemplateService } from './notificationTemplate';
+export type { NotificationTemplateService } from './notificationTemplate';
 
-/**
- * 默认导出
- */
-export default services;
+// ==================== 合规审计服务 ====================
+export { complianceService } from './compliance';
+export type { ComplianceService } from './compliance';
+
+// ==================== 软删除治理服务 ====================
+export { softDeleteService } from './softDelete';
+export type { SoftDeleteService } from './softDelete';
+
+// ==================== 管理端用户服务 ====================
+export { adminUserService } from './adminUser';
+export type { AdminUserService } from './adminUser';

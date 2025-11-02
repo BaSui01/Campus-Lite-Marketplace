@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { websocketService } from '../services/websocket';
+import { websocketService } from '../utils/websocket';
 import type { Notification } from '../types';
 
 /**

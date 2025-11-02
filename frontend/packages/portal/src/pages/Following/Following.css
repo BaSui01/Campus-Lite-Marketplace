@@ -1,0 +1,275 @@
+/**
+ * 关注页面样式 - 追随你感兴趣的人!👥
+ * @author BaSui 😎
+ * @description 美观的关注列表界面设计(蓝绿主题)
+ */
+
+.following-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.following-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.following-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.following-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+  color: #ffffff;
+}
+
+.following-header__subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+/* ==================== 内容区域 ==================== */
+
+.following-content {
+  min-height: 400px;
+}
+
+.following-loading {
+  padding: 20px 0;
+}
+
+.following-empty {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.following-empty .empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.following-empty .empty-text {
+  font-size: 24px;
+  color: #2d3436;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+}
+
+.following-empty .empty-tip {
+  font-size: 16px;
+  color: #636e72;
+  margin: 0 0 32px 0;
+}
+
+/* ==================== 关注列表 ==================== */
+
+.following-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.following-item {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.following-item:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.following-item__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.following-item__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.following-item__avatar .avatar-placeholder {
+  font-size: 32px;
+  color: #ffffff;
+}
+
+.following-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.following-item__name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2d3436;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.following-item__name:hover {
+  color: #667eea;
+}
+
+.following-item__time {
+  font-size: 14px;
+  color: #636e72;
+}
+
+.following-item__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .following-page {
+    padding: 10px 0;
+  }
+
+  .following-container {
+    padding: 0 10px;
+  }
+
+  .following-header {
+    padding: 24px 20px;
+    margin-bottom: 24px;
+  }
+
+  .following-header__title {
+    font-size: 28px;
+  }
+
+  .following-header__subtitle {
+    font-size: 14px;
+  }
+
+  .following-item {
+    padding: 16px 20px;
+  }
+
+  .following-item__avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .following-item__avatar .avatar-placeholder {
+    font-size: 28px;
+  }
+
+  .following-item__name {
+    font-size: 16px;
+  }
+
+  .following-item__time {
+    font-size: 13px;
+  }
+
+  .following-item__actions {
+    flex-direction: column;
+  }
+
+  .following-item__actions button {
+    width: 100%;
+  }
+
+  .following-empty .empty-icon {
+    font-size: 64px;
+  }
+
+  .following-empty .empty-text {
+    font-size: 20px;
+  }
+
+  .following-empty .empty-tip {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .following-header {
+    padding: 20px 16px;
+  }
+
+  .following-header__title {
+    font-size: 24px;
+  }
+
+  .following-item {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .following-item__avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .following-item__avatar .avatar-placeholder {
+    font-size: 24px;
+  }
+
+  .following-item__name {
+    font-size: 15px;
+  }
+
+  .following-item__time {
+    font-size: 12px;
+  }
+
+  .following-empty {
+    padding: 60px 16px;
+  }
+
+  .following-empty .empty-icon {
+    font-size: 56px;
+  }
+
+  .following-empty .empty-text {
+    font-size: 18px;
+  }
+}

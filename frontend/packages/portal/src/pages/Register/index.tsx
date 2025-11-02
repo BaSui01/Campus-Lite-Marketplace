@@ -26,6 +26,9 @@ const Register: React.FC = () => {
     code: '',
   });
 
+  // BaSui新增：确认密码字段（用于验证，不提交到后端）
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   // UI 状态
   const [loading, setLoading] = useState(false);
   const [sendingCode, setSendingCode] = useState(false);
@@ -202,6 +205,13 @@ const Register: React.FC = () => {
       newErrors.password = '密码最多 20 位！';
     }
 
+    // ✅ BaSui新增：密码确认验证
+    if (!confirmPassword.trim()) {
+      newErrors.confirmPassword = '请再次输入密码！';
+    } else if (confirmPassword !== formData.password) {
+      newErrors.confirmPassword = '两次密码不一致！';
+    }
+
     if (!isVerified) {
       newErrors.captcha = '请先完成滑块验证！';
     }
@@ -372,10 +382,30 @@ const Register: React.FC = () => {
               placeholder="请输入密码（6-20位）"
               value={formData.password}
               onChange={handleInputChange('password')}
-              onPressEnter={handlePressEnter}
               error={!!errors.password}
               errorMessage={errors.password}
               prefix={<span>🔒</span>}
+              maxLength={20}
+            />
+          </div>
+
+          {/* ✅ BaSui新增：确认密码输入框 */}
+          <div className="register-form__field">
+            <label className="register-form__label">确认密码</label>
+            <Input
+              type="password"
+              size="large"
+              placeholder="请再次输入密码"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                // 清除确认密码的错误提示
+                setErrors(prev => ({ ...prev, confirmPassword: '' }));
+              }}
+              onPressEnter={handlePressEnter}
+              error={!!errors.confirmPassword}
+              errorMessage={errors.confirmPassword}
+              prefix={<span>🔑</span>}
               maxLength={20}
             />
           </div>

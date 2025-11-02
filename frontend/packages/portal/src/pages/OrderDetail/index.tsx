@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@campus/shared/components';
 import { orderService } from '@campus/shared/services/order';
+import { websocketService } from '@campus/shared/utils';
 import { useNotificationStore } from '../../store';
 import type { Order, PaymentMethod, OrderStatus } from '@campus/shared/types';
 import './OrderDetail.css';
@@ -73,6 +74,63 @@ const OrderDetail: React.FC = () => {
   useEffect(() => {
     loadOrderDetail();
   }, [orderNo]);
+
+  // ==================== 📦 实时订单状态更新（WebSocket）====================
+
+  /**
+   * 📦 监听 WebSocket 订单状态更新
+   */
+  useEffect(() => {
+    if (!order) return; // 订单未加载完成时不订阅
+
+    console.log('[OrderDetail] 📦 开始监听实时订单状态更新...');
+
+    // 定义订单更新处理器
+    const handleOrderUpdate = (data: any) => {
+      console.log('[OrderDetail] 📦 收到订单状态更新:', data);
+
+      const { orderId, orderNo: updatedOrderNo, status, message } = data;
+
+      // 只处理当前订单的更新
+      if (order.orderNo !== updatedOrderNo && order.orderId !== orderId) {
+        return;
+      }
+
+      console.log(`[OrderDetail] ✅ 更新订单 ${updatedOrderNo} 状态: ${order.status} → ${status}`);
+
+      // 🚀 乐观更新 UI（更新当前订单状态）
+      setOrder((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          status,
+          updateTime: new Date().toISOString(),
+        };
+      });
+
+      // 💬 显示 Toast 提示
+      if (message) {
+        toast.success(message);
+      } else {
+        toast.success(`订单状态已更新为：${getStatusText(status)} ✅`);
+      }
+    };
+
+    // 📡 订阅订单更新推送
+    websocketService.onOrderUpdate(handleOrderUpdate);
+
+    // 🔌 确保 WebSocket 已连接
+    if (!websocketService.isConnected()) {
+      console.log('[OrderDetail] 🔌 WebSocket 未连接，尝试连接...');
+      websocketService.connect();
+    }
+
+    // 🧹 清理函数（组件卸载时取消订阅）
+    return () => {
+      console.log('[OrderDetail] 🧹 取消订阅实时订单状态更新');
+      websocketService.offOrderUpdate(handleOrderUpdate);
+    };
+  }, [order]); // 依赖 order，订单加载后才订阅
 
   // ==================== 事件处理 ====================
 

@@ -6,7 +6,7 @@
  */
 
 import { DefaultApi } from '../api';
-import { createApiConfig, axiosInstance } from '../utils/http';
+import { createApi } from '../utils/apiClient';
 import type {
   ApiResponse,
   RegisterRequest,
@@ -23,12 +23,12 @@ import type {
  * 认证 API 服务类
  * ✅ 基于 OpenAPI 生成的代码，路径自动包含 /api 前缀
  */
-class AuthService {
+export class AuthService {
   private api: DefaultApi;
 
   constructor() {
-    // 使用 OpenAPI 生成的 DefaultApi（路径已经包含 /api 前缀）
-    this.api = new DefaultApi(createApiConfig(), undefined, axiosInstance);
+    // 使用共享 API 客户端创建与当前环境一致的 DefaultApi 实例
+    this.api = createApi();
   }
 
   /**

@@ -24,3 +24,6 @@ export * from './hooks';
 
 // 导出 API 服务（新增）
 export * from './services';
+
+// 导出工厂方法（Store 等）
+export * from './factories';

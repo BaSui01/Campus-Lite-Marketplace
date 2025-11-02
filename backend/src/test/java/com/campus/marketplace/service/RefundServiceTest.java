@@ -233,4 +233,190 @@ class RefundServiceTest {
         assertThat(refund.getRetryCount()).isEqualTo(2);
         assertThat(refund.getLastError()).isEqualTo("oops");
     }
+
+    @Test
+    @DisplayName("用户查询自己的退款列表 - 分页成功")
+    void listMyRefunds_success() {
+        User buyer = User.builder().username("buyer").build();
+        buyer.setId(1L);
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+
+        RefundRequest refund1 = RefundRequest.builder()
+                .refundNo("RFD1")
+                .orderNo("ORD1")
+                .applicantId(1L)
+                .status(RefundStatus.APPLIED)
+                .amount(new BigDecimal("100"))
+                .build();
+        RefundRequest refund2 = RefundRequest.builder()
+                .refundNo("RFD2")
+                .orderNo("ORD2")
+                .applicantId(1L)
+                .status(RefundStatus.REFUNDED)
+                .amount(new BigDecimal("200"))
+                .build();
+
+        org.springframework.data.domain.Page<RefundRequest> page = new org.springframework.data.domain.PageImpl<>(
+                java.util.List.of(refund1, refund2),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                2
+        );
+        when(refundRepository.findByApplicantId(eq(1L), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(page);
+
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listMyRefunds(0, 10, null);
+
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        verify(refundRepository).findByApplicantId(eq(1L), any(org.springframework.data.domain.Pageable.class));
+    }
+
+    @Test
+    @DisplayName("用户查询自己的退款列表 - 按状态筛选")
+    void listMyRefunds_withStatusFilter() {
+        User buyer = User.builder().username("buyer").build();
+        buyer.setId(1L);
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+
+        RefundRequest refund = RefundRequest.builder()
+                .refundNo("RFD1")
+                .orderNo("ORD1")
+                .applicantId(1L)
+                .status(RefundStatus.REFUNDED)
+                .amount(new BigDecimal("100"))
+                .build();
+
+        org.springframework.data.domain.Page<RefundRequest> page = new org.springframework.data.domain.PageImpl<>(
+                java.util.List.of(refund),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                1
+        );
+        when(refundRepository.findByApplicantIdAndStatus(eq(1L), eq(RefundStatus.REFUNDED), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(page);
+
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listMyRefunds(0, 10, RefundStatus.REFUNDED);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getStatus()).isEqualTo(RefundStatus.REFUNDED);
+        verify(refundRepository).findByApplicantIdAndStatus(eq(1L), eq(RefundStatus.REFUNDED), any(org.springframework.data.domain.Pageable.class));
+    }
+
+    @Test
+    @DisplayName("用户查询自己的退款详情 - 成功")
+    void getMyRefund_success() {
+        User buyer = User.builder().username("buyer").build();
+        buyer.setId(1L);
+        RefundRequest refund = RefundRequest.builder()
+                .refundNo("RFD1")
+                .orderNo("ORD1")
+                .applicantId(1L)
+                .status(RefundStatus.APPLIED)
+                .amount(new BigDecimal("100"))
+                .build();
+
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+        when(refundRepository.findByRefundNo("RFD1")).thenReturn(Optional.of(refund));
+
+        RefundRequest result = refundService.getMyRefund("RFD1");
+
+        assertThat(result.getRefundNo()).isEqualTo("RFD1");
+        assertThat(result.getApplicantId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("用户查询他人的退款详情 - 应拒绝")
+    void getMyRefund_shouldRejectWhenNotOwner() {
+        User buyer = User.builder().username("buyer").build();
+        buyer.setId(1L);
+        RefundRequest refund = RefundRequest.builder()
+                .refundNo("RFD1")
+                .orderNo("ORD1")
+                .applicantId(2L) // 不是当前用户
+                .status(RefundStatus.APPLIED)
+                .amount(new BigDecimal("100"))
+                .build();
+
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+        when(refundRepository.findByRefundNo("RFD1")).thenReturn(Optional.of(refund));
+
+        assertThatThrownBy(() -> refundService.getMyRefund("RFD1"))
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("code", com.campus.marketplace.common.exception.ErrorCode.PERMISSION_DENIED.getCode());
+    }
+
+    @Test
+    @DisplayName("管理员查询所有退款列表 - 分页成功")
+    void listAllRefunds_success() {
+        RefundRequest refund1 = RefundRequest.builder()
+                .refundNo("RFD1")
+                .orderNo("ORD1")
+                .applicantId(1L)
+                .status(RefundStatus.APPLIED)
+                .amount(new BigDecimal("100"))
+                .build();
+
+        org.springframework.data.domain.Page<RefundRequest> page = new org.springframework.data.domain.PageImpl<>(
+                java.util.List.of(refund1),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                1
+        );
+        when(refundRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(page);
+
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(0, 10, null, null);
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(refundRepository).findAll(any(org.springframework.data.domain.Pageable.class));
+    }
+
+    @Test
+    @DisplayName("管理员查询所有退款列表 - 按状态筛选")
+    void listAllRefunds_withStatusFilter() {
+        RefundRequest refund = RefundRequest.builder()
+                .refundNo("RFD1")
+                .orderNo("ORD1")
+                .applicantId(1L)
+                .status(RefundStatus.APPLIED)
+                .amount(new BigDecimal("100"))
+                .build();
+
+        org.springframework.data.domain.Page<RefundRequest> page = new org.springframework.data.domain.PageImpl<>(
+                java.util.List.of(refund),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                1
+        );
+        when(refundRepository.findByStatus(eq(RefundStatus.APPLIED), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(page);
+
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(0, 10, RefundStatus.APPLIED, null);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getStatus()).isEqualTo(RefundStatus.APPLIED);
+        verify(refundRepository).findByStatus(eq(RefundStatus.APPLIED), any(org.springframework.data.domain.Pageable.class));
+    }
+
+    @Test
+    @DisplayName("管理员查询所有退款列表 - 按关键词搜索")
+    void listAllRefunds_withKeyword() {
+        RefundRequest refund = RefundRequest.builder()
+                .refundNo("RFD1")
+                .orderNo("ORD1")
+                .applicantId(1L)
+                .status(RefundStatus.APPLIED)
+                .amount(new BigDecimal("100"))
+                .build();
+
+        org.springframework.data.domain.Page<RefundRequest> page = new org.springframework.data.domain.PageImpl<>(
+                java.util.List.of(refund),
+                org.springframework.data.domain.PageRequest.of(0, 10),
+                1
+        );
+        when(refundRepository.findByRefundNoContainingOrOrderNoContaining(eq("RFD1"), eq("RFD1"), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(page);
+
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(0, 10, null, "RFD1");
+
+        assertThat(result.getContent()).hasSize(1);
+        verify(refundRepository).findByRefundNoContainingOrOrderNoContaining(eq("RFD1"), eq("RFD1"), any(org.springframework.data.domain.Pageable.class));
+    }
 }

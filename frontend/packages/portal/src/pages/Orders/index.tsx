@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@campus/shared/components';
 import { orderService } from '@campus/shared/services/order';
+import { websocketService } from '@campus/shared/utils';
 import type { Order, OrderStatus, PageInfo } from '@campus/shared/types';
 import './Orders.css';
 
@@ -106,6 +107,57 @@ const Orders: React.FC = () => {
   useEffect(() => {
     loadOrderList();
   }, [activeTab, filterStatus]);
+
+  // ==================== 📦 实时订单状态更新（WebSocket）====================
+
+  /**
+   * 📦 监听 WebSocket 订单状态更新
+   */
+  useEffect(() => {
+    console.log('[Orders] 📦 开始监听实时订单状态更新...');
+
+    // 定义订单更新处理器
+    const handleOrderUpdate = (data: any) => {
+      console.log('[Orders] 📦 收到订单状态更新:', data);
+
+      const { orderId, orderNo, status, message } = data;
+
+      // 🚀 乐观更新 UI（更新列表中对应的订单）
+      setOrderList((prev) =>
+        prev.map((order) => {
+          if (order.orderId === orderId || order.orderNo === orderNo) {
+            console.log(`[Orders] ✅ 更新订单 ${orderNo} 状态: ${order.status} → ${status}`);
+            return {
+              ...order,
+              status,
+              updateTime: new Date().toISOString(),
+            };
+          }
+          return order;
+        })
+      );
+
+      // 💬 显示 Toast 提示（可选）
+      if (message) {
+        console.log(`[Orders] 💬 订单 ${orderNo}: ${message}`);
+      }
+    };
+
+    // 📡 订阅订单更新推送
+    websocketService.onOrderUpdate(handleOrderUpdate);
+
+    // 🔌 确保 WebSocket 已连接
+    if (!websocketService.isConnected()) {
+      console.log('[Orders] 🔌 WebSocket 未连接，尝试连接...');
+      websocketService.connect();
+    }
+
+    // 🧹 清理函数（组件卸载时取消订阅）
+    return () => {
+      console.log('[Orders] 🧹 取消订阅实时订单状态更新');
+      websocketService.offOrderUpdate(handleOrderUpdate);
+    };
+  }, []); // 空依赖，只在组件挂载时执行一次
 
   // ==================== 事件处理 ====================
 

@@ -8,7 +8,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Input, Button, Skeleton } from '@campus/shared/components';
 import { useWebSocketService } from '@campus/shared/hooks';
-import { messageService } from '@campus/shared/services';
+import { getApi } from '@campus/shared/utils';
+import type { ConversationResponse, MessageResponse, SendMessageRequest } from '@campus/shared/api/models';
 import { useAuthStore, useNotificationStore } from '../../store';
 import './Chat.css';
 

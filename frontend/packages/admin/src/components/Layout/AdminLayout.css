@@ -1,0 +1,57 @@
+/**
+ * 主布局样式
+ *
+ * @author BaSui 😎
+ * @date 2025-11-01
+ */
+
+.admin-layout {
+  min-height: 100vh;
+}
+
+.admin-sider {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-header {
+  padding: 0 24px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.trigger {
+  font-size: 18px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-wrapper {
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-content {
+  margin: 24px;
+  padding: 24px;
+  background: #fff;
+  min-height: 280px;
+  border-radius: 8px;
+}

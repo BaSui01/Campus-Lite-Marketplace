@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -87,6 +88,18 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         
         log.warn("参数绑定失败: {}", errorMessage);
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), errorMessage));
+    }
+
+    /**
+     * 处理缺少请求参数异常
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        String errorMessage = String.format("缺少必填参数: %s", e.getParameterName());
+        log.warn("请求参数缺失: {}", errorMessage);
         return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
                 resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), errorMessage));
     }

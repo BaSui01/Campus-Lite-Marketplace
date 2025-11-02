@@ -299,11 +299,19 @@ const ForgotPassword: React.FC = () => {
 
           {/* 选项卡 */}
           <Tabs
-            defaultValue="email"
+            defaultActiveKey="email"
             onChange={handleTabChange}
-            tabs={[
-              { label: '📧 邮箱找回', value: 'email' },
-              { label: '📱 手机找回', value: 'phone' },
+            items={[
+              {
+                key: 'email',
+                label: '📧 邮箱找回',
+                children: null, // 内容在外部渲染
+              },
+              {
+                key: 'phone',
+                label: '📱 手机找回',
+                children: null, // 内容在外部渲染
+              },
             ]}
           />
 

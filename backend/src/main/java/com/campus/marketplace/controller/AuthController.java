@@ -9,12 +9,16 @@ import com.campus.marketplace.common.annotation.RateLimit;
 import com.campus.marketplace.common.dto.request.ConfirmRegisterByEmailRequest;
 import com.campus.marketplace.common.dto.request.ResetPasswordByEmailRequest;
 import com.campus.marketplace.common.dto.request.ResetPasswordBySmsRequest;
+import com.campus.marketplace.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 认证控制器
@@ -28,10 +32,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "认证管理", description = "用户注册、登录、登出等认证相关接口")
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     /**
      * 用户注册
@@ -193,17 +199,17 @@ public class AuthController {
                     required = true,
                     example = "basui"
             )
-            @RequestParam String username) {
+            @RequestParam @NotBlank(message = "用户名不能为空") String username) {
 
-        log.debug("校验用户名: {}", username);
-
-        // 参数校验
-        if (username == null || username.trim().isEmpty()) {
-            return ApiResponse.error(40000, "用户名不能为空");
+        String normalizedUsername = username.trim();
+        if (normalizedUsername.isEmpty()) {
+            throw new IllegalArgumentException("用户名不能为空");
         }
 
+        log.debug("校验用户名: {}", normalizedUsername);
+
         // 查询用户名是否存在
-        boolean exists = authService.existsByUsername(username);
+        boolean exists = userRepository.existsByUsername(normalizedUsername);
 
         String message = exists ? "用户名已存在" : "用户名可用";
         return ApiResponse.success(message, exists);
@@ -228,22 +234,20 @@ public class AuthController {
                     required = true,
                     example = "basui@campus.edu"
             )
-            @RequestParam String email) {
+            @RequestParam
+            @NotBlank(message = "邮箱不能为空")
+            @Email(message = "邮箱格式不正确")
+            String email) {
 
-        log.debug("校验邮箱: {}", email);
-
-        // 参数校验
-        if (email == null || email.trim().isEmpty()) {
-            return ApiResponse.error(40000, "邮箱不能为空");
+        String normalizedEmail = email.trim().toLowerCase();
+        if (normalizedEmail.isEmpty()) {
+            throw new IllegalArgumentException("邮箱不能为空");
         }
 
-        // 简单的邮箱格式校验（必须包含 @）
-        if (!email.contains("@")) {
-            return ApiResponse.error(40000, "邮箱格式不正确");
-        }
+        log.debug("校验邮箱: {}", normalizedEmail);
 
         // 查询邮箱是否存在
-        boolean exists = authService.existsByEmail(email);
+        boolean exists = userRepository.existsByEmail(normalizedEmail);
 
         String message = exists ? "邮箱已被注册" : "邮箱可用";
         return ApiResponse.success(message, exists);

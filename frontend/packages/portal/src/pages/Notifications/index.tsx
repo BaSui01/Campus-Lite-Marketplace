@@ -7,6 +7,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Tabs } from '@campus/shared/components';
+import { getApi, websocketService } from '@campus/shared/utils';
+import type { NotificationResponse } from '@campus/shared/api/models';
+import type { AxiosError } from 'axios';
 import { useNotificationStore } from '../../store';
 import './Notifications.css';
 
@@ -30,6 +33,7 @@ interface Notification {
 const Notifications: React.FC = () => {
   const navigate = useNavigate();
   const toast = useNotificationStore();
+  const api = getApi();
 
   // ==================== 状态管理 ====================
 
@@ -37,6 +41,16 @@ const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const mapNotificationType = (rawType?: string): NotificationType => {
+    const type = rawType?.toLowerCase();
+    if (!type) return 'system';
+    if (type.includes('order')) return 'order';
+    if (type.includes('message')) return 'message';
+    if (type.includes('like')) return 'like';
+    if (type.includes('comment')) return 'comment';
+    return 'system';
+  };
 
   // ==================== 数据加载 ====================
 
@@ -48,67 +62,35 @@ const Notifications: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 获取通知列表
-      // TODO: 集成真实 API
-      // const response = await notificationService.listNotifications({ type: activeTab });
-      // setNotifications(response.data);
-      // setUnreadCount(response.data.filter((n: Notification) => !n.isRead).length);
+      const response = await api.listNotifications({ page: 0, size: 50 });
+      const payload = response.data;
 
-      // 临时模拟数据
-      const mockNotifications: Notification[] = [
-        {
-          notificationId: '1',
-          type: 'system',
-          title: '系统通知',
-          content: '欢迎使用校园轻享集市！🎉',
-          isRead: false,
-          createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-        },
-        {
-          notificationId: '2',
-          type: 'order',
-          title: '订单通知',
-          content: '您的订单已发货，请注意查收！📦',
-          isRead: false,
-          createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-          relatedId: 'ORDER-001',
-        },
-        {
-          notificationId: '3',
-          type: 'message',
-          title: '新消息',
-          content: '张三给你发送了一条消息',
-          isRead: true,
-          createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-        },
-        {
-          notificationId: '4',
-          type: 'like',
-          title: '点赞通知',
-          content: '李四点赞了你的帖子',
-          isRead: true,
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-        },
-        {
-          notificationId: '5',
-          type: 'comment',
-          title: '评论通知',
-          content: '王五评论了你的帖子：不错！👍',
-          isRead: true,
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-        },
-      ];
+      if ((payload.code ?? 0) === 0 && payload.data?.content) {
+        const apiNotifications: Notification[] = payload.data.content.map((n: NotificationResponse) => ({
+          notificationId: String(n.id ?? ''),
+          type: mapNotificationType(n.type),
+          title: n.title || '通知',
+          content: n.content || '',
+          isRead: n.status === 'READ',
+          createdAt: n.createdAt || '',
+          relatedId: n.relatedId ? String(n.relatedId) : undefined,
+        }));
 
-      // 按类型筛选
-      const filteredNotifications =
-        activeTab === 'all'
-          ? mockNotifications
-          : mockNotifications.filter((n) => n.type === activeTab);
+        // 按类型筛选
+        const filteredNotifications =
+          activeTab === 'all'
+            ? apiNotifications
+            : apiNotifications.filter((n) => n.type === activeTab);
 
-      setNotifications(filteredNotifications);
-      setUnreadCount(mockNotifications.filter((n) => !n.isRead).length);
-    } catch (err: any) {
+        setNotifications(filteredNotifications);
+        setUnreadCount(apiNotifications.filter((n) => !n.isRead).length);
+      } else {
+        toast.error(payload.message || '加载通知失败！😭');
+      }
+    } catch (err: unknown) {
+      const error = err as AxiosError<any>;
       console.error('加载通知列表失败：', err);
-      toast.error(err.response?.data?.message || '加载通知失败！😭');
+      toast.error(error.response?.data?.message || error.message || '加载通知失败！😭');
     } finally {
       setLoading(false);
     }
@@ -118,6 +100,53 @@ const Notifications: React.FC = () => {
     loadNotifications();
   }, [activeTab]);
 
+  // ==================== 🔔 实时通知推送（WebSocket）====================
+
+  /**
+   * 🔔 监听 WebSocket 实时通知推送
+   */
+  useEffect(() => {
+    console.log('[Notifications] 🔔 开始监听实时通知推送...');
+
+    // 定义通知处理器
+    const handleNewNotification = (notification: any) => {
+      console.log('[Notifications] 🔔 收到新通知:', notification);
+
+      // 🎯 转换为前端格式
+      const newNotification: Notification = {
+        notificationId: String(notification.id),
+        type: mapNotificationType(notification.type),
+        title: notification.title || '通知',
+        content: notification.content,
+        isRead: false, // 新通知默认未读
+        createdAt: new Date().toISOString(),
+        relatedId: notification.relatedId ? String(notification.relatedId) : undefined,
+      };
+
+      // 🚀 乐观更新 UI（添加到列表顶部）
+      setNotifications((prev) => [newNotification, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+
+      // 💬 显示 Toast 提示
+      toast.info(`📬 新通知：${newNotification.title}`);
+    };
+
+    // 📡 订阅通知推送
+    websocketService.onNotification(handleNewNotification);
+
+    // 🔌 确保 WebSocket 已连接
+    if (!websocketService.isConnected()) {
+      console.log('[Notifications] 🔌 WebSocket 未连接，尝试连接...');
+      websocketService.connect();
+    }
+
+    // 🧹 清理函数（组件卸载时取消订阅）
+    return () => {
+      console.log('[Notifications] 🧹 取消订阅实时通知推送');
+      websocketService.offNotification(handleNewNotification);
+    };
+  }, []); // 空依赖，只在组件挂载时执行一次
+
   // ==================== 事件处理 ====================
 
   /**
@@ -125,19 +154,18 @@ const Notifications: React.FC = () => {
    */
   const handleMarkAsRead = async (notificationId: string) => {
     try {
-      // 🚀 调用真实后端 API 标记已读
-      // TODO: 集成真实 API
-      // await notificationService.markAsRead(notificationId);
-
       // 乐观更新 UI
       setNotifications((prev) =>
         prev.map((n) => (n.notificationId === notificationId ? { ...n, isRead: true } : n))
       );
-
       setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (err: any) {
+
+      // 🚀 调用真实后端 API 标记已读
+      await api.markAsRead({ body: JSON.stringify({ notificationIds: [Number(notificationId)] }) });
+    } catch (err: unknown) {
+      const error = err as AxiosError<any>;
       console.error('标记已读失败：', err);
-      toast.error(err.response?.data?.message || '操作失败！😭');
+      toast.error(error.response?.data?.message || error.message || '操作失败！😭');
     }
   };
 
@@ -146,17 +174,18 @@ const Notifications: React.FC = () => {
    */
   const handleMarkAllAsRead = async () => {
     try {
-      // 🚀 调用真实后端 API 全部标记已读
-      // TODO: 集成真实 API
-      // await notificationService.markAllAsRead();
-
       // 乐观更新 UI
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
+
+      // 🚀 调用真实后端 API 全部标记已读
+      await api.markAllAsRead();
+
       toast.success('已全部标记为已读！✅');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as AxiosError<any>;
       console.error('全部标记已读失败：', err);
-      toast.error(err.response?.data?.message || '操作失败！😭');
+      toast.error(error.response?.data?.message || error.message || '操作失败！😭');
     }
   };
 
@@ -169,20 +198,21 @@ const Notifications: React.FC = () => {
     }
 
     try {
-      // 🚀 调用真实后端 API 删除通知
-      // TODO: 集成真实 API
-      // await notificationService.deleteNotification(notificationId);
-
       // 乐观更新 UI
       const notification = notifications.find((n) => n.notificationId === notificationId);
       if (notification && !notification.isRead) {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
       setNotifications((prev) => prev.filter((n) => n.notificationId !== notificationId));
+
+      // 🚀 调用真实后端 API 删除通知
+      await api.deleteNotifications({ body: JSON.stringify({ notificationIds: [Number(notificationId)] }) });
+
       toast.success('通知已删除！🗑️');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as AxiosError<any>;
       console.error('删除通知失败：', err);
-      toast.error(err.response?.data?.message || '删除失败！😭');
+      toast.error(error.response?.data?.message || error.message || '删除失败！😭');
     }
   };
 

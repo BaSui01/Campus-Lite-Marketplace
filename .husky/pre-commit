@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-# 🎯 BaSui 的 pre-commit 钩子
-# 提交前自动格式化和检查代码
-
-cd frontend
-pnpm lint-staged

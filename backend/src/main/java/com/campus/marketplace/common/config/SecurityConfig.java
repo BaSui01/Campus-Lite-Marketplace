@@ -27,10 +27,16 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * Spring Security 配置类
+ * Spring Security 配置类（安全配置统一入口）
  *
- * 配置基于 JWT 的无状态认证机制
- * 配置 CORS、CSRF 防护和权限控制
+ * 职责范围：
+ * - 🔐 JWT 认证/授权机制（无状态）
+ * - 🌐 CORS 跨域配置（前后端分离必备）
+ * - 🛡️ CSRF 防护（JWT 模式已禁用）
+ * - 🎯 路径权限控制（公开/认证/管理员）
+ * - 🚨 异常处理器（401/403 错误）
+ *
+ * ⚠️ 重要：CORS 配置统一在此管理,WebMvcConfig 只负责静态资源!
  *
  * @author BaSui
  * @date 2025-10-29
@@ -66,18 +72,18 @@ public class SecurityConfig {
                 // 配置请求授权
                 .authorizeHttpRequests(auth -> auth
                         // 公开接口（不需要认证）
-                        .requestMatchers(matchersWithContext("/api/auth/**")).permitAll()
+                        .requestMatchers(matchersWithContext("/auth/**")).permitAll()
                         .requestMatchers(matchersWithContext("/actuator/health")).permitAll()
                         
                         // 公共查询接口
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/api/search", "/api/search/**")).permitAll()
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/api/recommend/hot")).permitAll()
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/api/replies/**")).permitAll()
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/api/users/**")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/search", "/search/**")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/recommend/hot")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/replies/**")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/users/**")).permitAll()
                         
                         // 支付回调
-                        .requestMatchers(HttpMethod.POST, matchersWithContext("/api/payment/wechat/notify")).permitAll()
-                        .requestMatchers(HttpMethod.POST, matchersWithContext("/api/payment/alipay/refund/notify")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/payment/wechat/notify")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/payment/alipay/refund/notify")).permitAll()
                         
                         // Swagger UI 和 API 文档
                         .requestMatchers(matchersWithContext("/swagger-ui.html")).permitAll()
@@ -85,16 +91,16 @@ public class SecurityConfig {
                         .requestMatchers(matchersWithContext("/v3/api-docs/**")).permitAll()
 
                         // 管理后台必须具备明确权限
-                        .requestMatchers(matchersWithContext("/api/admin/**"))
+                        .requestMatchers(matchersWithContext("/admin/**"))
                         .hasAuthority(PermissionCodes.SYSTEM_STATISTICS_VIEW)
                         
                         // 物品查询接口（公开）
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/api/goods/**")).permitAll()
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/api/categories/**")).permitAll()
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/api/tags/**")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/goods/**")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/categories/**")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/tags/**")).permitAll()
                         
                         // 帖子查询接口（公开）
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/api/posts/**")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/posts/**")).permitAll()
                         
                         // WebSocket 连接
                         .requestMatchers(matchersWithContext("/ws/**")).permitAll()
@@ -116,7 +122,20 @@ public class SecurityConfig {
     }
 
     /**
-     * 配置 CORS（跨域资源共享）
+     * 配置 CORS（跨域资源共享）🌐
+     *
+     * ⚠️ 前后端分离项目必备配置!
+     *
+     * 配置说明：
+     * - allowedOriginPatterns("*") - 开发环境允许所有源（生产环境需改为具体域名）
+     * - allowedMethods - 允许所有常用 HTTP 方法
+     * - allowCredentials(true) - 允许携带 Cookie/Token
+     * - exposedHeaders("Authorization") - 允许前端读取 JWT Token
+     *
+     * 统一管理原因：
+     * - Spring Security 的 CORS 优先级高于 WebMvcConfig
+     * - 避免多处配置导致冲突和混乱
+     * - 安全相关配置集中管理更清晰
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

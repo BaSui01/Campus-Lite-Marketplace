@@ -143,7 +143,8 @@ management:
         include: ${ACTUATOR_ENDPOINTS:health,info,metrics,prometheus,loggers,caches,threaddump,heapdump}
         # 排除敏感端点
         exclude: ${ACTUATOR_EXCLUDE:shutdown}
-      base-path: ${ACTUATOR_BASE_PATH:/actuator}
+      # BaSui临时修复：直接硬编码 /actuator
+      base-path: /actuator
   endpoint:
     health:
       show-details: ${ACTUATOR_HEALTH_SHOW_DETAILS:when-authorized}
@@ -172,7 +173,8 @@ management:
 server:
   port: ${SERVER_PORT:8080}
   servlet:
-    context-path: ${APP_CONTEXT_PATH:/}
+    # BaSui临时修复：直接硬编码 /api，跳过环境变量
+    context-path: /api
   tomcat:
     threads:
       max: ${TOMCAT_MAX_THREADS:200}
@@ -239,6 +241,9 @@ wechat:
 
 # 应用级自定义配置
 app:
+  cache:
+    prewarm:
+      enabled: ${APP_CACHE_PREWARM_ENABLED:false}
   redis:
     mode: ${APP_REDIS_MODE:redis} # 可选 redis/in-memory，开发默认使用 redis
 
@@ -295,14 +300,10 @@ spring:
   config:
     activate:
       on-profile: test
-  autoconfigure:
-    exclude:
-      - org.redisson.spring.starter.RedissonAutoConfiguration
-      - org.redisson.spring.starter.RedissonAutoConfigurationV2
   datasource:
     url: jdbc:postgresql://${TEST_DB_HOST:${CI_DB_HOST:localhost}}:${TEST_DB_PORT:${CI_DB_PORT:5432}}/${TEST_DB_NAME:${CI_DB_NAME:campus_marketplace_test}}
     username: ${TEST_DB_USERNAME:${CI_DB_USERNAME:postgres}}
-    password: ${TEST_DB_PASSWORD:${CI_DB_PASSWORD:postgres}}
+    password: ${TEST_DB_PASSWORD:${CI_DB_PASSWORD:123456}}
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: ${TEST_DB_POOL_MIN_IDLE:5}
@@ -312,7 +313,6 @@ spring:
     hibernate:
       ddl-auto: ${TEST_JPA_DDL_AUTO:validate}
     show-sql: ${TEST_JPA_SHOW_SQL:false}
-    defer-datasource-initialization: true
   data:
     redis:
       host: ${TEST_REDIS_HOST:${CI_REDIS_HOST:localhost}}
@@ -335,8 +335,11 @@ spring:
   flyway:
     enabled: true
 app:
+  cache:
+    prewarm:
+      enabled: false
   redis:
-    mode: ${APP_REDIS_MODE:in-memory}
+    mode: ${APP_REDIS_MODE:redis}
   scheduling:
     privacy:
       enabled: false
@@ -349,12 +352,10 @@ server:
   port: ${TEST_SERVER_PORT:${SERVER_PORT:8080}}
 management:
   endpoints:
+    enabled-by-default: false  # ✅ BaSui: 测试环境禁用所有 Actuator 端点
     web:
       exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: always
+        include: none
 
 ---
 spring:

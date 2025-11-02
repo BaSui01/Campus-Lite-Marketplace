@@ -24,7 +24,7 @@ import type {
 /**
  * 订单 API 服务类
  */
-class OrderService {
+export class OrderService {
   // ==================== 订单相关接口 ====================
 
   /**

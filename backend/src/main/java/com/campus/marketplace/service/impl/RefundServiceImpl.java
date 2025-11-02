@@ -184,6 +184,87 @@ public class RefundServiceImpl implements RefundService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "退款不存在"));
     }
 
+    /**
+     * 用户查询自己的退款列表（带分页和状态筛选）
+     *
+     * @param page 页码（从0开始）
+     * @param size 每页大小
+     * @param status 退款状态（可选）
+     * @return 分页退款列表
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<RefundRequest> listMyRefunds(int page, int size, RefundStatus status) {
+        String username = SecurityUtil.getCurrentUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page,
+                size,
+                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")
+        );
+
+        if (status != null) {
+            return refundRepository.findByApplicantIdAndStatus(user.getId(), status, pageable);
+        } else {
+            return refundRepository.findByApplicantId(user.getId(), pageable);
+        }
+    }
+
+    /**
+     * 用户查询自己的退款详情（权限校验）
+     *
+     * @param refundNo 退款单号
+     * @return 退款详情
+     * @throws BusinessException 如果不是自己的退款
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public RefundRequest getMyRefund(String refundNo) {
+        String username = SecurityUtil.getCurrentUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        RefundRequest refund = refundRepository.findByRefundNo(refundNo)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "退款不存在"));
+
+        // 权限校验：只能查看自己的退款
+        if (!refund.getApplicantId().equals(user.getId())) {
+            throw new BusinessException(ErrorCode.PERMISSION_DENIED, "只能查看自己的退款");
+        }
+
+        return refund;
+    }
+
+    /**
+     * 管理员查询所有退款列表（带分页、状态筛选、关键词搜索）
+     *
+     * @param page 页码（从0开始）
+     * @param size 每页大小
+     * @param status 退款状态（可选）
+     * @param keyword 搜索关键词（可选，匹配退款单号或订单号）
+     * @return 分页退款列表
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<RefundRequest> listAllRefunds(int page, int size, RefundStatus status, String keyword) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page,
+                size,
+                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")
+        );
+
+        // 优先级：关键词搜索 > 状态筛选 > 全部
+        if (keyword != null && !keyword.isBlank()) {
+            return refundRepository.findByRefundNoContainingOrOrderNoContaining(keyword, keyword, pageable);
+        } else if (status != null) {
+            return refundRepository.findByStatus(status, pageable);
+        } else {
+            return refundRepository.findAll(pageable);
+        }
+    }
+
     private String generateRefundNo() {
         String timestamp = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));

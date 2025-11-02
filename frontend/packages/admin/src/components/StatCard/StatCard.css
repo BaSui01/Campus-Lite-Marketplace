@@ -1,0 +1,47 @@
+/**
+ * 统计卡片样式
+ *
+ * @author BaSui 😎
+ * @date 2025-11-01
+ */
+
+.stat-card {
+  height: 100%;
+}
+
+.stat-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.stat-card-left {
+  flex: 1;
+}
+
+.stat-card-title {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.stat-card-trend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.trend-value {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.trend-label {
+  font-size: 12px;
+}
+
+.stat-card-icon {
+  font-size: 48px;
+  opacity: 0.8;
+}

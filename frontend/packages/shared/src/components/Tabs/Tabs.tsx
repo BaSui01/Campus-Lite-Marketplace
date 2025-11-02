@@ -143,7 +143,7 @@ export interface TabsProps {
  * ```
  */
 export const Tabs: React.FC<TabsProps> = ({
-  items,
+  items = [], // ✅ 默认空数组,防御性编程!
   activeKey: controlledActiveKey,
   defaultActiveKey,
   layout = 'horizontal',

@@ -8,7 +8,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Input, Button, Skeleton } from '@campus/shared/components';
 import { goodsService } from '@campus/shared/services/goods';
-import type { GoodsResponse, PageGoodsResponse } from '@campus/shared/api/models';
+import type { GoodsResponse, PageGoodsResponse, CategoryNodeResponse, TagResponse } from '@campus/shared/api/models';
+import { useAuthStore } from '../../store';
 import './Home.css';
 
 /**
@@ -17,10 +18,13 @@ import './Home.css';
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   // 状态管理
   const [goodsList, setGoodsList] = useState<GoodsResponse[]>([]);
   const [recommendList, setRecommendList] = useState<GoodsResponse[]>([]);
+  const [categoryTree, setCategoryTree] = useState<CategoryNodeResponse[]>([]);
+  const [hotTags, setHotTags] = useState<TagResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [keyword, setKeyword] = useState(searchParams.get('keyword') || '');
@@ -31,8 +35,12 @@ const Home: React.FC = () => {
   const [hasMore, setHasMore] = useState(false);
 
   // 筛选条件
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>();
+  const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [minPrice, setMinPrice] = useState<number | undefined>();
   const [maxPrice, setMaxPrice] = useState<number | undefined>();
+  const [minPriceInput, setMinPriceInput] = useState<string>('');
+  const [maxPriceInput, setMaxPriceInput] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortDirection, setSortDirection] = useState<string>('desc');
 
@@ -53,6 +61,8 @@ const Home: React.FC = () => {
         keyword,
         page: currentPage,
         size: pageSize,
+        categoryId: selectedCategoryId,
+        tags: selectedTags,
         minPrice,
         maxPrice,
         sortBy,
@@ -63,6 +73,8 @@ const Home: React.FC = () => {
         keyword: keyword || undefined,
         page: currentPage,
         size: pageSize,
+        categoryId: selectedCategoryId,
+        tags: selectedTags.length > 0 ? selectedTags : undefined,
         minPrice,
         maxPrice,
         sortBy,
@@ -92,16 +104,64 @@ const Home: React.FC = () => {
   };
 
   /**
-   * 🌟 加载推荐商品
+   * 🌟 加载推荐商品（智能推荐：登录用个性化，未登录用热门）
    */
   const loadRecommendGoods = async () => {
     try {
-      console.log('[Home] 🌟 加载推荐商品');
-      const response = await goodsService.getRecommendGoods(10);
+      console.log('[Home] 🌟 加载推荐商品, 已登录:', isAuthenticated);
+
+      let response: GoodsResponse[];
+
+      if (isAuthenticated) {
+        // 🎯 已登录 → 加载个性化推荐
+        console.log('[Home] 🎯 调用个性化推荐接口');
+        response = await goodsService.getPersonalRecommendations(10);
+      } else {
+        // 🔥 未登录 → 加载热门榜单
+        console.log('[Home] 🔥 调用热门榜单接口');
+        response = await goodsService.getRecommendGoods(10);
+      }
+
       console.log('[Home] ✅ 推荐商品加载成功:', response);
       setRecommendList(response);
     } catch (error) {
       console.error('[Home] ❌ 加载推荐商品失败:', error);
+      // 失败降级：尝试加载热门榜单
+      try {
+        console.log('[Home] 🔄 降级加载热门榜单');
+        const fallbackResponse = await goodsService.getRecommendGoods(10);
+        setRecommendList(fallbackResponse);
+      } catch (fallbackError) {
+        console.error('[Home] ❌ 降级加载也失败:', fallbackError);
+      }
+    }
+  };
+
+  /**
+   * 📂 加载分类树
+   */
+  const loadCategoryTree = async () => {
+    try {
+      console.log('[Home] 📂 加载分类树');
+      const response = await goodsService.getCategoryTree();
+      console.log('[Home] ✅ 分类树加载成功:', response);
+      setCategoryTree(response);
+    } catch (error) {
+      console.error('[Home] ❌ 加载分类树失败:', error);
+    }
+  };
+
+  /**
+   * 🏷️ 加载热门标签
+   */
+  const loadHotTags = async () => {
+    try {
+      console.log('[Home] 🏷️ 加载热门标签');
+      const response = await goodsService.getHotTags(20);
+      console.log('[Home] ✅ 热门标签加载成功:', response);
+      setHotTags(response);
+    } catch (error) {
+      console.error('[Home] ❌ 加载热门标签失败:', error);
     }
   };
 
@@ -113,6 +173,72 @@ const Home: React.FC = () => {
     setPage(0);
     setSearchParams(keyword ? { keyword } : {});
     loadGoodsList(false);
+  };
+
+  /**
+   * 📂 处理分类选择
+   */
+  const handleCategorySelect = (categoryId?: number) => {
+    console.log('[Home] 📂 选择分类:', categoryId);
+    setSelectedCategoryId(categoryId);
+    setPage(0);
+  };
+
+  /**
+   * 🏷️ 处理标签点击（多选切换）
+   */
+  const handleTagToggle = (tagId: number) => {
+    setSelectedTags(prev => {
+      if (prev.includes(tagId)) {
+        // 已选中 → 取消选中
+        console.log('[Home] 🏷️ 取消标签:', tagId);
+        return prev.filter(id => id !== tagId);
+      } else {
+        // 未选中 → 选中
+        console.log('[Home] 🏷️ 选中标签:', tagId);
+        return [...prev, tagId];
+      }
+    });
+    setPage(0);
+  };
+
+  /**
+   * 💰 应用价格筛选
+   */
+  const handleApplyPriceFilter = () => {
+    const min = minPriceInput.trim() ? parseFloat(minPriceInput) : undefined;
+    const max = maxPriceInput.trim() ? parseFloat(maxPriceInput) : undefined;
+
+    // 验证价格输入
+    if (min !== undefined && (isNaN(min) || min < 0)) {
+      console.warn('[Home] 💰 最低价格无效:', minPriceInput);
+      return;
+    }
+    if (max !== undefined && (isNaN(max) || max < 0)) {
+      console.warn('[Home] 💰 最高价格无效:', maxPriceInput);
+      return;
+    }
+    if (min !== undefined && max !== undefined && min > max) {
+      console.warn('[Home] 💰 最低价格不能大于最高价格');
+      return;
+    }
+
+    console.log('[Home] 💰 应用价格筛选:', { min, max });
+    setMinPrice(min);
+    setMaxPrice(max);
+    setPage(0);
+  };
+
+  /**
+   * 💰 清除价格筛选
+   */
+  const handleClearPriceFilter = () => {
+    console.log('[Home] 💰 清除价格筛选');
+    setMinPriceInput('');
+    setMaxPriceInput('');
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
+    setPage(0);
   };
 
   /**
@@ -150,7 +276,16 @@ const Home: React.FC = () => {
   useEffect(() => {
     loadGoodsList(false);
     loadRecommendGoods();
-  }, [sortBy, sortDirection, minPrice, maxPrice]);
+    loadCategoryTree();
+    loadHotTags();
+  }, [sortBy, sortDirection, minPrice, maxPrice, selectedCategoryId, selectedTags]);
+
+  /**
+   * 🔄 登录状态变化时重新加载推荐
+   */
+  useEffect(() => {
+    loadRecommendGoods();
+  }, [isAuthenticated]);
 
   /**
    * 💰 格式化价格
@@ -204,7 +339,9 @@ const Home: React.FC = () => {
         {/* 左侧推荐 */}
         <aside className="home-sidebar">
           <div className="home-recommend">
-            <h3 className="home-recommend__title">🌟 推荐商品</h3>
+            <h3 className="home-recommend__title">
+              {isAuthenticated ? '🎯 为你推荐' : '🔥 热门榜单'}
+            </h3>
             {recommendList.length > 0 ? (
               <div className="home-recommend__list">
                 {recommendList.map(goods => (
@@ -237,6 +374,61 @@ const Home: React.FC = () => {
         <main className="home-main">
           {/* 筛选栏 */}
           <div className="home-filter">
+            {/* 分类筛选 */}
+            <div className="home-filter__category">
+              <select
+                className="category-select"
+                value={selectedCategoryId || ''}
+                onChange={(e) => handleCategorySelect(e.target.value ? Number(e.target.value) : undefined)}
+              >
+                <option value="">📂 全部分类</option>
+                {categoryTree.map((category) => (
+                  <React.Fragment key={category.id}>
+                    <option value={category.id}>{category.name}</option>
+                    {category.children?.map((child) => (
+                      <option key={child.id} value={child.id}>
+                        &nbsp;&nbsp;└─ {child.name}
+                      </option>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </select>
+            </div>
+
+            {/* 价格筛选 */}
+            <div className="home-filter__price">
+              <input
+                type="number"
+                className="price-input"
+                placeholder="最低价"
+                value={minPriceInput}
+                onChange={(e) => setMinPriceInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleApplyPriceFilter()}
+                min="0"
+                step="0.01"
+              />
+              <span className="price-separator">-</span>
+              <input
+                type="number"
+                className="price-input"
+                placeholder="最高价"
+                value={maxPriceInput}
+                onChange={(e) => setMaxPriceInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleApplyPriceFilter()}
+                min="0"
+                step="0.01"
+              />
+              <button className="price-apply-btn" onClick={handleApplyPriceFilter}>
+                应用
+              </button>
+              {(minPrice !== undefined || maxPrice !== undefined) && (
+                <button className="price-clear-btn" onClick={handleClearPriceFilter}>
+                  清除
+                </button>
+              )}
+            </div>
+
+            {/* 排序筛选 */}
             <div className="home-filter__sort">
               <button
                 className={`home-filter__sort-item ${sortBy === 'createdAt' ? 'active' : ''}`}
@@ -257,10 +449,38 @@ const Home: React.FC = () => {
                 浏览量 {sortBy === 'viewCount' && (sortDirection === 'desc' ? '↓' : '↑')}
               </button>
             </div>
+
+            {/* 统计信息 */}
             <div className="home-filter__info">
               找到 <span className="home-filter__count">{totalElements}</span> 件商品
             </div>
           </div>
+
+          {/* 标签筛选栏 */}
+          {hotTags.length > 0 && (
+            <div className="home-tags">
+              <div className="home-tags__label">🏷️ 热门标签：</div>
+              <div className="home-tags__list">
+                {hotTags.map(tag => (
+                  <button
+                    key={tag.id}
+                    className={`home-tags__item ${selectedTags.includes(tag.id!) ? 'active' : ''}`}
+                    onClick={() => handleTagToggle(tag.id!)}
+                  >
+                    #{tag.name}
+                  </button>
+                ))}
+              </div>
+              {selectedTags.length > 0 && (
+                <button
+                  className="home-tags__clear"
+                  onClick={() => setSelectedTags([])}
+                >
+                  清除筛选
+                </button>
+              )}
+            </div>
+          )}
 
           {/* 商品列表 */}
           {loading ? (

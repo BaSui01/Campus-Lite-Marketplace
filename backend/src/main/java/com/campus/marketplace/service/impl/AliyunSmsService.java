@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@Profile("!dev")
+@Profile("!dev & !test")
 @ConditionalOnProperty(name = "sms.provider", havingValue = "aliyun", matchIfMissing = true)
 @RequiredArgsConstructor
 public class AliyunSmsService implements SmsService {

@@ -5,8 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { websocketService } from '../services/websocket';
-import { WebSocketReadyState } from '../services/WebSocketClient';
+import { websocketService, WebSocketReadyState } from '../utils/websocket';
 
 /**
  * useWebSocketService 配置选项

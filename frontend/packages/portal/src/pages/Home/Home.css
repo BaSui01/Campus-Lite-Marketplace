@@ -131,14 +131,110 @@
   padding: 16px 20px;
   margin-bottom: 16px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.home-filter__category {
+  flex-shrink: 0;
+}
+
+.home-filter__category .category-select {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.home-filter__category .category-select:hover {
+  border-color: #40a9ff;
+}
+
+.home-filter__category .category-select:focus {
+  border-color: #1890ff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.home-filter__price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.home-filter__price .price-input {
+  width: 90px;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #595959;
+  transition: all 0.3s ease;
+}
+
+.home-filter__price .price-input:hover {
+  border-color: #40a9ff;
+}
+
+.home-filter__price .price-input:focus {
+  border-color: #1890ff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.home-filter__price .price-separator {
+  color: #8c8c8c;
+  font-weight: bold;
+}
+
+.home-filter__price .price-apply-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #1890ff;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.home-filter__price .price-apply-btn:hover {
+  background: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+.home-filter__price .price-clear-btn {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.home-filter__price .price-clear-btn:hover {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
 }
 
 .home-filter__sort {
   display: flex;
   gap: 16px;
+  flex: 1;
+  min-width: 0;
 }
 
 .home-filter__sort-item {
@@ -172,6 +268,80 @@
 .home-filter__count {
   color: #1890ff;
   font-weight: bold;
+}
+
+/* ==================== 标签筛选栏 ==================== */
+
+.home-tags {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.home-tags__label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #595959;
+  flex-shrink: 0;
+}
+
+.home-tags__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.home-tags__item {
+  padding: 6px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #595959;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.home-tags__item:hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+.home-tags__item.active {
+  border-color: #1890ff;
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.home-tags__clear {
+  padding: 6px 14px;
+  border: 1px solid #ff4d4f;
+  border-radius: 16px;
+  background: #fff1f0;
+  color: #ff4d4f;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.home-tags__clear:hover {
+  background: #ff4d4f;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
 }
 
 /* 加载状态 */
@@ -380,9 +550,28 @@
     gap: 12px;
   }
 
+  .home-filter__price {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .home-filter__price .price-input {
+    flex: 1;
+    min-width: 80px;
+  }
+
   .home-filter__sort {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .home-tags {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-tags__list {
+    width: 100%;
   }
 
   .home-goods-grid {

@@ -28,11 +28,10 @@
         <!-- 统一控制最低覆盖率门槛，可在本地/CI 通过 -Dcoverage.minimum=0.80 临时调整 -->
         <coverage.minimum>0.85</coverage.minimum>
 
-        <!-- 🚀 BaSui优化：Maven 多核并行配置 -->
-        <!-- Maven 并行模块构建线程数：1C = 1 线程/核心 -->
-        <maven.build.threads>1C</maven.build.threads>
-        <!-- 测试并行度：基于 CPU 核心数动态调整 -->
-        <surefire.forkCount>1C</surefire.forkCount>
+        <!-- 🚦 调整默认并行策略：单线程构建，避免占满全部核心 -->
+        <maven.build.threads>1</maven.build.threads>
+        <!-- 测试进程默认保持单个 JVM，降低本地环境 CPU 压力 -->
+        <surefire.forkCount>1</surefire.forkCount>
         <failsafe.forkCount>1</failsafe.forkCount>
     </properties>
 
@@ -628,10 +627,10 @@
                     <!-- 🚀 BaSui优化：多核并行测试 (1C = 每个 CPU 核心 1 个 JVM 进程) -->
                     <forkCount>${surefire.forkCount}</forkCount>
                     <reuseForks>true</reuseForks>
-                    <!-- 启用并行测试：类级别并行 -->
+                    <!-- 启用并行测试：类级别并行（限制线程数量，防止吃满所有核心） -->
                     <parallel>classes</parallel>
-                    <threadCount>4</threadCount>
-                    <perCoreThreadCount>true</perCoreThreadCount>
+                    <threadCount>2</threadCount>
+                    <perCoreThreadCount>false</perCoreThreadCount>
                     <!-- 在本地/CI 无 Docker 环境时,排除需要 Testcontainers 的集成测试 -->
                     <excludes>
                         <exclude>**/*IT.java</exclude>

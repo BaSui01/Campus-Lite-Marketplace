@@ -17,7 +17,7 @@ import type {
 /**
  * 用户 API 服务类
  */
-class UserService {
+export class UserService {
   /**
    * 获取当前用户资料
    * @returns 当前用户信息

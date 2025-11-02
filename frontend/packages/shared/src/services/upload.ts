@@ -11,7 +11,7 @@ import { IMAGE_UPLOAD_URL, FILE_UPLOAD_URL } from '../constants';
 /**
  * 文件上传 API 服务类
  */
-class UploadService {
+export class UploadService {
   /**
    * 上传图片
    * @param file 图片文件
