@@ -1,0 +1,79 @@
+/**
+ * Empty 组件样式 - 空状态的优雅装扮！✨
+ * @author BaSui 😎
+ */
+
+/* ==================== 基础样式 ==================== */
+.campus-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 8px;
+  text-align: center;
+  background-color: transparent;
+  margin: 0 auto;
+  max-width: 100%;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* ==================== 图片容器 ==================== */
+.campus-empty__image-wrapper {
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.campus-empty__image {
+  width: 100%;
+  height: auto;
+  max-width: 184px;
+  margin: 0 auto;
+  display: block;
+}
+
+.campus-empty__image img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ==================== 描述容器 ==================== */
+.campus-empty__description-wrapper {
+  flex: none;
+}
+
+.campus-empty__description {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.25);
+  font-size: 14px;
+  line-height: 1.5715;
+  font-weight: 400;
+  white-space: pre-wrap;
+}
+
+/* ==================== 操作区域 ==================== */
+.campus-empty__footer {
+  margin-top: 16px;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media screen and (max-width: 480px) {
+  .campus-empty {
+    padding: 24px 8px;
+  }
+
+  .campus-empty__image {
+    max-width: 152px;
+  }
+
+  .campus-empty__description {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+}
+
+/* ==================== 调试样式 ==================== */
+.campus-empty {
+  /* 调试时取消注释查看边界 */
+  /* outline: 1px solid rgba(0, 0, 0, 0.1); */
+}

@@ -6,7 +6,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { tokenStorage } from '../utils/storage';
-import { api } from '../utils/api';
+import { createApi } from '../utils/apiClient';
+
+// 创建 API 客户端实例
+const api = createApi();
 
 /**
  * 用户信息接口
@@ -199,8 +202,11 @@ export const useAuth = (): UseAuthResult => {
     try {
       setLoading(true);
 
-      // 调用后端登出 API
-      await api.logout();
+      // 调用后端登出 API（需要传递当前access token）
+      const accessToken = tokenStorage.getAccessToken();
+      if (accessToken) {
+        await api.logout(accessToken);
+      }
     } catch (error) {
       console.error('登出失败:', error);
     } finally {
@@ -221,12 +227,8 @@ export const useAuth = (): UseAuthResult => {
         throw new Error('Refresh token 不存在');
       }
 
-      // 调用后端刷新 Token API
-      const response = await api.refreshToken({
-        refreshTokenRequest: {
-          refreshToken: refreshTokenValue,
-        },
-      });
+      // 调用后端刷新 Token API（使用Authorization Bearer方式传递refresh token）
+      const response = await api.refresh(refreshTokenValue);
 
       // 保存新的 Token
       const data = response.data.data as any;

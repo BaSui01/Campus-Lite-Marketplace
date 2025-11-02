@@ -1,0 +1,171 @@
+/**
+ * Select 组件样式 - 选择器的漂亮衣裳！👗
+ * @author BaSui 😎
+ */
+
+/* ==================== 基础样式 ==================== */
+.campus-select {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 100%;
+  vertical-align: middle;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  font-size: 14px;
+  line-height: 1.5715;
+}
+
+.campus-select:hover {
+  border-color: #4096ff;
+  box-shadow: 0 0 0 2px rgba(64, 150, 255, 0.1);
+}
+
+.campus-select:focus-within {
+  border-color: #4096ff;
+  box-shadow: 0 0 0 2px rgba(64, 150, 255, 0.2);
+}
+
+/* ==================== Select 内部元素 ==================== */
+.campus-select__inner {
+  width: 100%;
+  padding: 4px 28px 4px 11px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 14px;
+  line-height: 1.5715;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.campus-select__inner:disabled {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.25);
+  cursor: not-allowed;
+}
+
+.campus-select__inner option {
+  padding: 8px 12px;
+  color: rgba(0, 0, 0, 0.88);
+  font-weight: normal;
+}
+
+.campus-select__inner option:disabled {
+  color: rgba(0, 0, 0, 0.25);
+  cursor: not-allowed;
+}
+
+/* ==================== 尺寸变化 ==================== */
+.campus-select--small {
+  font-size: 12px;
+  line-height: 1.6667;
+}
+
+.campus-select--small .campus-select__inner {
+  padding: 0px 24px 0px 7px;
+  font-size: 12px;
+  line-height: 1.6667;
+}
+
+.campus-select--medium {
+  font-size: 14px;
+  line-height: 1.5715;
+}
+
+.campus-select--medium .campus-select__inner {
+  padding: 4px 28px 4px 11px;
+  font-size: 14px;
+  line-height: 1.5715;
+}
+
+.campus-select--large {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.campus-select--large .campus-select__inner {
+  padding: 8px 32px 8px 15px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ==================== 状态样式 ==================== */
+.campus-select--disabled {
+  border-color: #d9d9d9;
+  background-color: rgba(0, 0, 0, 0.04);
+  cursor: not-allowed;
+}
+
+.campus-select--disabled:hover {
+  border-color: #d9d9d9;
+  box-shadow: none;
+}
+
+.campus-select--disabled:focus-within {
+  border-color: #d9d9d9;
+  box-shadow: none;
+}
+
+/* ==================== 清除按钮 ==================== */
+.campus-select__clear {
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 1;
+}
+
+.campus-select:hover .campus-select__clear {
+  opacity: 1;
+}
+
+.campus-select__clear:hover {
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* ==================== 下拉箭头 ==================== */
+.campus-select__arrow {
+  position: absolute;
+  top: 50%;
+  right: 11px;
+  transform: translateY(-50%);
+  color: rgba(0, 0, 0, 0.25);
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+
+.campus-select:hover .campus-select__arrow {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.campus-select:focus-within .campus-select__arrow {
+  color: #4096ff;
+}
+
+/* ==================== 多选模式 ==================== */
+.campus-select__inner[multiple] {
+  padding-right: 11px;
+  option:checked {
+    background-color: #e6f7ff;
+    color: #4096ff;
+    font-weight: bold;
+  }
+}
+
+/* ==================== 调试样式 ==================== */
+.campus-select {
+  /* 调试时取消注释查看边界 */
+  /* outline: 1px solid red; */
+}

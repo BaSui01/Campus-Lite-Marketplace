@@ -1,11 +1,7 @@
 /**
- * 认证 Hook
- *
- * 使用示例：
- * const { user, isAuthenticated, login, logout } = useAuth();
- *
+ * 管理端认证 Hook
  * @author BaSui 😎
- * @date 2025-11-01
+ * @date 2025-11-02
  */
 
 import { useAuthStore } from '@/stores/auth';

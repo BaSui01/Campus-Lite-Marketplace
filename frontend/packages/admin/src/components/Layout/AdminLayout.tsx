@@ -1,180 +1,212 @@
 /**
- * 主布局组件
- *
- * 包含：侧边栏、顶栏、面包屑、内容区域
- *
+ * 管理端布局组件
  * @author BaSui 😎
- * @date 2025-11-01
+ * @date 2025-11-02
  */
 
 import React from 'react';
-import { Layout, Menu, Breadcrumb, Avatar, Dropdown, Space, Button, Typography } from 'antd';
+import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
   LogoutOutlined,
-  DashboardOutlined,
-  FileTextOutlined,
-  SafetyOutlined,
-  SettingOutlined,
-  FileSearchOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { useAppStore } from '@/stores/app';
-import { useAuth } from '@/hooks/useAuth';
-import { usePermission } from '@/hooks/usePermission';
-import { PERMISSIONS } from '@/utils/constants';
-import './AdminLayout.css';
+import { useAuth, usePermission } from '@/hooks';
+import { UserAvatar, Badge } from '@campus/shared';
+import { MENU_ITEMS } from '@/config/menu';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { DashboardOutlined, FileTextOutlined, SafetyOutlined, SettingOutlined, FileSearchOutlined } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
-const { Text } = Typography;
+const { Title } = Typography;
 
-const AdminLayout: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { menuCollapsed, toggleMenu } = useAppStore();
+const getIcon = (iconName: string) => {
+  const icons: Record<string, React.ReactNode> = {
+    DashboardOutlined: <DashboardOutlined />,
+    UserOutlined: <UserOutlined />,
+    FileTextOutlined: <FileTextOutlined />,
+    SafetyOutlined: <SafetyOutlined />,
+    SettingOutlined: <SettingOutlined />,
+    FileSearchOutlined: <FileSearchOutlined />,
+  };
+  return icons[iconName];
+};
+
+interface AdminLayoutProps {
+  children: React.ReactNode;
+}
+
+export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const { hasPermission } = usePermission();
+  const [collapsed, setCollapsed] = React.useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // ===== 菜单配置 =====
-  const menuItems: MenuProps['items'] = [
-    {
-      key: '/admin/dashboard',
-      icon: <DashboardOutlined />,
-      label: '仪表盘',
-    },
-    {
-      key: '/admin/users',
-      icon: <UserOutlined />,
-      label: '用户管理',
-      children: [
-        { key: '/admin/users/list', label: '用户列表' },
-        { key: '/admin/users/banned', label: '封禁记录' },
-      ],
-    },
-    {
-      key: '/admin/content',
-      icon: <FileTextOutlined />,
-      label: '内容管理',
-      children: [
-        { key: '/admin/content/goods', label: '商品审核' },
-        { key: '/admin/content/posts', label: '帖子审核' },
-        { key: '/admin/content/reports', label: '举报处理' },
-      ],
-    },
-    {
-      key: '/admin/roles',
-      icon: <SafetyOutlined />,
-      label: '角色权限',
-    },
-    {
-      key: '/admin/system',
-      icon: <SettingOutlined />,
-      label: '系统管理',
-      children: [
-        { key: '/admin/system/rate-limit', label: '限流管理' },
-        { key: '/admin/system/notifications', label: '通知模板' },
-        { key: '/admin/system/compliance', label: '合规管理' },
-        { key: '/admin/system/recycle-bin', label: '回收站' },
-      ],
-    },
-    {
-      key: '/admin/logs',
-      icon: <FileSearchOutlined />,
-      label: '日志管理',
-      children: [
-        { key: '/admin/logs/audit', label: '审计日志' },
-        { key: '/admin/logs/operation', label: '操作日志' },
-      ],
-    },
-  ];
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('登出失败:', error);
+    }
+  };
 
-  // ===== 用户菜单 =====
+  // ===== 菜单处理函数 =====
+  const filterMenuByPermission = (items: typeof MENU_ITEMS) => {
+    return items
+      .filter(item => {
+        // 如果没有权限要求，显示菜单
+        if (!item.permission) return true;
+        // 检查用户是否有权限
+        return hasPermission(item.permission);
+      })
+      .map(item => ({
+        key: item.key,
+        label: item.label,
+        icon: item.icon ? getIcon(item.icon) : undefined,
+        children: item.children 
+          ? filterMenuByPermission(item.children)
+          : undefined,
+      }));
+  };
+
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    const findMenuItem = (items: typeof MENU_ITEMS, targetKey: string) => {
+      for (const item of items) {
+        if (item.key === targetKey && item.path) {
+          return item.path;
+        }
+        if (item.children) {
+          const found = findMenuItem(item.children, targetKey);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const path = findMenuItem(MENU_ITEMS, key);
+    if (path) {
+      navigate(path);
+    }
+  };
+
+  // 获取当前选中的菜单项
+  const getSelectedKeys = (): string[] => {
+    const currentPath = location.pathname;
+    
+    const findMatchingKey = (items: typeof MENU_ITEMS): string | null => {
+      for (const item of items) {
+        if (item.path === currentPath) {
+          return item.key;
+        }
+        if (item.children) {
+          const found = findMatchingKey(item.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const selectedKey = findMatchingKey(MENU_ITEMS);
+    return selectedKey ? [selectedKey] : ['dashboard'];
+  };
+
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
-      icon: <UserOutlined />,
       label: '个人信息',
+      icon: <UserOutlined />,
     },
     {
       type: 'divider',
     },
     {
       key: 'logout',
-      icon: <LogoutOutlined />,
       label: '退出登录',
-      danger: true,
-      onClick: () => {
-        logout();
-        navigate('/admin/login');
-      },
+      icon: <LogoutOutlined />,
+      onClick: handleLogout,
     },
   ];
 
-  // ===== 菜单点击 =====
-  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-    navigate(key);
-  };
-
   return (
-    <Layout className="admin-layout">
-      {/* 侧边栏 */}
+    <Layout style={{ minHeight: '100vh' }}>
       <Sider
         trigger={null}
         collapsible
-        collapsed={menuCollapsed}
-        width={240}
-        className="admin-sider"
+        collapsed={collapsed}
+        style={{
+          position: 'fixed',
+          height: '100vh',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          zIndex: 999,
+        }}
       >
-        <div className="logo">
-          {menuCollapsed ? 'CM' : '校园轻享集市'}
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <Title level={4} style={{ color: 'white', margin: 0 }}>
+            {collapsed ? '管理' : '校园集市管理系统'}
+          </Title>
         </div>
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
+          selectedKeys={getSelectedKeys()}
+          items={filterMenuByPermission(MENU_ITEMS)}
           onClick={handleMenuClick}
         />
       </Sider>
-
-      <Layout>
-        {/* 顶部栏 */}
-        <Header className="admin-header">
+      
+      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
+        <Header
+          style={{
+            padding: '0 16px',
+            background: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <Button
             type="text"
-            icon={menuCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={toggleMenu}
-            className="trigger"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              fontSize: '16px',
+              width: 64,
+              height: 64,
+            }}
           />
-
-          <Space className="user-info">
-            <Text>欢迎，{user?.nickname}</Text>
-            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-              <Avatar src={user?.avatar} icon={<UserOutlined />} />
-            </Dropdown>
+          
+          <Space>
+            <Badge dot>
+              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+                <Space style={{ cursor: 'pointer' }}>
+                  <UserAvatar 
+                    src={user?.avatar}
+                    alt={user?.nickname || user?.username}
+                    size="small"
+                  />
+                  <span>{user?.nickname || user?.username}</span>
+                </Space>
+              </Dropdown>
+            </Badge>
           </Space>
         </Header>
-
-        {/* 面包屑 */}
-        <div className="breadcrumb-wrapper">
-          <Breadcrumb
-            items={[
-              { title: '首页' },
-              { title: '仪表盘' },
-            ]}
-          />
-        </div>
-
-        {/* 内容区域 */}
-        <Content className="admin-content">
-          <Outlet />
+        
+        <Content
+          style={{
+            margin: '16px',
+            padding: '16px',
+            minHeight: 280,
+            background: '#fff',
+          }}
+        >
+          {children}
         </Content>
       </Layout>
     </Layout>
   );
 };
-
-export default AdminLayout;

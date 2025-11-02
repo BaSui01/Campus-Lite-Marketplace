@@ -19,6 +19,8 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
+import { Card, Badge } from '@campus/shared';
+import { LineChart, BarChart } from '@/components/Charts';
 import StatCard from '@/components/StatCard';
 import { statisticsService } from '@campus/shared';
 import './Dashboard.css';
@@ -42,6 +44,18 @@ const Dashboard: React.FC = () => {
   const { data: topUsers, isLoading: usersLoading } = useQuery({
     queryKey: ['top-users'],
     queryFn: () => statisticsService.getTopUsers(10),
+  });
+
+  // ===== 查询趋势数据 =====
+  const { data: trendData, isLoading: trendLoading } = useQuery({
+    queryKey: ['user-trend'],
+    queryFn: () => statisticsService.getUserTrend(30),
+  });
+
+  // ===== 查询收入趋势 =====
+  const { data: revenueData, isLoading: revenueLoading } = useQuery({
+    queryKey: ['revenue-trend'],
+    queryFn: () => statisticsService.getRevenueTrend(30),
   });
 
   return (
@@ -185,6 +199,44 @@ const Dashboard: React.FC = () => {
           </Col>
         </Row>
       </Card>
+
+      {/* 图表区域 */}
+      <Row gutter={[16, 16]} className="chart-section">
+        <Col xs={24} lg={12}>
+          <Card title="📈 用户增长趋势" loading={trendLoading}>
+            <LineChart 
+              data={trendData || []}
+              height={300}
+              color="#52c41a"
+            />
+          </Card>
+        </Col>
+        <Col xs={24} lg={12}>
+          <Card title="💰 收入趋势" loading={revenueLoading}>
+            <LineChart 
+              data={revenueData || []}
+              height={300}
+              color="#faad14"
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* 商品类别分布 */}
+      <Row gutter={[16, 16]} className="chart-section">
+        <Col xs={24}>
+          <Card title="📦 商品类别分布" loading={goodsLoading}>
+            <BarChart 
+              data={topGoods?.map(item => ({ 
+                name: item.category || '其他', 
+                value: item.count || item.value || 0 
+              })) || []}
+              height={350}
+              color="#1890ff"
+            />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

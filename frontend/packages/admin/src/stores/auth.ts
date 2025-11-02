@@ -1,5 +1,7 @@
 /**
  * 管理端认证 Store（基于共享 createAuthStore）
+ * @author BaSui 😎
+ * @date 2025-11-02
  */
 
 import {

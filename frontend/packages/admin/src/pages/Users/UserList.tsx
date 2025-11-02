@@ -35,6 +35,8 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { Table } from '@campus/shared';
 import { userService, adminUserService } from '@campus/shared';
 import type { User, UserListQuery } from '@campus/shared';
 import dayjs from 'dayjs';
@@ -45,6 +47,7 @@ const { TextArea } = Input;
 
 const UserList: React.FC = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useState<UserListQuery>({
     page: 0,
     pageSize: 20,
@@ -217,7 +220,12 @@ const UserList: React.FC = () => {
       width: 180,
       render: (_, record) => (
         <Space>
-          <Button type="link" size="small" icon={<EyeOutlined />}>
+          <Button 
+            type="link" 
+            size="small" 
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/admin/users/${record.id}`)}
+          >
             详情
           </Button>
           {record.status === 'BANNED' ? (
@@ -265,7 +273,6 @@ const UserList: React.FC = () => {
           <Table
             columns={columns}
             dataSource={data?.content || []}
-            rowKey="id"
             loading={isLoading}
             pagination={{
               current: (searchParams.page || 0) + 1,
