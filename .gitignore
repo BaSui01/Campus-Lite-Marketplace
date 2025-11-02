@@ -295,3 +295,4 @@ gatling-results/
 
 
 frontend/packages/shared/src/nul
+backend/src/main/java/com/campus/marketplace/controller/nul
