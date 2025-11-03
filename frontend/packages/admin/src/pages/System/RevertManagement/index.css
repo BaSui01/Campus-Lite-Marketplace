@@ -1,0 +1,211 @@
+/**
+ * 撤销管理页面样式
+ * @author BaSui 😎
+ */
+
+.revert-management-page {
+  padding: 24px;
+  min-height: 100vh;
+  background: var(--color-bg-page, #f9fafb);
+}
+
+/* 页头 */
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1f2937);
+  margin: 0 0 8px 0;
+}
+
+.page-description {
+  font-size: 14px;
+  color: var(--color-text-secondary, #6b7280);
+  margin: 0;
+}
+
+/* 统计卡片 */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1f2937);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+/* 标签页 */
+.page-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.tab-button {
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary, #6b7280);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-button:hover {
+  color: var(--color-primary, #3b82f6);
+}
+
+.tab-button.active {
+  color: var(--color-primary, #3b82f6);
+  border-bottom-color: var(--color-primary, #3b82f6);
+}
+
+/* 内容区域 */
+.page-content {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
+}
+
+/* 原因文本截断 */
+.revert-reason-text {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: var(--color-text-tertiary, #9ca3af);
+  font-size: 14px;
+}
+
+/* 审批弹窗内容 */
+.approval-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.approval-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-bg-secondary, #f9fafb);
+  border-radius: 8px;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.info-label {
+  font-weight: 500;
+  color: var(--color-text-secondary, #6b7280);
+  min-width: 80px;
+}
+
+.reason-text {
+  flex: 1;
+  margin: 0;
+  line-height: 1.6;
+  color: var(--color-text-primary, #1f2937);
+}
+
+.approval-comment-section h4 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary, #1f2937);
+  margin: 0 0 12px 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .revert-management-page {
+    padding: 16px;
+  }
+  
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-tabs {
+    overflow-x: auto;
+  }
+  
+  .tab-button {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .page-content {
+    padding: 16px;
+  }
+}

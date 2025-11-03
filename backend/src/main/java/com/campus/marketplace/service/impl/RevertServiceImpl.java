@@ -35,6 +35,7 @@ public class RevertServiceImpl implements RevertService {
     private final RevertRequestRepository revertRequestRepository;
     private final RevertStrategyFactory strategyFactory;
     private final RevertNotificationService notificationService;
+    private final com.campus.marketplace.service.AuditLogService auditLogService;
 
     @Override
     @Transactional
@@ -105,7 +106,24 @@ public class RevertServiceImpl implements RevertService {
             RevertExecutionResult result = strategy.executeRevert(auditLog, approverId);
 
             if (result.isSuccess()) {
-                revertRequest.markExecuted(null); // TODO: 关联撤销审计日志
+                // 记录撤销操作的审计日志
+                try {
+                    auditLogService.logReversibleAction(
+                        approverId,
+                        "SYSTEM", // 审批人用户名（TODO: 从UserService获取）
+                        com.campus.marketplace.common.enums.AuditActionType.UPDATE,
+                        auditLog.getTargetType() + "_REVERT",
+                        auditLog.getEntityId(),
+                        auditLog.getNewValue(), // 撤销前（当前值）
+                        auditLog.getOldValue()  // 撤销后（历史值）
+                    );
+                    log.info("撤销审计日志已记录: revertRequestId={}, auditLogId={}", 
+                            revertRequest.getId(), revertRequest.getAuditLogId());
+                } catch (Exception e) {
+                    log.error("记录撤销审计日志失败: revertRequestId={}", revertRequest.getId(), e);
+                }
+                
+                revertRequest.markExecuted(null); // 暂不关联审计日志ID
                 revertRequestRepository.save(revertRequest);
             } else {
                 revertRequest.markFailed(result.getMessage());

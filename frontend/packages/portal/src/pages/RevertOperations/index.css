@@ -1,0 +1,56 @@
+/**
+ * 可撤销操作列表页面样式
+ * @author BaSui 😎
+ */
+
+.revert-operations-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: 100vh;
+  background: var(--color-bg-page, #f9fafb);
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1f2937);
+  margin: 0 0 12px 0;
+}
+
+.page-description {
+  font-size: 14px;
+  color: var(--color-text-secondary, #6b7280);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.page-content {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .revert-operations-page {
+    padding: 16px;
+  }
+  
+  .page-header {
+    margin-bottom: 24px;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .page-description {
+    font-size: 13px;
+  }
+}

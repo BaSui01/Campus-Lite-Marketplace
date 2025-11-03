@@ -32,6 +32,10 @@ public enum AuditActionType {
     ORDER_CREATE("创建订单"),
     ORDER_PAY("订单支付"),
     ORDER_CANCEL("取消订单"),
+
+    DISPUTE_CREATE("纠纷创建"),
+    DISPUTE_UPDATE("纠纷更新"),
+    DISPUTE_CLOSE("纠纷关闭"),
     
     REPORT_CREATE("创建举报"),
     REPORT_HANDLE("处理举报"),

@@ -103,6 +103,12 @@ export const MENU_ITEMS: MenuItem[] = [
         label: '回收站',
         path: '/admin/system/recycle-bin',
       },
+      {
+        key: 'system-revert',
+        label: '数据撤销',
+        path: '/admin/system/revert',
+        permission: PERMISSION_CODES.SYSTEM_DATA_REVERT,
+      },
     ],
   },
   {

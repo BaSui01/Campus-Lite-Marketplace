@@ -102,11 +102,25 @@ public class RevertApprovalServiceImpl implements RevertApprovalService {
         // 2. 普通审批人只能看到自己负责的审批请求
         // 3. 审批权限由 User 的 role 字段决定（ADMIN, SUPER_ADMIN 等）
         //
-        // TODO: 等权限服务完善后，根据 approverId 查询用户角色，按角色返回不同的待审批数量
-        // 调用方法：
-        // - User user = userService.getUserById(approverId);
-        // - if (user.hasRole(Role.ADMIN)) { 返回所有待审批 }
-        // - else { 返回该审批人负责的待审批 }
+        // 注意：UserService 暂无 hasRole() 或 getUserRoles() 方法
+        // 建议：在 UserService 或新建 RoleService 中添加角色查询方法
+        // 
+        // 接口定义：
+        // public interface UserService {
+        //     User getUserById(Long userId);
+        //     boolean hasRole(Long userId, String roleName);  // 检查用户是否具有某个角色
+        //     List<String> getUserRoles(Long userId);  // 获取用户的所有角色
+        // }
+        //
+        // 实现示例：
+        // User user = userService.getUserById(approverId);
+        // if (user != null && userService.hasRole(approverId, "ADMIN")) {
+        //     // 管理员：返回所有待审批
+        //     return revertRequestRepository.countByStatus(RevertRequestStatus.PENDING);
+        // } else {
+        //     // 普通审批人：返回自己负责的待审批（需要RevertRequest表添加assignedTo字段）
+        //     return revertRequestRepository.countByStatusAndAssignedTo(RevertRequestStatus.PENDING, approverId);
+        // }
 
         // 当前简化实现：返回所有待审批的撤销请求数量
         long pendingCount = revertRequestRepository.countByStatus(RevertRequestStatus.PENDING);

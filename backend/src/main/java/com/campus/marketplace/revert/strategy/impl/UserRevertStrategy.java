@@ -7,7 +7,6 @@ import com.campus.marketplace.common.enums.UserStatus;
 import com.campus.marketplace.revert.dto.RevertExecutionResult;
 import com.campus.marketplace.revert.dto.RevertValidationResult;
 import com.campus.marketplace.revert.strategy.RevertStrategy;
-import com.campus.marketplace.service.DataBackupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,7 +33,6 @@ import java.util.Optional;
 public class UserRevertStrategy implements RevertStrategy {
 
     private final com.campus.marketplace.repository.UserRepository userRepository;
-    private final DataBackupService dataBackupService;
     private final com.campus.marketplace.service.CacheService cacheService;
     
     @Override
@@ -103,12 +101,28 @@ public class UserRevertStrategy implements RevertStrategy {
             // 3. 保存更新
             userRepository.save(user);
 
-            // 4. 清理用户会话（TODO: 等会话服务实现后解除注释）
-            // 调用方法：sessionService.invalidateUserSessions(userId);
-            // 说明：如果用户被解封（从 BANNED 恢复到 ACTIVE），需要清理所有活跃会话，强制重新登录
-            // 使用场景：防止已封禁的用户token仍然有效
+            // 4. 清理用户会话
+            // 注意：当前系统暂无会话服务（SessionService 或 TokenService）
+            // 建议：创建会话服务来管理用户登录会话和Token
+            // 
+            // 接口定义：
+            // public interface SessionService {
+            //     void invalidateUserSessions(Long userId);  // 清理用户所有会话
+            //     void invalidateSessionByToken(String token);  // 清理指定token会话
+            // }
+            // 
+            // 实现逻辑：
+            // 1. 如果用户被解封（从 BANNED 恢复到 ACTIVE），需要清理所有活跃会话，强制重新登录
+            // 2. 防止已封禁的用户token仍然有效
+            // 3. 可通过Redis存储会话，key格式: session:user:{userId}:*
+            //
+            // 调用示例：
+            // if (user.getStatus() == UserStatus.ACTIVE) {
+            //     sessionService.invalidateUserSessions(userId);
+            //     log.info("用户会话已清理: userId={}", userId);
+            // }
             if (user.getStatus() == UserStatus.ACTIVE) {
-                log.debug("用户会话清理（待实现）: userId={}", userId);
+                log.debug("用户会话清理（待实现SessionService）: userId={}", userId);
             }
 
             log.info("用户撤销执行成功: userId={}", userId);

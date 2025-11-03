@@ -35,6 +35,13 @@ public enum NotificationType {
     SUBSCRIPTION_MATCHED_GOODS("关注关键词有新内容"),
 
     /**
+     * 纠纷相关通知
+     */
+    DISPUTE_SUBMITTED("纠纷已提交"),
+    DISPUTE_ESCALATED("纠纷已升级"),
+    DISPUTE_CLOSED("纠纷已关闭"),
+    DISPUTE_RESOLVED("纠纷已解决"),  
+    /**
      * 系统通知
      */
     SYSTEM_ANNOUNCEMENT("系统公告"),

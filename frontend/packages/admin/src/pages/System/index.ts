@@ -8,3 +8,4 @@ export { default as RateLimit } from './RateLimit';
 export { default as RecycleBin } from './RecycleBin';
 export { default as Notifications } from './Notifications';
 export { default as Compliance } from './Compliance';
+export { default as RevertManagement } from './RevertManagement';

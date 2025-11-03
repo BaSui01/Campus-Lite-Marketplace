@@ -181,19 +181,41 @@ public class RevertNotificationServiceImpl implements RevertNotificationService 
                 null
             );
             
-            // 同时通知管理员（TODO: 等用户角色服务实现后解除注释）
-            // 调用方法：List<Long> adminIds = userService.getAdminUserIds();
-            // 说明：获取所有具有审批权限的管理员ID列表
-            // 然后遍历发送通知：
-            // for (Long adminId : adminIds) {
-            //     notificationService.sendNotification(adminId, NotificationType.SYSTEM, title, content, revertRequest.getId(), "REVERT_REQUEST", null);
+            // 同时通知管理员
+            // 注意：UserService 暂无 getAdminUserIds() 或 getUsersByRole() 方法
+            // 建议：在 UserService 中添加按角色查询用户的方法
+            // 
+            // 接口定义：
+            // public interface UserService {
+            //     List<Long> getAdminUserIds();  // 获取所有管理员ID
+            //     List<Long> getUserIdsByRole(String roleName);  // 按角色名查询用户ID列表
+            //     List<User> getUsersByRole(String roleName);  // 按角色名查询用户列表
             // }
-            log.debug("管理员通知（待实现）: revertRequestId={}", revertRequest.getId());
+            //
+            // 实现示例：
+            // try {
+            //     List<Long> adminIds = userService.getAdminUserIds();
+            //     for (Long adminId : adminIds) {
+            //         notificationService.sendNotification(
+            //             adminId, 
+            //             NotificationType.SYSTEM_ANNOUNCEMENT, 
+            //             title, 
+            //             content, 
+            //             revertRequest.getId(), 
+            //             "REVERT_REQUEST", 
+            //             null
+            //         );
+            //     }
+            //     log.info("管理员通知已发送: revertRequestId={}, 通知人数={}", revertRequest.getId(), adminIds.size());
+            // } catch (Exception e) {
+            //     log.error("发送管理员通知失败: revertRequestId={}", revertRequest.getId(), e);
+            // }
+            log.debug("管理员通知（待实现getAdminUserIds方法）: revertRequestId={}", revertRequest.getId());
             
             log.info("撤销警告通知已发送: requesterId={}", revertRequest.getRequesterId());
             
         } catch (Exception e) {
-            log.error("发送撤销警告通知失败: revertRequestId={}", revertRequest.getId(), e);
+            log.error("发送撤销警告通知 失败: revertRequestId={}", revertRequest.getId(), e);
         }
     }
 }

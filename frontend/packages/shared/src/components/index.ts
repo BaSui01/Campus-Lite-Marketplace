@@ -145,3 +145,31 @@ export { ImageUpload, type ImageUploadProps } from './ImageUpload';
  * @description 基于 contentEditable 实现，支持基础格式化功能（粗体、斜体、对齐、列表等）
  */
 export { RichTextEditor, type RichTextEditorProps } from './RichTextEditor';
+
+// ==================== P3 数据撤销组件（新增）====================
+
+/**
+ * RevertOperationsList - 可撤销操作列表组件
+ * @description 展示用户可以撤销的操作列表（表格形式），支持筛选、分页、预览和申请撤销
+ */
+export { 
+  RevertOperationsList, 
+  type RevertOperationsListProps,
+  type RevertableOperation,
+  type RevertListParams,
+  type RevertListResponse,
+  type EntityType,
+  type ActionType
+} from './RevertOperationsList';
+
+/**
+ * RevertPreviewModal - 撤销预览弹窗组件
+ * @description 展示撤销操作的影响预览和确认，包括验证结果、影响范围、数据对比等
+ */
+export { 
+  RevertPreviewModal, 
+  type RevertPreviewModalProps,
+  type RevertPreviewData,
+  type ValidationResult,
+  type ValidationLevel
+} from './RevertPreviewModal';

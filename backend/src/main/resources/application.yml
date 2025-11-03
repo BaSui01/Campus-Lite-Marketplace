@@ -445,3 +445,25 @@ wechat:
 app:
   redis:
     mode: ${APP_REDIS_MODE:redis}
+
+# 纠纷超时检查配置
+dispute:
+  timeout:
+    check:
+      # 协商超时检查定时任务 Cron 表达式（默认：每6小时执行一次）
+      # 格式：秒 分 时 日 月 周
+      # 0 0 */6 * * ? = 每天 0点、6点、12点、18点 执行
+      negotiation:
+        cron: ${DISPUTE_TIMEOUT_CHECK_NEGOTIATION_CRON:0 0 */6 * * ?}
+      # 仲裁超时检查定时任务 Cron 表达式（默认：每6小时执行一次）
+      arbitration:
+        cron: ${DISPUTE_TIMEOUT_CHECK_ARBITRATION_CRON:0 0 */6 * * ?}
+
+# 物流系统配置
+logistics:
+  # 是否启用模拟物流API（开发/测试环境使用）
+  mock:
+    enabled: ${LOGISTICS_MOCK_ENABLED:true}
+  # 是否启用定时任务
+  scheduler:
+    enabled: ${LOGISTICS_SCHEDULER_ENABLED:true}

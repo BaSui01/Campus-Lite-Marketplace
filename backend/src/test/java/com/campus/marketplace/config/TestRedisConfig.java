@@ -57,6 +57,7 @@ public class TestRedisConfig {
     @Bean
     @Primary
     @ConditionalOnMissingBean
+    @SuppressWarnings("unchecked") // Mock返回原始类型，需要抑制类型安全警告
     public RedisTemplate<String, Object> redisTemplate() {
         return mock(RedisTemplate.class);
     }

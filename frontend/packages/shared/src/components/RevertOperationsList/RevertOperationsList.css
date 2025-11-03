@@ -1,0 +1,96 @@
+/**
+ * 可撤销操作列表样式
+ * @author BaSui 😎
+ */
+
+.revert-operations-list {
+  width: 100%;
+  min-height: 300px;
+  background: var(--color-bg-container, #ffffff);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+/* 实体信息列 */
+.revert-entity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.revert-entity-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text-primary, #1f2937);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.revert-entity-description {
+  font-size: 12px;
+  color: var(--color-text-secondary, #6b7280);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 时间显示 */
+.revert-time {
+  font-size: 13px;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+/* 操作按钮区域 */
+.revert-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.revert-status-hint {
+  font-size: 12px;
+  color: var(--color-text-tertiary, #9ca3af);
+}
+
+/* 分页容器 */
+.revert-pagination {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .revert-operations-list {
+    padding: 12px;
+  }
+  
+  .revert-entity-name {
+    font-size: 13px;
+  }
+  
+  .revert-entity-description {
+    font-size: 11px;
+  }
+  
+  .revert-actions {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* 加载状态 */
+.revert-operations-list > .loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* 空状态 */
+.revert-operations-list > .empty {
+  min-height: 400px;
+}

@@ -124,7 +124,6 @@ class DataBackupServiceTest {
     @DisplayName("应该清理过期的备份数据")
     void shouldCleanupExpiredBackups() {
         // Given
-        LocalDateTime now = LocalDateTime.now();
         when(dataBackupRepository.countByExpireAtBeforeAndIsActiveTrue(any(LocalDateTime.class)))
                 .thenReturn(5);
         when(dataBackupRepository.deleteByExpireAtBeforeAndIsActiveTrue(any(LocalDateTime.class)))

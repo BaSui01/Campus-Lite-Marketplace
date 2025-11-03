@@ -14,7 +14,7 @@ import UserList from '@/pages/Users/UserList';
 import UserDetail from '@/pages/Users/UserDetail';
 import { ReportList } from '@/pages/Content';
 import { RoleList } from '@/pages/Roles';
-import { RateLimit, RecycleBin, Notifications, Compliance } from '@/pages/System';
+import { RateLimit, RecycleBin, Notifications, Compliance, RevertManagement } from '@/pages/System';
 import { PermissionGuard } from '@/components';
 import { PERMISSION_CODES } from '@campus/shared';
 
@@ -93,6 +93,14 @@ export const router = createBrowserRouter([
         element: (
           <PermissionGuard permission={PERMISSION_CODES.SYSTEM_COMPLIANCE_REVIEW}>
             <Compliance />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'system/revert',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_DATA_REVERT}>
+            <RevertManagement />
           </PermissionGuard>
         ),
       },

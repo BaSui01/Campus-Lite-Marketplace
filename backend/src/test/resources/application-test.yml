@@ -1,0 +1,103 @@
+spring:
+  application:
+    name: campus-marketplace-test
+  
+  # 排除Redis相关自动配置 - 测试环境不依赖Redis
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+  
+  # 测试数据库配置
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+  # JPA测试配置
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        # 禁用二级缓存 - 避免Redis依赖
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+          region:
+            factory_class: org.hibernate.cache.internal.NoCachingRegionFactory
+        javax:
+          cache:
+            missing_cache_strategy: create
+
+  # 禁用Redis和缓存
+  data:
+    redis:
+      repositories:
+        enabled: false
+      redisson:
+        config: classpath:redisson-test.yaml
+  redis:
+    redisson:
+      config: classpath:redisson-test.yaml
+  cache:
+    type: none
+
+  # 禁用Flyway
+  flyway:
+    enabled: false
+
+  # 测试环境禁用调度
+  task:
+    scheduling:
+      enabled: false
+
+  # 禁用不必要的功能
+  main:
+    banner-mode: off
+  output:
+    ansi:
+      enabled: DETECT
+
+  # H2 Console (仅测试时可访问)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# JWT测试配置
+jwt:
+  secret: 5bwzFhN2dpPiac1wgPaFgb5iu_lEB5JrSxZqv-WIOwRiE_dQOE-fMFxy24-iOXgWm1NxybaJMrkbCXG9mY0a4Q
+  expiration: 7200000
+  header: Authorization
+  prefix: "Bearer "
+
+# 日志配置 - 测试时简化
+logging:
+  level:
+    root: WARN
+    com.campus.marketplace: INFO
+    org.hibernate.SQL: WARN
+    org.springframework: WARN
+  pattern:
+    console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
+
+# Actuator测试配置
+management:
+  endpoints:
+    enabled-by-default: false
+  endpoint:
+    health:
+      enabled: false
+
+# 应用配置 - 禁用Redis模式
+app:
+  redis:
+    mode: none

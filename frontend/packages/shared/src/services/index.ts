@@ -67,3 +67,11 @@ export type { SoftDeleteService } from './softDelete';
 // ==================== 管理端用户服务 ====================
 export { adminUserService } from './adminUser';
 export type { AdminUserService } from './adminUser';
+
+// ==================== 撤销操作服务 ====================
+export { revertService, RevertService } from './revert';
+export type { 
+  CreateRevertRequest, 
+  RevertExecutionResult, 
+  RevertRequestParams 
+} from './revert';

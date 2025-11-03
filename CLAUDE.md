@@ -1,7 +1,7 @@
 # AI上下文文档
 
 > **架构**: Spring Boot 单体 + 前后端分离 | TDD 开发 | 测试覆盖率 ≥85%  
-> **作者**: BaSui 😎 | **更新**: 2025-11-02
+> **作者**: BaSui 😎 | **更新**: 2025-11-03
 
 ---
 
@@ -123,7 +123,6 @@ implementation 'com.fasterxml.jackson.core:jackson-databind'
 - 🔴 **第1步**：先写失败测试，不写实现代码
 - 🟢 **第2-7步**：逐步实现，每步对应测试
 - 🔵 **第8-9步**：运行测试、重构优化
-- 📊 **覆盖率**：必须≥85%，测试覆盖所有场景
 
 **复用检查标准操作**：
 1. 🔍 **Grep搜索**：搜索相似字段名、类名、方法名
@@ -229,6 +228,33 @@ implementation 'com.fasterxml.jackson.core:jackson-databind'
 -  **存放**：**根目录/docs/specs**
 - `tech.md` - 技术栈、依赖规范、性能标准
 - `structure.md` - 项目结构、命名规范
+
+#### 📚 必读全局文档说明
+
+**开发前必须先阅读这两个文档！**
+
+1. **[docs/specs/tech.md](docs/specs/tech.md)** - 技术栈与依赖规范
+   - **后端技术栈**：Spring Boot 3.2.12、Java 21、PostgreSQL、Redis、Redisson
+   - **前端技术栈**：React 18、TypeScript 5、Vite 5、pnpm Monorepo
+   - **依赖管理规范**：禁止重复依赖、版本锁定策略、安全升级原则
+   - **性能标准**：API响应时间、数据库查询、缓存命中率、构建时间
+   - **测试标准**：TDD流程、覆盖率≥85%、突变测试≥60%
+   - **安全标准**：CVE扫描、已修复漏洞清单、代码安全规范
+
+2. **[docs/specs/structure.md](docs/specs/structure.md)** - 项目结构与命名规范
+   - **后端结构**：分层架构（Controller → Service → Repository → Entity）
+   - **前端结构**：Monorepo 包隔离（admin / portal / shared）
+   - **命名规范**：Java类、方法、变量、包命名 + TypeScript文件、组件、类型命名
+   - **目录组织**：功能模块化、通用层复用、扁平化原则
+   - **依赖规则**：禁止的依赖方向、模块解耦策略
+   - **代码文件大小限制**：Controller≤300行、Service≤500行、Component≤300行
+
+**何时查阅这些文档：**
+- ✅ **开发新功能前**：确认技术选型和项目结构
+- ✅ **添加新依赖前**：检查是否有重复功能的依赖
+- ✅ **创建新文件前**：确认命名规范和目录位置
+- ✅ **编写 Specs 时**：避免重复描述全局通用内容，直接引用这两个文档
+- ✅ **代码审查时**：检查是否符合全局规范
 
 **功能开发流程（每个新功能）：**
 ```

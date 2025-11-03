@@ -25,8 +25,8 @@ public class OrderRevertStrategy implements RevertStrategy {
     
     private final OrderRepository orderRepository;
     private final com.campus.marketplace.service.CacheService cacheService;
-    private final com.campus.marketplace.service.PaymentService paymentService;
     private final com.campus.marketplace.service.RefundService refundService;
+    private final com.campus.marketplace.repository.RefundRequestRepository refundRequestRepository;
     
     @Override
     public String getSupportedEntityType() {
@@ -162,13 +162,17 @@ public class OrderRevertStrategy implements RevertStrategy {
         if (("COMPLETED".equals(currentStatus) || "REVIEWED".equals(currentStatus)) &&
             ("PAID".equals(targetStatus) || "PENDING_PAYMENT".equals(targetStatus))) {
 
-            // 集成支付服务检查结算状态（TODO: 等支付服务实现后解除注释）
-            // 调用方法：boolean isSettled = paymentService.checkSettlementStatus(order.getId());
-            // 说明：检查订单款项是否已结算给卖家
-            // 如果已结算：需要财务部门处理退款，拒绝撤销或标记为需要人工处理
-            // 如果未结算：可以直接回滚订单状态
+            // 注意：支付服务暂无 checkSettlementStatus() 方法
+            // 建议：在 PaymentService 接口中添加以下方法来检查结算状态
+            // boolean checkSettlementStatus(Long orderId);
+            // 
+            // 实现逻辑：
+            // - 查询 PaymentLog 表，检查订单款项是否已结算给卖家（类型=SETTLEMENT）
+            // - 如果已结算：需要财务部门处理退款，拒绝撤销或标记为需要人工处理
+            // - 如果未结算：可以直接回滚订单状态
+            //
+            // 当前策略：所有涉及退款的订单撤销都需要管理员严格审批
             log.warn("订单回滚涉及退款，需要管理员审批: orderId={}", order.getId());
-            log.debug("支付结算状态检查（待实现）: orderId={}", order.getId());
 
             return RevertValidationResult.warning("该操作涉及资金退款，需要严格审批");
         }
@@ -249,8 +253,19 @@ public class OrderRevertStrategy implements RevertStrategy {
                             
                             log.info("自动创建退款申请: orderId={}, refundNo={}", orderId, refundNo);
                             
-                            // TODO: 自动审批退款（需要管理员权限）
-                            // refundService.approveAndRefund(refundNo);
+                            // 注意：自动审批退款需要管理员权限
+                            // 当前策略：仅创建退款申请，等待管理员手动审批
+                            // 
+                            // 如需自动审批，需要满足以下条件：
+                            // 1. 当前操作人具有管理员或财务权限
+                            // 2. 订单金额未超过自动审批限额（如: ≤1000元）
+                            // 3. 买家信用良好，无恶意退款记录
+                            //
+                            // 实现方式：
+                            // if (hasAutoApprovalPermission && order.getAmount() <= AUTO_APPROVAL_LIMIT) {
+                            //     refundService.approveAndRefund(refundNo);
+                            //     log.info("自动审批退款成功: refundNo={}", refundNo);
+                            // }
                             
                         } catch (Exception e) {
                             log.error("创建自动退款失败: orderId={}", orderId, e);
@@ -279,15 +294,22 @@ public class OrderRevertStrategy implements RevertStrategy {
         }
         
         // 2. 订单金额必须大于0
-        if (order.getTotalAmount() == null || 
-            order.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+        if (order.getAmount() == null ||
+            order.getAmount().compareTo(java.math.BigDecimal.ZERO) <= 0) {
             return false;
         }
         
-        // 3. TODO: 检查是否已经退款
-        // if (refundService.hasRefund(order.getOrderNo())) {
-        //     return false;
-        // }
+        // 3. 检查是否已经退款
+        try {
+            var existingRefund = refundRequestRepository.findByOrderNo(order.getOrderNo());
+            if (existingRefund.isPresent()) {
+                log.debug("订单已存在退款申请，跳过自动退款: orderNo={}, refundNo={}", 
+                         order.getOrderNo(), existingRefund.get().getRefundNo());
+                return false;
+            }
+        } catch (Exception e) {
+            log.warn("检查退款状态失败，继续处理: orderNo={}", order.getOrderNo(), e);
+        }
         
         return true;
     }
