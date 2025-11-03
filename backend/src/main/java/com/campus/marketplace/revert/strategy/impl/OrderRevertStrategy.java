@@ -25,6 +25,8 @@ public class OrderRevertStrategy implements RevertStrategy {
     
     private final OrderRepository orderRepository;
     private final com.campus.marketplace.service.CacheService cacheService;
+    private final com.campus.marketplace.service.PaymentService paymentService;
+    private final com.campus.marketplace.service.RefundService refundService;
     
     @Override
     public String getSupportedEntityType() {
@@ -220,7 +222,74 @@ public class OrderRevertStrategy implements RevertStrategy {
             log.error("清除订单缓存失败，但不影响撤销结果: orderId={}", auditLog.getEntityId(), e);
         }
         
+        // 处理自动退款（如果撤销结果标记需要退款）
+        try {
+            String additionalData = (String) result.getAdditionalData();
+            if (additionalData != null && additionalData.contains("退款")) {
+                Long orderId = auditLog.getEntityId();
+                
+                // 查询订单信息
+                var orderOpt = orderRepository.findById(orderId);
+                if (orderOpt.isPresent()) {
+                    var order = orderOpt.get();
+                    
+                    // 检查订单是否需要退款处理
+                    if (shouldProcessRefund(order)) {
+                        // 创建退款申请
+                        try {
+                            String refundNo = refundService.applyRefund(
+                                order.getOrderNo(),
+                                "订单撤销导致的自动退款",
+                                java.util.Map.of(
+                                    "reason", "REVERT_OPERATION",
+                                    "auditLogId", auditLog.getId().toString(),
+                                    "revertLogId", revertAuditLog.getId().toString()
+                                )
+                            );
+                            
+                            log.info("自动创建退款申请: orderId={}, refundNo={}", orderId, refundNo);
+                            
+                            // TODO: 自动审批退款（需要管理员权限）
+                            // refundService.approveAndRefund(refundNo);
+                            
+                        } catch (Exception e) {
+                            log.error("创建自动退款失败: orderId={}", orderId, e);
+                            // 不阻塞撤销流程，退款失败需要人工处理
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("处理自动退款失败: orderId={}", auditLog.getEntityId(), e);
+        }
+        
         log.info("订单撤销后处理完成: orderId={}", auditLog.getEntityId());
+    }
+    
+    /**
+     * 判断订单是否需要退款处理
+     */
+    private boolean shouldProcessRefund(com.campus.marketplace.common.entity.Order order) {
+        // 1. 订单状态必须是已支付或更后的状态
+        var status = order.getStatus();
+        if (status != com.campus.marketplace.common.enums.OrderStatus.PAID &&
+            status != com.campus.marketplace.common.enums.OrderStatus.COMPLETED &&
+            status != com.campus.marketplace.common.enums.OrderStatus.REVIEWED) {
+            return false;
+        }
+        
+        // 2. 订单金额必须大于0
+        if (order.getTotalAmount() == null || 
+            order.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            return false;
+        }
+        
+        // 3. TODO: 检查是否已经退款
+        // if (refundService.hasRefund(order.getOrderNo())) {
+        //     return false;
+        // }
+        
+        return true;
     }
     
     @Override
