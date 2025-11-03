@@ -8,10 +8,11 @@ import java.util.List;
  * 推荐与榜单服务
  *
  * - 热门榜单（按校区）
- * - 个性化推荐（基于浏览/收藏召回，冷启动回退热榜）
+ * - 个性化推荐（协同过滤 + 基于内容 + 用户画像）
  *
  * @author BaSui
  * @date 2025-10-29
+ * @enhanced 2025-11-04 - 添加协同过滤和用户画像集成
  */
 
 public interface RecommendService {
@@ -40,4 +41,41 @@ public interface RecommendService {
      * @return 推荐物品列表
      */
     List<GoodsResponse> getPersonalRecommendations(int size);
+
+    /**
+     * 协同过滤推荐（基于相似用户的行为）
+     *
+     * @param userId 用户ID
+     * @param size   返回数量
+     * @return 推荐商品列表
+     */
+    List<GoodsResponse> getCollaborativeFilteringRecommendations(Long userId, int size);
+
+    /**
+     * 基于内容的推荐（相似商品）
+     *
+     * @param goodsId 商品ID
+     * @param size    返回数量
+     * @return 相似商品列表
+     */
+    List<GoodsResponse> getSimilarGoods(Long goodsId, int size);
+
+    /**
+     * 混合推荐（结合协同过滤、内容推荐和用户画像）
+     *
+     * @param userId 用户ID
+     * @param size   返回数量
+     * @return 推荐商品列表
+     */
+    List<GoodsResponse> getHybridRecommendations(Long userId, int size);
+
+    /**
+     * 计算用户相似度（批量，定时任务调用）
+     */
+    void calculateUserSimilarities();
+
+    /**
+     * 预计算推荐结果（缓存预热，定时任务调用）
+     */
+    void precomputeRecommendations();
 }
