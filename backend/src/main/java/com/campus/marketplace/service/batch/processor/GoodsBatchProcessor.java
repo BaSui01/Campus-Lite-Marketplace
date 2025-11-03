@@ -3,7 +3,6 @@ package com.campus.marketplace.service.batch.processor;
 import com.campus.marketplace.common.dto.request.GoodsBatchRequest;
 import com.campus.marketplace.common.entity.BatchTaskItem;
 import com.campus.marketplace.common.entity.Goods;
-import com.campus.marketplace.common.enums.BatchOperationType;
 import com.campus.marketplace.common.enums.BatchType;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.utils.SecurityUtil;

@@ -132,6 +132,12 @@ public class AuditLog extends BaseEntity {
     private Boolean isReversible = false;
 
     /**
+     * 撤销截止时间（超过此时间不可撤销）
+     */
+    @Column(name = "revert_deadline")
+    private LocalDateTime revertDeadline;
+
+    /**
      * 撤销操作的审计日志ID
      */
     @Column(name = "reverted_by_log_id")
@@ -142,4 +148,28 @@ public class AuditLog extends BaseEntity {
      */
     @Column(name = "reverted_at")
     private LocalDateTime revertedAt;
+
+    /**
+     * 撤销次数（支持多次撤销和重做）
+     */
+    @Column(name = "revert_count")
+    @Builder.Default
+    private Integer revertCount = 0;
+
+    /**
+     * 检查是否在撤销期限内
+     */
+    public boolean isWithinRevertDeadline() {
+        if (revertDeadline == null) {
+            return false;
+        }
+        return LocalDateTime.now().isBefore(revertDeadline);
+    }
+
+    /**
+     * 检查是否已被撤销
+     */
+    public boolean isReverted() {
+        return revertedByLogId != null && revertedAt != null;
+    }
 }

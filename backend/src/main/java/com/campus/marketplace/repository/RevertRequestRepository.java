@@ -1,0 +1,51 @@
+package com.campus.marketplace.repository;
+
+import com.campus.marketplace.common.entity.RevertRequest;
+import com.campus.marketplace.common.enums.RevertRequestStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * 撤销请求 Repository
+ * 
+ * @author BaSui
+ * @date 2025-11-03
+ */
+@Repository
+public interface RevertRequestRepository extends JpaRepository<RevertRequest, Long> {
+
+    /**
+     * 根据审计日志ID查询撤销请求
+     */
+    Optional<RevertRequest> findByAuditLogId(Long auditLogId);
+
+    /**
+     * 查询用户的撤销请求列表
+     */
+    Page<RevertRequest> findByRequesterIdOrderByCreatedAtDesc(Long requesterId, Pageable pageable);
+
+    /**
+     * 查询待审批的撤销请求
+     */
+    Page<RevertRequest> findByStatusOrderByCreatedAtAsc(RevertRequestStatus status, Pageable pageable);
+
+    /**
+     * 查询用户特定状态的请求
+     */
+    List<RevertRequest> findByRequesterIdAndStatus(Long requesterId, RevertRequestStatus status);
+
+    /**
+     * 统计用户的请求数量
+     */
+    long countByRequesterIdAndStatus(Long requesterId, RevertRequestStatus status);
+
+    /**
+     * 检查审计日志是否已有撤销请求
+     */
+    boolean existsByAuditLogId(Long auditLogId);
+}

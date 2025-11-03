@@ -6,7 +6,6 @@ import com.campus.marketplace.common.dto.request.InventoryBatchRequest;
 import com.campus.marketplace.common.dto.request.PriceBatchRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.enums.BatchType;
-import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.service.BatchLimitService;
 import com.campus.marketplace.service.BatchOperationService;

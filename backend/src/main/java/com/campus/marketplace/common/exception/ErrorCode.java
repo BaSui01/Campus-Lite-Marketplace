@@ -230,7 +230,12 @@ public enum ErrorCode {
     FOLLOW_NOT_FOUND(40409, "关注关系不存在"),
     SUBSCRIPTION_NOT_FOUND(40410, "订阅不存在"),
     PRIVACY_REQUEST_NOT_FOUND(40411, "隐私请求不存在"),
-    PRIVACY_REQUEST_CONFLICT(40013, "存在未处理的隐私请求");
+    PRIVACY_REQUEST_CONFLICT(40013, "存在未处理的隐私请求"),
+
+    /**
+     * 数据完整性错误
+     */
+    DATA_INTEGRITY_ERROR(50001, "数据完整性验证失败");
 
     /**
      * 错误码
