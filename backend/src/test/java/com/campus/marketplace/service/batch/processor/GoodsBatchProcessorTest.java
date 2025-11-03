@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -89,18 +90,26 @@ class GoodsBatchProcessorTest {
         when(goodsRepository.findById(goodsId)).thenReturn(Optional.of(goods));
         when(goodsRepository.save(any(Goods.class))).thenReturn(goods);
 
-        // Act
-        BatchProcessor.BatchItemResult result = processor.processItem(item);
+        // Act & Assert
+        try (MockedStatic<com.campus.marketplace.common.utils.SecurityUtil> securityUtil = 
+                mockStatic(com.campus.marketplace.common.utils.SecurityUtil.class)) {
+            securityUtil.when(com.campus.marketplace.common.utils.SecurityUtil::getCurrentUserId)
+                    .thenReturn(1L);
+            securityUtil.when(com.campus.marketplace.common.utils.SecurityUtil::getCurrentUsername)
+                    .thenReturn("admin");
 
-        // Assert
-        assertThat(result.success()).isTrue();
-        assertThat(result.message()).contains("上架成功");
-        verify(goodsRepository).save(argThat(g -> 
-            g.getStatus() == GoodsStatus.APPROVED
-        ));
-        verify(cacheService).delete("goods:" + goodsId);
-        verify(auditLogService).logEntityChange(anyLong(), anyString(), any(), anyString(), 
-            anyLong(), anyMap(), anyMap());
+            BatchProcessor.BatchItemResult result = processor.processItem(item);
+
+            // Assert
+            assertThat(result.success()).isTrue();
+            assertThat(result.message()).contains("上架成功");
+            verify(goodsRepository).save(argThat(g -> 
+                g.getStatus() == GoodsStatus.APPROVED
+            ));
+            verify(cacheService).delete("goods:" + goodsId);
+            verify(auditLogService).logEntityChange(anyLong(), anyString(), any(), anyString(), 
+                anyLong(), anyMap(), anyMap());
+        }
     }
 
     @Test
@@ -131,16 +140,24 @@ class GoodsBatchProcessorTest {
         when(goodsRepository.findById(goodsId)).thenReturn(Optional.of(goods));
         when(goodsRepository.save(any(Goods.class))).thenReturn(goods);
 
-        // Act
-        BatchProcessor.BatchItemResult result = processor.processItem(item);
+        // Act & Assert
+        try (MockedStatic<com.campus.marketplace.common.utils.SecurityUtil> securityUtil = 
+                mockStatic(com.campus.marketplace.common.utils.SecurityUtil.class)) {
+            securityUtil.when(com.campus.marketplace.common.utils.SecurityUtil::getCurrentUserId)
+                    .thenReturn(1L);
+            securityUtil.when(com.campus.marketplace.common.utils.SecurityUtil::getCurrentUsername)
+                    .thenReturn("admin");
 
-        // Assert
-        assertThat(result.success()).isTrue();
-        assertThat(result.message()).contains("下架成功");
-        verify(goodsRepository).save(argThat(g -> 
-            g.getStatus() == GoodsStatus.OFFLINE
-        ));
-        verify(cacheService).delete("goods:" + goodsId);
+            BatchProcessor.BatchItemResult result = processor.processItem(item);
+
+            // Assert
+            assertThat(result.success()).isTrue();
+            assertThat(result.message()).contains("下架成功");
+            verify(goodsRepository).save(argThat(g -> 
+                g.getStatus() == GoodsStatus.OFFLINE
+            ));
+            verify(cacheService).delete("goods:" + goodsId);
+        }
     }
 
     @Test
@@ -234,14 +251,22 @@ class GoodsBatchProcessorTest {
         when(goodsRepository.findById(goodsId)).thenReturn(Optional.of(goods));
         when(goodsRepository.save(any(Goods.class))).thenReturn(goods);
 
-        // Act
-        BatchProcessor.BatchItemResult result = processor.processItem(item);
+        // Act & Assert
+        try (MockedStatic<com.campus.marketplace.common.utils.SecurityUtil> securityUtil = 
+                mockStatic(com.campus.marketplace.common.utils.SecurityUtil.class)) {
+            securityUtil.when(com.campus.marketplace.common.utils.SecurityUtil::getCurrentUserId)
+                    .thenReturn(1L);
+            securityUtil.when(com.campus.marketplace.common.utils.SecurityUtil::getCurrentUsername)
+                    .thenReturn("admin");
 
-        // Assert
-        assertThat(result.success()).isTrue();
-        assertThat(result.message()).contains("删除成功");
-        verify(goodsRepository).save(argThat(Goods::isDeleted));
-        verify(cacheService).delete("goods:" + goodsId);
+            BatchProcessor.BatchItemResult result = processor.processItem(item);
+
+            // Assert
+            assertThat(result.success()).isTrue();
+            assertThat(result.message()).contains("删除成功");
+            verify(goodsRepository).save(argThat(Goods::isDeleted));
+            verify(cacheService).delete("goods:" + goodsId);
+        }
     }
 
     @Test
