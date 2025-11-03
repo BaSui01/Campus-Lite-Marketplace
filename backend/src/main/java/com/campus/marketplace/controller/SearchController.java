@@ -1,53 +1,129 @@
 package com.campus.marketplace.controller;
 
+import com.campus.marketplace.common.dto.SearchFilterDTO;
+import com.campus.marketplace.common.dto.SearchSuggestionDTO;
 import com.campus.marketplace.common.dto.response.ApiResponse;
-import com.campus.marketplace.common.dto.response.SearchResultItem;
+import com.campus.marketplace.common.dto.response.GoodsResponse;
+import com.campus.marketplace.common.entity.User;
+import com.campus.marketplace.common.exception.BusinessException;
+import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.utils.SecurityUtil;
+import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
- * Search Controller
- *
+ * 搜索控制器
+ * 
  * @author BaSui
- * @date 2025-10-29
+ * @date 2025-11-03
  */
-
+@Slf4j
 @RestController
 @RequestMapping("/api/search")
 @RequiredArgsConstructor
-@Validated
-@Tag(name = "搜索", description = "全文检索接口")
+@Tag(name = "搜索功能", description = "智能搜索相关接口")
 public class SearchController {
 
     private final SearchService searchService;
+    private final UserRepository userRepository;
 
-    @GetMapping
-    @Operation(summary = "全文检索", description = "支持 goods/post，两者默认 goods；关键词必填，返回高亮片段与排序")
-    public ApiResponse<Page<SearchResultItem>> search(
-            @Parameter(description = "搜索类型：goods/post，默认 goods", example = "goods")
-            @RequestParam(required = false) String type,
-            @Parameter(description = "搜索关键词（必填）", example = "耳机")
-            @RequestParam(name = "q") String q,
-            @Parameter(description = "页码，从0开始", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "每页大小", example = "20")
-            @RequestParam(defaultValue = "20") int size,
-            @Parameter(description = "标签 ID 列表（仅 goods 生效）", example = "1,2,3")
-            @RequestParam(name = "tags", required = false) java.util.List<Long> tagIds
+    @GetMapping("/suggestions")
+    @Operation(summary = "获取搜索建议")
+    public ApiResponse<SearchSuggestionDTO> getSearchSuggestions(
+        @Parameter(description = "关键词前缀") @RequestParam(required = false) String keyword
     ) {
-        if (q == null || q.isBlank()) {
-            throw new IllegalArgumentException("搜索关键词不能为空");
-        }
-        Page<SearchResultItem> result = searchService.search(type, q, page, size, tagIds);
+        Long userId = getCurrentUserIdOrNull();
+        SearchSuggestionDTO suggestions = searchService.getSearchSuggestions(userId, keyword);
+        return ApiResponse.success(suggestions);
+    }
+
+    @GetMapping("/goods")
+    @Operation(summary = "搜索商品")
+    public ApiResponse<Page<GoodsResponse>> searchGoods(
+        @Parameter(description = "搜索关键词") @RequestParam(required = false) String keyword,
+        @Parameter(description = "最低价格") @RequestParam(required = false) java.math.BigDecimal minPrice,
+        @Parameter(description = "最高价格") @RequestParam(required = false) java.math.BigDecimal maxPrice,
+        @Parameter(description = "分类ID") @RequestParam(required = false) Long categoryId,
+        @Parameter(description = "排序字段") @RequestParam(defaultValue = "createdAt") String sortBy,
+        @Parameter(description = "排序方向") @RequestParam(defaultValue = "DESC") String sortDirection,
+        @Parameter(description = "页码") @RequestParam(defaultValue = "0") int page,
+        @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int size
+    ) {
+        Long userId = getCurrentUserIdOrNull();
+        
+        SearchFilterDTO filter = SearchFilterDTO.builder()
+            .minPrice(minPrice)
+            .maxPrice(maxPrice)
+            .categoryId(categoryId)
+            .sortBy(sortBy)
+            .sortDirection(sortDirection)
+            .build();
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<GoodsResponse> result = searchService.searchGoods(keyword, filter, pageable, userId);
+        
         return ApiResponse.success(result);
+    }
+
+    @GetMapping("/hot-keywords")
+    @Operation(summary = "获取热门搜索词")
+    public ApiResponse<List<String>> getHotKeywords(
+        @Parameter(description = "返回数量") @RequestParam(defaultValue = "10") int limit
+    ) {
+        List<String> keywords = searchService.getHotKeywords(limit);
+        return ApiResponse.success(keywords);
+    }
+
+    @GetMapping("/history")
+    @Operation(summary = "获取我的搜索历史")
+    public ApiResponse<List<String>> getUserSearchHistory(
+        @Parameter(description = "返回数量") @RequestParam(defaultValue = "20") int limit
+    ) {
+        Long userId = getCurrentUserId();
+        List<String> history = searchService.getUserSearchHistory(userId, limit);
+        return ApiResponse.success(history);
+    }
+
+    @DeleteMapping("/history")
+    @Operation(summary = "清空搜索历史")
+    public ApiResponse<Void> clearSearchHistory() {
+        Long userId = getCurrentUserId();
+        searchService.clearUserSearchHistory(userId);
+        return ApiResponse.success();
+    }
+
+    /**
+     * 获取当前登录用户ID（可能为null）
+     */
+    private Long getCurrentUserIdOrNull() {
+        try {
+            String username = SecurityUtil.getCurrentUsername();
+            return userRepository.findByUsername(username)
+                .map(User::getId)
+                .orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取当前登录用户ID（必须登录）
+     */
+    private Long getCurrentUserId() {
+        String username = SecurityUtil.getCurrentUsername();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        return user.getId();
     }
 }

@@ -84,6 +84,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     );
 
     /**
+     * 查找指定状态且更新时间早于指定时间的订单
+     *
+     * 用于自动确认收货和异常订单检测
+     *
+     * @param status 订单状态
+     * @param updatedBefore 更新时间阈值
+     * @return 订单列表
+     */
+    @Query("SELECT o FROM Order o WHERE o.status = :status AND o.updatedAt < :updatedBefore")
+    List<Order> findByStatusAndUpdatedAtBefore(
+            @Param("status") OrderStatus status,
+            @Param("updatedBefore") LocalDateTime updatedBefore
+    );
+
+    /**
      * 按校区统计订单数量
      */
     long countByCampusId(Long campusId);

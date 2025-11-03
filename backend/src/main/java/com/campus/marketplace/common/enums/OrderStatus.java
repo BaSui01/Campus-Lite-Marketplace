@@ -22,6 +22,16 @@ public enum OrderStatus {
     PAID("已支付"),
     
     /**
+     * 已发货
+     */
+    SHIPPED("已发货"),
+    
+    /**
+     * 已送达（待确认收货）
+     */
+    DELIVERED("已送达"),
+    
+    /**
      * 已完成
      */
     COMPLETED("已完成"),
