@@ -1,6 +1,6 @@
 package com.campus.marketplace.service;
 
-import com.campus.marketplace.common.dto.request.CreateReplyRequest;
+import com.campus.marketplace.common.dto.request.CreatePostReplyRequest;
 import com.campus.marketplace.common.entity.Post;
 import com.campus.marketplace.common.entity.Reply;
 import com.campus.marketplace.common.entity.User;
@@ -61,7 +61,7 @@ class ReplyServiceTest {
     private MockedStatic<SecurityUtil> securityUtilMock;
     private User testUser;
     private Post testPost;
-    private CreateReplyRequest validRequest;
+    private CreatePostReplyRequest validRequest;
 
     @BeforeEach
     void setUp() {
@@ -83,7 +83,7 @@ class ReplyServiceTest {
                 .replyCount(0)
                 .build();
         testPost.setId(100L);
-        validRequest = new CreateReplyRequest(100L, "这是一个测试回复", null, null);
+        validRequest = new CreatePostReplyRequest(100L, "这是一个测试回复", null, null);
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
@@ -150,7 +150,7 @@ class ReplyServiceTest {
             reply.setId(200L);
             return reply;
         });
-        CreateReplyRequest requestWithBadWord = new CreateReplyRequest(100L, "包含傻逼的回复", null, null);
+        CreatePostReplyRequest requestWithBadWord = new CreatePostReplyRequest(100L, "包含傻逼的回复", null, null);
         Long replyId = replyService.createReply(requestWithBadWord);
         assertThat(replyId).isNotNull();
         ArgumentCaptor<Reply> replyCaptor = ArgumentCaptor.forClass(Reply.class);
@@ -172,7 +172,7 @@ class ReplyServiceTest {
     @Test
     @DisplayName("楼中楼回复")
     void createReply_SubReply() {
-        CreateReplyRequest subReplyRequest = new CreateReplyRequest(100L, "楼中楼回复", 50L, 2L);
+        CreatePostReplyRequest subReplyRequest = new CreatePostReplyRequest(100L, "楼中楼回复", 50L, 2L);
         Reply parentReply = Reply.builder().postId(100L).content("父回复").authorId(2L).build();
         parentReply.setId(50L);
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));

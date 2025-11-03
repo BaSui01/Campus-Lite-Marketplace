@@ -2,7 +2,7 @@ package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
 import com.campus.marketplace.common.config.TestSecurityConfig;
-import com.campus.marketplace.common.dto.request.CreateReplyRequest;
+import com.campus.marketplace.common.dto.request.CreatePostReplyRequest;
 import com.campus.marketplace.common.dto.response.ReplyResponse;
 import com.campus.marketplace.service.ReplyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +52,7 @@ class ReplyControllerTest {
     @DisplayName("学生创建回复成功")
     @WithMockUser(roles = "STUDENT")
     void createReply_success() throws Exception {
-        CreateReplyRequest request = new CreateReplyRequest(100L, "不错", null, null);
+        CreatePostReplyRequest request = new CreatePostReplyRequest(100L, "不错", null, null);
         when(replyService.createReply(request)).thenReturn(321L);
 
         mockMvc.perform(post("/api/replies")
@@ -69,7 +69,7 @@ class ReplyControllerTest {
     @DisplayName("非学生角色创建回复被拒绝")
     @WithMockUser(roles = "USER")
     void createReply_forbidden() throws Exception {
-        CreateReplyRequest request = new CreateReplyRequest(101L, "评论", null, null);
+        CreatePostReplyRequest request = new CreatePostReplyRequest(101L, "评论", null, null);
 
         mockMvc.perform(post("/api/replies")
                         .contentType("application/json")

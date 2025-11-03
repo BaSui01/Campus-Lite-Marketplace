@@ -1,6 +1,6 @@
 package com.campus.marketplace.controller;
 
-import com.campus.marketplace.common.dto.request.CreateReplyRequest;
+import com.campus.marketplace.common.dto.request.CreatePostReplyRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.ReplyResponse;
 import com.campus.marketplace.service.ReplyService;
@@ -42,7 +42,7 @@ public class ReplyController {
             required = true,
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = CreateReplyRequest.class),
+                    schema = @Schema(implementation = CreatePostReplyRequest.class),
                     examples = @ExampleObject(
                             name = "请求示例",
                             value = """
@@ -57,7 +57,7 @@ public class ReplyController {
             )
     )
     @RateLimit(key = "reply:create", maxRequests = 15, timeWindow = 60)
-    public ApiResponse<Long> createReply(@Valid @RequestBody CreateReplyRequest request) {
+    public ApiResponse<Long> createReply(@Valid @RequestBody CreatePostReplyRequest request) {
         Long replyId = replyService.createReply(request);
         return ApiResponse.success(replyId);
     }

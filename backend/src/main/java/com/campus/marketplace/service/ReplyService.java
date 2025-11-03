@@ -1,6 +1,6 @@
 package com.campus.marketplace.service;
 
-import com.campus.marketplace.common.dto.request.CreateReplyRequest;
+import com.campus.marketplace.common.dto.request.CreatePostReplyRequest;
 import com.campus.marketplace.common.dto.response.ReplyResponse;
 import org.springframework.data.domain.Page;
 
@@ -20,7 +20,7 @@ public interface ReplyService {
      * @param request 回复请求
      * @return 回复 ID
      */
-    Long createReply(CreateReplyRequest request);
+    Long createReply(CreatePostReplyRequest request);
 
     /**
      * 查询帖子的回复列表

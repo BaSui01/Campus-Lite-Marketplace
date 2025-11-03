@@ -1,6 +1,6 @@
 package com.campus.marketplace.service.impl;
 
-import com.campus.marketplace.common.dto.request.CreateReplyRequest;
+import com.campus.marketplace.common.dto.request.CreatePostReplyRequest;
 import com.campus.marketplace.common.dto.response.ReplyResponse;
 import com.campus.marketplace.common.entity.Post;
 import com.campus.marketplace.common.entity.Reply;
@@ -52,7 +52,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long createReply(CreateReplyRequest request) {
+    public Long createReply(CreatePostReplyRequest request) {
         log.info("用户回复帖子: postId={}, contentLength={}", request.postId(), request.content().length());
 
         String username = SecurityUtil.getCurrentUsername();
