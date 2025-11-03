@@ -102,4 +102,29 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * 按校区统计订单数量
      */
     long countByCampusId(Long campusId);
+
+    /**
+     * 统计卖家指定状态的订单数量
+     * 
+     * @param sellerId 卖家ID
+     * @param status 订单状态
+     * @return 订单数量
+     */
+    long countBySellerIdAndStatus(Long sellerId, OrderStatus status);
+
+    /**
+     * 统计卖家的总订单数量
+     * 
+     * @param sellerId 卖家ID
+     * @return 订单数量
+     */
+    long countBySellerId(Long sellerId);
+
+    /**
+     * 根据商品ID查询所有订单
+     * 
+     * @param goodsId 商品ID
+     * @return 订单列表
+     */
+    List<Order> findByGoodsId(Long goodsId);
 }

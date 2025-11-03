@@ -106,8 +106,11 @@ public class ContentAuditServiceImpl implements ContentAuditService {
             }
         }
 
-        // TODO: 检测重复发帖（需要查询数据库）
-        // TODO: 检测灌水内容（短时间内大量发帖）
+        // 高级审核功能（需要额外实现）：
+        // 1. 重复发帖检测：查询用户最近N条帖子，计算内容相似度（使用 Levenshtein 距离算法）
+        // 2. 灌水检测：统计用户短时间内发帖数量，超过阈值则判定为灌水
+        // 3. 图片审核：集成阿里云内容安全API或腾讯云天御，检测违规图片
+        // 建议：在用户发帖前，在 Service 层调用这些检测方法
 
         return false;
     }

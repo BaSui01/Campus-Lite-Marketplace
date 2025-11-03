@@ -1,5 +1,6 @@
 package com.campus.marketplace.common.config;
 
+import com.campus.marketplace.websocket.DisputeWebSocketHandler;
 import com.campus.marketplace.websocket.MessageWebSocketHandler;
 import com.campus.marketplace.websocket.WebSocketAuthInterceptor;
 import org.junit.jupiter.api.DisplayName;
@@ -12,29 +13,41 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@DisplayName("WebSocketConfig 测试")
+@DisplayName("WebSocketConfig Test")
 class WebSocketConfigTest {
 
     @Test
-    @DisplayName("注册消息处理器并启用 SockJS 降级")
+    @DisplayName("Register both message and dispute handlers")
     void registerWebSocketHandlers_success() {
-        MessageWebSocketHandler handler = mock(MessageWebSocketHandler.class);
+        MessageWebSocketHandler messageHandler = mock(MessageWebSocketHandler.class);
+        DisputeWebSocketHandler disputeHandler = mock(DisputeWebSocketHandler.class);
         WebSocketAuthInterceptor interceptor = mock(WebSocketAuthInterceptor.class);
         WebSocketHandlerRegistry registry = mock(WebSocketHandlerRegistry.class);
-        WebSocketHandlerRegistration registration = mock(WebSocketHandlerRegistration.class);
+        WebSocketHandlerRegistration messageRegistration = mock(WebSocketHandlerRegistration.class);
+        WebSocketHandlerRegistration disputeRegistration = mock(WebSocketHandlerRegistration.class);
         SockJsServiceRegistration sockJs = mock(SockJsServiceRegistration.class);
 
-        when(registry.addHandler(handler, "/ws/message")).thenReturn(registration);
-        when(registration.addInterceptors(interceptor)).thenReturn(registration);
-        when(registration.setAllowedOrigins("*")).thenReturn(registration);
-        when(registration.withSockJS()).thenReturn(sockJs);
+        when(registry.addHandler(messageHandler, "/ws/message")).thenReturn(messageRegistration);
+        when(messageRegistration.addInterceptors(interceptor)).thenReturn(messageRegistration);
+        when(messageRegistration.setAllowedOrigins("*")).thenReturn(messageRegistration);
+        when(messageRegistration.withSockJS()).thenReturn(sockJs);
 
-        WebSocketConfig config = new WebSocketConfig(handler, interceptor);
+        when(registry.addHandler(disputeHandler, "/ws/dispute")).thenReturn(disputeRegistration);
+        when(disputeRegistration.addInterceptors(interceptor)).thenReturn(disputeRegistration);
+        when(disputeRegistration.setAllowedOrigins("*")).thenReturn(disputeRegistration);
+        when(disputeRegistration.withSockJS()).thenReturn(sockJs);
+
+        WebSocketConfig config = new WebSocketConfig(messageHandler, disputeHandler, interceptor);
         config.registerWebSocketHandlers(registry);
 
-        verify(registry).addHandler(handler, "/ws/message");
-        verify(registration).addInterceptors(interceptor);
-        verify(registration).setAllowedOrigins("*");
-        verify(registration).withSockJS();
+        verify(registry).addHandler(messageHandler, "/ws/message");
+        verify(messageRegistration).addInterceptors(interceptor);
+        verify(messageRegistration).setAllowedOrigins("*");
+        verify(messageRegistration).withSockJS();
+
+        verify(registry).addHandler(disputeHandler, "/ws/dispute");
+        verify(disputeRegistration).addInterceptors(interceptor);
+        verify(disputeRegistration).setAllowedOrigins("*");
+        verify(disputeRegistration).withSockJS();
     }
 }

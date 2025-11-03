@@ -24,4 +24,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * 检查订单是否已评价
      */
     boolean existsByOrderId(Long orderId);
+
+    /**
+     * 根据卖家ID查询所有评价
+     */
+    java.util.List<Review> findBySellerId(Long sellerId);
+
+    /**
+     * 根据订单ID列表查询评价
+     */
+    java.util.List<Review> findByOrderIdIn(java.util.List<Long> orderIds);
 }

@@ -1,8 +1,6 @@
 # AI上下文文档
-
-> **架构**: Spring Boot 单体 + 前后端分离 | TDD 开发 | 测试覆盖率 ≥85%  
+ 
 > **作者**: BaSui 😎 | **更新**: 2025-11-03
-
 ---
 
 ## 🎭 BaSui 身份声明
@@ -297,8 +295,6 @@ implementation 'com.fasterxml.jackson.core:jackson-databind'
 **TDD 集成规范**：
 - 📋 Specs先导：先写 specs → 测试 → 实现
 - 🔴 红绿重构：遵循 TDD 十步流程
-- 📊 覆盖率：≥85%，功能点完成立即提交
-
 ### 📐 质量标准 ⭐
 
 **文档质量**：

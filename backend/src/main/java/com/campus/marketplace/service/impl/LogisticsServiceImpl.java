@@ -19,11 +19,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 物流服务实现类
@@ -311,18 +309,42 @@ public class LogisticsServiceImpl implements LogisticsService {
      * @return 平均送达时长（小时）
      */
     private Double calculateAverageDeliveryTime(LogisticsCompany company, LocalDateTime startDate, LocalDateTime endDate) {
-        // TODO: 从数据库查询所有已签收的物流记录，计算平均送达时长
-        // 暂时返回模拟数据
-        return switch (company) {
-            case SHUNFENG -> 24.0;
-            case ZHONGTONG -> 48.0;
-            case YUANTONG -> 48.0;
-            case YUNDA -> 48.0;
-            case EMS -> 72.0;
-            case JINGDONG -> 24.0;
-            case DEBANG -> 72.0;
-            case SHENTONG -> 48.0;
-        };
+        // 查询指定快递公司在时间范围内已签收的物流记录
+        List<Logistics> deliveredLogistics = logisticsRepository.findDeliveredLogistics(
+                company,
+                LogisticsStatus.DELIVERED,
+                startDate,
+                endDate
+        );
+
+        // 如果没有已签收的物流记录，返回0.0
+        if (deliveredLogistics.isEmpty()) {
+            log.debug("快递公司{}在时间范围内没有已签收的物流记录", company);
+            return 0.0;
+        }
+
+        // 计算平均送达时长（小时）
+        double totalHours = 0.0;
+        int validCount = 0;
+
+        for (Logistics logistics : deliveredLogistics) {
+            if (logistics.getCreatedAt() != null && logistics.getActualDeliveryTime() != null) {
+                Duration duration = Duration.between(logistics.getCreatedAt(), logistics.getActualDeliveryTime());
+                totalHours += duration.toHours();
+                validCount++;
+            }
+        }
+
+        // 如果没有有效的记录，返回0.0
+        if (validCount == 0) {
+            log.debug("快递公司{}在时间范围内没有有效的送达时长数据", company);
+            return 0.0;
+        }
+
+        double averageHours = totalHours / validCount;
+        log.debug("快递公司{}的平均送达时长：{}小时（基于{}条记录）", company, averageHours, validCount);
+
+        return averageHours;
     }
 
     /**

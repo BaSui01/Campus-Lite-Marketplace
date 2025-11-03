@@ -1,5 +1,6 @@
 package com.campus.marketplace.controller;
 
+import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.SearchService;
 import com.campus.marketplace.common.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,10 +23,13 @@ class SearchControllerValidationTest {
     @Mock
     private SearchService searchService;
 
+    @Mock
+    private UserRepository userRepository;
+
     @BeforeEach
     void setup() {
         this.mockMvc = MockMvcBuilders
-                .standaloneSetup(new SearchController(searchService))
+                .standaloneSetup(new SearchController(searchService, userRepository))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
@@ -33,7 +37,9 @@ class SearchControllerValidationTest {
     @Test
     @DisplayName("空关键词应返回400")
     void emptyQueryReturnsBadRequest() throws Exception {
-        mockMvc.perform(get("/api/search").param("q", ""))
+        mockMvc.perform(get("/api/search")
+                        .param("type", "goods")
+                        .param("keyword", ""))
                 .andExpect(status().isBadRequest());
     }
 }

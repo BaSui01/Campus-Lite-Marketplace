@@ -3,13 +3,24 @@ package com.campus.marketplace.service.impl;
 import com.campus.marketplace.common.dto.SearchFilterDTO;
 import com.campus.marketplace.common.dto.SearchSuggestionDTO;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
+import com.campus.marketplace.common.dto.response.SearchResultItem;
 import com.campus.marketplace.common.entity.Goods;
 import com.campus.marketplace.common.entity.SearchHistory;
 import com.campus.marketplace.common.entity.SearchKeyword;
+import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.GoodsStatus;
+import com.campus.marketplace.common.exception.BusinessException;
+import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.GoodsRepository;
+import com.campus.marketplace.repository.GoodsTagRepository;
+import com.campus.marketplace.repository.PostRepository;
 import com.campus.marketplace.repository.SearchHistoryRepository;
 import com.campus.marketplace.repository.SearchKeywordRepository;
+import com.campus.marketplace.repository.SearchLogRepository;
+import com.campus.marketplace.repository.UserRepository;
+import com.campus.marketplace.repository.projection.GoodsSearchProjection;
+import com.campus.marketplace.repository.projection.PostSearchProjection;
 import com.campus.marketplace.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +39,9 @@ import java.util.stream.Collectors;
 
 /**
  * 搜索服务实现类
- * 
+ *
+ * 支持 FTS 全文搜索（商品+帖子）和简化版商品搜索
+ *
  * @author BaSui
  * @date 2025-11-03
  */
@@ -38,8 +51,153 @@ import java.util.stream.Collectors;
 public class SearchServiceImpl implements SearchService {
 
     private final GoodsRepository goodsRepository;
+    private final GoodsTagRepository goodsTagRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final SearchHistoryRepository searchHistoryRepository;
     private final SearchKeywordRepository searchKeywordRepository;
+    private final SearchLogRepository searchLogRepository;
+
+    @Override
+    public Page<SearchResultItem> search(String type, String keyword, int page, int size, List<Long> tagIds) {
+        // 参数校验
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new IllegalArgumentException("搜索关键词不能为空");
+        }
+
+        // 标签数量限制（最多10个）
+        if (tagIds != null && tagIds.size() > 10) {
+            throw new BusinessException(ErrorCode.INVALID_PARAMETER, "标签数量不能超过10个");
+        }
+
+        // 获取当前用户的校区ID
+        Long campusId = getCurrentUserCampusId();
+
+        // 创建分页参数
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 根据类型执行不同的搜索
+        Page<SearchResultItem> result;
+        if ("goods".equalsIgnoreCase(type)) {
+            result = searchGoods(keyword.trim(), campusId, tagIds, pageable);
+        } else if ("post".equalsIgnoreCase(type)) {
+            result = searchPosts(keyword.trim(), campusId, pageable);
+        } else {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "不支持的搜索类型: " + type);
+        }
+
+        // 记录搜索日志（异步）
+        recordSearchLog(keyword.trim(), type, (int) result.getTotalElements());
+
+        log.info("搜索完成: type={}, keyword=, campusId={}, totalElements={}",
+                type, keyword, campusId, result.getTotalElements());
+
+        return result;
+    }
+
+    /**
+     * 搜索商品（FTS）
+     */
+    private Page<SearchResultItem> searchGoods(String keyword, Long campusId, List<Long> tagIds, Pageable pageable) {
+        Page<GoodsSearchProjection> goodsPage;
+
+        if (tagIds != null && !tagIds.isEmpty()) {
+            // 先根据标签筛选商品ID
+            List<Long> goodsIds = goodsTagRepository.findGoodsIdsByAllTagIds(tagIds, (long) tagIds.size());
+
+            if (goodsIds.isEmpty()) {
+                // 没有匹配的商品，返回空页
+                return Page.empty(pageable);
+            }
+
+            // 使用标签筛选后的商品ID进行FTS搜索
+            Long[] goodsIdsArray = goodsIds.toArray(new Long[0]);
+            goodsPage = goodsRepository.searchGoodsFtsWithIds(keyword, campusId, goodsIdsArray, pageable);
+        } else {
+            // 直接FTS搜索
+            goodsPage = goodsRepository.searchGoodsFts(keyword, campusId, pageable);
+        }
+
+        // 转换为 SearchResultItem
+        List<SearchResultItem> items = goodsPage.getContent().stream()
+                .map(projection -> SearchResultItem.builder()
+                        .type("GOODS")
+                        .id(projection.getId())
+                        .title(projection.getTitle())
+                        .snippet(projection.getSnippet())
+                        .price(projection.getPrice())
+                        .campusId(projection.getCampusId())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(items, pageable, goodsPage.getTotalElements());
+    }
+
+    /**
+     * 搜索帖子（FTS）
+     */
+    private Page<SearchResultItem> searchPosts(String keyword, Long campusId, Pageable pageable) {
+        Page<PostSearchProjection> postPage = postRepository.searchPostsFts(keyword, campusId, pageable);
+
+        // 转换为 SearchResultItem
+        List<SearchResultItem> items = postPage.getContent().stream()
+                .map(projection -> SearchResultItem.builder()
+                        .type("POST")
+                        .id(projection.getId())
+                        .title(projection.getTitle())
+                        .snippet(projection.getSnippet())
+                        .price(null) // 帖子没有价格
+                        .campusId(projection.getCampusId())
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(items, pageable, postPage.getTotalElements());
+    }
+
+    /**
+     * 获取当前用户的校区ID
+     */
+    private Long getCurrentUserCampusId() {
+        try {
+            // 检查是否有跨校区权限
+            if (SecurityUtil.hasAuthority("system:campus:cross")) {
+                return null; // 返回null表示不限制校区
+            }
+
+            // 获取当前用户的校区ID
+            String username = SecurityUtil.getCurrentUsername();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+            return user.getCampusId();
+        } catch (Exception e) {
+            log.warn("获取用户校区ID失败，使用默认校区: {}", e.getMessage());
+            return null; // 未登录或获取失败时不限制校区
+        }
+    }
+
+    /**
+     * 记录搜索日志（异步）
+     */
+    private void recordSearchLog(String keyword, String type, int resultCount) {
+        try {
+            String username = SecurityUtil.getCurrentUsername();
+            Long campusId = getCurrentUserCampusId();
+
+            SearchLog searchLog = SearchLog.builder()
+                    .username(username)
+                    .keyword(keyword)
+                    .campusId(campusId)
+                    .resultCount((long) resultCount)
+                    .build();
+
+            searchLogRepository.save(searchLog);
+            log.debug("搜索日志保存成功: username={}, keyword={}, type={}, resultCount={}",
+                    username, keyword, type, resultCount);
+        } catch (Exception e) {
+            log.warn("记录搜索日志失败: {}", e.getMessage());
+        }
+    }
 
     @Override
     public SearchSuggestionDTO getSearchSuggestions(Long userId, String keyword) {
@@ -98,7 +256,6 @@ public class SearchServiceImpl implements SearchService {
             goodsList = goodsRepository.findByStatus(GoodsStatus.APPROVED, pageable).getContent();
         } else {
             // 根据关键词搜索（简化版：标题或描述包含关键词）
-            String searchKeyword = "%" + keyword.trim() + "%";
             goodsList = goodsRepository.findAll().stream()
                 .filter(g -> g.getStatus() == GoodsStatus.APPROVED)
                 .filter(g -> (g.getTitle() != null && g.getTitle().toLowerCase().contains(keyword.toLowerCase()))

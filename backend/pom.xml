@@ -321,6 +321,13 @@
             <version>0.2.8</version>
         </dependency>
 
+        <!-- jieba 中文分词（NLP - 用于评价标签提取） -->
+        <dependency>
+            <groupId>com.huaban</groupId>
+            <artifactId>jieba-analysis</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
         <!-- 测试依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

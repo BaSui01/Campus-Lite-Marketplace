@@ -55,8 +55,9 @@ public class CommunityServiceImpl implements CommunityService {
             throw new BusinessException(ErrorCode.INVALID_PARAMETER, "话题标签最多3个");
         }
 
-        Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        if (!postRepository.existsById(postId)) {
+            throw new BusinessException(ErrorCode.POST_NOT_FOUND);
+        }
 
         // 先删除现有标签
         topicTagRepository.deleteByPostId(postId);
@@ -158,8 +159,9 @@ public class CommunityServiceImpl implements CommunityService {
     public void collectPost(Long postId, Long userId) {
         log.info("收藏帖子: postId={}, userId={}", postId, userId);
 
-        Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        if (!postRepository.existsById(postId)) {
+            throw new BusinessException(ErrorCode.POST_NOT_FOUND);
+        }
 
         if (postCollectRepository.existsByPostIdAndUserId(postId, userId)) {
             throw new BusinessException(ErrorCode.OPERATION_FAILED, "已经收藏过了");

@@ -36,6 +36,7 @@ public class RevertServiceImpl implements RevertService {
     private final RevertStrategyFactory strategyFactory;
     private final RevertNotificationService notificationService;
     private final com.campus.marketplace.service.AuditLogService auditLogService;
+    private final com.campus.marketplace.repository.UserRepository userRepository;
 
     @Override
     @Transactional
@@ -108,9 +109,13 @@ public class RevertServiceImpl implements RevertService {
             if (result.isSuccess()) {
                 // 记录撤销操作的审计日志
                 try {
+                    String approverUsername = userRepository.findById(approverId)
+                        .map(com.campus.marketplace.common.entity.User::getUsername)
+                        .orElse("SYSTEM");
+                    
                     auditLogService.logReversibleAction(
                         approverId,
-                        "SYSTEM", // 审批人用户名（TODO: 从UserService获取）
+                        approverUsername,
                         com.campus.marketplace.common.enums.AuditActionType.UPDATE,
                         auditLog.getTargetType() + "_REVERT",
                         auditLog.getEntityId(),

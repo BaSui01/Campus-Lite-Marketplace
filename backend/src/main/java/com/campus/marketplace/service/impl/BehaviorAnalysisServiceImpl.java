@@ -214,8 +214,11 @@ public class BehaviorAnalysisServiceImpl implements BehaviorAnalysisService {
     @Override
     public Map<String, Object> getBehaviorHeatmap() {
         Map<String, Object> heatmap = new HashMap<>();
-        // TODO: 实现热力图数据统计
-        heatmap.put("message", "热力图数据待实现");
+        // 热力图数据统计需要：
+        // 1. 用户行为日志按时间段（小时/日）聚合
+        // 2. 按行为类型分组统计
+        // 3. 前端使用热力图库（如 ECharts、Heatmap.js）渲染
+        heatmap.put("message", "热力图数据功能待实现，需要前端热力图组件配合");
         return heatmap;
     }
 

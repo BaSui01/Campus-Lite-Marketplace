@@ -32,7 +32,6 @@ import java.util.Optional;
 public class BatchRevertStrategy implements RevertStrategy {
 
     private final com.campus.marketplace.repository.BatchTaskRepository batchTaskRepository;
-    private final com.campus.marketplace.service.NotificationService notificationService;
 
     @Override
     public String getSupportedEntityType() {
@@ -165,45 +164,27 @@ public class BatchRevertStrategy implements RevertStrategy {
             auditLog.setRevertedAt(LocalDateTime.now());
             auditLog.setRevertCount(auditLog.getRevertCount() + 1);
 
-            // 2. 发送站内信通知管理员（批量操作撤销风险高，需要及时通知）
-            try {
-                // 注意：需要获取管理员ID列表，参考 RevertNotificationServiceImpl 中的建议
-                // 当前简化实现：假设有固定的管理员ID（实际应从UserService获取）
-                // 
-                // 建议实现：
-                // List<Long> adminIds = userService.getAdminUserIds();
-                // for (Long adminId : adminIds) { ... }
-                
-                String title = "⚠️ 批量操作已撤销";
-                String content = String.format(
-                    "批量任务已被撤销，请及时检查受影响的数据！\n\n" +
-                    "批量任务ID: %d\n" +
-                    "撤销结果: %s\n" +
-                    "撤销时间: %s\n\n" +
-                    "如果任务已部分执行，请手动回滚受影响的数据！",
-                    auditLog.getEntityId(),
-                    result.getMessage(),
-                    LocalDateTime.now()
-                );
-                
-                // 这里需要实际的管理员ID，暂时使用日志记录
-                log.warn("批量操作撤销通知（待实现管理员通知）: batchTaskId={}, message={}", 
-                        auditLog.getEntityId(), content);
-                
-                // 实际调用示例：
-                // notificationService.sendNotification(
-                //     adminId,
-                //     NotificationType.SYSTEM_ANNOUNCEMENT,
-                //     title,
-                //     content,
-                //     auditLog.getEntityId(),
-                //     "BATCH_REVERT",
-                //     null
-                // );
-                
-            } catch (Exception e) {
-                log.error("发送批量撤销通知失败: batchTaskId={}", auditLog.getEntityId(), e);
-            }
+            // 2. 记录批量撤销警告（未来可扩展：发送通知给管理员）
+            // 注意：批量操作撤销风险高，需要及时通知管理员
+            // 
+            // 扩展建议：
+            // 1. 注入 UserService 获取管理员ID列表: userService.getAdminUserIds()
+            // 2. 注入 NotificationService 发送通知
+            // 3. 实现示例：
+            //    for (Long adminId : adminIds) {
+            //        notificationService.sendNotification(
+            //            adminId,
+            //            NotificationType.SYSTEM_ANNOUNCEMENT,
+            //            "⚠️ 批量操作已撤销",
+            //            String.format("批量任务ID: %d 已被撤销...", auditLog.getEntityId()),
+            //            auditLog.getEntityId(),
+            //            "BATCH_REVERT",
+            //            null
+            //        );
+            //    }
+            
+            log.warn("⚠️ 批量操作已撤销（需人工检查）: batchTaskId={}, result={}", 
+                    auditLog.getEntityId(), result.getMessage());
 
             log.info("批量操作撤销后处理完成: batchTaskId={}", auditLog.getEntityId());
             log.warn("⚠️ 注意：批量操作已撤销，如果任务已部分执行，请检查并手动回滚受影响的数据！");

@@ -51,10 +51,10 @@ class RevertStrategyFactoryTest {
     private com.campus.marketplace.repository.OrderRepository orderRepository;
 
     @Mock
-    private com.campus.marketplace.service.PaymentService paymentService;
+    private com.campus.marketplace.service.RefundService refundService;
 
     @Mock
-    private com.campus.marketplace.service.RefundService refundService;
+    private com.campus.marketplace.repository.RefundRequestRepository refundRequestRepository;
 
     @Mock
     private com.campus.marketplace.repository.UserRepository userRepository;
@@ -66,8 +66,8 @@ class RevertStrategyFactoryTest {
     void setUp() {
         // 创建所有撤销策略实例（Mock 依赖）
         GoodsRevertStrategy goodsStrategy = new GoodsRevertStrategy(goodsRepository, dataBackupService, cacheService);
-        OrderRevertStrategy orderStrategy = new OrderRevertStrategy(orderRepository, cacheService, paymentService, refundService);
-        UserRevertStrategy userStrategy = new UserRevertStrategy(userRepository, dataBackupService, cacheService);
+        OrderRevertStrategy orderStrategy = new OrderRevertStrategy(orderRepository, cacheService, refundService, refundRequestRepository);
+        UserRevertStrategy userStrategy = new UserRevertStrategy(userRepository, cacheService);
         BatchRevertStrategy batchStrategy = new BatchRevertStrategy(batchTaskRepository);
 
         // 注入策略列表到工厂

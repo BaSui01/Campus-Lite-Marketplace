@@ -38,6 +38,20 @@ public class SearchController {
     private final SearchService searchService;
     private final UserRepository userRepository;
 
+    @GetMapping
+    @Operation(summary = "全文搜索（FTS）", description = "支持商品和帖子的全文搜索，支持标签筛选")
+    public ApiResponse<Page<com.campus.marketplace.common.dto.response.SearchResultItem>> search(
+        @Parameter(description = "搜索类型（goods/post）", required = true) @RequestParam String type,
+        @Parameter(description = "搜索关键词", required = true) @RequestParam String keyword,
+        @Parameter(description = "页码（从0开始）") @RequestParam(defaultValue = "0") int page,
+        @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int size,
+        @Parameter(description = "标签ID列表（可选，仅商品搜索支持）") @RequestParam(required = false) List<Long> tagIds
+    ) {
+        Page<com.campus.marketplace.common.dto.response.SearchResultItem> result =
+                searchService.search(type, keyword, page, size, tagIds);
+        return ApiResponse.success(result);
+    }
+
     @GetMapping("/suggestions")
     @Operation(summary = "获取搜索建议")
     public ApiResponse<SearchSuggestionDTO> getSearchSuggestions(

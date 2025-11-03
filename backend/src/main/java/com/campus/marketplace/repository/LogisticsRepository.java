@@ -107,7 +107,7 @@ public interface LogisticsRepository extends JpaRepository<Logistics, Long> {
      *
      * 注意：此方法使用 EXTRACT(EPOCH FROM ...) 函数，仅在 PostgreSQL 中有效。
      * H2 数据库不支持此语法，因此暂时注释。
-     * TODO: 后续在 Service 层实现时，使用 Java 代码计算平均送达时长。
+     * 建议：在 Service 层查询数据后，使用 Java 代码计算平均送达时长。
      *
      * @param company   快递公司
      * @param startDate 开始时间
@@ -123,4 +123,23 @@ public interface LogisticsRepository extends JpaRepository<Logistics, Long> {
     //         @Param("startDate") LocalDateTime startDate,
     //         @Param("endDate") LocalDateTime endDate
     // );
+    /**
+     * 查询指定快递公司在时间范围内已签收的物流记录
+     *
+     * @param company   快递公司
+     * @param startDate 开始时间
+     * @param endDate   结束时间
+     * @return 已签收的物流记录列表
+     */
+    @Query("SELECT l FROM Logistics l WHERE l.logisticsCompany = :company " +
+            "AND l.status = :status " +
+            "AND l.actualDeliveryTime IS NOT NULL " +
+            "AND l.createdAt BETWEEN :startDate AND :endDate")
+    List<Logistics> findDeliveredLogistics(
+            @Param("company") LogisticsCompany company,
+            @Param("status") LogisticsStatus status,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
 }

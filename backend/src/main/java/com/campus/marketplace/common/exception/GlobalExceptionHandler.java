@@ -1,9 +1,12 @@
 package com.campus.marketplace.common.exception;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
+import com.campus.marketplace.service.ErrorLogService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +20,18 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * 全局异常处理器
  * 
  * 统一处理系统中的所有异常，返回标准的错误响应
+ * 增加了错误日志记录功能
  * 
  * @author BaSui
  * @date 2025-10-25
@@ -33,6 +41,9 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     private final MessageSource messageSource;
+    
+    @Autowired(required = false)
+    private ErrorLogService errorLogService;
 
     public GlobalExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
@@ -159,6 +170,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<Void> handleNullPointerException(NullPointerException e) {
         log.error("空指针异常", e);
+        logError(e);
         return ApiResponse.error(ErrorCode.SYSTEM_ERROR.getCode(),
                 resolveErrorMessage(ErrorCode.SYSTEM_ERROR.getCode(), ErrorCode.SYSTEM_ERROR.getMessage()));
     }
@@ -170,8 +182,79 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<Void> handleException(Exception e) {
         log.error("系统异常", e);
+        logError(e);
         return ApiResponse.error(ErrorCode.SYSTEM_ERROR.getCode(),
                 resolveErrorMessage(ErrorCode.SYSTEM_ERROR.getCode(), ErrorCode.SYSTEM_ERROR.getMessage()));
+    }
+
+    /**
+     * 记录错误日志
+     */
+    private void logError(Throwable exception) {
+        if (errorLogService == null) {
+            return;
+        }
+
+        try {
+            HttpServletRequest request = getCurrentRequest();
+            if (request != null) {
+                Map<String, Object> requestParams = extractRequestParams(request);
+                errorLogService.logError(
+                    exception,
+                    request.getRequestURI(),
+                    request.getMethod(),
+                    getClientIp(request),
+                    requestParams
+                );
+            }
+        } catch (Exception e) {
+            log.error("记录错误日志失败", e);
+        }
+    }
+
+    /**
+     * 获取当前请求
+     */
+    private HttpServletRequest getCurrentRequest() {
+        try {
+            ServletRequestAttributes attributes = 
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            return attributes != null ? attributes.getRequest() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取客户端IP
+     */
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+
+    /**
+     * 提取请求参数
+     */
+    private Map<String, Object> extractRequestParams(HttpServletRequest request) {
+        Map<String, Object> params = new HashMap<>();
+        request.getParameterMap().forEach((key, value) -> {
+            if (value.length == 1) {
+                params.put(key, value[0]);
+            } else {
+                params.put(key, value);
+            }
+        });
+        return params;
     }
 
     private String resolveErrorMessage(int code, String defaultMsg) {
