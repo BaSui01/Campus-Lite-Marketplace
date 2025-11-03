@@ -7,6 +7,7 @@ import com.campus.marketplace.common.entity.LogisticsTrackRecord;
 import com.campus.marketplace.common.enums.LogisticsCompany;
 import com.campus.marketplace.common.enums.LogisticsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
+import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.logistics.LogisticsApiException;
 import com.campus.marketplace.logistics.LogisticsProvider;
 import com.campus.marketplace.logistics.LogisticsProviderFactory;
@@ -106,7 +107,7 @@ public class LogisticsServiceImpl implements LogisticsService {
         log.info("查询物流信息: orderId={}", orderId);
 
         Logistics logistics = logisticsRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new BusinessException("物流信息不存在"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "物流信息不存在"));
 
         return convertToDTO(logistics);
     }
@@ -117,7 +118,7 @@ public class LogisticsServiceImpl implements LogisticsService {
         log.info("查询物流信息: trackingNumber={}", trackingNumber);
 
         Logistics logistics = logisticsRepository.findByTrackingNumber(trackingNumber)
-                .orElseThrow(() -> new BusinessException("物流信息不存在"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "物流信息不存在"));
 
         return convertToDTO(logistics);
     }
@@ -129,7 +130,7 @@ public class LogisticsServiceImpl implements LogisticsService {
         log.info("手动同步物流信息: orderId={}", orderId);
 
         Logistics logistics = logisticsRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new BusinessException("物流信息不存在"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "物流信息不存在"));
 
         // 同步物流信息
         syncLogisticsInternal(logistics);
