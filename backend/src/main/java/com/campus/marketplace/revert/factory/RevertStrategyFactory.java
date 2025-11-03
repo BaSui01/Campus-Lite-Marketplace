@@ -7,6 +7,7 @@ import com.campus.marketplace.revert.strategy.impl.BatchRevertStrategy;
 import com.campus.marketplace.revert.strategy.impl.GoodsRevertStrategy;
 import com.campus.marketplace.revert.strategy.impl.OrderRevertStrategy;
 import com.campus.marketplace.revert.strategy.impl.UserRevertStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

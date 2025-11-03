@@ -57,18 +57,133 @@ public class OrderRevertStrategy implements RevertStrategy {
             Long orderId = auditLog.getEntityId();
             log.info("开始执行订单撤销: orderId={}, applicantId={}", orderId, applicantId);
             
-            // TODO: 实现订单状态回滚逻辑
             // 1. 查询订单
-            // 2. 验证资金状态
-            // 3. 回滚订单状态
-            // 4. 处理退款
+            var orderOpt = orderRepository.findById(orderId);
+            if (orderOpt.isEmpty()) {
+                return RevertExecutionResult.failed("订单不存在", orderId);
+            }
             
-            return RevertExecutionResult.success("订单撤销成功", orderId);
+            var order = orderOpt.get();
+            String currentStatus = order.getStatus().name();
+            
+            // 2. 解析旧状态
+            String oldValue = auditLog.getOldValue();
+            if (oldValue == null || oldValue.trim().isEmpty()) {
+                return RevertExecutionResult.failed("历史状态数据不存在", orderId);
+            }
+            
+            // 简化处理：从审计日志中提取状态信息
+            // 实际应该解析JSON，这里假设oldValue包含status字段
+            String targetStatus = extractStatusFromAuditLog(oldValue);
+            if (targetStatus == null) {
+                return RevertExecutionResult.failed("无法解析历史状态", orderId);
+            }
+            
+            // 3. 验证状态转换合法性
+            RevertValidationResult statusValidation = validateStatusTransition(currentStatus, targetStatus, order);
+            if (!statusValidation.isValid()) {
+                return RevertExecutionResult.failed(statusValidation.getMessage(), orderId);
+            }
+            
+            // 4. 执行状态回滚
+            try {
+                com.campus.marketplace.common.enums.OrderStatus newStatus = 
+                    com.campus.marketplace.common.enums.OrderStatus.valueOf(targetStatus);
+                
+                order.setStatus(newStatus);
+                order.setUpdatedAt(LocalDateTime.now());
+                orderRepository.save(order);
+                
+                log.info("订单状态回滚成功: orderId={}, {} -> {}", orderId, currentStatus, targetStatus);
+                
+                // 5. 处理退款标记（如果需要）
+                String refundNote = checkRefundRequirement(currentStatus, targetStatus);
+                
+                RevertExecutionResult result = RevertExecutionResult.success(
+                    String.format("订单状态已回滚: %s -> %s", currentStatus, targetStatus), 
+                    orderId
+                );
+                
+                if (refundNote != null) {
+                    result.setAdditionalData(refundNote);
+                }
+                
+                return result;
+                
+            } catch (IllegalArgumentException e) {
+                return RevertExecutionResult.failed("无效的订单状态: " + targetStatus, orderId);
+            }
             
         } catch (Exception e) {
             log.error("订单撤销执行失败: orderId={}", auditLog.getEntityId(), e);
             return RevertExecutionResult.failed("撤销执行失败: " + e.getMessage());
         }
+    }
+    
+    /**
+     * 从审计日志中提取状态信息（简化实现）
+     */
+    private String extractStatusFromAuditLog(String oldValue) {
+        try {
+            // 简化处理：假设格式类似 {"status":"PAID",...}
+            if (oldValue.contains("\"status\"")) {
+                int startIdx = oldValue.indexOf("\"status\":\"") + 10;
+                int endIdx = oldValue.indexOf("\"", startIdx);
+                if (startIdx > 9 && endIdx > startIdx) {
+                    return oldValue.substring(startIdx, endIdx);
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            log.warn("解析审计日志失败: {}", oldValue, e);
+            return null;
+        }
+    }
+    
+    /**
+     * 验证状态转换合法性
+     */
+    private RevertValidationResult validateStatusTransition(String currentStatus, String targetStatus, 
+                                                            com.campus.marketplace.common.entity.Order order) {
+        // 1. 不允许回滚到相同状态
+        if (currentStatus.equals(targetStatus)) {
+            return RevertValidationResult.failed("当前状态与目标状态相同，无需回滚");
+        }
+        
+        // 2. 已取消的订单不允许回滚
+        if ("CANCELLED".equals(currentStatus)) {
+            return RevertValidationResult.failed("已取消的订单不允许回滚");
+        }
+        
+        // 3. 如果涉及退款，检查是否已结算
+        if (("COMPLETED".equals(currentStatus) || "REVIEWED".equals(currentStatus)) && 
+            ("PAID".equals(targetStatus) || "PENDING_PAYMENT".equals(targetStatus))) {
+            // TODO: 集成支付服务检查结算状态
+            // PaymentService.checkSettlementStatus(order.getId())
+            log.warn("订单回滚涉及退款，需要管理员审批: orderId={}", order.getId());
+            return RevertValidationResult.warning("该操作涉及资金退款，需要严格审批");
+        }
+        
+        // 4. 其他状态转换检查
+        return RevertValidationResult.success("状态转换验证通过");
+    }
+    
+    /**
+     * 检查是否需要退款
+     */
+    private String checkRefundRequirement(String currentStatus, String targetStatus) {
+        // 如果从已完成回滚到已支付，需要退款
+        if (("COMPLETED".equals(currentStatus) || "REVIEWED".equals(currentStatus)) && 
+            "PAID".equals(targetStatus)) {
+            return "⚠️ 注意：该订单状态回滚可能需要处理退款，请联系财务部门核实";
+        }
+        
+        // 如果从已支付回滚到待支付，需要退款
+        if ("PAID".equals(currentStatus) && "PENDING_PAYMENT".equals(targetStatus)) {
+            return "⚠️ 注意：该订单已支付，回滚后需要处理退款";
+        }
+        
+        return null;
     }
     
     @Override
