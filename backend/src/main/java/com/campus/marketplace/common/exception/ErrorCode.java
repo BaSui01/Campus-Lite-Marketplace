@@ -34,9 +34,19 @@ public enum ErrorCode {
     NOT_FOUND(404, "资源不存在"),
 
     /**
+     * 资源不存在（通用）
+     */
+    RESOURCE_NOT_FOUND(404, "资源不存在"),
+
+    /**
      * 用户不存在
      */
     USER_NOT_FOUND(40401, "用户不存在"),
+
+    /**
+     * 无效的操作
+     */
+    INVALID_OPERATION(400, "无效的操作"),
 
     /**
      * 操作失败

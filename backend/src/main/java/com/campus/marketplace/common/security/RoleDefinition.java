@@ -59,6 +59,53 @@ public enum RoleDefinition {
             PermissionCodes.SYSTEM_USER_BAN,
             PermissionCodes.SYSTEM_REPORT_HANDLE
     )),
+    APPEAL_MANAGER("ROLE_APPEAL_MANAGER", "申诉专员", Set.of(
+            PermissionCodes.SYSTEM_USER_APPEAL_HANDLE,
+            PermissionCodes.SYSTEM_DISPUTE_HANDLE,
+            PermissionCodes.SYSTEM_DISPUTE_VIEW
+    )),
+    BATCH_MANAGER("ROLE_BATCH_MANAGER", "批量操作管理员", Set.of(
+            PermissionCodes.SYSTEM_BATCH_GOODS_OFFLINE,
+            PermissionCodes.SYSTEM_BATCH_GOODS_UPDATE,
+            PermissionCodes.SYSTEM_BATCH_GOODS_DELETE,
+            PermissionCodes.SYSTEM_BATCH_USERS_NOTIFY
+    )),
+    DATA_MANAGER("ROLE_DATA_MANAGER", "数据管理员", Set.of(
+            PermissionCodes.SYSTEM_DATA_TRACK,
+            PermissionCodes.SYSTEM_DATA_REVERT,
+            PermissionCodes.SYSTEM_AUDIT_VIEW
+    )),
+    REVIEW_MANAGER("ROLE_REVIEW_MANAGER", "评价管理员", Set.of(
+            PermissionCodes.SYSTEM_REVIEW_MANAGE,
+            PermissionCodes.SYSTEM_REVIEW_DELETE
+    )),
+    LOGISTICS_MANAGER("ROLE_LOGISTICS_MANAGER", "物流管理员", Set.of(
+            PermissionCodes.SYSTEM_LOGISTICS_MANAGE,
+            PermissionCodes.SYSTEM_LOGISTICS_VIEW
+    )),
+    SYSTEM_SCHEDULER("ROLE_SYSTEM_SCHEDULER", "系统调度员", Set.of(
+            PermissionCodes.SYSTEM_SCHEDULE_VIEW,
+            PermissionCodes.SYSTEM_SCHEDULE_MANAGE,
+            PermissionCodes.SYSTEM_SCHEDULE_EXECUTE,
+            PermissionCodes.SYSTEM_BROADCAST
+    )),
+    CACHE_MANAGER("ROLE_CACHE_MANAGER", "缓存管理员", Set.of(
+            PermissionCodes.SYSTEM_CACHE_VIEW,
+            PermissionCodes.SYSTEM_CACHE_MANAGE
+    )),
+    PLUGIN_MANAGER("ROLE_PLUGIN_MANAGER", "插件管理员", Set.of(
+            PermissionCodes.SYSTEM_PLUGIN_VIEW,
+            PermissionCodes.SYSTEM_PLUGIN_MANAGE
+    )),
+    WEBSOCKET_MANAGER("ROLE_WEBSOCKET_MANAGER", "WebSocket管理员", Set.of(
+            PermissionCodes.SYSTEM_WEBSOCKET_CONNECT,
+            PermissionCodes.SYSTEM_CHAT_GROUP
+    )),
+    RECOMMENDATION_ENGINEER("ROLE_RECOMMENDATION_ENGINEER", "推荐算法师", Set.of(
+            PermissionCodes.SYSTEM_RECOMMENDATION_VIEW,
+            PermissionCodes.SYSTEM_RECOMMENDATION_MANAGE,
+            PermissionCodes.SYSTEM_STATISTICS_VIEW
+    )),
     USER("ROLE_USER", "普通用户", Collections.emptySet()),
     STUDENT("ROLE_STUDENT", "学生用户", Collections.emptySet());
 

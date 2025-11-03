@@ -3,8 +3,10 @@ package com.campus.marketplace.service.impl;
 import com.campus.marketplace.common.dto.response.AuditLogResponse;
 import com.campus.marketplace.common.entity.AuditLog;
 import com.campus.marketplace.common.enums.AuditActionType;
+import com.campus.marketplace.common.enums.AuditEntityType;
 import com.campus.marketplace.repository.AuditLogRepository;
 import com.campus.marketplace.service.AuditLogService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,10 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 /**
- * Audit Log Service Impl
+ * Audit Log Service Impl - 增强版支持数据追踪和撤销
  *
  * @author BaSui
  * @date 2025-10-29
+ * @updated 2025-11-02 - 增加数据追踪功能
  */
 
 @Slf4j
@@ -30,6 +33,7 @@ import java.time.LocalDateTime;
 public class AuditLogServiceImpl implements AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -90,5 +94,98 @@ public class AuditLogServiceImpl implements AuditLogService {
         }
 
         return logPage.map(AuditLogResponse::from);
+    }
+
+    // ===== 增强方法实现 =====
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void logEntityChange(Long operatorId, String operatorName, AuditActionType actionType, 
+                               String entityName, Long entityId, Object oldValue, Object newValue) {
+        try {
+            String oldJson = objectMapper.writeValueAsString(oldValue);
+            String newJson = objectMapper.writeValueAsString(newValue);
+            
+            AuditLog auditLog = AuditLog.builder()
+                    .operatorId(operatorId)
+                    .operatorName(operatorName)
+                    .actionType(actionType)
+                    .entityName(entityName)
+                    .entityId(entityId)
+                    .entityType(AuditEntityType.valueOf(entityName.toUpperCase()))
+                    .oldValue(oldJson)
+                    .newValue(newJson)
+                    .isReversible(true)
+                    .details(String.format("实体变更: %s[%d]", entityName, entityId))
+                    .result("SUCCESS")
+                    .build();
+
+            auditLogRepository.save(auditLog);
+            
+            log.info("实体变更审计记录成功: operator={}, entity={}, id={}", 
+                    operatorName, entityName, String.valueOf(entityId));
+        } catch (Exception e) {
+            log.error("实体变更审计记录失败: operator={}, entity={}, error={}", 
+                    operatorName, entityName, e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void logBatchOperation(Long operatorId, String operatorName, AuditActionType actionType,
+                                  String targetType, String targetIds, String details, 
+                                  boolean isReversible) {
+        try {
+            AuditLog auditLog = AuditLog.builder()
+                    .operatorId(operatorId)
+                    .operatorName(operatorName)
+                    .actionType(actionType)
+                    .targetType(targetType)
+                    .targetIds(targetIds)
+                    .details(details)
+                    .isReversible(isReversible)
+                    .result("SUCCESS")
+                    .build();
+
+            auditLogRepository.save(auditLog);
+            
+            log.info("批量操作审计记录成功: operator={}, target={}, count={}", 
+                    operatorName, targetType, String.valueOf(targetIds.split(",").length));
+        } catch (Exception e) {
+            log.error("批量操作审计记录失败: operator={}, target={}, error={}", 
+                    operatorName, targetType, e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void logReversibleAction(Long operatorId, String operatorName, AuditActionType actionType, 
+                                   String entityName, Long entityId, Object oldValue, Object newValue) {
+        try {
+            String oldJson = objectMapper.writeValueAsString(oldValue);
+            String newJson = objectMapper.writeValueAsString(newValue);
+            
+            AuditLog auditLog = AuditLog.builder()
+                    .operatorId(operatorId)
+                    .operatorName(operatorName)
+                    .actionType(actionType)
+                    .entityName(entityName)
+                    .entityId(entityId)
+                    .entityType(AuditEntityType.valueOf(entityName.toUpperCase()))
+                    .oldValue(oldJson)
+                    .newValue(newJson)
+                    .isReversible(true)
+                    .details(String.format("可撤销操作: %s[%d]", entityName, entityId))
+                    .result("SUCCESS")
+                    .build();
+
+            auditLogRepository.save(auditLog);
+            
+            log.info("可撤销操作审计记录成功: operator={}, entity={}, id={}", 
+                    operatorName, entityName, String.valueOf(entityId));
+        } catch (Exception e) {
+            log.error("可撤销操作审计记录失败: operator={}, entity={}, error={}", 
+                    operatorName, entityName, e.getMessage());
+        }
     }
 }

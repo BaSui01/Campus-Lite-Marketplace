@@ -1,0 +1,39 @@
+# 批量操作系统配置
+batch:
+  # 线程池配置
+  thread-pool:
+    core-size: 4
+    max-size: 20
+    queue-capacity: 1000
+    thread-name-prefix: "batch-"
+  
+  # 分片配置
+  shard:
+    small-batch-size: 100      # 小批量阈值
+    medium-batch-size: 1000    # 中批量阈值
+    small-shard-size: 100      # 小批量分片大小
+    large-shard-size: 500      # 大批量分片大小
+  
+  # 限流配置
+  rate-limit:
+    user-permits-per-second: 0.1    # 普通用户10秒1次
+    vip-permits-per-second: 1.0     # VIP用户1秒1次
+    admin-permits-per-second: 10.0  # 管理员1秒10次
+  
+  # 权限配置
+  limits:
+    regular-user: 500
+    vip-user: 2000
+    admin: 999999
+  
+  # 监控配置
+  monitor:
+    enabled: true
+    metrics-interval: 60  # 指标收集间隔（秒）
+    alert-threshold: 0.5  # 告警阈值（失败率）
+  
+  # 任务配置
+  task:
+    max-retry: 3              # 最大重试次数
+    timeout-multiplier: 2     # 超时倍数
+    cleanup-days: 30          # 任务清理天数
