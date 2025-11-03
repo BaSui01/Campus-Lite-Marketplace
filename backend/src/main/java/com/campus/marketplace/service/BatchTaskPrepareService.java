@@ -5,7 +5,6 @@ import com.campus.marketplace.common.entity.BatchTaskItem;
 import com.campus.marketplace.common.enums.BatchType;
 import com.campus.marketplace.repository.BatchTaskItemRepository;
 import com.campus.marketplace.repository.BatchTaskRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ public class BatchTaskPrepareService {
 
     private final BatchTaskRepository batchTaskRepository;
     private final BatchTaskItemRepository batchTaskItemRepository;
-    private final ObjectMapper objectMapper;
 
     /**
      * 为批量任务准备任务项

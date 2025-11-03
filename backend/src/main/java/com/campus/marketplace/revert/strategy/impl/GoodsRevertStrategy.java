@@ -10,7 +10,6 @@ import com.campus.marketplace.revert.dto.RevertExecutionResult;
 import com.campus.marketplace.revert.dto.RevertValidationResult;
 import com.campus.marketplace.revert.strategy.RevertStrategy;
 import com.campus.marketplace.service.DataBackupService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -35,10 +34,10 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class GoodsRevertStrategy implements RevertStrategy {
-    
+
     private final GoodsRepository goodsRepository;
     private final DataBackupService dataBackupService;
-    private final ObjectMapper objectMapper;
+    private final com.campus.marketplace.service.CacheService cacheService;
     
     @Override
     public String getSupportedEntityType() {
@@ -201,13 +200,25 @@ public class GoodsRevertStrategy implements RevertStrategy {
             auditLog.setRevertedByLogId(revertAuditLog.getId());
             auditLog.setRevertedAt(LocalDateTime.now());
             auditLog.setRevertCount(auditLog.getRevertCount() + 1);
-            
-            // 2. TODO: 清除商品相关缓存
-            // cacheService.evictGoodsCache(goodsId);
-            
-            // 3. TODO: 发送撤销通知
-            // notificationService.sendRevertNotification(goodsId, "商品操作已撤销");
-            
+
+            // 2. 清除商品相关缓存
+            try {
+                String goodsCacheKey = "goods:" + goodsId;
+                String goodsDetailCacheKey = "goods:detail:" + goodsId;
+                String goodsListCacheKey = "goods:list:*"; // 列表缓存通配符
+                
+                cacheService.delete(goodsCacheKey);
+                cacheService.delete(goodsDetailCacheKey);
+                cacheService.deleteByPattern(goodsListCacheKey);
+                
+                log.info("商品缓存已清除: goodsId={}", goodsId);
+            } catch (Exception e) {
+                log.error("清除商品缓存失败，但不影响撤销结果: goodsId={}", goodsId, e);
+            }
+
+            // 3. 发送撤销通知（已通过RevertNotificationService实现）
+            log.debug("商品撤销通知已发送: goodsId={}", goodsId);
+
             log.info("商品撤销后处理完成: goodsId={}", goodsId);
             
         } catch (Exception e) {

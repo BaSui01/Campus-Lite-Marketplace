@@ -45,6 +45,11 @@ public interface RevertRequestRepository extends JpaRepository<RevertRequest, Lo
     long countByRequesterIdAndStatus(Long requesterId, RevertRequestStatus status);
 
     /**
+     * 统计特定状态的撤销请求数量（用于审批人查询待审批数量）
+     */
+    long countByStatus(RevertRequestStatus status);
+
+    /**
      * 检查审计日志是否已有撤销请求
      */
     boolean existsByAuditLogId(Long auditLogId);

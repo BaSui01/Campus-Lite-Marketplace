@@ -11,6 +11,7 @@ import com.campus.marketplace.revert.dto.RevertExecutionResult;
 import com.campus.marketplace.revert.dto.RevertValidationResult;
 import com.campus.marketplace.revert.factory.RevertStrategyFactory;
 import com.campus.marketplace.revert.strategy.RevertStrategy;
+import com.campus.marketplace.service.RevertNotificationService;
 import com.campus.marketplace.service.RevertService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class RevertServiceImpl implements RevertService {
     private final AuditLogRepository auditLogRepository;
     private final RevertRequestRepository revertRequestRepository;
     private final RevertStrategyFactory strategyFactory;
+    private final RevertNotificationService notificationService;
 
     @Override
     @Transactional
@@ -66,6 +68,18 @@ public class RevertServiceImpl implements RevertService {
 
         log.info("撤销请求创建成功: auditLogId={}, applicantId={}", auditLogId, applicantId);
 
+        // 6. 发送撤销申请通知
+        try {
+            notificationService.sendRevertRequestNotification(revertRequest);
+            
+            // 如果有警告信息，发送警告通知
+            if (validationResult.getMessage() != null && validationResult.getMessage().contains("警告")) {
+                notificationService.sendRevertWarningNotification(revertRequest, validationResult.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("发送撤销申请通知失败，但不影响撤销请求创建: revertRequestId={}", revertRequest.getId(), e);
+        }
+
         return RevertExecutionResult.success("撤销请求已提交", auditLog.getEntityId());
     }
 
@@ -96,6 +110,13 @@ public class RevertServiceImpl implements RevertService {
             } else {
                 revertRequest.markFailed(result.getMessage());
                 revertRequestRepository.save(revertRequest);
+            }
+            
+            // 5. 发送执行结果通知
+            try {
+                notificationService.sendRevertExecutionNotification(revertRequest, result);
+            } catch (Exception e) {
+                log.error("发送撤销执行通知失败: revertRequestId={}", revertRequestId, e);
             }
 
             return result;

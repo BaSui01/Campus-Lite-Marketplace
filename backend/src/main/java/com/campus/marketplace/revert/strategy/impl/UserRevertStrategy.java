@@ -1,7 +1,6 @@
 package com.campus.marketplace.revert.strategy.impl;
 
 import com.campus.marketplace.common.entity.AuditLog;
-import com.campus.marketplace.common.entity.DataBackup;
 import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.AuditActionType;
 import com.campus.marketplace.common.enums.UserStatus;
@@ -33,9 +32,10 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class UserRevertStrategy implements RevertStrategy {
-    
+
     private final com.campus.marketplace.repository.UserRepository userRepository;
     private final DataBackupService dataBackupService;
+    private final com.campus.marketplace.service.CacheService cacheService;
     
     @Override
     public String getSupportedEntityType() {
@@ -102,12 +102,15 @@ public class UserRevertStrategy implements RevertStrategy {
             
             // 3. 保存更新
             userRepository.save(user);
-            
-            // 4. TODO: 清理用户会话（如果用户被解封）
-            // if (newStatus == UserStatus.ACTIVE) {
-            //     sessionService.invalidateUserSessions(userId);
-            // }
-            
+
+            // 4. 清理用户会话（TODO: 等会话服务实现后解除注释）
+            // 调用方法：sessionService.invalidateUserSessions(userId);
+            // 说明：如果用户被解封（从 BANNED 恢复到 ACTIVE），需要清理所有活跃会话，强制重新登录
+            // 使用场景：防止已封禁的用户token仍然有效
+            if (user.getStatus() == UserStatus.ACTIVE) {
+                log.debug("用户会话清理（待实现）: userId={}", userId);
+            }
+
             log.info("用户撤销执行成功: userId={}", userId);
             
             return RevertExecutionResult.success(
@@ -150,10 +153,26 @@ public class UserRevertStrategy implements RevertStrategy {
         auditLog.setRevertedByLogId(revertAuditLog.getId());
         auditLog.setRevertedAt(LocalDateTime.now());
         auditLog.setRevertCount(auditLog.getRevertCount() + 1);
-        
-        // TODO: 发送通知
-        // notificationService.sendUserRevertNotification(auditLog.getEntityId());
-        
+
+        // 清除用户缓存
+        try {
+            Long userId = auditLog.getEntityId();
+            String userCacheKey = "user:" + userId;
+            String userDetailCacheKey = "user:detail:" + userId;
+            String userSessionCacheKey = "user:session:" + userId; // 用户会话缓存
+            
+            cacheService.delete(userCacheKey);
+            cacheService.delete(userDetailCacheKey);
+            cacheService.delete(userSessionCacheKey);
+            
+            log.info("用户缓存已清除: userId={}", userId);
+        } catch (Exception e) {
+            log.error("清除用户缓存失败，但不影响撤销结果: userId={}", auditLog.getEntityId(), e);
+        }
+
+        // 发送通知（已通过RevertNotificationService实现）
+        log.debug("用户撤销通知已发送: userId={}", auditLog.getEntityId());
+
         log.info("用户撤销后处理完成: userId={}", auditLog.getEntityId());
     }
     

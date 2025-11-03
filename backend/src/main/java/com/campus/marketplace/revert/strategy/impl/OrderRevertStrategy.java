@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 public class OrderRevertStrategy implements RevertStrategy {
     
     private final OrderRepository orderRepository;
+    private final com.campus.marketplace.service.CacheService cacheService;
     
     @Override
     public String getSupportedEntityType() {
@@ -156,11 +157,17 @@ public class OrderRevertStrategy implements RevertStrategy {
         }
         
         // 3. 如果涉及退款，检查是否已结算
-        if (("COMPLETED".equals(currentStatus) || "REVIEWED".equals(currentStatus)) && 
+        if (("COMPLETED".equals(currentStatus) || "REVIEWED".equals(currentStatus)) &&
             ("PAID".equals(targetStatus) || "PENDING_PAYMENT".equals(targetStatus))) {
-            // TODO: 集成支付服务检查结算状态
-            // PaymentService.checkSettlementStatus(order.getId())
+
+            // 集成支付服务检查结算状态（TODO: 等支付服务实现后解除注释）
+            // 调用方法：boolean isSettled = paymentService.checkSettlementStatus(order.getId());
+            // 说明：检查订单款项是否已结算给卖家
+            // 如果已结算：需要财务部门处理退款，拒绝撤销或标记为需要人工处理
+            // 如果未结算：可以直接回滚订单状态
             log.warn("订单回滚涉及退款，需要管理员审批: orderId={}", order.getId());
+            log.debug("支付结算状态检查（待实现）: orderId={}", order.getId());
+
             return RevertValidationResult.warning("该操作涉及资金退款，需要严格审批");
         }
         
@@ -196,6 +203,22 @@ public class OrderRevertStrategy implements RevertStrategy {
         auditLog.setRevertedByLogId(revertAuditLog.getId());
         auditLog.setRevertedAt(LocalDateTime.now());
         auditLog.setRevertCount(auditLog.getRevertCount() + 1);
+        
+        // 清除订单缓存
+        try {
+            Long orderId = auditLog.getEntityId();
+            String orderCacheKey = "order:" + orderId;
+            String orderDetailCacheKey = "order:detail:" + orderId;
+            String userOrderListCacheKey = "order:user:*"; // 用户订单列表缓存
+            
+            cacheService.delete(orderCacheKey);
+            cacheService.delete(orderDetailCacheKey);
+            cacheService.deleteByPattern(userOrderListCacheKey);
+            
+            log.info("订单缓存已清除: orderId={}", orderId);
+        } catch (Exception e) {
+            log.error("清除订单缓存失败，但不影响撤销结果: orderId={}", auditLog.getEntityId(), e);
+        }
         
         log.info("订单撤销后处理完成: orderId={}", auditLog.getEntityId());
     }

@@ -35,6 +35,7 @@ public class RevertApprovalServiceImpl implements RevertApprovalService {
     private final RevertRequestRepository revertRequestRepository;
     private final AuditLogRepository auditLogRepository;
     private final RevertStrategyFactory strategyFactory;
+    private final com.campus.marketplace.service.RevertNotificationService notificationService;
 
     @Override
     @Transactional
@@ -54,21 +55,22 @@ public class RevertApprovalServiceImpl implements RevertApprovalService {
             // 批准请求
             revertRequest.approve(approverId, null, comment);
             log.info("撤销请求已批准: revertRequestId={}, approverId={}", revertRequestId, approverId);
-            
-            // TODO: 发送审批通过通知
-            // notificationService.sendApprovalNotification(revertRequest, true);
         } else {
             // 拒绝请求
             revertRequest.reject(approverId, null, comment);
             log.info("撤销请求已拒绝: revertRequestId={}, approverId={}, reason={}", 
                     revertRequestId, approverId, comment);
-            
-            // TODO: 发送审批拒绝通知
-            // notificationService.sendApprovalNotification(revertRequest, false);
         }
 
         // 4. 保存审批结果
         revertRequestRepository.save(revertRequest);
+        
+        // 5. 发送审批结果通知
+        try {
+            notificationService.sendApprovalNotification(revertRequest, approved);
+        } catch (Exception e) {
+            log.error("发送审批通知失败，但不影响审批结果: revertRequestId={}", revertRequestId, e);
+        }
     }
 
     @Override
@@ -94,10 +96,22 @@ public class RevertApprovalServiceImpl implements RevertApprovalService {
 
     @Override
     public long getPendingApprovalCount(Long approverId) {
-        // TODO: 实现根据审批人权限查询待审批数量
-        // 这里简化处理，返回所有待审批的撤销请求数量
-        return revertRequestRepository.countByRequesterIdAndStatus(
-            approverId, RevertRequestStatus.PENDING
-        );
+        // 根据审批人权限查询待审批数量
+        // 说明：
+        // 1. 管理员可以看到所有待审批的撤销请求
+        // 2. 普通审批人只能看到自己负责的审批请求
+        // 3. 审批权限由 User 的 role 字段决定（ADMIN, SUPER_ADMIN 等）
+        //
+        // TODO: 等权限服务完善后，根据 approverId 查询用户角色，按角色返回不同的待审批数量
+        // 调用方法：
+        // - User user = userService.getUserById(approverId);
+        // - if (user.hasRole(Role.ADMIN)) { 返回所有待审批 }
+        // - else { 返回该审批人负责的待审批 }
+
+        // 当前简化实现：返回所有待审批的撤销请求数量
+        long pendingCount = revertRequestRepository.countByStatus(RevertRequestStatus.PENDING);
+        log.debug("待审批撤销请求数量查询（简化实现）: approverId={}, count={}", approverId, pendingCount);
+
+        return pendingCount;
     }
 }

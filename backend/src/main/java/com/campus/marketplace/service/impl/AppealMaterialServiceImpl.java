@@ -10,7 +10,6 @@ import com.campus.marketplace.service.AppealMaterialService;
 import com.campus.marketplace.service.FileService;
 import com.campus.marketplace.service.AuditLogService;
 import com.campus.marketplace.service.FileSecurityService;
-import com.campus.marketplace.repository.AppealRepository;
 import com.campus.marketplace.repository.AppealMaterialRepository;
 import com.campus.marketplace.common.enums.AuditActionType;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,6 @@ import java.nio.file.Paths;
 public class AppealMaterialServiceImpl implements AppealMaterialService {
 
     private final AppealMaterialRepository appealMaterialRepository;
-    private final AppealRepository appealRepository;
     private final FileService fileService;
     private final AuditLogService auditLogService;
     private final FileSecurityService fileSecurityService;
