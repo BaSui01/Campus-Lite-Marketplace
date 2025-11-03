@@ -33,6 +33,7 @@ public enum NotificationType {
     MESSAGE_RECEIVED("收到新消息"),
     FOLLOW_SELLER_NEW_GOODS("关注卖家上架新品"),
     SUBSCRIPTION_MATCHED_GOODS("关注关键词有新内容"),
+    REVIEW_REPLIED("评价被回复"),
 
     /**
      * 纠纷相关通知

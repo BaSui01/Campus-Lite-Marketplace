@@ -68,4 +68,13 @@ public class WebSocketMessage {
     public static final String TYPE_IMAGE = "IMAGE";
     public static final String TYPE_SYSTEM = "SYSTEM";
     public static final String TYPE_ERROR = "ERROR";
+    
+    // Dispute System Message Types
+    public static final String TYPE_DISPUTE_CREATED = "DISPUTE_CREATED"; // Dispute created
+    public static final String TYPE_DISPUTE_NEGOTIATION = "DISPUTE_NEGOTIATION"; // Negotiation message
+    public static final String TYPE_DISPUTE_PROPOSAL = "DISPUTE_PROPOSAL"; // Negotiation proposal
+    public static final String TYPE_DISPUTE_ESCALATED = "DISPUTE_ESCALATED"; // Dispute escalated to arbitration
+    public static final String TYPE_DISPUTE_ARBITRATION = "DISPUTE_ARBITRATION"; // Arbitration decision
+    public static final String TYPE_DISPUTE_COMPLETED = "DISPUTE_COMPLETED"; // Dispute completed
+    public static final String TYPE_DISPUTE_CLOSED = "DISPUTE_CLOSED"; // Dispute closed
 }

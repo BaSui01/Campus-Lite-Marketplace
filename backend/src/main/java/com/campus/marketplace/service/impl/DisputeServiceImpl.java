@@ -11,6 +11,8 @@ import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.repository.DisputeRepository;
 import com.campus.marketplace.service.*;
 import lombok.RequiredArgsConstructor;
+import com.campus.marketplace.websocket.DisputeWebSocketHandler;
+import com.campus.marketplace.common.dto.websocket.WebSocketMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +38,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DisputeServiceImpl implements DisputeService {
 
     private final DisputeRepository disputeRepository;
-    private final OrderService orderService;
+    private final com.campus.marketplace.repository.OrderRepository orderRepository;
+    private final DisputeWebSocketHandler disputeWebSocketHandler;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
 
@@ -67,14 +70,8 @@ public class DisputeServiceImpl implements DisputeService {
         }
 
         // 2. 通过订单ID查询订单信息
-        // 注意：OrderService使用orderNo，我们需要先通过Repository查询Order获取orderNo
-        Order order = disputeRepository.findById(request.getOrderId())
-                .map(d -> d.getOrder())
-                .orElse(null);
-
-        if (order == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "订单不存在");
-        }
+        Order order = orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "订单不存在"));
 
         // 3. 验证用户是否为订单参与方
         boolean isBuyer = order.getBuyerId().equals(userId);
@@ -137,6 +134,13 @@ public class DisputeServiceImpl implements DisputeService {
         } catch (Exception e) {
             log.error("发送纠纷通知失败: disputeId={}, respondentId={}", dispute.getId(), respondentId, e);
         }
+        // 9. Send WebSocket real-time notification
+        sendWebSocketNotification(
+                respondentId,
+                WebSocketMessage.TYPE_DISPUTE_CREATED,
+                String.format("New dispute created for order %s", order.getOrderNo()),
+                dispute.getId()
+        );
 
         return dispute.getId();
     }
@@ -353,6 +357,30 @@ public class DisputeServiceImpl implements DisputeService {
      * 生成纠纷编号
      * 格式：DSP-YYYYMMDD-XXXXXX
      */
+    /**
+     * Send WebSocket notification to user
+     *
+     * @param userId user ID
+     * @param type message type
+     * @param content message content
+     * @param disputeId dispute ID
+     */
+    private void sendWebSocketNotification(Long userId, String type, String content, Long disputeId) {
+        try {
+            WebSocketMessage wsMessage = WebSocketMessage.builder()
+                    .type(type)
+                    .content(content)
+                    .messageId(disputeId)
+                    .timestamp(System.currentTimeMillis())
+                    .build();
+            disputeWebSocketHandler.sendDisputeNotification(userId, wsMessage);
+            log.debug("WebSocket notification sent: userId={}, type={}", userId, type);
+        } catch (Exception e) {
+            log.error("Failed to send WebSocket notification: userId={}, type={}", userId, type, e);
+        }
+    }
+
+
     private String generateDisputeCode() {
         String datePart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         long sequence = DISPUTE_SEQUENCE.getAndIncrement();

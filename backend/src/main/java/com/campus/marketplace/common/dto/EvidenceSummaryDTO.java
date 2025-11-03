@@ -26,6 +26,11 @@ public class EvidenceSummaryDTO implements Serializable {
     private Long disputeId;
 
     /**
+     * 证据总数
+     */
+    private Long totalCount;
+
+    /**
      * 买家证据总数
      */
     private Long buyerEvidenceCount;
