@@ -3,7 +3,13 @@
     "allow": [
       "Read(//f/code/**)",
       "Bash(tasklist)",
-      "Bash(findstr postgres)"
+      "Bash(findstr postgres)",
+      "Bash(./mvnw:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(java:*)",
+      "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

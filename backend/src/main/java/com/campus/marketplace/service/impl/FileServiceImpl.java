@@ -36,7 +36,7 @@ public class FileServiceImpl implements FileService {
     @Value("${file.upload.max-size:10485760}") // 默认 10MB
     private Long maxFileSize;
 
-    @Value("${file.upload.allowed-types:image/jpeg,image/png,image/gif,image/webp}")
+    @Value("${file.upload.allowed-types:image/jpeg,image/png,image/gif,image/webp,video/mp4,video/mpeg,video/quicktime,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet}")
     private String[] allowedTypes;
 
     @Override
@@ -47,8 +47,9 @@ public class FileServiceImpl implements FileService {
         // 🎯 第二步：生成唯一文件名
         String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
 
-        // 🎯 第三步：确保上传目录存在
-        Path uploadPath = Paths.get(uploadDir);
+        // 🎯 第三步：按日期分类创建子目录（格式：yyyy/MM/dd）
+        String dateDir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        Path uploadPath = Paths.get(uploadDir, dateDir);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
@@ -57,10 +58,10 @@ public class FileServiceImpl implements FileService {
         Path filePath = uploadPath.resolve(uniqueFileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        log.info("文件上传成功: {}", uniqueFileName);
+        log.info("文件上传成功: {}/{}", dateDir, uniqueFileName);
 
-        // 🎯 返回访问URL
-        return "/uploads/" + uniqueFileName;
+        // 🎯 返回访问URL（包含日期路径）
+        return "/uploads/" + dateDir + "/" + uniqueFileName;
     }
 
     @Override
@@ -68,16 +69,18 @@ public class FileServiceImpl implements FileService {
         // 🎯 第一步：先上传原图
         String fileUrl = uploadFile(file);
 
-        // 🎯 第二步：生成缩略图
+        // 🎯 第二步：生成缩略图（仅支持图片）
         try {
-            String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-            Path originalFile = Paths.get(uploadDir, fileName);
-            
+            // 提取文件路径（去掉 /uploads/ 前缀）
+            String relativePath = fileUrl.replace("/uploads/", "");
+            Path originalFile = Paths.get(uploadDir, relativePath);
+
             // 生成缩略图文件名
+            String fileName = originalFile.getFileName().toString();
             String extension = FilenameUtils.getExtension(fileName);
             String baseName = FilenameUtils.getBaseName(fileName);
             String thumbnailFileName = baseName + "_thumb." + extension;
-            Path thumbnailPath = Paths.get(uploadDir, thumbnailFileName);
+            Path thumbnailPath = originalFile.getParent().resolve(thumbnailFileName);
 
             // 使用 Thumbnailator 生成缩略图 (最大 200x200)
             Thumbnails.of(originalFile.toFile())
@@ -85,7 +88,7 @@ public class FileServiceImpl implements FileService {
                     .keepAspectRatio(true)
                     .toFile(thumbnailPath.toFile());
 
-            log.info("缩略图生成成功: {}", thumbnailFileName);
+            log.info("缩略图生成成功: {}", thumbnailPath);
         } catch (Exception e) {
             log.warn("缩略图生成失败（但原图上传成功）: {}", e.getMessage());
             // 缩略图生成失败不影响主流程，只记录警告
@@ -97,23 +100,24 @@ public class FileServiceImpl implements FileService {
     @Override
     public boolean deleteFile(String fileUrl) {
         try {
-            // 🎯 提取文件名
-            String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-            Path filePath = Paths.get(uploadDir, fileName);
+            // 🎯 提取文件路径（去掉 /uploads/ 前缀）
+            String relativePath = fileUrl.replace("/uploads/", "");
+            Path filePath = Paths.get(uploadDir, relativePath);
 
             // 🎯 删除文件
             if (Files.exists(filePath)) {
                 Files.delete(filePath);
-                log.info("文件删除成功: {}", fileName);
+                log.info("文件删除成功: {}", relativePath);
 
                 // 🎯 如果有缩略图，也一起删除
+                String fileName = filePath.getFileName().toString();
                 String extension = FilenameUtils.getExtension(fileName);
                 String baseName = FilenameUtils.getBaseName(fileName);
                 String thumbnailFileName = baseName + "_thumb." + extension;
-                Path thumbnailPath = Paths.get(uploadDir, thumbnailFileName);
+                Path thumbnailPath = filePath.getParent().resolve(thumbnailFileName);
                 if (Files.exists(thumbnailPath)) {
                     Files.delete(thumbnailPath);
-                    log.info("缩略图删除成功: {}", thumbnailFileName);
+                    log.info("缩略图删除成功: {}", thumbnailPath);
                 }
 
                 return true;

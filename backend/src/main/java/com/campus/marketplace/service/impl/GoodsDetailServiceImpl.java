@@ -41,6 +41,7 @@ public class GoodsDetailServiceImpl implements GoodsDetailService {
     private final FavoriteRepository favoriteRepository;
     private final ViewLogRepository viewLogRepository;
     private final ReviewRepository reviewRepository;
+    private final OrderRepository orderRepository;
     
     @org.springframework.context.annotation.Lazy
     private ReviewStatisticsService reviewStatisticsService;

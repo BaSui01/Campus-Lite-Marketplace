@@ -141,7 +141,7 @@ public class BehaviorAnalysisServiceImpl implements BehaviorAnalysisService {
             if (log.getTargetType() != null) {
                 String category = log.getTargetType();
                 double weight = log.getBehaviorType().getWeight();
-                tags.merge(category, weight, Double::sum);
+                tags.merge(category, weight, (oldValue, newValue) -> oldValue + newValue);
             }
         }
 

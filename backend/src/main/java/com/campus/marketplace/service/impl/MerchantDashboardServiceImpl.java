@@ -4,7 +4,6 @@ import com.campus.marketplace.common.entity.MerchantDashboard;
 import com.campus.marketplace.repository.MerchantDashboardRepository;
 import com.campus.marketplace.repository.OrderRepository;
 import com.campus.marketplace.repository.GoodsRepository;
-import com.campus.marketplace.repository.ViewLogRepository;
 import com.campus.marketplace.service.MerchantDashboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +31,6 @@ public class MerchantDashboardServiceImpl implements MerchantDashboardService {
     private final MerchantDashboardRepository merchantDashboardRepository;
     private final OrderRepository orderRepository;
     private final GoodsRepository goodsRepository;
-    private final ViewLogRepository viewLogRepository;
 
     @Override
     public Map<String, Object> getTodayOverview(Long merchantId) {

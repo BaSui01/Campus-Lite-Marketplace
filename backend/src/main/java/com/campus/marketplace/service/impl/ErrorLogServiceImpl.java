@@ -133,7 +133,7 @@ public class ErrorLogServiceImpl implements ErrorLogService {
         // 检测严重错误
         List<ErrorLog> criticalErrors = errorLogRepository.findUnalertedErrors(
             ErrorSeverity.CRITICAL, since);
-        if (!criticalErrors.isEmpty()) {
+        if (criticalErrors.size() >= CRITICAL_ERROR_THRESHOLD) {
             sendAlert(ErrorSeverity.CRITICAL, criticalErrors);
             markAsAlerted(criticalErrors);
         }

@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
  * @date 2025-10-28
  */
 @Entity
-@Table(name = "t_compliance_audit", indexes = {
-        @Index(name = "idx_comp_target", columnList = "target_type,target_id"),
-        @Index(name = "idx_comp_created", columnList = "created_at")
+@Table(name = "t_compliance_audit_log", indexes = {
+        @Index(name = "idx_compliance_audit_target", columnList = "target_type,target_id"),
+        @Index(name = "idx_compliance_audit_created", columnList = "created_at")
 })
 @Getter
 @Setter

@@ -9,8 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "t_task", indexes = {
-        @Index(name = "uk_task_name", columnList = "name", unique = true)
+@Table(name = "t_scheduled_task", indexes = {
+        @Index(name = "uk_scheduled_task_name", columnList = "name", unique = true)
 })
 /**
  * Scheduled Task

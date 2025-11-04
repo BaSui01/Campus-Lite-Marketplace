@@ -41,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderAutomationIntegrationTest {
 
     @Container
+    @SuppressWarnings("resource") // Testcontainers 自动管理容器生命周期
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14")
         .withDatabaseName("testdb")
         .withUsername("test")

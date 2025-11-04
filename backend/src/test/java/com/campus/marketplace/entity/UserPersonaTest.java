@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserPersonaTest {
 
     @Container
+    @SuppressWarnings("resource") // Testcontainers 自动管理容器生命周期
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14")
             .withDatabaseName("campus_marketplace_test")
             .withUsername("test")

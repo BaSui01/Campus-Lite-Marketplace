@@ -3,7 +3,6 @@ package com.campus.marketplace.service.impl;
 import com.campus.marketplace.common.entity.MarketingCampaign;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
-import com.campus.marketplace.common.utils.RedisUtil;
 import com.campus.marketplace.repository.MarketingCampaignRepository;
 import com.campus.marketplace.service.MarketingCampaignService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ public class MarketingCampaignServiceImpl implements MarketingCampaignService {
 
     private final MarketingCampaignRepository marketingCampaignRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final RedisUtil redisUtil;
     
     private static final String CAMPAIGN_STOCK_KEY_PREFIX = "campaign:stock:";
     private static final String CAMPAIGN_LOCK_KEY_PREFIX = "campaign:lock:";

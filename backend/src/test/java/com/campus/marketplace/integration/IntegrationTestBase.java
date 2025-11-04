@@ -43,6 +43,7 @@ public abstract class IntegrationTestBase {
             "redis:7.4.1-alpine"
     );
 
+    @SuppressWarnings("resource") // Testcontainers 自动管理容器生命周期
     private static final PostgreSQLContainer<?> POSTGRES_CONTAINER = new PostgreSQLContainer<>(
             DockerImageName.parse(POSTGRES_IMAGE)
                     .asCompatibleSubstituteFor("postgres")
@@ -52,6 +53,7 @@ public abstract class IntegrationTestBase {
             .withPassword("campus_test")
             .withReuse(true);
 
+    @SuppressWarnings("resource") // Testcontainers 自动管理容器生命周期
     private static final GenericContainer<?> REDIS_CONTAINER = new GenericContainer<>(
             DockerImageName.parse(REDIS_IMAGE)
                     .asCompatibleSubstituteFor("redis")

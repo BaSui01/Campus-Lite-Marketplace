@@ -7,6 +7,7 @@ import com.campus.marketplace.common.dto.response.SearchResultItem;
 import com.campus.marketplace.common.entity.Goods;
 import com.campus.marketplace.common.entity.SearchHistory;
 import com.campus.marketplace.common.entity.SearchKeyword;
+import com.campus.marketplace.common.entity.SearchLog;
 import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;

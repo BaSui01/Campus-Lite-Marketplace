@@ -37,11 +37,11 @@ public class ViewLogServiceImpl implements ViewLogService {
                                     .orElse(null);
                         }
 
-                        ViewLog log = ViewLog.builder()
+                        ViewLog viewLog = ViewLog.builder()
                                 .userId(userId)
                                 .goodsId(goodsId)
                                 .build();
-                        viewLogRepository.save(log);
+                        viewLogRepository.save(viewLog);
                         log.debug("浏览日志保存成功: username={}, userId={}, goodsId={}", username, userId, goodsId);
                     } catch (Exception e) {
                         log.warn("保存浏览日志失败: username={}, goodsId={}", username, goodsId, e);
