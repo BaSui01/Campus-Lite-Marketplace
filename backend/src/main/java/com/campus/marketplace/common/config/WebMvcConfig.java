@@ -20,29 +20,26 @@ public class WebMvcConfig implements WebMvcConfigurer {
     /**
      * 配置静态资源映射 📁
      *
-     * 映射规则：
-     * - /static/goods/** → classpath:/static/goods/
-     * - /static/uploads/** → classpath:/static/uploads/
+     * 映射规则（统一使用根目录 uploads/）：
+     * - /uploads/** → file:./uploads/
      *
      * 使用场景：
-     * - 商品图片展示
-     * - 用户上传文件访问
-     * - 开发/测试环境占位图
+     * - 商品图片展示：/uploads/goods/123.jpg
+     * - 用户头像访问：/uploads/avatars/user_123.jpg
+     * - 帖子图片访问：/uploads/posts/post_456_1.jpg
+     * - 聊天文件访问：/uploads/messages/msg_789.jpg
      *
-     * ⚠️ 重要：静态资源路径必须加 /static/ 前缀,避免和 API 路由冲突!
+     * ⚠️ 重要：
+     * - 已删除 backend/src/main/resources/static/ 目录
+     * - 统一使用根目录 uploads/ 存储所有静态文件
+     * - 种子数据图片已移动到 uploads/goods/
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 商品图片静态资源映射 📸
-        // ⚠️ 使用 /static/goods/** 而不是 /goods/**,避免和 API 路由 /api/goods 冲突!
-        registry.addResourceHandler("/static/goods/**")
-                .addResourceLocations("classpath:/static/goods/")
-                .setCachePeriod(3600); // 缓存 1 小时 ⏰
-
-        // 用户上传文件静态资源映射 📤
-        // ⚠️ 使用 /static/uploads/** 而不是 /uploads/**,避免路由冲突!
-        registry.addResourceHandler("/static/uploads/**")
-                .addResourceLocations("classpath:/static/uploads/", "file:./uploads/")
+        // 统一静态资源映射 📁
+        // 映射根目录的 uploads/ 文件夹到 /uploads/** URL
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:./uploads/")
                 .setCachePeriod(86400); // 缓存 24 小时 ⏰
     }
 }
