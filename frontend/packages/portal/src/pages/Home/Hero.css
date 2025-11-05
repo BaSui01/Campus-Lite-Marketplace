@@ -1,0 +1,327 @@
+/**
+ * Hero 区域样式
+ * @author BaSui 😎
+ */
+
+/* ==================== Hero 主容器 ==================== */
+.hero {
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+/* ==================== 轮播图区域 ==================== */
+.hero__carousel {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hero__carousel-background {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-image 0.5s ease-in-out;
+}
+
+/* ==================== 轮播箭头 ==================== */
+.hero__carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.hero__carousel-arrow:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.hero__carousel-arrow--left {
+  left: 20px;
+}
+
+.hero__carousel-arrow--right {
+  right: 20px;
+}
+
+/* ==================== 轮播内容 ==================== */
+.hero__carousel-content {
+  text-align: center;
+  color: white;
+  padding: 0 20px;
+  max-width: 800px;
+  z-index: 5;
+}
+
+.hero__title {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.hero__description {
+  font-size: 20px;
+  margin-bottom: 32px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+/* ==================== 搜索框 ==================== */
+.hero__search {
+  display: flex;
+  gap: 12px;
+  max-width: 600px;
+  margin: 0 auto 24px;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.hero__search-input {
+  flex: 1;
+}
+
+.hero__search-icon {
+  font-size: 18px;
+}
+
+.hero__search-button {
+  padding: 0 32px;
+  height: 48px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero__search-button:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* ==================== 热门搜索 ==================== */
+.hero__hot-keywords {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+.hero__hot-keywords-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hero__hot-keyword {
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero__hot-keyword:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* ==================== 轮播指示器 ==================== */
+.hero__carousel-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+.hero__carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero__carousel-dot.active {
+  width: 32px;
+  border-radius: 6px;
+  background: white;
+}
+
+.hero__carousel-dot:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* ==================== 快捷入口 ==================== */
+.hero__quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.hero__quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero__quick-action:hover {
+  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
+}
+
+.hero__quick-action-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.hero__quick-action-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ==================== 动画 ==================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 响应式 ==================== */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .hero__carousel {
+    height: 400px;
+  }
+
+  .hero__title {
+    font-size: 36px;
+  }
+
+  .hero__description {
+    font-size: 18px;
+  }
+
+  .hero__quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .hero__carousel {
+    height: 300px;
+    border-radius: 0;
+  }
+
+  .hero__title {
+    font-size: 28px;
+  }
+
+  .hero__description {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  .hero__search {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hero__search-button {
+    width: 100%;
+  }
+
+  .hero__quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .hero__quick-action {
+    padding: 16px;
+  }
+
+  .hero__quick-action-icon {
+    font-size: 24px;
+  }
+
+  .hero__quick-action-text {
+    font-size: 14px;
+  }
+
+  .hero__carousel-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+
+  .hero__carousel-arrow--left {
+    left: 10px;
+  }
+
+  .hero__carousel-arrow--right {
+    right: 10px;
+  }
+
+  .hero__hot-keywords {
+    font-size: 12px;
+  }
+
+  .hero__hot-keyword {
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+}

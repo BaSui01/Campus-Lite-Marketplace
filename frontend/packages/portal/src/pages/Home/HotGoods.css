@@ -1,0 +1,84 @@
+/**
+ * HotGoods 热门商品区域样式
+ * @author BaSui 😎
+ */
+
+/* ==================== 主容器 ==================== */
+.hot-goods {
+  margin-bottom: 40px;
+}
+
+/* ==================== Header ==================== */
+.hot-goods__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.hot-goods__title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.hot-goods__more {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hot-goods__more:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+/* ==================== 商品网格 ==================== */
+.hot-goods__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* ==================== 错误状态 ==================== */
+.hot-goods__error {
+  padding: 60px 20px;
+}
+
+/* ==================== 响应式 ==================== */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .hot-goods__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .hot-goods__title {
+    font-size: 24px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .hot-goods__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .hot-goods__title {
+    font-size: 20px;
+  }
+
+  .hot-goods__more {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}

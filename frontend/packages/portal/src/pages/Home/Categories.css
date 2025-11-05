@@ -1,0 +1,120 @@
+/**
+ * Categories 分类导航样式
+ * @author BaSui 😎
+ */
+
+/* ==================== 主容器 ==================== */
+.categories {
+  margin-bottom: 40px;
+}
+
+/* ==================== Header ==================== */
+.categories__header {
+  margin-bottom: 24px;
+}
+
+.categories__title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+/* ==================== 分类网格 ==================== */
+.categories__grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 16px;
+}
+
+/* ==================== 分类项 ==================== */
+.categories__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.categories__item:hover {
+  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
+}
+
+.categories__item-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.categories__item-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.categories__item-count {
+  font-size: 14px;
+  color: #999;
+}
+
+/* ==================== 响应式 ==================== */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .categories__grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .categories__item {
+    padding: 20px 12px;
+  }
+
+  .categories__item-icon {
+    font-size: 40px;
+  }
+
+  .categories__item-name {
+    font-size: 14px;
+  }
+
+  .categories__title {
+    font-size: 24px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .categories__grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .categories__item {
+    padding: 16px 8px;
+  }
+
+  .categories__item-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .categories__item-name {
+    font-size: 12px;
+  }
+
+  .categories__item-count {
+    font-size: 12px;
+  }
+
+  .categories__title {
+    font-size: 20px;
+  }
+}

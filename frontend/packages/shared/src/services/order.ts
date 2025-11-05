@@ -152,8 +152,46 @@ export class OrderService {
   async getGoodsReviews(goodsId: number, params?: { page?: number; pageSize?: number }): Promise<ApiResponse<PageInfo<Review>>> {
     return http.get(`/reviews/goods/${goodsId}`, { params });
   }
+
+  // ==================== 管理员功能 ====================
+
+  /**
+   * 获取订单列表（管理员视角）
+   * @param params 查询参数
+   * @returns 订单列表
+   */
+  async listOrdersAdmin(params: {
+    keyword?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    size?: number;
+  }): Promise<ApiResponse<PageInfo<Order>>> {
+    return http.get('/orders/admin/list', { params });
+  }
+
+  /**
+   * 取消订单（管理员）
+   * @param orderNo 订单号
+   * @param reason 取消原因
+   * @returns 操作结果
+   */
+  async cancelOrderAdmin(orderNo: string, reason: string): Promise<ApiResponse<void>> {
+    return http.post(`/orders/${orderNo}/cancel/admin`, { reason });
+  }
+
+  /**
+   * 强制完成订单（管理员）
+   * @param orderNo 订单号
+   * @returns 操作结果
+   */
+  async forceCompleteOrder(orderNo: string): Promise<ApiResponse<void>> {
+    return http.post(`/orders/${orderNo}/force-complete`);
+  }
 }
 
 // 导出单例
+
 export const orderService = new OrderService();
 export default orderService;
