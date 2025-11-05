@@ -69,9 +69,7 @@ public interface ErrorLogService {
     void detectAndAlert();
 
     /**
-     * 清理历史数据
-     * 
-     * @param daysToKeep 保留天数
+     * 清理历史数据（保留30天）
      */
-    void cleanupOldLogs(int daysToKeep);
+    void cleanupOldLogs();
 }

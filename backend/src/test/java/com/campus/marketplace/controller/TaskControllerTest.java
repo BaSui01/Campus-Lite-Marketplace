@@ -41,7 +41,6 @@ class TaskControllerTest {
     @DisplayName("查询定时任务列表成功")
     void listTasks_success() throws Exception {
         ScheduledTask task = ScheduledTask.builder()
-                .id(1L)
                 .name("recompute-hot")
                 .status("ENABLED")
                 .description("重算热门商品")

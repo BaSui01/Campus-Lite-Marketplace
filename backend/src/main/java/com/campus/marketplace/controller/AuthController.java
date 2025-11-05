@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.LoginRequest;
 import com.campus.marketplace.common.dto.request.RegisterRequest;
@@ -48,7 +48,7 @@ public class AuthController {
             summary = "用户注册",
             description = "使用校园邮箱注册新账号，注册成功后赠送 100 积分"
     )
-    @PostMapping("/register")
+        @PostMapping("/register")
     @RateLimit(key = "auth:register", maxRequests = 3, timeWindow = 3600, limitType = com.campus.marketplace.common.annotation.RateLimit.LimitType.IP)
     public ApiResponse<Long> register(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -61,10 +61,7 @@ public class AuthController {
         return ApiResponse.success("注册成功", userId);
     }
 
-    /**
-     * 发送注册邮箱验证码
-     */
-    @PostMapping("/register/code")
+        @PostMapping("/register/code")
     @RateLimit(key = "auth:register:code", maxRequests = 5, timeWindow = 300)
     @Operation(summary = "发送注册邮箱验证码")
     public ApiResponse<Void> sendRegisterEmailCode(@RequestParam String email) {
@@ -72,20 +69,14 @@ public class AuthController {
         return ApiResponse.success(null);
     }
 
-    /**
-     * 邮箱验证码注册
-     */
-    @PostMapping("/register/by-email")
+        @PostMapping("/register/by-email")
     @Operation(summary = "邮箱验证码注册")
     public ApiResponse<Void> registerByEmail(@Valid @RequestBody ConfirmRegisterByEmailRequest request) {
         authService.registerByEmailCode(request);
         return ApiResponse.success(null);
     }
 
-    /**
-     * 发送重置密码邮箱验证码
-     */
-    @PostMapping("/password/reset/code/email")
+        @PostMapping("/password/reset/code/email")
     @RateLimit(key = "auth:pwd:reset:email:code", maxRequests = 5, timeWindow = 300)
     @Operation(summary = "发送重置密码邮箱验证码")
     public ApiResponse<Void> sendResetEmailCode(@RequestParam String email) {
@@ -93,20 +84,14 @@ public class AuthController {
         return ApiResponse.success(null);
     }
 
-    /**
-     * 通过邮箱验证码重置密码
-     */
-    @PostMapping("/password/reset/email")
+        @PostMapping("/password/reset/email")
     @Operation(summary = "通过邮箱验证码重置密码")
     public ApiResponse<Void> resetPasswordByEmail(@Valid @RequestBody ResetPasswordByEmailRequest request) {
         authService.resetPasswordByEmailCode(request);
         return ApiResponse.success(null);
     }
 
-    /**
-     * 发送重置密码短信验证码（开发阶段日志）
-     */
-    @PostMapping("/password/reset/code/sms")
+        @PostMapping("/password/reset/code/sms")
     @RateLimit(key = "auth:pwd:reset:sms:code", maxRequests = 5, timeWindow = 300)
     @Operation(summary = "发送重置密码短信验证码")
     public ApiResponse<Void> sendResetSmsCode(@RequestParam String phone) {
@@ -114,10 +99,7 @@ public class AuthController {
         return ApiResponse.success(null);
     }
 
-    /**
-     * 通过短信验证码重置密码
-     */
-    @PostMapping("/password/reset/sms")
+        @PostMapping("/password/reset/sms")
     @Operation(summary = "通过短信验证码重置密码")
     public ApiResponse<Void> resetPasswordBySms(@Valid @RequestBody ResetPasswordBySmsRequest request) {
         authService.resetPasswordBySmsCode(request);
@@ -146,11 +128,7 @@ public class AuthController {
         return ApiResponse.success(response);
     }
 
-    /**
-     * 用户登出
-     * 
-     * POST /api/auth/logout
-     */
+    @Operation(summary = "用户登出")
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@RequestHeader("Authorization") String authorization) {
         log.info("收到登出请求");
@@ -162,11 +140,7 @@ public class AuthController {
         return ApiResponse.success("登出成功", null);
     }
 
-    /**
-     * 刷新 Token
-     *
-     * POST /api/auth/refresh
-     */
+    @Operation(summary = "刷新Token")
     @PostMapping("/refresh")
     public ApiResponse<LoginResponse> refresh(@RequestHeader("Authorization") String authorization) {
         log.info("收到刷新 Token 请求");

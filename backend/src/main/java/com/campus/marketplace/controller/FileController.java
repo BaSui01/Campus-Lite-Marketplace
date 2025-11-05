@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.service.FileService;
@@ -32,13 +32,7 @@ public class FileController {
 
     private final FileService fileService;
 
-    /**
-     * 上传图片（基础版本）
-     *
-     * @param file 图片文件
-     * @return 文件访问URL
-     */
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "上传图片", description = "上传单个图片文件，返回访问URL")
     @RateLimit(key = "file:upload", maxRequests = 30, timeWindow = 60)
@@ -54,13 +48,7 @@ public class FileController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 上传图片（带缩略图）
-     *
-     * @param file 图片文件
-     * @return 文件访问URL和缩略图URL
-     */
-    @PostMapping(value = "/upload-with-thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PostMapping(value = "/upload-with-thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "上传图片（带缩略图）", description = "上传图片并自动生成缩略图")
     @RateLimit(key = "file:upload-thumb", maxRequests = 20, timeWindow = 60)
@@ -83,13 +71,7 @@ public class FileController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 删除文件
-     *
-     * @param fileUrl 文件URL
-     * @return 是否删除成功
-     */
-    @DeleteMapping
+        @DeleteMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "删除文件", description = "删除指定的文件（包括缩略图）")
     public ApiResponse<Boolean> deleteFile(@Parameter(description = "文件URL", example = "https://cdn.campus.com/uploads/xxx.png") @RequestParam("url") String fileUrl) {

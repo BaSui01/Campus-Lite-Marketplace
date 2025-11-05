@@ -1,6 +1,8 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.CreateRevertRequestDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.revert.dto.RevertExecutionResult;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2025-11-03
  */
 @Slf4j
+@Tag(name = "操作撤销")
 @RestController
 @RequestMapping("/api/revert")
 @RequiredArgsConstructor
@@ -27,9 +30,8 @@ public class RevertController {
 
     private final RevertService revertService;
 
-    /**
-     * 申请撤销操作
-     */
+        @Operation(summary = "申请撤销操作")
+
     @PostMapping("/request")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<RevertExecutionResult> requestRevert(
@@ -42,9 +44,7 @@ public class RevertController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 查询用户的撤销请求历史
-     */
+        @Operation(summary = "查询用户的撤销请求历史")
     @GetMapping("/requests")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<Page<?>> getUserRevertRequests(Pageable pageable) {
@@ -53,9 +53,8 @@ public class RevertController {
         return ApiResponse.success(requests);
     }
 
-    /**
-     * 执行撤销操作（管理员）
-     */
+        @Operation(summary = "执行撤销操作")
+
     @PostMapping("/execute/{revertRequestId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<RevertExecutionResult> executeRevert(@PathVariable Long revertRequestId) {

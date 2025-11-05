@@ -16,8 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.context.annotation.Profile;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +38,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @ConditionalOnExpression("'${app.cache.prewarm.enabled:false}'=='true'")
-@Profile("cache-warm")
 @ConditionalOnClass(name = {
         "com.campus.marketplace.common.dto.GoodsCacheDTO",
         "com.campus.marketplace.common.dto.CategoryCacheDTO"

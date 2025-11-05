@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,10 +55,8 @@ class FeatureFlagControllerTest {
     @DisplayName("查询功能开关列表")
     void list_success() throws Exception {
         FeatureFlag flag = FeatureFlag.builder()
-                .id(1L)
                 .key("new-ui")
                 .enabled(true)
-                .updatedAt(Instant.now())
                 .build();
         when(repository.findAll()).thenReturn(List.of(flag));
 
@@ -80,12 +77,10 @@ class FeatureFlagControllerTest {
                 .description("测试开关")
                 .build();
         FeatureFlag saved = FeatureFlag.builder()
-                .id(2L)
                 .key("beta-feature")
                 .enabled(true)
                 .rulesJson("{\"segments\":[]}")
                 .description("测试开关")
-                .updatedAt(Instant.now())
                 .build();
         when(repository.findByKey("beta-feature")).thenReturn(Optional.empty());
         when(repository.save(any(FeatureFlag.class))).thenReturn(saved);
@@ -106,12 +101,10 @@ class FeatureFlagControllerTest {
     @DisplayName("更新已有功能开关")
     void upsert_updateExisting() throws Exception {
         FeatureFlag existing = FeatureFlag.builder()
-                .id(5L)
                 .key("old-flag")
                 .enabled(false)
                 .rulesJson("{}")
                 .description("旧描述")
-                .updatedAt(Instant.EPOCH)
                 .build();
         FeatureFlag body = FeatureFlag.builder()
                 .key("old-flag")
@@ -120,12 +113,10 @@ class FeatureFlagControllerTest {
                 .description("更新描述")
                 .build();
         FeatureFlag saved = FeatureFlag.builder()
-                .id(5L)
                 .key("old-flag")
                 .enabled(true)
                 .rulesJson("{\"rule\":1}")
                 .description("更新描述")
-                .updatedAt(Instant.now())
                 .build();
 
         when(repository.findByKey("old-flag")).thenReturn(Optional.of(existing));
@@ -156,10 +147,8 @@ class FeatureFlagControllerTest {
     @DisplayName("删除功能开关并刷新单个缓存")
     void delete_success() throws Exception {
         FeatureFlag flag = FeatureFlag.builder()
-                .id(9L)
                 .key("to-delete")
                 .enabled(false)
-                .updatedAt(Instant.now())
                 .build();
         when(repository.findByKey("to-delete")).thenReturn(Optional.of(flag));
 

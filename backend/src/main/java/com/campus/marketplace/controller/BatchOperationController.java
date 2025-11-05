@@ -7,6 +7,8 @@ import com.campus.marketplace.common.dto.response.BatchTaskResponse;
 import com.campus.marketplace.common.enums.BatchTaskStatus;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.service.BatchOperationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,12 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 批量操作控制器
- * 
- * @author BaSui
- * @date 2025-11-02
- */
+@Tag(name = "批量操作", description = "批量任务管理接口")
 @Slf4j
 @RestController
 @RequestMapping("/api/batch")
@@ -31,9 +28,7 @@ public class BatchOperationController {
 
     private final BatchOperationService batchOperationService;
 
-    /**
-     * 创建批量任务
-     */
+    @Operation(summary = "创建批量任务")
     @PostMapping("/tasks")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<Long> createBatchTask(@Valid @RequestBody CreateBatchTaskRequest request) {
@@ -46,9 +41,7 @@ public class BatchOperationController {
         return ApiResponse.success(taskId);
     }
 
-    /**
-     * 查询批量任务列表
-     */
+    @Operation(summary = "查询批量任务列表")
     @GetMapping("/tasks")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<Page<BatchTaskResponse>> getBatchTasks(
@@ -63,9 +56,7 @@ public class BatchOperationController {
         return ApiResponse.success(tasks);
     }
 
-    /**
-     * 查询批量任务详情
-     */
+    @Operation(summary = "查询批量任务详情")
     @GetMapping("/tasks/{taskId}")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<BatchTaskResponse> getBatchTaskDetail(@PathVariable Long taskId) {
@@ -74,9 +65,7 @@ public class BatchOperationController {
         return ApiResponse.success(response);
     }
 
-    /**
-     * 查询批量任务进度
-     */
+    @Operation(summary = "查询批量任务进度")
     @GetMapping("/tasks/{taskId}/progress")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<BatchTaskProgressResponse> getTaskProgress(@PathVariable Long taskId) {
@@ -84,9 +73,7 @@ public class BatchOperationController {
         return ApiResponse.success(progress);
     }
 
-    /**
-     * 取消批量任务
-     */
+    @Operation(summary = "取消批量任务")
     @PostMapping("/tasks/{taskId}/cancel")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<Void> cancelBatchTask(@PathVariable Long taskId) {

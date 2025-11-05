@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.UserProfileResponse;
@@ -32,16 +32,7 @@ public class BlacklistController {
 
     private final BlacklistService blacklistService;
 
-    /**
-     * 添加到黑名单
-     *
-     * 🚫 拉黑用户后，对方无法给你发送消息
-     *
-     * @param blockedUserId 被拉黑的用户ID
-     * @param reason 拉黑原因（可选）
-     * @return 成功提示
-     */
-    @Operation(summary = "添加到黑名单", description = "拉黑指定用户，对方将无法给你发送消息")
+        @Operation(summary = "添加到黑名单", description = "拉黑指定用户，对方将无法给你发送消息")
     @PostMapping("/block/{blockedUserId}")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Void> addToBlacklist(
@@ -57,15 +48,7 @@ public class BlacklistController {
         return ApiResponse.success();
     }
 
-    /**
-     * 从黑名单移除
-     *
-     * ✅ 解除拉黑后，对方可以正常给你发送消息
-     *
-     * @param blockedUserId 被拉黑的用户ID
-     * @return 成功提示
-     */
-    @Operation(summary = "从黑名单移除", description = "解除对指定用户的拉黑，对方可以正常发送消息")
+        @Operation(summary = "从黑名单移除", description = "解除对指定用户的拉黑，对方可以正常发送消息")
     @DeleteMapping("/unblock/{blockedUserId}")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Void> removeFromBlacklist(
@@ -80,16 +63,7 @@ public class BlacklistController {
         return ApiResponse.success();
     }
 
-    /**
-     * 查询黑名单列表
-     *
-     * 📋 返回当前用户拉黑的所有用户
-     *
-     * @param page 页码（从0开始）
-     * @param size 每页大小（默认20）
-     * @return 黑名单用户列表（分页）
-     */
-    @Operation(summary = "查询黑名单列表", description = "获取当前用户的黑名单列表")
+        @Operation(summary = "查询黑名单列表", description = "获取当前用户的黑名单列表")
     @GetMapping("/list")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Page<UserProfileResponse>> listBlacklist(
@@ -105,15 +79,7 @@ public class BlacklistController {
         return ApiResponse.success(blacklist);
     }
 
-    /**
-     * 检查是否拉黑了某人
-     *
-     * 🔍 查询当前用户是否拉黑了指定用户
-     *
-     * @param blockedUserId 被检查的用户ID
-     * @return true-已拉黑，false-未拉黑
-     */
-    @Operation(summary = "检查是否拉黑", description = "查询当前用户是否拉黑了指定用户")
+        @Operation(summary = "检查是否拉黑", description = "查询当前用户是否拉黑了指定用户")
     @GetMapping("/check/{blockedUserId}")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Boolean> isBlocked(

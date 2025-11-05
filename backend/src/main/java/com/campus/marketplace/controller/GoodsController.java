@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.ApproveGoodsRequest;
 import com.campus.marketplace.common.dto.request.CreateGoodsRequest;
@@ -37,10 +37,7 @@ public class GoodsController {
 
     private final GoodsService goodsService;
 
-    /**
-     * 发布物品
-     */
-    @PostMapping
+        @PostMapping
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "发布物品", description = "用户发布二手物品信息")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -71,10 +68,7 @@ public class GoodsController {
         return ApiResponse.success(goodsId);
     }
 
-    /**
-     * 查询物品列表
-     */
-    @GetMapping
+        @GetMapping
     @Operation(summary = "查询物品列表", description = "分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选和排序")
     public ApiResponse<Page<GoodsResponse>> listGoods(
             @Parameter(description = "搜索关键词", example = "苹果笔记本") @RequestParam(required = false) String keyword,
@@ -93,10 +87,7 @@ public class GoodsController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 查询物品详情
-     */
-    @GetMapping("/{id}")
+        @GetMapping("/{id}")
     @Operation(summary = "查询物品详情", description = "根据物品 ID 查询详细信息")
     public ApiResponse<GoodsDetailResponse> getGoodsDetail(
             @Parameter(description = "物品 ID", example = "12345") @PathVariable Long id
@@ -105,10 +96,7 @@ public class GoodsController {
         return ApiResponse.success(response);
     }
 
-    /**
-     * 查询待审核物品列表（管理员）
-     */
-    @GetMapping("/pending")
+        @GetMapping("/pending")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_GOODS_APPROVE)")
     @Operation(summary = "查询待审核物品列表", description = "管理员查询所有待审核的物品")
     public ApiResponse<Page<GoodsResponse>> listPendingGoods(
@@ -119,10 +107,7 @@ public class GoodsController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 审核物品（管理员）
-     */
-    @PostMapping("/{id}/approve")
+        @PostMapping("/{id}/approve")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_GOODS_APPROVE)")
     @Operation(summary = "审核物品", description = "管理员审核物品，通过或拒绝")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(

@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.PayOrderRequest;
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
@@ -79,6 +79,8 @@ public class PaymentController {
      * @param request 支付请求
      * @return 提示信息
      */
+    @Operation(summary = "创建支付订单")
+
     @PostMapping("/create")
     @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Deprecated
@@ -100,6 +102,8 @@ public class PaymentController {
      * @param httpRequest HTTP请求
      * @return 响应给微信服务器
      */
+    @Operation(summary = "微信支付回调通知")
+
     @PostMapping("/wechat/notify")
     public ResponseEntity<String> wechatPayNotify(HttpServletRequest httpRequest) {
         log.info("📥 收到微信支付回调通知，当前版本: {}", wechatPayVersion);
@@ -224,9 +228,11 @@ public class PaymentController {
      * @param orderNo 订单号
      * @return 支付状态
      */
+    @Operation(summary = "查询支付状态")
+
     @GetMapping("/status/{orderNo}")
     @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
-    @Operation(summary = "查询支付状态", description = "根据订单号查询当前支付状态")
+    
     public ApiResponse<String> queryPaymentStatus(@Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo) {
         log.info("🔍 查询支付状态: orderNo={}, version={}", orderNo, wechatPayVersion);
         
@@ -248,6 +254,8 @@ public class PaymentController {
      *
      * POST /api/payment/alipay/refund/notify
      */
+    @Operation(summary = "支付宝退款回调")
+
     @PostMapping("/alipay/refund/notify")
     public ResponseEntity<String> alipayRefundNotify(HttpServletRequest request) {
         try {

@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.component.RateLimitRuleManager;
 import com.campus.marketplace.common.dto.response.ApiResponse;
@@ -26,9 +26,12 @@ public class RateLimitAdminController {
 
     private final RateLimitRuleManager ruleManager;
 
+    @Operation(summary = "获取所有限流规则")
+
+
     @GetMapping("/rules")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
-    @Operation(summary = "查看规则", description = "查看当前限流开关与黑白名单")
+    
     public ApiResponse<Map<String, Object>> getRules() {
         Map<String, Object> data = new HashMap<>();
         data.put("enabled", ruleManager.isEnabled());
@@ -38,13 +41,19 @@ public class RateLimitAdminController {
         return ApiResponse.success(data);
     }
 
+    @Operation(summary = "切换全局限流开关")
+
+
     @PostMapping("/enabled/{enabled}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
-    @Operation(summary = "设置开关", description = "开启或关闭限流")
+    
     public ApiResponse<Void> setEnabled(@PathVariable boolean enabled) {
         ruleManager.setEnabled(enabled);
         return ApiResponse.success();
     }
+
+    @Operation(summary = "添加用户白名单")
+
 
     @PostMapping("/whitelist/users/{userId}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
@@ -53,12 +62,16 @@ public class RateLimitAdminController {
         return ApiResponse.success();
     }
 
+    @Operation(summary = "移除用户白名单")
     @DeleteMapping("/whitelist/users/{userId}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     public ApiResponse<Void> removeUserWhitelist(@PathVariable Long userId) {
         ruleManager.removeUserWhitelist(userId);
         return ApiResponse.success();
     }
+
+    @Operation(summary = "添加IP白名单")
+
 
     @PostMapping("/whitelist/ips/{ip}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
@@ -67,12 +80,16 @@ public class RateLimitAdminController {
         return ApiResponse.success();
     }
 
+    @Operation(summary = "移除IP白名单")
     @DeleteMapping("/whitelist/ips/{ip}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     public ApiResponse<Void> removeIpWhitelist(@PathVariable String ip) {
         ruleManager.removeIpWhitelist(ip);
         return ApiResponse.success();
     }
+
+    @Operation(summary = "添加IP黑名单")
+
 
     @PostMapping("/blacklist/ips/{ip}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
@@ -81,6 +98,7 @@ public class RateLimitAdminController {
         return ApiResponse.success();
     }
 
+    @Operation(summary = "移除IP黑名单")
     @DeleteMapping("/blacklist/ips/{ip}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     public ApiResponse<Void> removeIpBlacklist(@PathVariable String ip) {

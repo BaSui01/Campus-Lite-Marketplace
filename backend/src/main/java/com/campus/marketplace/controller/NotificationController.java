@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.NotificationResponse;
@@ -35,15 +35,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    /**
-     * 查询通知列表
-     *
-     * @param status 通知状态（可选）
-     * @param page   页码（从0开始）
-     * @param size   每页大小
-     * @return 通知列表
-     */
-    @GetMapping
+        @GetMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "查询通知列表", description = "分页查询当前用户的通知列表")
     public ApiResponse<Page<NotificationResponse>> listNotifications(
@@ -59,12 +51,7 @@ public class NotificationController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 查询未读通知数量
-     *
-     * @return 未读数量
-     */
-    @GetMapping("/unread-count")
+        @GetMapping("/unread-count")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "查询未读数量", description = "获取当前用户的未读通知数量")
     public ApiResponse<Long> getUnreadCount() {
@@ -72,13 +59,7 @@ public class NotificationController {
         return ApiResponse.success(count);
     }
 
-    /**
-     * 标记通知为已读
-     *
-     * @param notificationIds 通知ID列表
-     * @return 成功标识
-     */
-    @PutMapping("/mark-read")
+        @PutMapping("/mark-read")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "标记通知为已读", description = "批量标记指定的通知为已读")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -97,12 +78,7 @@ public class NotificationController {
         return ApiResponse.success("标记成功");
     }
 
-    /**
-     * 全部标记为已读
-     *
-     * @return 成功标识
-     */
-    @PutMapping("/mark-all-read")
+        @PutMapping("/mark-all-read")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "全部标记为已读", description = "标记当前用户所有未读通知为已读")
     public ApiResponse<String> markAllAsRead() {
@@ -113,13 +89,7 @@ public class NotificationController {
         return ApiResponse.success("全部已读");
     }
 
-    /**
-     * 删除通知
-     *
-     * @param notificationIds 通知ID列表
-     * @return 成功标识
-     */
-    @DeleteMapping
+        @DeleteMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "删除通知", description = "批量删除指定的通知（软删除）")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(

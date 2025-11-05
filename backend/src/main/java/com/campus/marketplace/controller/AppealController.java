@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.CreateAppealRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
@@ -35,11 +35,7 @@ public class AppealController {
 
     private final AppealService appealService;
 
-    /**
-     * 提交申诉
-     * 用户对处罚、下架等操作提出申诉
-     */
-    @Operation(summary = "提交申诉", description = "用户提交申诉申请")
+        @Operation(summary = "提交申诉", description = "用户提交申诉申请")
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<Long> submitAppeal(@Valid @RequestBody CreateAppealRequest request) {
@@ -61,10 +57,7 @@ public class AppealController {
         }
     }
 
-    /**
-     * 获取当前用户的申诉列表
-     */
-    @Operation(summary = "查询我的申诉", description = "获取当前用户的所有申诉记录")
+        @Operation(summary = "查询我的申诉", description = "获取当前用户的所有申诉记录")
     @GetMapping("/my")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<Page<Appeal>> getMyAppeals(
@@ -81,10 +74,7 @@ public class AppealController {
         }
     }
 
-    /**
-     * 获取申诉详情（包含材料）
-     */
-    @Operation(summary = "查询申诉详情", description = "获取申诉的详细信息和材料")
+        @Operation(summary = "查询申诉详情", description = "获取申诉的详细信息和材料")
     @GetMapping("/{appealId}")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<AppealDetailResponse> getAppealDetail(@PathVariable Long appealId) {
@@ -106,11 +96,7 @@ public class AppealController {
         }
     }
 
-    /**
-     * 取消申诉
-     * 用户可以取消状态为"待处理"且未过期的申诉
-     */
-    @Operation(summary = "取消申诉", description = "取消尚未处理的申诉")
+        @Operation(summary = "取消申诉", description = "取消尚未处理的申诉")
     @PostMapping("/{appealId}/cancel")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<Void> cancelAppeal(@PathVariable Long appealId) {
@@ -138,11 +124,7 @@ public class AppealController {
         }
     }
 
-    /**
-     * 验证申诉资格
-     * 检查是否可以对特定目标提交申诉
-     */
-    @Operation(summary = "验证申诉资格", description = "检查是否可以提交申诉")
+        @Operation(summary = "验证申诉资格", description = "检查是否可以提交申诉")
     @PostMapping("/validate")
     @PreAuthorize("isAuthenticated()")
     public ApiResponse<Boolean> validateAppealEligibility(@Valid @RequestBody CreateAppealRequest request) {

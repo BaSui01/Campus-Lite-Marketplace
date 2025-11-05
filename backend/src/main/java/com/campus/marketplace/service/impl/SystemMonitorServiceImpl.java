@@ -279,7 +279,8 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
     @Override
     @Transactional
     @Scheduled(cron = "0 0 2 * * ?") // 每天凌晨2点执行
-    public void cleanupOldRecords(int daysToKeep) {
+    public void cleanupOldRecords() {
+        int daysToKeep = 30; // 默认保留30天
         LocalDateTime cutoff = LocalDateTime.now().minusDays(daysToKeep);
         healthCheckRecordRepository.deleteByCheckTimeBefore(cutoff);
         log.info("✅ 健康检查历史数据清理完成: 删除{}天前的记录", daysToKeep);

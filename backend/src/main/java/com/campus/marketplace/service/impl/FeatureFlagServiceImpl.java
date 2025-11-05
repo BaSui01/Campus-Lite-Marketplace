@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -39,7 +39,7 @@ public class FeatureFlagServiceImpl implements com.campus.marketplace.service.Fe
     @Value("${spring.profiles.active:dev}")
     private String activeEnv;
 
-    private record Cached(boolean enabled, FeatureFlagRules rules, Instant updatedAt) {}
+    private record Cached(boolean enabled, FeatureFlagRules rules, LocalDateTime updatedAt) {}
 
     @Override
     public boolean isEnabled(String key, Long userId, Long campusId, String env) {

@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.entity.Topic;
@@ -37,10 +37,7 @@ public class CommunityController {
     private final CommunityService communityService;
     private final UserRepository userRepository;
 
-    /**
-     * 获取热门话题（前10个）
-     */
-    @GetMapping("/topics/hot")
+        @GetMapping("/topics/hot")
     @Operation(summary = "获取热门话题", description = "获取当前最热门的10个话题")
     public ApiResponse<List<Topic>> getHotTopics() {
         log.info("获取热门话题");
@@ -48,10 +45,7 @@ public class CommunityController {
         return ApiResponse.success(hotTopics);
     }
 
-    /**
-     * 为帖子添加话题标签
-     */
-    @PostMapping("/posts/{postId}/topics")
+        @PostMapping("/posts/{postId}/topics")
     @Operation(summary = "为帖子添加话题标签", description = "最多添加3个话题标签")
     public ApiResponse<Void> addTopicsToPost(
         @Parameter(description = "帖子ID") @PathVariable Long postId,
@@ -63,10 +57,7 @@ public class CommunityController {
         return ApiResponse.success();
     }
 
-    /**
-     * 移除帖子的话题标签
-     */
-    @DeleteMapping("/posts/{postId}/topics")
+        @DeleteMapping("/posts/{postId}/topics")
     @Operation(summary = "移除帖子的话题标签")
     public ApiResponse<Void> removeTopicsFromPost(
         @Parameter(description = "帖子ID") @PathVariable Long postId
@@ -76,10 +67,7 @@ public class CommunityController {
         return ApiResponse.success();
     }
 
-    /**
-     * 点赞帖子
-     */
-    @PostMapping("/posts/{postId}/like")
+        @PostMapping("/posts/{postId}/like")
     @Operation(summary = "点赞帖子")
     public ApiResponse<Void> likePost(
         @Parameter(description = "帖子ID") @PathVariable Long postId
@@ -90,10 +78,7 @@ public class CommunityController {
         return ApiResponse.success();
     }
 
-    /**
-     * 取消点赞
-     */
-    @DeleteMapping("/posts/{postId}/like")
+        @DeleteMapping("/posts/{postId}/like")
     @Operation(summary = "取消点赞")
     public ApiResponse<Void> unlikePost(
         @Parameter(description = "帖子ID") @PathVariable Long postId
@@ -104,10 +89,7 @@ public class CommunityController {
         return ApiResponse.success();
     }
 
-    /**
-     * 收藏帖子
-     */
-    @PostMapping("/posts/{postId}/collect")
+        @PostMapping("/posts/{postId}/collect")
     @Operation(summary = "收藏帖子")
     public ApiResponse<Void> collectPost(
         @Parameter(description = "帖子ID") @PathVariable Long postId
@@ -118,10 +100,7 @@ public class CommunityController {
         return ApiResponse.success();
     }
 
-    /**
-     * 取消收藏
-     */
-    @DeleteMapping("/posts/{postId}/collect")
+        @DeleteMapping("/posts/{postId}/collect")
     @Operation(summary = "取消收藏")
     public ApiResponse<Void> uncollectPost(
         @Parameter(description = "帖子ID") @PathVariable Long postId
@@ -132,10 +111,7 @@ public class CommunityController {
         return ApiResponse.success();
     }
 
-    /**
-     * 获取用户动态流
-     */
-    @GetMapping("/feed")
+        @GetMapping("/feed")
     @Operation(summary = "获取用户动态流", description = "获取关注用户的动态")
     public ApiResponse<List<UserFeed>> getUserFeed() {
         Long userId = getCurrentUserId();
@@ -144,10 +120,7 @@ public class CommunityController {
         return ApiResponse.success(feeds);
     }
 
-    /**
-     * 获取话题下的帖子ID列表
-     */
-    @GetMapping("/topics/{topicId}/posts")
+        @GetMapping("/topics/{topicId}/posts")
     @Operation(summary = "获取话题下的帖子", description = "获取指定话题下的所有帖子ID")
     public ApiResponse<List<Long>> getPostsByTopic(
         @Parameter(description = "话题ID") @PathVariable Long topicId
@@ -157,10 +130,7 @@ public class CommunityController {
         return ApiResponse.success(postIds);
     }
 
-    /**
-     * 检查用户是否已点赞
-     */
-    @GetMapping("/posts/{postId}/liked")
+        @GetMapping("/posts/{postId}/liked")
     @Operation(summary = "检查是否已点赞")
     public ApiResponse<Boolean> checkPostLiked(
         @Parameter(description = "帖子ID") @PathVariable Long postId
@@ -170,10 +140,7 @@ public class CommunityController {
         return ApiResponse.success(liked);
     }
 
-    /**
-     * 检查用户是否已收藏
-     */
-    @GetMapping("/posts/{postId}/collected")
+        @GetMapping("/posts/{postId}/collected")
     @Operation(summary = "检查是否已收藏")
     public ApiResponse<Boolean> checkPostCollected(
         @Parameter(description = "帖子ID") @PathVariable Long postId
@@ -183,10 +150,7 @@ public class CommunityController {
         return ApiResponse.success(collected);
     }
 
-    /**
-     * 获取帖子点赞数
-     */
-    @GetMapping("/posts/{postId}/likes/count")
+        @GetMapping("/posts/{postId}/likes/count")
     @Operation(summary = "获取帖子点赞数")
     public ApiResponse<Long> getPostLikeCount(
         @Parameter(description = "帖子ID") @PathVariable Long postId
@@ -195,10 +159,7 @@ public class CommunityController {
         return ApiResponse.success(count);
     }
 
-    /**
-     * 获取帖子收藏数
-     */
-    @GetMapping("/posts/{postId}/collects/count")
+        @GetMapping("/posts/{postId}/collects/count")
     @Operation(summary = "获取帖子收藏数")
     public ApiResponse<Long> getPostCollectCount(
         @Parameter(description = "帖子ID") @PathVariable Long postId

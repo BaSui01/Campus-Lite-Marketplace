@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.entity.Topic;
@@ -36,10 +36,7 @@ public class TopicController {
     private final TopicService topicService;
     private final UserRepository userRepository;
 
-    /**
-     * 创建话题
-     */
-    @PostMapping
+        @PostMapping
     @Operation(summary = "创建话题")
     public ApiResponse<Long> createTopic(@RequestBody Map<String, String> request) {
         String name = request.get("name");
@@ -49,10 +46,7 @@ public class TopicController {
         return ApiResponse.success(topicId);
     }
 
-    /**
-     * 更新话题
-     */
-    @PutMapping("/{topicId}")
+        @PutMapping("/{topicId}")
     @Operation(summary = "更新话题")
     public ApiResponse<Void> updateTopic(
         @Parameter(description = "话题ID") @PathVariable Long topicId,
@@ -65,10 +59,7 @@ public class TopicController {
         return ApiResponse.success();
     }
 
-    /**
-     * 删除话题
-     */
-    @DeleteMapping("/{topicId}")
+        @DeleteMapping("/{topicId}")
     @Operation(summary = "删除话题")
     public ApiResponse<Void> deleteTopic(
         @Parameter(description = "话题ID") @PathVariable Long topicId
@@ -78,10 +69,7 @@ public class TopicController {
         return ApiResponse.success();
     }
 
-    /**
-     * 根据ID查询话题
-     */
-    @GetMapping("/{topicId}")
+        @GetMapping("/{topicId}")
     @Operation(summary = "查询话题详情")
     public ApiResponse<Topic> getTopicById(
         @Parameter(description = "话题ID") @PathVariable Long topicId
@@ -90,30 +78,21 @@ public class TopicController {
         return ApiResponse.success(topic);
     }
 
-    /**
-     * 获取所有话题
-     */
-    @GetMapping
+        @GetMapping
     @Operation(summary = "获取所有话题")
     public ApiResponse<List<Topic>> getAllTopics() {
         List<Topic> topics = topicService.getAllTopics();
         return ApiResponse.success(topics);
     }
 
-    /**
-     * 获取热门话题（前10个）
-     */
-    @GetMapping("/hot")
+        @GetMapping("/hot")
     @Operation(summary = "获取热门话题")
     public ApiResponse<List<Topic>> getHotTopics() {
         List<Topic> topics = topicService.getHotTopics();
         return ApiResponse.success(topics);
     }
 
-    /**
-     * 关注话题
-     */
-    @PostMapping("/{topicId}/follow")
+        @PostMapping("/{topicId}/follow")
     @Operation(summary = "关注话题")
     public ApiResponse<Void> followTopic(
         @Parameter(description = "话题ID") @PathVariable Long topicId
@@ -124,10 +103,7 @@ public class TopicController {
         return ApiResponse.success();
     }
 
-    /**
-     * 取消关注话题
-     */
-    @DeleteMapping("/{topicId}/follow")
+        @DeleteMapping("/{topicId}/follow")
     @Operation(summary = "取消关注话题")
     public ApiResponse<Void> unfollowTopic(
         @Parameter(description = "话题ID") @PathVariable Long topicId
@@ -138,10 +114,7 @@ public class TopicController {
         return ApiResponse.success();
     }
 
-    /**
-     * 获取用户关注的话题
-     */
-    @GetMapping("/followed")
+        @GetMapping("/followed")
     @Operation(summary = "获取我关注的话题")
     public ApiResponse<List<Topic>> getUserFollowedTopics() {
         Long userId = getCurrentUserId();
@@ -149,10 +122,7 @@ public class TopicController {
         return ApiResponse.success(topics);
     }
 
-    /**
-     * 检查是否已关注话题
-     */
-    @GetMapping("/{topicId}/followed")
+        @GetMapping("/{topicId}/followed")
     @Operation(summary = "检查是否已关注")
     public ApiResponse<Boolean> checkTopicFollowed(
         @Parameter(description = "话题ID") @PathVariable Long topicId
@@ -162,10 +132,7 @@ public class TopicController {
         return ApiResponse.success(followed);
     }
 
-    /**
-     * 获取话题关注人数
-     */
-    @GetMapping("/{topicId}/followers/count")
+        @GetMapping("/{topicId}/followers/count")
     @Operation(summary = "获取话题关注人数")
     public ApiResponse<Long> getTopicFollowerCount(
         @Parameter(description = "话题ID") @PathVariable Long topicId

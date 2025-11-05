@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
@@ -27,10 +27,7 @@ public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
-    /**
-     * 添加收藏
-     */
-    @PostMapping("/{goodsId}")
+        @PostMapping("/{goodsId}")
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "添加收藏", description = "用户收藏物品")
     public ApiResponse<Void> addFavorite(
@@ -40,10 +37,7 @@ public class FavoriteController {
         return ApiResponse.success(null);
     }
 
-    /**
-     * 取消收藏
-     */
-    @DeleteMapping("/{goodsId}")
+        @DeleteMapping("/{goodsId}")
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "取消收藏", description = "用户取消收藏物品")
     public ApiResponse<Void> removeFavorite(
@@ -53,10 +47,7 @@ public class FavoriteController {
         return ApiResponse.success(null);
     }
 
-    /**
-     * 查询收藏列表
-     */
-    @GetMapping
+        @GetMapping
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "查询收藏列表", description = "查询当前用户的收藏列表")
     public ApiResponse<Page<GoodsResponse>> listFavorites(
@@ -67,10 +58,7 @@ public class FavoriteController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 检查是否已收藏
-     */
-    @GetMapping("/{goodsId}/check")
+        @GetMapping("/{goodsId}/check")
     @Operation(summary = "检查是否已收藏", description = "检查当前用户是否已收藏指定物品")
     public ApiResponse<Boolean> isFavorited(
             @Parameter(description = "物品 ID", example = "12345") @PathVariable Long goodsId

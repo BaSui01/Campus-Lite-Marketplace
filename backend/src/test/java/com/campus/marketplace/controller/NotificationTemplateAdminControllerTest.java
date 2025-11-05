@@ -60,7 +60,6 @@ class NotificationTemplateAdminControllerTest {
     @WithMockUser(authorities = "system:rate-limit:manage")
     void list_success() throws Exception {
         NotificationTemplate tpl = NotificationTemplate.builder()
-                .id(1L)
                 .code("ORDER_PAID")
                 .titleKey("tpl.order.title")
                 .contentKey("tpl.order.content")

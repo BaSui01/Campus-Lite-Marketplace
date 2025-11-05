@@ -130,22 +130,22 @@ public class PerformanceReportServiceImpl implements PerformanceReportService {
         List<ApiPerformanceLog> allLogs = apiPerformanceLogRepository.findAll();
         
         long totalRequests = allLogs.size();
-        long successRequests = allLogs.stream().filter(ApiPerformanceLog::getIsSuccess).count();
+        long successRequests = allLogs.stream().filter(log -> log.getStatusCode() >= 200 && log.getStatusCode() < 300).count();
         long failedRequests = totalRequests - successRequests;
-        long slowQueryCount = allLogs.stream().filter(ApiPerformanceLog::getIsSlow).count();
+        long slowQueryCount = allLogs.stream().filter(log -> log.getResponseTime() > 1000).count();
 
         double successRate = totalRequests > 0 ? (double) successRequests / totalRequests * 100 : 100.0;
         double slowQueryRate = totalRequests > 0 ? (double) slowQueryCount / totalRequests * 100 : 0.0;
 
         // 计算平均响应时间
         double avgResponseTime = allLogs.stream()
-            .mapToLong(ApiPerformanceLog::getDurationMs)
+            .mapToInt(ApiPerformanceLog::getResponseTime)
             .average()
             .orElse(0.0);
 
         // 计算P95和P99
         List<Long> sortedDurations = allLogs.stream()
-            .map(ApiPerformanceLog::getDurationMs)
+            .map(log -> (long) log.getResponseTime())
             .sorted()
             .collect(Collectors.toList());
 
@@ -348,8 +348,8 @@ public class PerformanceReportServiceImpl implements PerformanceReportService {
             return 30.0; // 默认满分
         }
 
-        long successCount = allLogs.stream().filter(ApiPerformanceLog::getIsSuccess).count();
-        long slowCount = allLogs.stream().filter(ApiPerformanceLog::getIsSlow).count();
+        long successCount = allLogs.stream().filter(log -> log.getStatusCode() >= 200 && log.getStatusCode() < 300).count();
+        long slowCount = allLogs.stream().filter(log -> log.getResponseTime() > 1000).count();
 
         double successRate = (double) successCount / allLogs.size();
         double slowRate = (double) slowCount / allLogs.size();

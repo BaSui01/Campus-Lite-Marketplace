@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.BatchReviewRequest;
 import com.campus.marketplace.common.dto.request.ReviewRequest;
@@ -38,11 +38,7 @@ public class AppealAdminController {
 
     private final AppealService appealService;
 
-    /**
-     * 审核申诉
-     * 管理员可以批准或拒绝申诉
-     */
-    @Operation(summary = "审核申诉", description = "管理员审核申诉，可批准或拒绝")
+        @Operation(summary = "审核申诉", description = "管理员审核申诉，可批准或拒绝")
     @PostMapping("/{appealId}/review")
     @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
     public ApiResponse<Appeal> reviewAppeal(
@@ -70,11 +66,7 @@ public class AppealAdminController {
         }
     }
 
-    /**
-     * 批量审核申诉
-     * 管理员可以一次性审核多个申诉
-     */
-    @Operation(summary = "批量审核申诉", description = "批量审核多个申诉")
+        @Operation(summary = "批量审核申诉", description = "批量审核多个申诉")
     @PostMapping("/batch-review")
     @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
     public ApiResponse<BatchReviewResult> batchReviewAppeals(@Valid @RequestBody BatchReviewRequest request) {
@@ -102,10 +94,7 @@ public class AppealAdminController {
         }
     }
 
-    /**
-     * 获取所有待审核申诉
-     */
-    @Operation(summary = "查询待审核申诉", description = "获取所有待审核的申诉列表")
+        @Operation(summary = "查询待审核申诉", description = "获取所有待审核的申诉列表")
     @GetMapping("/pending")
     @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
     public ApiResponse<Page<Appeal>> getPendingAppeals(
@@ -126,11 +115,7 @@ public class AppealAdminController {
         }
     }
 
-    /**
-     * 标记过期申诉
-     * 定时任务或管理员手动触发
-     */
-    @Operation(summary = "标记过期申诉", description = "将超期未处理的申诉标记为过期")
+        @Operation(summary = "标记过期申诉", description = "将超期未处理的申诉标记为过期")
     @PostMapping("/mark-expired")
     @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
     public ApiResponse<Integer> markExpiredAppeals() {
@@ -145,11 +130,7 @@ public class AppealAdminController {
         }
     }
 
-    /**
-     * 获取申诉统计信息
-     * 包括待处理、审核中、已完成等各状态数量
-     */
-    @Operation(summary = "申诉统计", description = "获取申诉系统的统计数据")
+        @Operation(summary = "申诉统计", description = "获取申诉系统的统计数据")
     @GetMapping("/statistics")
     @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
     public ApiResponse<AppealStatistics> getAppealStatistics() {
@@ -161,10 +142,7 @@ public class AppealAdminController {
         }
     }
 
-    /**
-     * 按状态查询申诉
-     */
-    @Operation(summary = "按状态查询", description = "根据申诉状态查询申诉列表")
+        @Operation(summary = "按状态查询", description = "根据申诉状态查询申诉列表")
     @GetMapping("/status/{status}")
     @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
     public ApiResponse<Page<Appeal>> getAppealsByStatus(
@@ -184,10 +162,7 @@ public class AppealAdminController {
         }
     }
 
-    /**
-     * 获取申诉详情（管理员权限）
-     */
-    @Operation(summary = "查询申诉详情", description = "管理员查看任意申诉的详细信息")
+        @Operation(summary = "查询申诉详情", description = "管理员查看任意申诉的详细信息")
     @GetMapping("/{appealId}")
     @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
     public ApiResponse<Appeal> getAppealDetail(@PathVariable Long appealId) {

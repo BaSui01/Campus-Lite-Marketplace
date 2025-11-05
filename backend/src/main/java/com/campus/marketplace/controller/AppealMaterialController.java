@@ -1,6 +1,8 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import com.campus.marketplace.common.dto.response.MaterialUploadResponse;
 import com.campus.marketplace.common.entity.AppealMaterial;
 import com.campus.marketplace.service.AppealMaterialService;
@@ -20,12 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
  * @author BaSui
  * @date 2025-11-03
  */
+@Tag(name = "申诉材料")
 @RestController
 @RequestMapping("/api/appeals/materials")
 @RequiredArgsConstructor
 public class AppealMaterialController {
 
     private final AppealMaterialService appealMaterialService;
+
+    @Operation(summary = "上传申诉材料")
 
     @PostMapping("/{appealId}/upload")
     public ApiResponse<MaterialUploadResponse> uploadMaterials(
@@ -49,6 +54,8 @@ public class AppealMaterialController {
         }
     }
 
+    @Operation(summary = "删除申诉材料")
+
     @DeleteMapping("/{materialId}")
     public ApiResponse<Void> deleteMaterial(@PathVariable Long materialId) {
         try {
@@ -66,6 +73,7 @@ public class AppealMaterialController {
         }
     }
 
+    @Operation(summary = "获取申诉材料列表")
     @GetMapping("/{appealId}")
     public ApiResponse<java.util.List<AppealMaterial>> getAppealMaterials(@PathVariable String appealId) {
         try {
@@ -76,6 +84,7 @@ public class AppealMaterialController {
         }
     }
 
+    @Operation(summary = "分页获取申诉材料")
     @GetMapping("/{appealId}/page")
     public ApiResponse<Page<AppealMaterial>> getAppealMaterialsPage(
             @PathVariable String appealId,
@@ -90,6 +99,7 @@ public class AppealMaterialController {
         }
     }
 
+    @Operation(summary = "按类型获取材料")
     @GetMapping("/{appealId}/type/{fileType}")
     public ApiResponse<java.util.List<AppealMaterial>> getMaterialsByType(
             @PathVariable String appealId,
@@ -101,6 +111,8 @@ public class AppealMaterialController {
             return ApiResponse.error(500, "获取材料列表失败: " + e.getMessage());
         }
     }
+
+    @Operation(summary = "生成缩略图")
 
     @PostMapping("/{materialId}/thumbnail")
     public ApiResponse<Boolean> generateThumbnail(@PathVariable Long materialId) {
@@ -116,6 +128,8 @@ public class AppealMaterialController {
         }
     }
 
+    @Operation(summary = "病毒扫描")
+
     @PostMapping("/{materialId}/scan")
     public ApiResponse<String> scanFileForVirus(@PathVariable Long materialId) {
         try {
@@ -126,6 +140,8 @@ public class AppealMaterialController {
         }
     }
 
+    @Operation(summary = "批量病毒扫描")
+
     @PostMapping("/batch-scan")
     public ApiResponse<String> batchVirusScan() {
         try {
@@ -135,6 +151,8 @@ public class AppealMaterialController {
             return ApiResponse.error(500, "批量扫描失败: " + e.getMessage());
         }
     }
+
+    @Operation(summary = "下载文件")
 
     @GetMapping("/{materialId}/download")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long materialId) {
@@ -152,6 +170,8 @@ public class AppealMaterialController {
         }
     }
 
+    @Operation(summary = "检查文件是否存在")
+
     @GetMapping("/{materialId}/exists")
     public ApiResponse<Boolean> checkFileExists(@PathVariable Long materialId) {
         try {
@@ -161,6 +181,8 @@ public class AppealMaterialController {
             return ApiResponse.error(500, "检查文件存在性失败: " + e.getMessage());
         }
     }
+
+    @Operation(summary = "获取材料统计信息")
 
     @GetMapping("/{appealId}/statistics")
     public ApiResponse<Object> getMaterialStatistics(

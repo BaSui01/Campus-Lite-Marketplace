@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.CreatePostRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
@@ -35,10 +35,7 @@ public class PostController {
 
     private final PostService postService;
 
-    /**
-     * 发布帖子
-     */
-    @PostMapping
+        @PostMapping
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "发布帖子", description = "用户发布论坛帖子")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -68,10 +65,7 @@ public class PostController {
         return ApiResponse.success(postId);
     }
 
-    /**
-     * 修改帖子
-     */
-    @PutMapping("/{id}")
+        @PutMapping("/{id}")
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "修改帖子", description = "作者或管理员可编辑帖子，内容变更将重置为待审核")
     public ApiResponse<Void> updatePost(
@@ -82,10 +76,7 @@ public class PostController {
         return ApiResponse.success(null);
     }
 
-    /**
-     * 查询帖子列表（分页）
-     */
-    @GetMapping
+        @GetMapping
     @Operation(summary = "查询帖子列表", description = "分页查询帖子列表，支持排序")
     public ApiResponse<Page<PostResponse>> listPosts(
             @Parameter(description = "页码（从 0 开始）", example = "0") @RequestParam(defaultValue = "0") int page,
@@ -97,10 +88,7 @@ public class PostController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 搜索帖子
-     */
-    @GetMapping("/search")
+        @GetMapping("/search")
     @Operation(summary = "搜索帖子", description = "根据关键词搜索帖子")
     public ApiResponse<Page<PostResponse>> searchPosts(
             @Parameter(description = "搜索关键词", example = "二手自行车") @RequestParam String keyword,
@@ -111,10 +99,7 @@ public class PostController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 查询指定用户的帖子列表
-     */
-    @GetMapping("/user/{authorId}")
+        @GetMapping("/user/{authorId}")
     @Operation(summary = "查询指定用户的帖子列表", description = "根据作者 ID 查询其发布的所有帖子")
     public ApiResponse<Page<PostResponse>> listPostsByAuthor(
             @Parameter(description = "作者 ID", example = "10002") @PathVariable Long authorId,
@@ -125,10 +110,7 @@ public class PostController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 查询帖子详情
-     */
-    @GetMapping("/{id}")
+        @GetMapping("/{id}")
     @Operation(summary = "查询帖子详情", description = "根据帖子 ID 查询详细信息")
     public ApiResponse<PostResponse> getPostDetail(
             @Parameter(description = "帖子 ID", example = "98765") @PathVariable Long id
@@ -137,10 +119,7 @@ public class PostController {
         return ApiResponse.success(response);
     }
 
-    /**
-     * 审核帖子（管理员）
-     */
-    @PostMapping("/{id}/approve")
+        @PostMapping("/{id}/approve")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_POST_APPROVE)")
     @Operation(summary = "审核帖子", description = "管理员审核帖子，通过或拒绝")
     public ApiResponse<Void> approvePost(
@@ -152,10 +131,7 @@ public class PostController {
         return ApiResponse.success(null);
     }
 
-    /**
-     * 删除帖子（作者或管理员）
-     */
-    @DeleteMapping("/{id}")
+        @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "删除帖子", description = "作者或管理员删除帖子")
     public ApiResponse<Void> deletePost(

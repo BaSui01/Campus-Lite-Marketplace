@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
@@ -29,10 +29,7 @@ public class RecommendController {
 
     private final RecommendService recommendService;
 
-    /**
-     * 热门榜单（按校区）
-     */
-    @GetMapping("/hot")
+        @GetMapping("/hot")
     @Operation(summary = "热门榜单", description = "按校区获取热门物品榜单")
     public ApiResponse<List<GoodsResponse>> hot(
             @Parameter(description = "校区ID", example = "1") @RequestParam(required = false) Long campusId,
@@ -41,10 +38,7 @@ public class RecommendController {
         return ApiResponse.success(recommendService.getHotList(campusId, size));
     }
 
-    /**
-     * 个性化推荐（需登录）
-     */
-    @GetMapping("/personal")
+        @GetMapping("/personal")
     @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN','SUPER_ADMIN')")
     @Operation(summary = "个性化推荐", description = "根据用户行为推荐物品，需登录")
     public ApiResponse<List<GoodsResponse>> personal(
@@ -53,10 +47,7 @@ public class RecommendController {
         return ApiResponse.success(recommendService.getPersonalRecommendations(size));
     }
 
-    /**
-     * 手动刷新热门榜单（管理员）
-     */
-    @PostMapping("/admin/hot/refresh")
+        @PostMapping("/admin/hot/refresh")
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     @Operation(summary = "刷新热门榜单", description = "管理员手动刷新热门榜单缓存")
     public ApiResponse<Void> refreshHot(

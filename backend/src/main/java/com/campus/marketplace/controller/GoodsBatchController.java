@@ -1,6 +1,8 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.CreateBatchTaskRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 import com.campus.marketplace.common.dto.request.GoodsBatchRequest;
 import com.campus.marketplace.common.dto.request.InventoryBatchRequest;
 import com.campus.marketplace.common.dto.request.PriceBatchRequest;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2025-11-03
  */
 @Slf4j
+@Tag(name = "商品批量操作")
 @RestController
 @RequestMapping("/api/goods/batch")
 @RequiredArgsConstructor
@@ -34,9 +37,8 @@ public class GoodsBatchController {
     private final BatchLimitService batchLimitService;
     private final ObjectMapper objectMapper;
 
-    /**
-     * 批量上架商品
-     */
+        @Operation(summary = "批量上架商品")
+
     @PostMapping("/online")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).BATCH_GOODS_ONLINE)")
     public ApiResponse<Long> batchOnline(@Valid @RequestBody GoodsBatchRequest request) throws Exception {
@@ -68,9 +70,8 @@ public class GoodsBatchController {
         return ApiResponse.success(taskId);
     }
 
-    /**
-     * 批量下架商品
-     */
+        @Operation(summary = "批量下架商品")
+
     @PostMapping("/offline")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).BATCH_GOODS_OFFLINE)")
     public ApiResponse<Long> batchOffline(@Valid @RequestBody GoodsBatchRequest request) throws Exception {
@@ -99,9 +100,8 @@ public class GoodsBatchController {
         return ApiResponse.success(taskId);
     }
 
-    /**
-     * 批量删除商品
-     */
+        @Operation(summary = "批量删除商品")
+
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).BATCH_GOODS_DELETE)")
     public ApiResponse<Long> batchDelete(@Valid @RequestBody GoodsBatchRequest request) throws Exception {
@@ -130,9 +130,8 @@ public class GoodsBatchController {
         return ApiResponse.success(taskId);
     }
 
-    /**
-     * 批量调整价格
-     */
+        @Operation(summary = "批量调整价格")
+
     @PostMapping("/price")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).BATCH_GOODS_PRICE)")
     public ApiResponse<Long> batchUpdatePrice(@Valid @RequestBody PriceBatchRequest request) throws Exception {
@@ -161,9 +160,8 @@ public class GoodsBatchController {
         return ApiResponse.success(taskId);
     }
 
-    /**
-     * 批量更新库存
-     */
+        @Operation(summary = "批量更新库存")
+
     @PostMapping("/inventory")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).BATCH_GOODS_INVENTORY)")
     public ApiResponse<Long> batchUpdateInventory(@Valid @RequestBody InventoryBatchRequest request) throws Exception {

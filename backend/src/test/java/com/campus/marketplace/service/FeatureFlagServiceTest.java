@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.Instant;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,7 +39,6 @@ class FeatureFlagServiceTest {
                 .key("exp.new-ui")
                 .enabled(true)
                 .rulesJson("{\"allowEnvs\":[\"dev\"]}")
-                .updatedAt(Instant.now())
                 .build();
         when(repository.findByKey("exp.new-ui")).thenReturn(Optional.of(flag));
         assertTrue(service.isEnabled("exp.new-ui", null, null, "dev"));
@@ -52,7 +50,6 @@ class FeatureFlagServiceTest {
         FeatureFlag flag = FeatureFlag.builder()
                 .key("exp.cache-test")
                 .enabled(false)
-                .updatedAt(Instant.now())
                 .build();
         when(repository.findByKey("exp.cache-test")).thenReturn(Optional.of(flag));
         assertFalse(service.isEnabled("exp.cache-test", null, null, null));

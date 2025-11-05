@@ -1,4 +1,4 @@
-package com.campus.marketplace.controller;
+﻿package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.annotation.RateLimit;
@@ -39,17 +39,7 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    /**
-     * 发送消息
-     *
-     * 🚀 支持文本、图片、商品卡片等消息类型
-     * ✅ 自动进行敏感词过滤
-     * 💬 WebSocket实时推送给接收者
-     *
-     * @param request 发送消息请求
-     * @return 消息ID
-     */
-    @Operation(summary = "发送消息", description = "发送私信给指定用户，支持文本/图片/商品卡片")
+        @Operation(summary = "发送消息", description = "发送私信给指定用户，支持文本/图片/商品卡片")
     @PostMapping("/send")
     @PreAuthorize("hasRole('USER')")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -80,15 +70,7 @@ public class MessageController {
         return ApiResponse.success(messageId);
     }
 
-    /**
-     * 获取未读消息数
-     *
-     * 📊 返回当前用户的未读消息总数
-     * ⚡ 优先从Redis读取，缓存未命中则查询数据库
-     *
-     * @return 未读消息数
-     */
-    @Operation(summary = "获取未读消息数", description = "获取当前用户的未读消息总数")
+        @Operation(summary = "获取未读消息数", description = "获取当前用户的未读消息总数")
     @GetMapping("/unread-count")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Integer> getUnreadCount() {
@@ -100,18 +82,7 @@ public class MessageController {
         return ApiResponse.success(unreadCount);
     }
 
-    /**
-     * 查询会话列表
-     *
-     * 📋 返回当前用户的所有会话
-     * 🔄 按最后消息时间倒序排列
-     * 📈 包含每个会话的未读消息数
-     *
-     * @param page 页码（从0开始）
-     * @param size 每页大小（默认20）
-     * @return 会话列表（分页）
-     */
-    @Operation(summary = "查询会话列表", description = "获取当前用户的所有私信会话，按最后消息时间倒序")
+        @Operation(summary = "查询会话列表", description = "获取当前用户的所有私信会话，按最后消息时间倒序")
     @GetMapping("/conversations")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Page<ConversationResponse>> listConversations(
@@ -127,19 +98,7 @@ public class MessageController {
         return ApiResponse.success(conversations);
     }
 
-    /**
-     * 查询聊天记录
-     *
-     * 💬 返回指定会话的消息历史
-     * 🔒 自动验证权限（只能查看自己的会话）
-     * ⏰ 按消息时间倒序排列
-     *
-     * @param conversationId 会话ID
-     * @param page 页码（从0开始）
-     * @param size 每页大小（默认50）
-     * @return 消息列表（分页）
-     */
-    @Operation(summary = "查询聊天记录", description = "获取指定会话的消息历史，按时间倒序")
+        @Operation(summary = "查询聊天记录", description = "获取指定会话的消息历史，按时间倒序")
     @GetMapping("/conversations/{conversationId}/messages")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Page<MessageResponse>> listMessages(
@@ -157,17 +116,7 @@ public class MessageController {
         return ApiResponse.success(messages);
     }
 
-    /**
-     * 标记会话消息为已读
-     *
-     * 📖 批量标记指定会话的所有未读消息为已读
-     * 📉 自动更新未读消息数
-     * 🔒 权限验证（只能标记自己的消息）
-     *
-     * @param conversationId 会话ID
-     * @return 已读消息数量
-     */
-    @Operation(summary = "标记会话为已读", description = "批量标记指定会话的所有未读消息为已读")
+        @Operation(summary = "标记会话为已读", description = "批量标记指定会话的所有未读消息为已读")
     @PostMapping("/conversations/{conversationId}/mark-read")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Integer> markConversationAsRead(
@@ -182,17 +131,7 @@ public class MessageController {
         return ApiResponse.success(count);
     }
 
-    /**
-     * 撤回消息
-     *
-     * 🔙 撤回自己发送的消息
-     * ⏰ 仅限1分钟内的消息
-     * 📡 实时通知接收者
-     *
-     * @param messageId 消息ID
-     * @return 成功响应
-     */
-    @Operation(summary = "撤回消息", description = "撤回自己发送的消息（1分钟内有效）")
+        @Operation(summary = "撤回消息", description = "撤回自己发送的消息（1分钟内有效）")
     @PostMapping("/messages/{messageId}/recall")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<Void> recallMessage(

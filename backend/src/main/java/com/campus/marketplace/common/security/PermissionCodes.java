@@ -118,6 +118,49 @@ public final class PermissionCodes {
     public static final String MARKET_SELLER_CENTER = "market:seller:center";
     public static final String MARKET_ORDER_MANAGE = "market:order:manage";
 
+    // ===== 优惠券管理（P0 - 核心业务）=====
+    public static final String SYSTEM_COUPON_VIEW = "system:coupon:view";
+    public static final String SYSTEM_COUPON_CREATE = "system:coupon:create";
+    public static final String SYSTEM_COUPON_UPDATE = "system:coupon:update";
+    public static final String SYSTEM_COUPON_DELETE = "system:coupon:delete";
+    public static final String SYSTEM_COUPON_MANAGE = "system:coupon:manage";
+
+    // ===== 积分管理（P0 - 核心业务）=====
+    public static final String SYSTEM_POINTS_VIEW = "system:points:view";
+    public static final String SYSTEM_POINTS_MANAGE = "system:points:manage";
+    public static final String SYSTEM_POINTS_GRANT = "system:points:grant";
+    public static final String SYSTEM_POINTS_DEDUCT = "system:points:deduct";
+
+    // ===== 搜索管理（P1 - 重要功能）=====
+    public static final String SYSTEM_SEARCH_VIEW = "system:search:view";
+    public static final String SYSTEM_SEARCH_MANAGE = "system:search:manage";
+    public static final String SYSTEM_SEARCH_ANALYTICS = "system:search:analytics";
+
+    // ===== 导出任务（P1 - 重要功能）=====
+    public static final String SYSTEM_EXPORT_VIEW = "system:export:view";
+    public static final String SYSTEM_EXPORT_CREATE = "system:export:create";
+    public static final String SYSTEM_EXPORT_DOWNLOAD = "system:export:download";
+
+    // ===== 收藏管理（P1 - 重要功能）=====
+    public static final String SYSTEM_FAVORITE_VIEW = "system:favorite:view";
+    public static final String SYSTEM_FAVORITE_DELETE = "system:favorite:delete";
+
+    // ===== 关注管理（P1 - 重要功能）=====
+    public static final String SYSTEM_FOLLOW_VIEW = "system:follow:view";
+    public static final String SYSTEM_FOLLOW_DELETE = "system:follow:delete";
+
+    // ===== 订阅管理（P2 - 辅助功能）=====
+    public static final String SYSTEM_SUBSCRIPTION_VIEW = "system:subscription:view";
+    public static final String SYSTEM_SUBSCRIPTION_MANAGE = "system:subscription:manage";
+
+    // ===== 浏览日志（P2 - 辅助功能）=====
+    public static final String SYSTEM_VIEW_LOG_VIEW = "system:view-log:view";
+    public static final String SYSTEM_VIEW_LOG_ANALYTICS = "system:view-log:analytics";
+
+    // ===== API性能监控（P2 - 辅助功能）=====
+    public static final String SYSTEM_API_PERFORMANCE_VIEW = "system:api-performance:view";
+    public static final String SYSTEM_API_PERFORMANCE_ANALYTICS = "system:api-performance:analytics";
+
     private static final Set<String> ALL_CODES_INTERNAL;
     private static final Set<String> ADMIN_DEFAULT_CODES_INTERNAL;
     private static final Map<String, String> DESCRIPTION_MAP;
@@ -179,7 +222,35 @@ public final class PermissionCodes {
                 MARKET_GOODS_APPROVE,
                 MARKET_ORDER_REFUND,
                 MARKET_SELLER_CENTER,
-                MARKET_ORDER_MANAGE
+                MARKET_ORDER_MANAGE,
+                // P0 权限
+                SYSTEM_COUPON_VIEW,
+                SYSTEM_COUPON_CREATE,
+                SYSTEM_COUPON_UPDATE,
+                SYSTEM_COUPON_DELETE,
+                SYSTEM_COUPON_MANAGE,
+                SYSTEM_POINTS_VIEW,
+                SYSTEM_POINTS_MANAGE,
+                SYSTEM_POINTS_GRANT,
+                SYSTEM_POINTS_DEDUCT,
+                // P1 权限
+                SYSTEM_SEARCH_VIEW,
+                SYSTEM_SEARCH_MANAGE,
+                SYSTEM_SEARCH_ANALYTICS,
+                SYSTEM_EXPORT_VIEW,
+                SYSTEM_EXPORT_CREATE,
+                SYSTEM_EXPORT_DOWNLOAD,
+                SYSTEM_FAVORITE_VIEW,
+                SYSTEM_FAVORITE_DELETE,
+                SYSTEM_FOLLOW_VIEW,
+                SYSTEM_FOLLOW_DELETE,
+                // P2 权限
+                SYSTEM_SUBSCRIPTION_VIEW,
+                SYSTEM_SUBSCRIPTION_MANAGE,
+                SYSTEM_VIEW_LOG_VIEW,
+                SYSTEM_VIEW_LOG_ANALYTICS,
+                SYSTEM_API_PERFORMANCE_VIEW,
+                SYSTEM_API_PERFORMANCE_ANALYTICS
         );
         ALL_CODES_INTERNAL = Collections.unmodifiableSet(all);
 
@@ -230,7 +301,35 @@ public final class PermissionCodes {
                 MARKET_GOODS_APPROVE,
                 MARKET_ORDER_REFUND,
                 MARKET_SELLER_CENTER,
-                MARKET_ORDER_MANAGE
+                MARKET_ORDER_MANAGE,
+                // P0 权限（管理员默认拥有）
+                SYSTEM_COUPON_VIEW,
+                SYSTEM_COUPON_CREATE,
+                SYSTEM_COUPON_UPDATE,
+                SYSTEM_COUPON_DELETE,
+                SYSTEM_COUPON_MANAGE,
+                SYSTEM_POINTS_VIEW,
+                SYSTEM_POINTS_MANAGE,
+                SYSTEM_POINTS_GRANT,
+                SYSTEM_POINTS_DEDUCT,
+                // P1 权限（管理员默认拥有）
+                SYSTEM_SEARCH_VIEW,
+                SYSTEM_SEARCH_MANAGE,
+                SYSTEM_SEARCH_ANALYTICS,
+                SYSTEM_EXPORT_VIEW,
+                SYSTEM_EXPORT_CREATE,
+                SYSTEM_EXPORT_DOWNLOAD,
+                SYSTEM_FAVORITE_VIEW,
+                SYSTEM_FAVORITE_DELETE,
+                SYSTEM_FOLLOW_VIEW,
+                SYSTEM_FOLLOW_DELETE,
+                // P2 权限（管理员默认拥有）
+                SYSTEM_SUBSCRIPTION_VIEW,
+                SYSTEM_SUBSCRIPTION_MANAGE,
+                SYSTEM_VIEW_LOG_VIEW,
+                SYSTEM_VIEW_LOG_ANALYTICS,
+                SYSTEM_API_PERFORMANCE_VIEW,
+                SYSTEM_API_PERFORMANCE_ANALYTICS
         );
         ADMIN_DEFAULT_CODES_INTERNAL = Collections.unmodifiableSet(adminDefaults);
 
@@ -307,6 +406,37 @@ public final class PermissionCodes {
         descriptions.put(MARKET_ORDER_REFUND, "处理订单退款");
         descriptions.put(MARKET_SELLER_CENTER, "卖家中心");
         descriptions.put(MARKET_ORDER_MANAGE, "订单管理");
+
+        // P0 权限描述
+        descriptions.put(SYSTEM_COUPON_VIEW, "查看优惠券");
+        descriptions.put(SYSTEM_COUPON_CREATE, "创建优惠券");
+        descriptions.put(SYSTEM_COUPON_UPDATE, "更新优惠券");
+        descriptions.put(SYSTEM_COUPON_DELETE, "删除优惠券");
+        descriptions.put(SYSTEM_COUPON_MANAGE, "管理优惠券");
+        descriptions.put(SYSTEM_POINTS_VIEW, "查看积分记录");
+        descriptions.put(SYSTEM_POINTS_MANAGE, "管理积分");
+        descriptions.put(SYSTEM_POINTS_GRANT, "发放积分");
+        descriptions.put(SYSTEM_POINTS_DEDUCT, "扣除积分");
+
+        // P1 权限描述
+        descriptions.put(SYSTEM_SEARCH_VIEW, "查看搜索记录");
+        descriptions.put(SYSTEM_SEARCH_MANAGE, "管理搜索关键词");
+        descriptions.put(SYSTEM_SEARCH_ANALYTICS, "搜索分析");
+        descriptions.put(SYSTEM_EXPORT_VIEW, "查看导出任务");
+        descriptions.put(SYSTEM_EXPORT_CREATE, "创建导出任务");
+        descriptions.put(SYSTEM_EXPORT_DOWNLOAD, "下载导出文件");
+        descriptions.put(SYSTEM_FAVORITE_VIEW, "查看收藏");
+        descriptions.put(SYSTEM_FAVORITE_DELETE, "删除收藏");
+        descriptions.put(SYSTEM_FOLLOW_VIEW, "查看关注");
+        descriptions.put(SYSTEM_FOLLOW_DELETE, "删除关注");
+
+        // P2 权限描述
+        descriptions.put(SYSTEM_SUBSCRIPTION_VIEW, "查看订阅");
+        descriptions.put(SYSTEM_SUBSCRIPTION_MANAGE, "管理订阅");
+        descriptions.put(SYSTEM_VIEW_LOG_VIEW, "查看浏览日志");
+        descriptions.put(SYSTEM_VIEW_LOG_ANALYTICS, "浏览日志分析");
+        descriptions.put(SYSTEM_API_PERFORMANCE_VIEW, "查看API性能");
+        descriptions.put(SYSTEM_API_PERFORMANCE_ANALYTICS, "API性能分析");
 
         DESCRIPTION_MAP = Collections.unmodifiableMap(descriptions);
     }

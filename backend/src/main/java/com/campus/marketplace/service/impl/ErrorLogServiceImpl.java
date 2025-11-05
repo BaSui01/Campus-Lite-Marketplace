@@ -158,7 +158,8 @@ public class ErrorLogServiceImpl implements ErrorLogService {
     @Override
     @Transactional
     @Scheduled(cron = "0 0 4 * * ?") // 每天凌晨4点执行
-    public void cleanupOldLogs(int daysToKeep) {
+    public void cleanupOldLogs() {
+        int daysToKeep = 30; // 默认保留30天
         LocalDateTime cutoff = LocalDateTime.now().minusDays(daysToKeep);
         errorLogRepository.deleteByErrorTimeBefore(cutoff);
         log.info("✅ 错误日志清理完成: 删除{}天前的记录", daysToKeep);

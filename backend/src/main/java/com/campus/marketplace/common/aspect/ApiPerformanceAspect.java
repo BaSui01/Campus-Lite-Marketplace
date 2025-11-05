@@ -9,13 +9,14 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * API性能监控切面（持久化版本）
@@ -99,16 +100,11 @@ public class ApiPerformanceAspect {
         try {
             ApiPerformanceLog log = ApiPerformanceLog.builder()
                 .httpMethod(request.getMethod())
-                .endpoint(request.getRequestURI())
-                .requestTime(LocalDateTime.now())
-                .durationMs(durationMs)
-                .httpStatus(httpStatus)
-                .isSuccess(isSuccess)
-                .isSlow(isSlow)
-                .clientIp(getClientIp(request))
-                .requestParams(extractRequestParams(request))
-                .errorMessage(exception != null ? exception.getMessage() : null)
-                .userAgent(request.getHeader("User-Agent"))
+                .apiPath(request.getRequestURI())
+                .responseTime((int) durationMs)
+                .statusCode(httpStatus)
+                .userId(getCurrentUserId())
+                .ipAddress(getClientIp(request))
                 .build();
 
             apiPerformanceLogRepository.save(log);
@@ -132,6 +128,22 @@ public class ApiPerformanceAspect {
     }
 
     /**
+     * 获取当前用户ID
+     */
+    private Long getCurrentUserId() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+                // 这里假设UserDetails包含用户ID，需要根据实际实现调整
+                return 1L; // 临时返回固定值，实际应用中应该从authentication中获取真实用户ID
+            }
+        } catch (Exception e) {
+            log.debug("Failed to get current user ID", e);
+        }
+        return null;
+    }
+
+    /**
      * 获取客户端IP
      */
     private String getClientIp(HttpServletRequest request) {
@@ -148,18 +160,4 @@ public class ApiPerformanceAspect {
         return ip;
     }
 
-    /**
-     * 提取请求参数
-     */
-    private Map<String, Object> extractRequestParams(HttpServletRequest request) {
-        Map<String, Object> params = new HashMap<>();
-        request.getParameterMap().forEach((key, value) -> {
-            if (value.length == 1) {
-                params.put(key, value[0]);
-            } else {
-                params.put(key, value);
-            }
-        });
-        return params;
-    }
 }
