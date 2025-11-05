@@ -1,0 +1,61 @@
+/**
+ * 商品详情页样式
+ * @author BaSui 😎
+ */
+
+/* ==================== 页面容器 ==================== */
+.goods-detail-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 20px 0 40px;
+}
+
+.goods-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 主内容区 ==================== */
+.goods-detail-main {
+  display: grid;
+  grid-template-columns: 500px 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.goods-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ==================== 响应式 ==================== */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .goods-detail-main {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .goods-detail-page {
+    padding: 12px 0;
+  }
+
+  .goods-detail-container {
+    padding: 0 12px;
+  }
+
+  .goods-detail-main {
+    gap: 16px;
+  }
+
+  .goods-detail-content {
+    gap: 16px;
+  }
+}

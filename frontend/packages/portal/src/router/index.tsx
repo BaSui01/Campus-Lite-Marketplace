@@ -21,7 +21,7 @@ const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
 // 主要页面
 const Home = lazy(() => import('../pages/Home'));
 const GoodsList = lazy(() => import('../pages/Goods/List'));
-const GoodsDetail = lazy(() => import('../pages/GoodsDetail'));
+const GoodsDetail = lazy(() => import('../pages/Goods/Detail'));
 const Publish = lazy(() => import('../pages/Publish'));
 const Chat = lazy(() => import('../pages/Chat'));
 const Orders = lazy(() => import('../pages/Orders'));
