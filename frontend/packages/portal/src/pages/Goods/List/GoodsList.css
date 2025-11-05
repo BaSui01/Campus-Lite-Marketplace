@@ -1,0 +1,167 @@
+/**
+ * 商品列表页样式
+ * @author BaSui 😎
+ */
+
+/* ==================== 页面容器 ==================== */
+.goods-list-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 20px 0;
+}
+
+.goods-list-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 20px;
+}
+
+/* ==================== 侧边栏 ==================== */
+.goods-list-aside {
+  width: 260px;
+  flex-shrink: 0;
+}
+
+/* ==================== 主内容区 ==================== */
+.goods-list-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ==================== 商品网格 ==================== */
+.goods-list-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+/* ==================== 错误状态 ==================== */
+.goods-list-error {
+  padding: 60px 20px;
+}
+
+/* ==================== 分页器 ==================== */
+.goods-list-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 0;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-pages {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination-page {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 12px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-page:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.pagination-page.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+.pagination-info {
+  margin-left: 12px;
+  font-size: 14px;
+  color: #999;
+}
+
+/* ==================== 响应式 ==================== */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .goods-list-container {
+    flex-direction: column;
+  }
+
+  .goods-list-aside {
+    width: 100%;
+  }
+
+  .goods-list-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .goods-list-page {
+    padding: 12px 0;
+  }
+
+  .goods-list-container {
+    padding: 0 12px;
+  }
+
+  .goods-list-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .goods-list-pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pagination-pages {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pagination-page {
+    min-width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .pagination-info {
+    width: 100%;
+    text-align: center;
+    margin-left: 0;
+    margin-top: 8px;
+  }
+}

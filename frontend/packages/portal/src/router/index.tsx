@@ -20,6 +20,7 @@ const ForgotPassword = lazy(() => import('../pages/ForgotPassword'));
 
 // 主要页面
 const Home = lazy(() => import('../pages/Home'));
+const GoodsList = lazy(() => import('../pages/Goods/List'));
 const GoodsDetail = lazy(() => import('../pages/GoodsDetail'));
 const Publish = lazy(() => import('../pages/Publish'));
 const Chat = lazy(() => import('../pages/Chat'));
@@ -111,6 +112,14 @@ export const router = createBrowserRouter(
           element: (
             <LazyLoadWrapper>
               <Home />
+            </LazyLoadWrapper>
+          ),
+        },
+        {
+          path: 'goods',
+          element: (
+            <LazyLoadWrapper>
+              <GoodsList />
             </LazyLoadWrapper>
           ),
         },
