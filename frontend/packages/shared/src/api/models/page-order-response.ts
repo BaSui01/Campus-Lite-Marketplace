@@ -43,18 +43,6 @@ export interface PageOrderResponse {
     'totalPages'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageOrderResponse
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageOrderResponse
-     */
-    'last'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof PageOrderResponse
      */
@@ -89,6 +77,18 @@ export interface PageOrderResponse {
      * @memberof PageOrderResponse
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageOrderResponse
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageOrderResponse
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {boolean}

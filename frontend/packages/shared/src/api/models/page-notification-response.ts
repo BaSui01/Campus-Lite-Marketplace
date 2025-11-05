@@ -43,18 +43,6 @@ export interface PageNotificationResponse {
     'totalPages'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageNotificationResponse
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageNotificationResponse
-     */
-    'last'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof PageNotificationResponse
      */
@@ -89,6 +77,18 @@ export interface PageNotificationResponse {
      * @memberof PageNotificationResponse
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageNotificationResponse
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageNotificationResponse
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {boolean}

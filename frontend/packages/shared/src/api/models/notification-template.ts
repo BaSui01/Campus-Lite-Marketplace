@@ -31,6 +31,30 @@ export interface NotificationTemplate {
      * @type {string}
      * @memberof NotificationTemplate
      */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NotificationTemplate
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof NotificationTemplate
+     */
+    'deleted'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof NotificationTemplate
+     */
+    'deletedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NotificationTemplate
+     */
     'code'?: string;
     /**
      * 

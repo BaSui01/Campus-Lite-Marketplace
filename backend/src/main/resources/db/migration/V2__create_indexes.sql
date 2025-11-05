@@ -197,14 +197,16 @@ CREATE INDEX idx_report_pending ON t_report(status, created_at DESC) WHERE statu
 -- =====================================================
 -- 21. 审计日志表索引
 -- =====================================================
-CREATE INDEX idx_audit_log_user ON t_audit_log(user_id);
-CREATE INDEX idx_audit_log_action ON t_audit_log(action);
-CREATE INDEX idx_audit_log_resource ON t_audit_log(resource_type, resource_id);
-CREATE INDEX idx_audit_log_created_at ON t_audit_log(created_at DESC);
+CREATE INDEX idx_audit_operator ON t_audit_log(operator_id);
+CREATE INDEX idx_audit_action ON t_audit_log(action_type);
+CREATE INDEX idx_audit_target ON t_audit_log(target_type, target_id);
+CREATE INDEX idx_audit_created_at ON t_audit_log(created_at);
+CREATE INDEX idx_audit_entity ON t_audit_log(entity_type, entity_id);
+CREATE INDEX idx_audit_reversible ON t_audit_log(is_reversible);
 CREATE INDEX idx_audit_log_deleted ON t_audit_log(deleted) WHERE deleted = false;
 
 -- 复合索引：用户操作日志查询
-CREATE INDEX idx_audit_log_user_action ON t_audit_log(user_id, action, created_at DESC);
+CREATE INDEX idx_audit_log_operator_action ON t_audit_log(operator_id, action_type, created_at DESC);
 
 -- =====================================================
 -- 22. 积分日志表索引

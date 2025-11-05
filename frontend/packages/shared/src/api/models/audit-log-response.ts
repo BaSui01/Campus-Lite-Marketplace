@@ -98,10 +98,19 @@ export const AuditLogResponseActionTypeEnum = {
     OrderCreate: 'ORDER_CREATE',
     OrderPay: 'ORDER_PAY',
     OrderCancel: 'ORDER_CANCEL',
+    DisputeCreate: 'DISPUTE_CREATE',
+    DisputeUpdate: 'DISPUTE_UPDATE',
+    DisputeClose: 'DISPUTE_CLOSE',
     ReportCreate: 'REPORT_CREATE',
     ReportHandle: 'REPORT_HANDLE',
+    UserAppeal: 'USER_APPEAL',
+    AppealApprove: 'APPEAL_APPROVE',
+    AppealReject: 'APPEAL_REJECT',
+    AppealCancel: 'APPEAL_CANCEL',
     ComplianceCheck: 'COMPLIANCE_CHECK',
-    NotificationFail: 'NOTIFICATION_FAIL'
+    NotificationFail: 'NOTIFICATION_FAIL',
+    Update: 'UPDATE',
+    Delete: 'DELETE'
 } as const;
 
 export type AuditLogResponseActionTypeEnum = typeof AuditLogResponseActionTypeEnum[keyof typeof AuditLogResponseActionTypeEnum];

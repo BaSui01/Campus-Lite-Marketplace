@@ -423,22 +423,51 @@ COMMENT ON COLUMN t_report.status IS '处理状态：PENDING=待处理, APPROVED
 -- =====================================================
 CREATE TABLE t_audit_log (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT,
-    action VARCHAR(50) NOT NULL,
-    resource_type VARCHAR(50) NOT NULL,
-    resource_id BIGINT,
+    operator_id BIGINT,
+    operator_name VARCHAR(50),
+    action_type VARCHAR(50) NOT NULL,
+    target_type VARCHAR(50) NOT NULL,
+    target_id BIGINT,
+    target_ids TEXT,
+    result VARCHAR(20),
+    old_value TEXT,
+    new_value TEXT,
+    entity_name VARCHAR(50) NOT NULL,
+    entity_type VARCHAR(20) NOT NULL,
+    entity_id BIGINT,
     details TEXT,
     ip_address VARCHAR(50),
     user_agent VARCHAR(500),
+    is_reversible BOOLEAN NOT NULL DEFAULT FALSE,
+    revert_deadline TIMESTAMP,
+    reverted_by_log_id BIGINT,
+    reverted_at TIMESTAMP,
+    revert_count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at TIMESTAMP,
-    CONSTRAINT fk_audit_log_user FOREIGN KEY (user_id) REFERENCES t_user(id)
+    CONSTRAINT fk_audit_log_operator FOREIGN KEY (operator_id) REFERENCES t_user(id)
 );
 
 COMMENT ON TABLE t_audit_log IS '审计日志表';
-COMMENT ON COLUMN t_audit_log.action IS '操作类型：CREATE=创建, UPDATE=更新, DELETE=删除';
+COMMENT ON COLUMN t_audit_log.operator_id IS '操作人ID';
+COMMENT ON COLUMN t_audit_log.operator_name IS '操作人用户名';
+COMMENT ON COLUMN t_audit_log.action_type IS '操作类型（枚举）';
+COMMENT ON COLUMN t_audit_log.target_type IS '目标对象类型';
+COMMENT ON COLUMN t_audit_log.target_id IS '目标对象ID';
+COMMENT ON COLUMN t_audit_log.target_ids IS '批量操作的ID列表（逗号分隔）';
+COMMENT ON COLUMN t_audit_log.result IS '操作结果（SUCCESS/FAILED）';
+COMMENT ON COLUMN t_audit_log.old_value IS '修改前的数据（JSON格式）';
+COMMENT ON COLUMN t_audit_log.new_value IS '修改后的数据（JSON格式）';
+COMMENT ON COLUMN t_audit_log.entity_name IS '实体名称';
+COMMENT ON COLUMN t_audit_log.entity_type IS '实体类型（枚举）';
+COMMENT ON COLUMN t_audit_log.entity_id IS '被操作实体的ID';
+COMMENT ON COLUMN t_audit_log.is_reversible IS '是否可撤销';
+COMMENT ON COLUMN t_audit_log.revert_deadline IS '撤销截止时间';
+COMMENT ON COLUMN t_audit_log.reverted_by_log_id IS '撤销操作的审计日志ID';
+COMMENT ON COLUMN t_audit_log.reverted_at IS '撤销时间';
+COMMENT ON COLUMN t_audit_log.revert_count IS '撤销次数';
 
 -- =====================================================
 -- 22. 积分日志表 (t_points_log)
@@ -500,9 +529,9 @@ COMMENT ON COLUMN t_view_log.duration IS '浏览时长（秒）';
 -- =====================================================
 CREATE TABLE t_api_performance_log (
     id BIGSERIAL PRIMARY KEY,
-    method VARCHAR(10) NOT NULL,
-    uri VARCHAR(500) NOT NULL,
-    duration BIGINT NOT NULL,
+    http_method VARCHAR(10) NOT NULL,
+    api_path VARCHAR(200) NOT NULL,
+    response_time INTEGER NOT NULL,
     status_code INTEGER NOT NULL,
     user_id BIGINT,
     ip_address VARCHAR(50),
@@ -513,7 +542,9 @@ CREATE TABLE t_api_performance_log (
 );
 
 COMMENT ON TABLE t_api_performance_log IS 'API性能日志表';
-COMMENT ON COLUMN t_api_performance_log.duration IS '请求耗时（毫秒）';
+COMMENT ON COLUMN t_api_performance_log.http_method IS 'HTTP方法 (GET/POST/PUT/DELETE)';
+COMMENT ON COLUMN t_api_performance_log.api_path IS 'API路径';
+COMMENT ON COLUMN t_api_performance_log.response_time IS '响应时间（毫秒）';
 
 -- =====================================================
 -- 完成！🎉

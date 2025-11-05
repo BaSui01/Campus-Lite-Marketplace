@@ -31,6 +31,30 @@ export interface ScheduledTask {
      * @type {string}
      * @memberof ScheduledTask
      */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScheduledTask
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ScheduledTask
+     */
+    'deleted'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScheduledTask
+     */
+    'deletedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScheduledTask
+     */
     'name'?: string;
     /**
      * 

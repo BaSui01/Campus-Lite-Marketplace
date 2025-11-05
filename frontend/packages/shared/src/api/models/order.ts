@@ -88,7 +88,7 @@ export interface Order {
      * @type {User}
      * @memberof Order
      */
-    'buyer'?: User;
+    'buyer'?: User | null;
     /**
      * 
      * @type {number}
@@ -100,7 +100,7 @@ export interface Order {
      * @type {User}
      * @memberof Order
      */
-    'seller'?: User;
+    'seller'?: User | null;
     /**
      * 
      * @type {number}
@@ -184,6 +184,8 @@ export interface Order {
 export const OrderStatusEnum = {
     PendingPayment: 'PENDING_PAYMENT',
     Paid: 'PAID',
+    Shipped: 'SHIPPED',
+    Delivered: 'DELIVERED',
     Completed: 'COMPLETED',
     Cancelled: 'CANCELLED',
     Reviewed: 'REVIEWED'

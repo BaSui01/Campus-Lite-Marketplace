@@ -31,7 +31,7 @@ public class PrivacyRequest extends BaseEntity {
     private Long userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 20)
+    @Column(name = "request_type", nullable = false, length = 30)
     private PrivacyRequestType type;
 
     @Enumerated(EnumType.STRING)

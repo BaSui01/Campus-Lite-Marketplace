@@ -31,6 +31,30 @@ export interface FeatureFlag {
      * @type {string}
      * @memberof FeatureFlag
      */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureFlag
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FeatureFlag
+     */
+    'deleted'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureFlag
+     */
+    'deletedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureFlag
+     */
     'key'?: string;
     /**
      * 
@@ -50,11 +74,5 @@ export interface FeatureFlag {
      * @memberof FeatureFlag
      */
     'description'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureFlag
-     */
-    'updatedAt'?: string;
 }
 

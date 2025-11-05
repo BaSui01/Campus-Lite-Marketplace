@@ -21,7 +21,7 @@ import type { Campus } from './campus';
 import type { Role } from './role';
 
 /**
- * 
+ * 业务数据载荷
  * @export
  * @interface User
  */

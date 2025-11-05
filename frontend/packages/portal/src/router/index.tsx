@@ -49,10 +49,15 @@ const RevertOperations = lazy(() => import('../pages/RevertOperations'));
  */
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
+  
   if (!isAuthenticated) {
-    // 未登录，重定向到登录页
-    return <Navigate to="/login" replace />;
+    // 未登录，保存当前路径并重定向到登录页
+    const currentPath = window.location.pathname + window.location.search;
+    const loginPath = `/login?redirect=${encodeURIComponent(currentPath)}`;
+    
+    console.log('[RequireAuth] 未登录，重定向到登录页:', loginPath);
+    
+    return <Navigate to={loginPath} replace />;
   }
 
   return <>{children}</>;

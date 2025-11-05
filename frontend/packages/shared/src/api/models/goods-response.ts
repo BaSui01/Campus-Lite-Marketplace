@@ -18,7 +18,7 @@
 import type { TagResponse } from './tag-response';
 
 /**
- * 业务数据载荷
+ * 
  * @export
  * @interface GoodsResponse
  */

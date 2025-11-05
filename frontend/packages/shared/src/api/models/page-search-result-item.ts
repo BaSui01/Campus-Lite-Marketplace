@@ -43,18 +43,6 @@ export interface PageSearchResultItem {
     'totalPages'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageSearchResultItem
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageSearchResultItem
-     */
-    'last'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof PageSearchResultItem
      */
@@ -89,6 +77,18 @@ export interface PageSearchResultItem {
      * @memberof PageSearchResultItem
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageSearchResultItem
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageSearchResultItem
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {boolean}

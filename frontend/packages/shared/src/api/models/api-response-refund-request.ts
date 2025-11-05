@@ -40,6 +40,6 @@ export interface ApiResponseRefundRequest {
      * @type {RefundRequest}
      * @memberof ApiResponseRefundRequest
      */
-    'data'?: RefundRequest | null;
+    'data'?: RefundRequest;
 }
 

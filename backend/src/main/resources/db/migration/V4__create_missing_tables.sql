@@ -700,45 +700,75 @@ COMMENT ON COLUMN t_compliance_whitelist.target_id IS '白名单目标ID';
 -- 34. 申诉表
 CREATE TABLE t_appeal (
     id BIGSERIAL PRIMARY KEY,
-    appeal_code VARCHAR(50) NOT NULL UNIQUE,
     user_id BIGINT NOT NULL,
-    target_type VARCHAR(20) NOT NULL,
+    target_type VARCHAR(50) NOT NULL,
     target_id BIGINT NOT NULL,
-    reason VARCHAR(500) NOT NULL,
+    appeal_type VARCHAR(50) NOT NULL,
+    reason TEXT NOT NULL,
+    deadline TIMESTAMP NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-    handler_id BIGINT,
-    handle_result VARCHAR(500),
-    handled_at TIMESTAMP,
+    reviewer_id BIGINT,
+    reviewer_name VARCHAR(50),
+    review_comment TEXT,
+    reviewed_at TIMESTAMP,
+    attachments TEXT,
+    result_details TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at TIMESTAMP,
     CONSTRAINT fk_appeal_user FOREIGN KEY (user_id) REFERENCES t_user(id),
-    CONSTRAINT fk_appeal_handler FOREIGN KEY (handler_id) REFERENCES t_user(id)
+    CONSTRAINT fk_appeal_reviewer FOREIGN KEY (reviewer_id) REFERENCES t_user(id)
 );
 
 COMMENT ON TABLE t_appeal IS '申诉表（封禁、删帖等申诉）';
 COMMENT ON COLUMN t_appeal.target_type IS '申诉对象类型：BAN=封禁, POST_DELETE=帖子删除, GOODS_REJECT=商品拒绝';
+COMMENT ON COLUMN t_appeal.appeal_type IS '申诉类型';
+COMMENT ON COLUMN t_appeal.deadline IS '截止时间';
 COMMENT ON COLUMN t_appeal.status IS '处理状态：PENDING=待处理, APPROVED=已通过, REJECTED=已拒绝';
+COMMENT ON COLUMN t_appeal.reviewer_id IS '审核人ID';
+COMMENT ON COLUMN t_appeal.reviewer_name IS '审核人用户名';
+COMMENT ON COLUMN t_appeal.review_comment IS '审核意见';
+COMMENT ON COLUMN t_appeal.reviewed_at IS '审核时间';
+COMMENT ON COLUMN t_appeal.attachments IS '附件列表（JSON格式）';
+COMMENT ON COLUMN t_appeal.result_details IS '处理结果详情';
 
 -- 35. 申诉材料表
 CREATE TABLE t_appeal_material (
     id BIGSERIAL PRIMARY KEY,
-    appeal_id BIGINT NOT NULL,
-    material_type VARCHAR(20) NOT NULL,
-    file_url VARCHAR(500) NOT NULL,
+    appeal_id VARCHAR(255) NOT NULL,
+    file_type VARCHAR(20) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
     file_name VARCHAR(200) NOT NULL,
     file_size BIGINT NOT NULL,
+    mime_type VARCHAR(100),
+    thumbnail_path VARCHAR(500),
     description VARCHAR(500),
+    status VARCHAR(20) NOT NULL DEFAULT 'UPLOADED',
+    uploaded_by BIGINT,
+    uploaded_by_name VARCHAR(50),
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+    file_hash VARCHAR(64),
+    virus_scan_result VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    deleted_at TIMESTAMP,
-    CONSTRAINT fk_material_appeal FOREIGN KEY (appeal_id) REFERENCES t_appeal(id) ON DELETE CASCADE
+    deleted_at TIMESTAMP
 );
 
 COMMENT ON TABLE t_appeal_material IS '申诉材料表（申诉证据）';
-COMMENT ON COLUMN t_appeal_material.material_type IS '材料类型：IMAGE=图片, VIDEO=视频, DOCUMENT=文档';
+COMMENT ON COLUMN t_appeal_material.file_type IS '文件类型 (image/pdf/document等)';
+COMMENT ON COLUMN t_appeal_material.file_path IS '文件路径';
+COMMENT ON COLUMN t_appeal_material.mime_type IS 'MIME类型';
+COMMENT ON COLUMN t_appeal_material.thumbnail_path IS '缩略图路径';
+COMMENT ON COLUMN t_appeal_material.status IS '文件状态';
+COMMENT ON COLUMN t_appeal_material.uploaded_by IS '上传用户ID';
+COMMENT ON COLUMN t_appeal_material.uploaded_by_name IS '上传用户名';
+COMMENT ON COLUMN t_appeal_material.uploaded_at IS '上传时间';
+COMMENT ON COLUMN t_appeal_material.is_primary IS '是否为主文件';
+COMMENT ON COLUMN t_appeal_material.file_hash IS '文件哈希值（用于去重）';
+COMMENT ON COLUMN t_appeal_material.virus_scan_result IS '病毒扫描结果';
 
 -- 36. 错误日志表
 CREATE TABLE t_error_log (
@@ -836,6 +866,9 @@ CREATE TABLE t_privacy_request (
     handled_at TIMESTAMP,
     executed BOOLEAN NOT NULL DEFAULT FALSE,
     executed_at TIMESTAMP,
+    scheduled_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    result_path VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
@@ -847,6 +880,9 @@ CREATE TABLE t_privacy_request (
 COMMENT ON TABLE t_privacy_request IS '隐私请求表（数据导出、删除等）';
 COMMENT ON COLUMN t_privacy_request.request_type IS '请求类型：DATA_EXPORT=数据导出, DATA_DELETE=数据删除, ACCOUNT_DELETION=账号注销';
 COMMENT ON COLUMN t_privacy_request.status IS '处理状态：PENDING=待处理, APPROVED=已通过, REJECTED=已拒绝, EXECUTED=已执行';
+COMMENT ON COLUMN t_privacy_request.scheduled_at IS '预定处理时间';
+COMMENT ON COLUMN t_privacy_request.completed_at IS '完成时间';
+COMMENT ON COLUMN t_privacy_request.result_path IS '结果文件路径（数据导出）';
 
 -- =====================================================
 -- 任务管理 (4个表)

@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Input, Button } from '@campus/shared/components';
 import { SliderCaptcha } from '../../components/SliderCaptcha';
 import { useAuthStore } from '../../store'; // ✅ 导入 useAuthStore
@@ -17,7 +17,11 @@ import './Login.css';
  */
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuthStore(); // ✅ 获取 login 方法
+  
+  // 获取重定向路径（登录成功后跳转）
+  const redirectPath = searchParams.get('redirect') || '/';
 
   // 表单状态
   const [formData, setFormData] = useState<LoginRequest>({
@@ -86,9 +90,10 @@ const Login: React.FC = () => {
 
       console.log('[Login] ✅ 登录成功，状态已更新');
 
-      // 3. 跳转到首页
+      // 3. 跳转到重定向路径或首页
+      console.log('[Login] 📍 跳转到:', redirectPath);
       setTimeout(() => {
-        navigate('/');
+        navigate(redirectPath, { replace: true });
       }, 500);
     } catch (error: any) {
       console.error('[Login] ❌ 登录失败:', error);

@@ -43,18 +43,6 @@ export interface PageAuditLogResponse {
     'totalPages'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageAuditLogResponse
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageAuditLogResponse
-     */
-    'last'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof PageAuditLogResponse
      */
@@ -89,6 +77,18 @@ export interface PageAuditLogResponse {
      * @memberof PageAuditLogResponse
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageAuditLogResponse
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageAuditLogResponse
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {boolean}

@@ -43,18 +43,6 @@ export interface PageReportResponse {
     'totalPages'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageReportResponse
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageReportResponse
-     */
-    'last'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof PageReportResponse
      */
@@ -89,6 +77,18 @@ export interface PageReportResponse {
      * @memberof PageReportResponse
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageReportResponse
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageReportResponse
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {boolean}

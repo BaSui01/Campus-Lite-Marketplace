@@ -43,18 +43,6 @@ export interface PageComplianceAuditLog {
     'totalPages'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageComplianceAuditLog
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageComplianceAuditLog
-     */
-    'last'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof PageComplianceAuditLog
      */
@@ -89,6 +77,18 @@ export interface PageComplianceAuditLog {
      * @memberof PageComplianceAuditLog
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageComplianceAuditLog
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageComplianceAuditLog
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {boolean}

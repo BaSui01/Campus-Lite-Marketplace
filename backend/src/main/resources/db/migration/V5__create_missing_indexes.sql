@@ -348,6 +348,7 @@ CREATE INDEX idx_privacy_type ON t_privacy_request(request_type);
 CREATE INDEX idx_privacy_status ON t_privacy_request(status);
 CREATE INDEX idx_privacy_handler ON t_privacy_request(handler_id);
 CREATE INDEX idx_privacy_executed ON t_privacy_request(executed);
+CREATE INDEX idx_privacy_scheduled_at ON t_privacy_request(scheduled_at);
 CREATE INDEX idx_privacy_created_at ON t_privacy_request(created_at DESC);
 CREATE INDEX idx_privacy_deleted ON t_privacy_request(deleted) WHERE deleted = false;
 

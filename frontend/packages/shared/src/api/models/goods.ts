@@ -103,7 +103,7 @@ export interface Goods {
      * @type {User}
      * @memberof Goods
      */
-    'seller'?: User;
+    'seller'?: User | null;
     /**
      * 
      * @type {number}

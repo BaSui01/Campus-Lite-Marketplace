@@ -43,18 +43,6 @@ export interface PageUserProfileResponse {
     'totalPages'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageUserProfileResponse
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageUserProfileResponse
-     */
-    'last'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof PageUserProfileResponse
      */
@@ -89,6 +77,18 @@ export interface PageUserProfileResponse {
      * @memberof PageUserProfileResponse
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageUserProfileResponse
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageUserProfileResponse
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {boolean}

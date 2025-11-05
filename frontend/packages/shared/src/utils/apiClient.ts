@@ -174,11 +174,15 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
           } catch (refreshError) {
             console.error('[API Client] ❌ Token 刷新失败:', refreshError);
             clearTokens();
-            window.location.href = '/login';
+            // 保存当前路径，登录后跳转回来
+            const currentPath = window.location.pathname + window.location.search;
+            window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
           }
         } else {
           clearTokens();
-          window.location.href = '/login';
+          // 保存当前路径，登录后跳转回来
+          const currentPath = window.location.pathname + window.location.search;
+          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
         }
       }
 

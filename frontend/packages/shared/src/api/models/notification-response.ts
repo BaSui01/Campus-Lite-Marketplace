@@ -101,6 +101,11 @@ export const NotificationResponseTypeEnum = {
     MessageReceived: 'MESSAGE_RECEIVED',
     FollowSellerNewGoods: 'FOLLOW_SELLER_NEW_GOODS',
     SubscriptionMatchedGoods: 'SUBSCRIPTION_MATCHED_GOODS',
+    ReviewReplied: 'REVIEW_REPLIED',
+    DisputeSubmitted: 'DISPUTE_SUBMITTED',
+    DisputeEscalated: 'DISPUTE_ESCALATED',
+    DisputeClosed: 'DISPUTE_CLOSED',
+    DisputeResolved: 'DISPUTE_RESOLVED',
     SystemAnnouncement: 'SYSTEM_ANNOUNCEMENT',
     UserBanned: 'USER_BANNED',
     UserUnbanned: 'USER_UNBANNED'

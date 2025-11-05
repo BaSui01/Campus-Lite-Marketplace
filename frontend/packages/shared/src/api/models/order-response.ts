@@ -121,6 +121,8 @@ export interface OrderResponse {
 export const OrderResponseStatusEnum = {
     PendingPayment: 'PENDING_PAYMENT',
     Paid: 'PAID',
+    Shipped: 'SHIPPED',
+    Delivered: 'DELIVERED',
     Completed: 'COMPLETED',
     Cancelled: 'CANCELLED',
     Reviewed: 'REVIEWED'

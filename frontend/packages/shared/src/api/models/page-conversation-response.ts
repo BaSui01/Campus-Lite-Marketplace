@@ -43,18 +43,6 @@ export interface PageConversationResponse {
     'totalPages'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageConversationResponse
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageConversationResponse
-     */
-    'last'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof PageConversationResponse
      */
@@ -89,6 +77,18 @@ export interface PageConversationResponse {
      * @memberof PageConversationResponse
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageConversationResponse
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageConversationResponse
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {boolean}
