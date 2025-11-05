@@ -81,11 +81,14 @@ public class ApiPerformanceServiceImpl implements ApiPerformanceService {
 
     @Override
     @Transactional
-    @Scheduled(cron = "0 0 3 * * ?") // 每天凌晨3点执行
-    public void cleanupOldLogs() {
-        int daysToKeep = 30; // 默认保留30天
+    public void cleanupOldLogs(int daysToKeep) {
         LocalDateTime cutoff = LocalDateTime.now().minusDays(daysToKeep);
         apiPerformanceLogRepository.deleteByCreatedAtBefore(cutoff);
         log.info("✅ API性能日志清理完成: 删除{}天前的记录", daysToKeep);
+    }
+
+    @Scheduled(cron = "0 0 3 * * ?") // 每天凌晨3点执行
+    public void scheduledCleanup() {
+        cleanupOldLogs(30); // 定时任务默认保留30天
     }
 }

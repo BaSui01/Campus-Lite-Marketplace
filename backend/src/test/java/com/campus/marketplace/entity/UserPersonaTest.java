@@ -185,7 +185,7 @@ class UserPersonaTest {
             // 应该抛出异常（唯一约束冲突）
             assertThat(false).as("应该抛出唯一约束异常").isTrue();
         } catch (Exception e) {
-            assertThat(e.getMessage()).contains("unique");
+            assertThat(e.getMessage().toLowerCase()).contains("unique");
         }
     }
 }

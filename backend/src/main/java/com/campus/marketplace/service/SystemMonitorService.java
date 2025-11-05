@@ -39,5 +39,5 @@ public interface SystemMonitorService {
     /**
      * 清理历史数据（保留30天）
      */
-    void cleanupOldRecords();
+    void cleanupOldRecords(int daysToKeep);
 }

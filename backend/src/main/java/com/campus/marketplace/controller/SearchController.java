@@ -47,6 +47,11 @@ public class SearchController {
         @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int size,
         @Parameter(description = "标签ID列表（可选，仅商品搜索支持）") @RequestParam(required = false) List<Long> tagIds
     ) {
+        // 验证关键词不为空
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new BusinessException(ErrorCode.INVALID_PARAMETER, "搜索关键词不能为空");
+        }
+        
         Page<com.campus.marketplace.common.dto.response.SearchResultItem> result =
                 searchService.search(type, keyword, page, size, tagIds);
         return ApiResponse.success(result);

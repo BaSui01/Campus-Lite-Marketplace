@@ -66,10 +66,17 @@ public class GlobalExceptionHandler {
         String msg = e.getCustomMessage() != null ? e.getCustomMessage()
                 : resolveErrorMessage(e.getCode(), e.getErrorCode().getMessage());
         log.warn("业务异常: code={}, message={}", e.getCode(), msg);
+        
+        // 根据错误码返回适当的HTTP状态码
         if (e.getErrorCode() == ErrorCode.TOO_MANY_REQUESTS) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(ApiResponse.error(e.getCode(), msg));
         }
+        if (e.getErrorCode() == ErrorCode.INVALID_PARAMETER || e.getErrorCode() == ErrorCode.INVALID_PARAM) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getCode(), msg));
+        }
+        
         return ResponseEntity.ok(ApiResponse.error(e.getCode(), msg));
     }
 

@@ -68,8 +68,8 @@ class MarketingCampaignServiceTest {
         // 手动设置ID（因为Builder不支持）
         testCampaign.setId(1L);
 
-        // Mock RedisTemplate
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        // Mock RedisTemplate (使用 lenient 避免 UnnecessaryStubbing)
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
     @Test

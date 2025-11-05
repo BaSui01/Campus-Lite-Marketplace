@@ -19,8 +19,8 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "t_health_check_record", indexes = {
-    @Index(name = "idx_health_check_time", columnList = "check_time DESC"),
-    @Index(name = "idx_health_status", columnList = "overall_status")
+    @Index(name = "idx_health_checked_at", columnList = "checked_at DESC"),
+    @Index(name = "idx_health_status", columnList = "status")
 })
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -30,62 +30,47 @@ import java.util.Map;
 public class HealthCheckRecord extends BaseEntity {
 
     /**
-     * 检查时间
+     * 服务名称
      */
-    @Column(name = "check_time", nullable = false)
-    private LocalDateTime checkTime;
+    @Column(name = "service_name", nullable = false, length = 50)
+    private String serviceName;
 
     /**
-     * 整体健康状态
+     * 检查类型
+     */
+    @Column(name = "check_type", nullable = false, length = 30)
+    private String checkType;
+
+    /**
+     * 健康状态
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "overall_status", nullable = false, length = 20)
-    private HealthStatus overallStatus;
-
-    /**
-     * 各组件状态详情（JSONB格式）
-     */
-    @Type(JsonBinaryType.class)
-    @Column(name = "component_details", columnDefinition = "JSONB")
-    private Map<String, ComponentStatus> componentDetails;
+    @Column(name = "status", nullable = false, length = 20)
+    private HealthStatus status;
 
     /**
      * 响应时间（毫秒）
      */
-    @Column(name = "response_time_ms")
-    private Long responseTimeMs;
+    @Column(name = "response_time", nullable = false)
+    private Long responseTime;
 
     /**
      * 错误信息
      */
-    @Column(name = "error_message", length = 1000)
+    @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
     /**
-     * 组件状态（内部类）
+     * 详情（JSONB格式）
      */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ComponentStatus {
-        /**
-         * 组件名称
-         */
-        private String name;
-        
-        /**
-         * 健康状态
-         */
-        private HealthStatus status;
-        
-        /**
-         * 详情信息
-         */
-        private Map<String, Object> details;
-        
-        /**
-         * 错误信息
-         */
-        private String error;
-    }
+    @Type(JsonBinaryType.class)
+    @Column(name = "details", columnDefinition = "JSONB")
+    private Map<String, Object> details;
+
+    /**
+     * 检查时间
+     */
+    @Column(name = "checked_at", nullable = false)
+    @Builder.Default
+    private LocalDateTime checkedAt = LocalDateTime.now();
 }

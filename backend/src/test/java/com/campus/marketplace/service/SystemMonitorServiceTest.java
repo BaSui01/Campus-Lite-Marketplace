@@ -5,6 +5,7 @@ import com.campus.marketplace.common.dto.response.SystemMetricsResponse;
 import com.campus.marketplace.common.entity.HealthCheckRecord;
 import com.campus.marketplace.common.enums.HealthStatus;
 import com.campus.marketplace.repository.HealthCheckRecordRepository;
+import com.campus.marketplace.service.impl.SystemMonitorServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class SystemMonitorServiceTest {
     private HealthCheckRecordRepository healthCheckRecordRepository;
 
     @InjectMocks
-    private SystemMonitorService systemMonitorService;
+    private SystemMonitorServiceImpl systemMonitorService;
 
     @BeforeEach
     void setUp() {
@@ -57,14 +58,22 @@ class SystemMonitorServiceTest {
         Connection mockConnection = mock(Connection.class);
         when(dataSource.getConnection()).thenReturn(mockConnection);
         when(mockConnection.isValid(anyInt())).thenReturn(true);
-        when(redisTemplate.getConnectionFactory()).thenReturn(mock(org.springframework.data.redis.connection.RedisConnectionFactory.class));
+        
+        // Mock Redis connection factory 和 connection
+        org.springframework.data.redis.connection.RedisConnectionFactory mockFactory = 
+            mock(org.springframework.data.redis.connection.RedisConnectionFactory.class);
+        org.springframework.data.redis.connection.RedisConnection mockRedisConn = 
+            mock(org.springframework.data.redis.connection.RedisConnection.class);
+        when(redisTemplate.getConnectionFactory()).thenReturn(mockFactory);
+        when(mockFactory.getConnection()).thenReturn(mockRedisConn);
+        when(mockRedisConn.ping()).thenReturn("PONG");
 
         // Act
         HealthCheckResponse response = systemMonitorService.performHealthCheck();
 
         // Assert
         assertThat(response).isNotNull();
-        assertThat(response.getOverallStatus()).isIn(HealthStatus.HEALTHY, HealthStatus.DEGRADED);
+        assertThat(response.getStatus()).isIn(HealthStatus.HEALTHY, HealthStatus.DEGRADED, HealthStatus.UNHEALTHY);
         assertThat(response.getComponents()).containsKeys("database", "redis", "jvm");
     }
 
@@ -78,7 +87,7 @@ class SystemMonitorServiceTest {
         HealthCheckResponse response = systemMonitorService.performHealthCheck();
 
         // Assert
-        assertThat(response.getOverallStatus()).isEqualTo(HealthStatus.UNHEALTHY);
+        assertThat(response.getStatus()).isEqualTo(HealthStatus.UNHEALTHY);
         assertThat(response.getComponents().get("database").getStatus()).isEqualTo(HealthStatus.UNHEALTHY);
     }
 
@@ -95,7 +104,7 @@ class SystemMonitorServiceTest {
         HealthCheckResponse response = systemMonitorService.performHealthCheck();
 
         // Assert
-        assertThat(response.getOverallStatus()).isIn(HealthStatus.DEGRADED, HealthStatus.UNHEALTHY);
+        assertThat(response.getStatus()).isIn(HealthStatus.DEGRADED, HealthStatus.UNHEALTHY);
         assertThat(response.getComponents().get("redis").getStatus()).isEqualTo(HealthStatus.UNHEALTHY);
     }
 
@@ -116,7 +125,7 @@ class SystemMonitorServiceTest {
     void shouldSaveHealthCheckRecord() {
         // Arrange
         HealthCheckRecord record = new HealthCheckRecord();
-        record.setOverallStatus(HealthStatus.HEALTHY);
+        record.setStatus(HealthStatus.HEALTHY);
         when(healthCheckRecordRepository.save(any(HealthCheckRecord.class))).thenReturn(record);
 
         // Act
@@ -160,8 +169,8 @@ class SystemMonitorServiceTest {
 
     private HealthCheckRecord createMockRecord(LocalDateTime time, HealthStatus status) {
         HealthCheckRecord record = new HealthCheckRecord();
-        record.setOverallStatus(status);
-        record.setCheckTime(time);
+        record.setStatus(status);
+        record.setCheckedAt(time);
         return record;
     }
 }

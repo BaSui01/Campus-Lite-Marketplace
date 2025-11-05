@@ -127,11 +127,8 @@ public class SystemMonitorController {
     @PostMapping("/errors/{errorId}/resolve")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_MONITOR_MANAGE)")
     @Operation(summary = "标记错误为已解决")
-    public ApiResponse<Void> markErrorAsResolved(
-        @PathVariable Long errorId,
-        @RequestParam String resolutionNote
-    ) {
-        errorLogService.markAsResolved(errorId, resolutionNote);
+    public ApiResponse<Void> markErrorAsResolved(@PathVariable Long errorId) {
+        errorLogService.markAsResolved(errorId);
         return ApiResponse.success();
     }
 

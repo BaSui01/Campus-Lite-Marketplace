@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @date 2025-11-03
  */
 @WebMvcTest(CommunityController.class)
+@Import(TestSecurityConfig.class)
 @DisplayName("社区控制器测试")
 class CommunityControllerTest {
 
@@ -39,6 +41,18 @@ class CommunityControllerTest {
 
     @MockBean
     private CommunityService communityService;
+
+    @MockBean
+    private com.campus.marketplace.repository.UserRepository userRepository;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        // Mock User for getCurrentUserId()
+        com.campus.marketplace.common.entity.User mockUser = new com.campus.marketplace.common.entity.User();
+        mockUser.setId(1L);
+        mockUser.setUsername("testuser");
+        when(userRepository.findByUsername(anyString())).thenReturn(java.util.Optional.of(mockUser));
+    }
 
     @Test
     @DisplayName("获取热门话题 - 应该返回前10个热门话题")

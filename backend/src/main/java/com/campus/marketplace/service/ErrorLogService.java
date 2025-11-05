@@ -18,16 +18,16 @@ public interface ErrorLogService {
      * 记录错误日志
      * 
      * @param exception 异常
-     * @param requestPath 请求路径
-     * @param httpMethod HTTP方法
-     * @param clientIp 客户端IP
+     * @param requestUrl 请求URL
+     * @param requestMethod 请求方法
+     * @param ipAddress IP地址
      * @param requestParams 请求参数
      */
     void logError(
         Throwable exception,
-        String requestPath,
-        String httpMethod,
-        String clientIp,
+        String requestUrl,
+        String requestMethod,
+        String ipAddress,
         Map<String, Object> requestParams
     );
 
@@ -59,9 +59,8 @@ public interface ErrorLogService {
      * 标记错误为已解决
      * 
      * @param errorId 错误ID
-     * @param resolutionNote 解决备注
      */
-    void markAsResolved(Long errorId, String resolutionNote);
+    void markAsResolved(Long errorId);
 
     /**
      * 检测并发送告警
@@ -71,5 +70,5 @@ public interface ErrorLogService {
     /**
      * 清理历史数据（保留30天）
      */
-    void cleanupOldLogs();
+    void cleanupOldLogs(int daysToKeep);
 }

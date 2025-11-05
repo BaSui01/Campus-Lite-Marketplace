@@ -25,7 +25,7 @@ public interface HealthCheckRecordRepository extends JpaRepository<HealthCheckRe
      * @param since 起始时间
      * @return 健康检查记录列表
      */
-    @Query("SELECT h FROM HealthCheckRecord h WHERE h.checkTime >= :since ORDER BY h.checkTime DESC")
+    @Query("SELECT h FROM HealthCheckRecord h WHERE h.checkedAt >= :since ORDER BY h.checkedAt DESC")
     List<HealthCheckRecord> findRecentRecords(@Param("since") LocalDateTime since);
 
     /**
@@ -36,8 +36,8 @@ public interface HealthCheckRecordRepository extends JpaRepository<HealthCheckRe
      * @param endTime 结束时间
      * @return 记录数量
      */
-    @Query("SELECT COUNT(h) FROM HealthCheckRecord h WHERE h.overallStatus = :status " +
-           "AND h.checkTime BETWEEN :startTime AND :endTime")
+    @Query("SELECT COUNT(h) FROM HealthCheckRecord h WHERE h.status = :status " +
+           "AND h.checkedAt BETWEEN :startTime AND :endTime")
     long countByStatusAndTimeRange(
         @Param("status") HealthStatus status,
         @Param("startTime") LocalDateTime startTime,
@@ -51,8 +51,8 @@ public interface HealthCheckRecordRepository extends JpaRepository<HealthCheckRe
      * @param endTime 结束时间
      * @return 平均响应时间（毫秒）
      */
-    @Query("SELECT AVG(h.responseTimeMs) FROM HealthCheckRecord h " +
-           "WHERE h.checkTime BETWEEN :startTime AND :endTime")
+    @Query("SELECT AVG(h.responseTime) FROM HealthCheckRecord h " +
+           "WHERE h.checkedAt BETWEEN :startTime AND :endTime")
     Double getAverageResponseTime(
         @Param("startTime") LocalDateTime startTime,
         @Param("endTime") LocalDateTime endTime
@@ -64,8 +64,8 @@ public interface HealthCheckRecordRepository extends JpaRepository<HealthCheckRe
      * @param since 起始时间
      * @return 异常记录列表
      */
-    @Query("SELECT h FROM HealthCheckRecord h WHERE h.overallStatus != 'HEALTHY' " +
-           "AND h.checkTime >= :since ORDER BY h.checkTime DESC")
+    @Query("SELECT h FROM HealthCheckRecord h WHERE h.status != 'HEALTHY' " +
+           "AND h.checkedAt >= :since ORDER BY h.checkedAt DESC")
     List<HealthCheckRecord> findRecentUnhealthyRecords(@Param("since") LocalDateTime since);
 
     /**
@@ -73,5 +73,5 @@ public interface HealthCheckRecordRepository extends JpaRepository<HealthCheckRe
      * 
      * @param before 截止时间
      */
-    void deleteByCheckTimeBefore(LocalDateTime before);
+    void deleteByCheckedAtBefore(LocalDateTime before);
 }

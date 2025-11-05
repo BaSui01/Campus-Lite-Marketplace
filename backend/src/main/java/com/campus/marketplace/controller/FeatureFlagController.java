@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -43,10 +43,10 @@ public class FeatureFlagController {
                     existing.setEnabled(body.isEnabled());
                     existing.setRulesJson(body.getRulesJson());
                     existing.setDescription(body.getDescription());
-                    existing.setUpdatedAt(Instant.now());
+                    existing.setUpdatedAt(LocalDateTime.now());
                     return existing;
                 }).orElseGet(() -> {
-                    body.setUpdatedAt(Instant.now());
+                    body.setUpdatedAt(LocalDateTime.now());
                     return body;
                 });
         FeatureFlag saved = repository.save(toSave);

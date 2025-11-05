@@ -24,12 +24,12 @@ public class HealthCheckResponse {
     /**
      * 检查时间
      */
-    private LocalDateTime checkTime;
+    private LocalDateTime checkedAt;
 
     /**
      * 整体健康状态
      */
-    private HealthStatus overallStatus;
+    private HealthStatus status;
 
     /**
      * 各组件状态
@@ -39,7 +39,7 @@ public class HealthCheckResponse {
     /**
      * 响应时间（毫秒）
      */
-    private Long responseTimeMs;
+    private Long responseTime;
 
     /**
      * 组件健康状态

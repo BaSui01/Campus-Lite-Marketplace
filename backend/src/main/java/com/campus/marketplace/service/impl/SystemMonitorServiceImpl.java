@@ -64,21 +64,21 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
         components.put("jvm", checkJvm());
 
         // 计算整体状态
-        HealthStatus overallStatus = calculateOverallStatus(components);
+        HealthStatus status = calculateOverallStatus(components);
 
         long responseTime = System.currentTimeMillis() - startTime;
 
         HealthCheckResponse response = HealthCheckResponse.builder()
-            .checkTime(LocalDateTime.now())
-            .overallStatus(overallStatus)
+            .checkedAt(LocalDateTime.now())
+            .status(status)
             .components(components)
-            .responseTimeMs(responseTime)
+            .responseTime(responseTime)
             .build();
 
         // 保存健康检查记录
         saveHealthCheckRecord(response);
 
-        log.info("✅ 健康检查完成: 状态={}, 响应时间={}ms", overallStatus, responseTime);
+        log.info("✅ 健康检查完成: 状态={}, 响应时间={}ms", status, responseTime);
 
         return response;
     }
@@ -208,22 +208,26 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
     @Transactional
     protected void saveHealthCheckRecord(HealthCheckResponse response) {
         try {
-            Map<String, HealthCheckRecord.ComponentStatus> componentDetails = new HashMap<>();
-            
-            response.getComponents().forEach((name, health) -> {
-                componentDetails.put(name, new HealthCheckRecord.ComponentStatus(
-                    health.getName(),
-                    health.getStatus(),
-                    health.getDetails(),
-                    health.getError()
-                ));
-            });
+            // 将组件详情转换为 Map<String, Object>
+            Map<String, Object> details = new HashMap<>();
+            if (response.getComponents() != null) {
+                response.getComponents().forEach((name, health) -> {
+                    Map<String, Object> componentInfo = new HashMap<>();
+                    componentInfo.put("name", health.getName());
+                    componentInfo.put("status", health.getStatus().name());
+                    componentInfo.put("details", health.getDetails());
+                    componentInfo.put("error", health.getError());
+                    details.put(name, componentInfo);
+                });
+            }
 
             HealthCheckRecord record = HealthCheckRecord.builder()
-                .checkTime(response.getCheckTime())
-                .overallStatus(response.getOverallStatus())
-                .componentDetails(componentDetails)
-                .responseTimeMs(response.getResponseTimeMs())
+                .serviceName("ApplicationHealthCheck")
+                .checkType("OVERALL")
+                .status(response.getStatus())
+                .responseTime(response.getResponseTime())
+                .details(details)
+                .checkedAt(response.getCheckedAt())
                 .build();
 
             healthCheckRecordRepository.save(record);
@@ -278,12 +282,15 @@ public class SystemMonitorServiceImpl implements SystemMonitorService {
 
     @Override
     @Transactional
-    @Scheduled(cron = "0 0 2 * * ?") // 每天凌晨2点执行
-    public void cleanupOldRecords() {
-        int daysToKeep = 30; // 默认保留30天
+    public void cleanupOldRecords(int daysToKeep) {
         LocalDateTime cutoff = LocalDateTime.now().minusDays(daysToKeep);
-        healthCheckRecordRepository.deleteByCheckTimeBefore(cutoff);
+        healthCheckRecordRepository.deleteByCheckedAtBefore(cutoff);
         log.info("✅ 健康检查历史数据清理完成: 删除{}天前的记录", daysToKeep);
+    }
+
+    @Scheduled(cron = "0 0 2 * * ?") // 每天凌晨2点执行
+    public void scheduledCleanup() {
+        cleanupOldRecords(30); // 定时任务默认保留30天
     }
 
     /**

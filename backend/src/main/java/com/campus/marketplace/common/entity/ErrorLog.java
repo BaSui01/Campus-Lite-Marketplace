@@ -1,13 +1,9 @@
 package com.campus.marketplace.common.entity;
 
 import com.campus.marketplace.common.enums.ErrorSeverity;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
-
 import java.time.LocalDateTime;
-import java.util.Map;
 
 /**
  * 错误日志实体
@@ -19,10 +15,9 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "t_error_log", indexes = {
-    @Index(name = "idx_error_time", columnList = "error_time DESC"),
     @Index(name = "idx_error_severity", columnList = "severity"),
     @Index(name = "idx_error_type", columnList = "error_type"),
-    @Index(name = "idx_error_resolved", columnList = "is_resolved")
+    @Index(name = "idx_error_resolved", columnList = "resolved")
 })
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -32,21 +27,15 @@ import java.util.Map;
 public class ErrorLog extends BaseEntity {
 
     /**
-     * 错误时间
-     */
-    @Column(name = "error_time", nullable = false)
-    private LocalDateTime errorTime;
-
-    /**
      * 错误类型（异常类名）
      */
-    @Column(name = "error_type", nullable = false, length = 500)
+    @Column(name = "error_type", nullable = false, length = 50)
     private String errorType;
 
     /**
      * 错误消息
      */
-    @Column(name = "error_message", nullable = false, length = 2000)
+    @Column(name = "error_message", nullable = false, columnDefinition = "TEXT")
     private String errorMessage;
 
     /**
@@ -56,29 +45,16 @@ public class ErrorLog extends BaseEntity {
     private String stackTrace;
 
     /**
-     * 严重程度
+     * 请求URL
      */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "severity", nullable = false, length = 20)
-    private ErrorSeverity severity;
+    @Column(name = "request_url", length = 500)
+    private String requestUrl;
 
     /**
-     * 请求路径
+     * 请求方法（GET/POST等）
      */
-    @Column(name = "request_path", length = 500)
-    private String requestPath;
-
-    /**
-     * HTTP方法
-     */
-    @Column(name = "http_method", length = 10)
-    private String httpMethod;
-
-    /**
-     * 客户端IP
-     */
-    @Column(name = "client_ip", length = 50)
-    private String clientIp;
+    @Column(name = "request_method", length = 10)
+    private String requestMethod;
 
     /**
      * 用户ID
@@ -87,24 +63,31 @@ public class ErrorLog extends BaseEntity {
     private Long userId;
 
     /**
-     * 请求参数（JSONB格式）
+     * IP地址
      */
-    @Type(JsonBinaryType.class)
-    @Column(name = "request_params", columnDefinition = "JSONB")
-    private Map<String, Object> requestParams;
+    @Column(name = "ip_address", length = 50)
+    private String ipAddress;
 
     /**
-     * 服务器信息（主机名、IP等）
+     * 用户代理
      */
-    @Column(name = "server_info", length = 200)
-    private String serverInfo;
+    @Column(name = "user_agent", length = 500)
+    private String userAgent;
+
+    /**
+     * 严重程度
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "severity", nullable = false, length = 20)
+    @Builder.Default
+    private ErrorSeverity severity = ErrorSeverity.MEDIUM;
 
     /**
      * 是否已解决
      */
-    @Column(name = "is_resolved")
+    @Column(name = "resolved")
     @Builder.Default
-    private Boolean isResolved = false;
+    private Boolean resolved = false;
 
     /**
      * 解决时间
@@ -113,21 +96,8 @@ public class ErrorLog extends BaseEntity {
     private LocalDateTime resolvedAt;
 
     /**
-     * 解决备注
+     * 解决人ID
      */
-    @Column(name = "resolution_note", length = 1000)
-    private String resolutionNote;
-
-    /**
-     * 是否已告警
-     */
-    @Column(name = "is_alerted")
-    @Builder.Default
-    private Boolean isAlerted = false;
-
-    /**
-     * 告警时间
-     */
-    @Column(name = "alerted_at")
-    private LocalDateTime alertedAt;
+    @Column(name = "resolved_by")
+    private Long resolvedBy;
 }

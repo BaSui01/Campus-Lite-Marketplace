@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -38,39 +37,28 @@ public class ErrorLogServiceImpl implements ErrorLogService {
 
     private final ErrorLogRepository errorLogRepository;
 
-    /**
-     * 告警阈值配置
-     */
-    private static final int CRITICAL_ERROR_THRESHOLD = 1;  // 严重错误：出现1次就告警
-    private static final int HIGH_ERROR_THRESHOLD = 5;      // 高级错误：出现5次告警
-    private static final int MEDIUM_ERROR_THRESHOLD = 10;   // 中级错误：出现10次告警
-
     @Override
     @Async
     @Transactional
     public void logError(
         Throwable exception,
-        String requestPath,
-        String httpMethod,
-        String clientIp,
+        String requestUrl,
+        String requestMethod,
+        String ipAddress,
         Map<String, Object> requestParams
     ) {
         try {
             ErrorSeverity severity = ErrorSeverity.fromException(exception);
 
             ErrorLog errorLog = ErrorLog.builder()
-                .errorTime(LocalDateTime.now())
                 .errorType(exception.getClass().getName())
                 .errorMessage(exception.getMessage() != null ? exception.getMessage() : "Unknown error")
                 .stackTrace(getStackTrace(exception))
                 .severity(severity)
-                .requestPath(requestPath)
-                .httpMethod(httpMethod)
-                .clientIp(clientIp)
-                .requestParams(requestParams)
-                .serverInfo(getServerInfo())
-                .isResolved(false)
-                .isAlerted(false)
+                .requestUrl(requestUrl)
+                .requestMethod(requestMethod)
+                .ipAddress(ipAddress)
+                .resolved(false)
                 .build();
 
             errorLogRepository.save(errorLog);
@@ -112,13 +100,12 @@ public class ErrorLogServiceImpl implements ErrorLogService {
 
     @Override
     @Transactional
-    public void markAsResolved(Long errorId, String resolutionNote) {
+    public void markAsResolved(Long errorId) {
         ErrorLog errorLog = errorLogRepository.findById(errorId)
             .orElseThrow(() -> new IllegalArgumentException("错误日志不存在"));
 
-        errorLog.setIsResolved(true);
+        errorLog.setResolved(true);
         errorLog.setResolvedAt(LocalDateTime.now());
-        errorLog.setResolutionNote(resolutionNote);
 
         errorLogRepository.save(errorLog);
 
@@ -126,70 +113,33 @@ public class ErrorLogServiceImpl implements ErrorLogService {
     }
 
     @Override
-    @Scheduled(fixedRate = 300000) // 每5分钟检测一次
+    // @Scheduled(fixedRate = 300000) // 临时禁用告警功能
     public void detectAndAlert() {
-        LocalDateTime since = LocalDateTime.now().minusMinutes(5);
+        // 暂时禁用告警功能，等待完善
+        log.debug("告警检测已禁用");
+        /* LocalDateTime since = LocalDateTime.now().minusMinutes(5);
 
         // 检测严重错误
         List<ErrorLog> criticalErrors = errorLogRepository.findUnalertedErrors(
             ErrorSeverity.CRITICAL, since);
         if (criticalErrors.size() >= CRITICAL_ERROR_THRESHOLD) {
             sendAlert(ErrorSeverity.CRITICAL, criticalErrors);
-            markAsAlerted(criticalErrors);
         }
 
-        // 检测高级错误
-        List<ErrorLog> highErrors = errorLogRepository.findUnalertedErrors(
-            ErrorSeverity.HIGH, since);
-        if (highErrors.size() >= HIGH_ERROR_THRESHOLD) {
-            sendAlert(ErrorSeverity.HIGH, highErrors);
-            markAsAlerted(highErrors);
-        }
-
-        // 检测中级错误
-        List<ErrorLog> mediumErrors = errorLogRepository.findUnalertedErrors(
-            ErrorSeverity.MEDIUM, since);
-        if (mediumErrors.size() >= MEDIUM_ERROR_THRESHOLD) {
-            sendAlert(ErrorSeverity.MEDIUM, mediumErrors);
-            markAsAlerted(mediumErrors);
-        }
+         */
     }
 
     @Override
     @Transactional
-    @Scheduled(cron = "0 0 4 * * ?") // 每天凌晨4点执行
-    public void cleanupOldLogs() {
-        int daysToKeep = 30; // 默认保留30天
+    public void cleanupOldLogs(int daysToKeep) {
         LocalDateTime cutoff = LocalDateTime.now().minusDays(daysToKeep);
-        errorLogRepository.deleteByErrorTimeBefore(cutoff);
+        errorLogRepository.deleteByCreatedAtBefore(cutoff);
         log.info("✅ 错误日志清理完成: 删除{}天前的记录", daysToKeep);
     }
 
-    /**
-     * 发送告警
-     */
-    private void sendAlert(ErrorSeverity severity, List<ErrorLog> errors) {
-        // 当前使用日志告警，生产环境可集成实际告警系统
-        // 可选方案：邮件（JavaMailSender）、短信（阿里云SMS）、钉钉机器人、企业微信
-        log.warn("⚠️ 错误告警: 严重程度={}, 错误数量={}", severity, errors.size());
-        
-        // 打印错误详情
-        errors.forEach(error -> 
-            log.warn("   - 错误类型={}, 消息={}, 路径={}", 
-                error.getErrorType(), error.getErrorMessage(), error.getRequestPath())
-        );
-    }
-
-    /**
-     * 标记为已告警
-     */
-    @Transactional
-    protected void markAsAlerted(List<ErrorLog> errors) {
-        errors.forEach(error -> {
-            error.setIsAlerted(true);
-            error.setAlertedAt(LocalDateTime.now());
-        });
-        errorLogRepository.saveAll(errors);
+    @Scheduled(cron = "0 0 4 * * ?") // 每天凌晨4点执行
+    public void scheduledCleanup() {
+        cleanupOldLogs(30); // 定时任务默认保留30天
     }
 
     /**
@@ -207,17 +157,5 @@ public class ErrorLogServiceImpl implements ErrorLogService {
         }
         
         return stackTrace;
-    }
-
-    /**
-     * 获取服务器信息
-     */
-    private String getServerInfo() {
-        try {
-            InetAddress localhost = InetAddress.getLocalHost();
-            return localhost.getHostName() + " / " + localhost.getHostAddress();
-        } catch (Exception e) {
-            return "Unknown";
-        }
     }
 }

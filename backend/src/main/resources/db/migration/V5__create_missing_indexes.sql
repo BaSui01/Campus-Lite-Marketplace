@@ -296,7 +296,7 @@ CREATE INDEX idx_whitelist_target ON t_compliance_whitelist(target_id);
 CREATE INDEX idx_appeal_user ON t_appeal(user_id);
 CREATE INDEX idx_appeal_target ON t_appeal(target_type, target_id);
 CREATE INDEX idx_appeal_status ON t_appeal(status);
-CREATE INDEX idx_appeal_handler ON t_appeal(handler_id);
+CREATE INDEX idx_appeal_reviewer ON t_appeal(reviewer_id);
 CREATE INDEX idx_appeal_created_at ON t_appeal(created_at DESC);
 CREATE INDEX idx_appeal_deleted ON t_appeal(deleted) WHERE deleted = false;
 
@@ -305,7 +305,7 @@ CREATE INDEX idx_appeal_pending ON t_appeal(status, created_at DESC) WHERE statu
 
 -- 申诉材料表索引
 CREATE INDEX idx_material_appeal ON t_appeal_material(appeal_id);
-CREATE INDEX idx_material_type ON t_appeal_material(material_type);
+CREATE INDEX idx_material_file_type ON t_appeal_material(file_type);
 CREATE INDEX idx_material_deleted ON t_appeal_material(deleted) WHERE deleted = false;
 
 -- 错误日志表索引

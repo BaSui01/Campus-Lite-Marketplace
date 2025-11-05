@@ -108,7 +108,8 @@ class CommunityServiceTest {
         Post post = new Post();
         post.setId(postId);
 
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        // Mock existsById instead of findById
+        when(postRepository.existsById(postId)).thenReturn(true);
 
         // Act
         communityService.addTopicTagsToPost(postId, topicIds);
@@ -181,7 +182,8 @@ class CommunityServiceTest {
         Post post = new Post();
         post.setId(postId);
 
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        // Mock existsById instead of findById
+        when(postRepository.existsById(postId)).thenReturn(true);
         when(postCollectRepository.existsByPostIdAndUserId(postId, userId))
             .thenReturn(false);
 

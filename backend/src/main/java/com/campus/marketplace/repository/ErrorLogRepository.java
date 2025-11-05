@@ -24,7 +24,7 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
      * 
      * @return 未解决的错误列表
      */
-    @Query("SELECT e FROM ErrorLog e WHERE e.isResolved = false ORDER BY e.errorTime DESC")
+    @Query("SELECT e FROM ErrorLog e WHERE e.resolved = false ORDER BY e.createdAt DESC")
     List<ErrorLog> findUnresolvedErrors();
 
     /**
@@ -36,7 +36,7 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
      * @return 错误列表
      */
     @Query("SELECT e FROM ErrorLog e WHERE e.severity = :severity " +
-           "AND e.errorTime BETWEEN :startTime AND :endTime ORDER BY e.errorTime DESC")
+           "AND e.createdAt BETWEEN :startTime AND :endTime ORDER BY e.createdAt DESC")
     List<ErrorLog> findBySeverityAndTimeRange(
         @Param("severity") ErrorSeverity severity,
         @Param("startTime") LocalDateTime startTime,
@@ -51,7 +51,7 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
      * @return 统计结果
      */
     @Query("SELECT e.severity, COUNT(e) FROM ErrorLog e " +
-           "WHERE e.errorTime BETWEEN :startTime AND :endTime " +
+           "WHERE e.createdAt BETWEEN :startTime AND :endTime " +
            "GROUP BY e.severity")
     List<Object[]> countBySeverityAndTimeRange(
         @Param("startTime") LocalDateTime startTime,
@@ -59,14 +59,14 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
     );
 
     /**
-     * 查询最近的错误（未告警）
+     * 查询最近的错误（按严重程度过滤）
      * 
      * @param severity 严重程度
      * @param since 起始时间
-     * @return 未告警的错误列表
+     * @return 错误列表
      */
     @Query("SELECT e FROM ErrorLog e WHERE e.severity = :severity " +
-           "AND e.isAlerted = false AND e.errorTime >= :since ORDER BY e.errorTime DESC")
+           "AND e.createdAt >= :since ORDER BY e.createdAt DESC")
     List<ErrorLog> findUnalertedErrors(
         @Param("severity") ErrorSeverity severity,
         @Param("since") LocalDateTime since
@@ -80,7 +80,7 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
      * @return 错误类型统计
      */
     @Query("SELECT e.errorType, COUNT(e) FROM ErrorLog e " +
-           "WHERE e.errorTime BETWEEN :startTime AND :endTime " +
+           "WHERE e.createdAt BETWEEN :startTime AND :endTime " +
            "GROUP BY e.errorType ORDER BY COUNT(e) DESC")
     List<Object[]> countByErrorType(
         @Param("startTime") LocalDateTime startTime,
@@ -92,5 +92,5 @@ public interface ErrorLogRepository extends JpaRepository<ErrorLog, Long> {
      * 
      * @param before 截止时间
      */
-    void deleteByErrorTimeBefore(LocalDateTime before);
+    void deleteByCreatedAtBefore(LocalDateTime before);
 }

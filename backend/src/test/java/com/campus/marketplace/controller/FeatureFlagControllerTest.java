@@ -82,6 +82,7 @@ class FeatureFlagControllerTest {
                 .rulesJson("{\"segments\":[]}")
                 .description("测试开关")
                 .build();
+        saved.setId(2L); // Set ID for the saved entity
         when(repository.findByKey("beta-feature")).thenReturn(Optional.empty());
         when(repository.save(any(FeatureFlag.class))).thenReturn(saved);
 

@@ -247,15 +247,15 @@ CREATE INDEX idx_view_log_goods_created ON t_view_log(goods_id, created_at DESC)
 -- =====================================================
 -- 25. API性能日志表索引
 -- =====================================================
-CREATE INDEX idx_api_performance_uri ON t_api_performance_log(uri);
-CREATE INDEX idx_api_performance_method ON t_api_performance_log(method);
-CREATE INDEX idx_api_performance_duration ON t_api_performance_log(duration DESC);
+CREATE INDEX idx_api_performance_api_path ON t_api_performance_log(api_path);
+CREATE INDEX idx_api_performance_http_method ON t_api_performance_log(http_method);
+CREATE INDEX idx_api_performance_response_time ON t_api_performance_log(response_time DESC);
 CREATE INDEX idx_api_performance_status ON t_api_performance_log(status_code);
 CREATE INDEX idx_api_performance_user ON t_api_performance_log(user_id);
 CREATE INDEX idx_api_performance_created_at ON t_api_performance_log(created_at DESC);
 
 -- 复合索引：慢查询分析
-CREATE INDEX idx_api_performance_slow ON t_api_performance_log(uri, duration DESC) WHERE duration > 1000;
+CREATE INDEX idx_api_performance_slow ON t_api_performance_log(api_path, response_time DESC) WHERE response_time > 1000;
 
 -- =====================================================
 -- 完成！🎉 所有索引创建完毕！

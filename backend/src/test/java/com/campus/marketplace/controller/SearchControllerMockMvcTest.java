@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,6 +38,18 @@ class SearchControllerMockMvcTest {
 
     @MockBean
     private SearchService searchService;
+
+    @MockBean
+    private com.campus.marketplace.repository.UserRepository userRepository;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        // Mock User
+        com.campus.marketplace.common.entity.User mockUser = new com.campus.marketplace.common.entity.User();
+        mockUser.setId(1L);
+        mockUser.setUsername("testuser");
+        when(userRepository.findByUsername(anyString())).thenReturn(java.util.Optional.of(mockUser));
+    }
 
     @Test
     @DisplayName("GET /api/search -> 返回分页搜索结果")

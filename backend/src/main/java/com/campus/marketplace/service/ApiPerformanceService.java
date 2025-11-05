@@ -48,5 +48,5 @@ public interface ApiPerformanceService {
     /**
      * 清理历史数据（保留30天）
      */
-    void cleanupOldLogs();
+    void cleanupOldLogs(int daysToKeep);
 }
