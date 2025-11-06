@@ -7,7 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Tabs } from '@campus/shared/components';
-import { getApi, websocketService } from '@campus/shared/utils';
+import { notificationService, NotificationType } from '@campus/shared/services';
+import { websocketService } from '@campus/shared/utils';
 import type { NotificationResponse } from '@campus/shared/api/models';
 import type { AxiosError } from 'axios';
 import { useNotificationStore } from '../../store';
@@ -61,32 +62,30 @@ const Notifications: React.FC = () => {
     setLoading(true);
 
     try {
-      // 🚀 调用真实后端 API 获取通知列表
-      const response = await api.listNotifications({ page: 0, size: 50 });
-      const payload = response.data;
+      // ✅ 使用 notificationService 获取通知列表
+      const response = await notificationService.listNotifications({
+        page: 0,
+        size: 50,
+      });
 
-      if ((payload.code ?? 0) === 0 && payload.data?.content) {
-        const apiNotifications: Notification[] = payload.data.content.map((n: NotificationResponse) => ({
-          notificationId: String(n.id ?? ''),
-          type: mapNotificationType(n.type),
-          title: n.title || '通知',
-          content: n.content || '',
-          isRead: n.status === 'READ',
-          createdAt: n.createdAt || '',
-          relatedId: n.relatedId ? String(n.relatedId) : undefined,
-        }));
+      const apiNotifications: Notification[] = response.content.map((n) => ({
+        notificationId: String(n.id ?? ''),
+        type: mapNotificationType(n.type),
+        title: n.title || '通知',
+        content: n.content || '',
+        isRead: n.status === 'READ',
+        createdAt: n.createdAt || '',
+        relatedId: n.relatedId ? String(n.relatedId) : undefined,
+      }));
 
-        // 按类型筛选
-        const filteredNotifications =
-          activeTab === 'all'
-            ? apiNotifications
-            : apiNotifications.filter((n) => n.type === activeTab);
+      // 按类型筛选
+      const filteredNotifications =
+        activeTab === 'all'
+          ? apiNotifications
+          : apiNotifications.filter((n) => n.type === activeTab);
 
-        setNotifications(filteredNotifications);
-        setUnreadCount(apiNotifications.filter((n) => !n.isRead).length);
-      } else {
-        toast.error(payload.message || '加载通知失败！😭');
-      }
+      setNotifications(filteredNotifications);
+      setUnreadCount(apiNotifications.filter((n) => !n.isRead).length);
     } catch (err: unknown) {
       const error = err as AxiosError<any>;
       console.error('加载通知列表失败：', err);
@@ -160,8 +159,8 @@ const Notifications: React.FC = () => {
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
-      // 🚀 调用真实后端 API 标记已读
-      await api.markAsRead({ body: JSON.stringify({ notificationIds: [Number(notificationId)] }) });
+      // ✅ 使用 notificationService 标记已读
+      await notificationService.markOneAsRead(Number(notificationId));
     } catch (err: unknown) {
       const error = err as AxiosError<any>;
       console.error('标记已读失败：', err);
@@ -178,8 +177,8 @@ const Notifications: React.FC = () => {
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
 
-      // 🚀 调用真实后端 API 全部标记已读
-      await api.markAllAsRead();
+      // ✅ 使用 notificationService 全部标记已读
+      await notificationService.markAllAsRead();
 
       toast.success('已全部标记为已读！✅');
     } catch (err: unknown) {
@@ -205,8 +204,8 @@ const Notifications: React.FC = () => {
       }
       setNotifications((prev) => prev.filter((n) => n.notificationId !== notificationId));
 
-      // 🚀 调用真实后端 API 删除通知
-      await api.deleteNotifications({ body: JSON.stringify({ notificationIds: [Number(notificationId)] }) });
+      // ✅ 使用 notificationService 删除通知
+      await notificationService.deleteOne(Number(notificationId));
 
       toast.success('通知已删除！🗑️');
     } catch (err: unknown) {

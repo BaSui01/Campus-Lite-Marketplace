@@ -214,3 +214,34 @@ export type {
   RecommendParams,
   RecommendResult
 } from './recommend';
+
+// ==================== 收藏服务 ====================
+export { favoriteService } from './favorite';
+export type {
+  FavoriteService,
+  FavoriteListParams,
+  FavoriteStatistics
+} from './favorite';
+
+// ==================== 通知服务 ====================
+export { notificationService, NotificationStatus, NotificationType } from './notification';
+export type {
+  NotificationService,
+  NotificationListParams,
+  PageNotificationResponse
+} from './notification';
+
+// ==================== 关注服务 ====================
+export { followService } from './follow';
+export type {
+  FollowService,
+  FollowingActivity
+} from './follow';
+
+// ==================== 订阅服务 ====================
+export { subscriptionService, SubscriptionType } from './subscription';
+export type {
+  SubscriptionService,
+  CreateSubscriptionParams,
+  SubscriptionMatch
+} from './subscription';

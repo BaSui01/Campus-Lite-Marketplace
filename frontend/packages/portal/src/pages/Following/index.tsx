@@ -7,8 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Avatar } from '@campus/shared/components';
+import { followService } from '@campus/shared/services';
 import { useNotificationStore } from '../../store';
-import { getApi } from '@campus/shared/utils';
 import './Following.css';
 
 // ==================== 类型定义 ====================
@@ -32,9 +32,6 @@ const Following: React.FC = () => {
   const [followings, setFollowings] = useState<Following[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // API 实例
-  const api = getApi();
-
   // ==================== 数据加载 ====================
 
   /**
@@ -44,19 +41,17 @@ const Following: React.FC = () => {
     setLoading(true);
 
     try {
-      // 🚀 调用真实后端 API 获取关注列表
-      const response = await api.listFollowings();
+      // ✅ 使用 followService 获取关注列表
+      const response = await followService.listFollowings();
 
-      if (response.data.success && response.data.data) {
-        const apiFollowings: Following[] = response.data.data.map((item: any) => ({
-          sellerId: item.sellerId,
-          sellerName: item.sellerName || '未知用户',
-          sellerAvatar: item.sellerAvatar,
-          followedAt: item.followedAt,
-        }));
+      const apiFollowings: Following[] = response.map((item) => ({
+        sellerId: item.sellerId || 0,
+        sellerName: item.sellerName || '未知用户',
+        sellerAvatar: item.sellerAvatar,
+        followedAt: item.followedAt || '',
+      }));
 
-        setFollowings(apiFollowings);
-      }
+      setFollowings(apiFollowings);
     } catch (err: any) {
       console.error('加载关注列表失败:', err);
       toast.error(err.response?.data?.message || '加载关注列表失败!😭');
@@ -83,8 +78,8 @@ const Following: React.FC = () => {
       // 乐观更新 UI
       setFollowings((prev) => prev.filter((f) => f.sellerId !== sellerId));
 
-      // 🚀 调用真实后端 API 取消关注
-      await api.unfollow({ sellerId });
+      // ✅ 使用 followService 取消关注
+      await followService.unfollowSeller(sellerId);
 
       toast.success('取消关注成功!👋');
     } catch (err: any) {

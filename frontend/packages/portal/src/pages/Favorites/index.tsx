@@ -7,8 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Pagination, GoodsCard } from '@campus/shared/components';
+import { favoriteService } from '@campus/shared/services';
 import { useNotificationStore } from '../../store';
-import { getApi } from '@campus/shared/utils';
 import './Favorites.css';
 
 // ==================== 类型定义 ====================
@@ -40,9 +40,6 @@ const Favorites: React.FC = () => {
   const [pageSize] = useState(12);
   const [total, setTotal] = useState(0);
 
-  // API 实例
-  const api = getApi();
-
   // ==================== 数据加载 ====================
 
   /**
@@ -52,25 +49,28 @@ const Favorites: React.FC = () => {
     setLoading(true);
 
     try {
-      // 🚀 调用真实后端 API 获取收藏列表
-      const response = await api.listFavorites({ page, size: pageSize });
+      // ✅ 使用 favoriteService 获取收藏列表
+      const response = await favoriteService.listFavorites({
+        page,
+        size: pageSize,
+        sortBy: 'createdAt',
+        sortDirection: 'desc',
+      });
 
-      if (response.data.success && response.data.data) {
-        const apiFavorites: FavoriteGoods[] = response.data.data.content.map((item: any) => ({
-          goodsId: item.id,
-          title: item.title,
-          price: item.price,
-          coverImage: item.images?.[0],
-          status: item.status,
-          sellerName: item.sellerName || '未知卖家',
-          viewCount: item.viewCount || 0,
-          favoriteCount: item.favoriteCount || 0,
-          favoritedAt: item.createdAt,
-        }));
+      const apiFavorites: FavoriteGoods[] = (response.content || []).map((item) => ({
+        goodsId: item.id || 0,
+        title: item.title || '',
+        price: item.price || 0,
+        coverImage: item.images?.[0],
+        status: item.status || 'ON_SALE',
+        sellerName: item.sellerName || '未知卖家',
+        viewCount: item.viewCount || 0,
+        favoriteCount: item.favoriteCount || 0,
+        favoritedAt: item.createdAt || '',
+      }));
 
-        setGoods(apiFavorites);
-        setTotal(response.data.data.totalElements || 0);
-      }
+      setGoods(apiFavorites);
+      setTotal(response.totalElements || 0);
     } catch (err: any) {
       console.error('加载收藏列表失败:', err);
       toast.error(err.response?.data?.message || '加载收藏列表失败!😭');
@@ -98,8 +98,8 @@ const Favorites: React.FC = () => {
       setGoods((prev) => prev.filter((g) => g.goodsId !== goodsId));
       setTotal((prev) => prev - 1);
 
-      // 🚀 调用真实后端 API 取消收藏
-      await api.removeFavorite({ goodsId });
+      // ✅ 使用 favoriteService 取消收藏
+      await favoriteService.removeFavorite(goodsId);
 
       toast.success('取消收藏成功!💔');
     } catch (err: any) {
