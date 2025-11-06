@@ -44,6 +44,10 @@ const Subscriptions = lazy(() => import('../pages/Subscriptions'));
 // 数据撤销相关页面
 const RevertOperations = lazy(() => import('../pages/RevertOperations'));
 
+// 评价相关页面
+const ReviewCreate = lazy(() => import('../pages/Review/Create'));
+const MyReviews = lazy(() => import('../pages/Review/MyReviews'));
+
 // ==================== 路由守卫组件 ====================
 
 /**
@@ -312,6 +316,26 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <RevertOperations />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'review/create',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <ReviewCreate />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'reviews/my',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <MyReviews />
             </LazyLoadWrapper>
           </RequireAuth>
         ),

@@ -14,6 +14,7 @@ import GoodsInfo from './GoodsInfo';
 import SellerCard from './SellerCard';
 import ActionBar from './ActionBar';
 import RecommendGoods from './RecommendGoods';
+import ReviewList from './ReviewList';
 import './GoodsDetail.css';
 
 export const GoodsDetail: React.FC = () => {
@@ -174,6 +175,9 @@ export const GoodsDetail: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* 商品评价 */}
+        <ReviewList goodsId={goodsId} />
 
         {/* 相似推荐 */}
         <RecommendGoods

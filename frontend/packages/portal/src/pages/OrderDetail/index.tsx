@@ -10,6 +10,7 @@ import { Skeleton } from '@campus/shared/components';
 import { orderService } from '@campus/shared/services/order';
 import { websocketService } from '@campus/shared/utils';
 import { useNotificationStore } from '../../store';
+import { LogisticsCard } from '../../components/LogisticsCard';
 import type { Order, PaymentMethod, OrderStatus } from '@campus/shared/types';
 import './OrderDetail.css';
 
@@ -529,6 +530,11 @@ const OrderDetail: React.FC = () => {
             )}
           </div>
         </div>
+
+        {/* ==================== 物流信息 ==================== */}
+        {(order.status === 'SHIPPED' || order.status === 'PENDING_RECEIPT' || order.status === 'COMPLETED') && order.id && (
+          <LogisticsCard orderId={order.id} />
+        )}
 
         {/* ==================== 买卖双方信息 ==================== */}
         <div className="users-info-section">

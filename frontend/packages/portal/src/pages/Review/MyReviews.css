@@ -1,0 +1,203 @@
+/**
+ * MyReviews 样式
+ * @author BaSui 😎
+ */
+
+.my-reviews {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.my-reviews__container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* 页面标题 */
+.my-reviews__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.my-reviews__title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.my-reviews__count {
+  font-size: 14px;
+  color: #999;
+}
+
+/* 评价列表 */
+.my-reviews__list {
+  /* ReviewCard 自带 margin-bottom */
+}
+
+/* 分页 */
+.my-reviews__pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 删除确认弹窗 */
+.my-reviews__delete-confirm {
+  padding: 20px;
+}
+
+.my-reviews__delete-confirm p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.my-reviews__delete-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* 编辑弹窗 */
+.my-reviews__edit-form {
+  padding: 20px;
+}
+
+.my-reviews__edit-notice {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+.my-reviews__edit-preview {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.my-reviews__edit-preview p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+}
+
+.my-reviews__edit-preview strong {
+  color: #666;
+}
+
+.my-reviews__edit-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* 按钮 */
+.my-reviews__btn {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.my-reviews__btn--cancel {
+  background-color: #fff;
+  color: #666;
+  border: 1px solid #d9d9d9;
+}
+
+.my-reviews__btn--cancel:hover {
+  color: #333;
+  border-color: #999;
+}
+
+.my-reviews__btn--danger {
+  background-color: #ff4d4f;
+  color: #fff;
+}
+
+.my-reviews__btn--danger:hover {
+  background-color: #ff7875;
+}
+
+.my-reviews__btn--primary {
+  background-color: #1890ff;
+  color: #fff;
+  width: 100%;
+}
+
+.my-reviews__btn--primary:hover {
+  background-color: #40a9ff;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .my-reviews {
+    padding: 12px;
+  }
+
+  .my-reviews__container {
+    max-width: 100%;
+  }
+
+  .my-reviews__header {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .my-reviews__title {
+    font-size: 20px;
+  }
+
+  .my-reviews__count {
+    font-size: 12px;
+  }
+
+  .my-reviews__pagination {
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .my-reviews__delete-confirm {
+    padding: 16px;
+  }
+
+  .my-reviews__delete-confirm p {
+    font-size: 13px;
+  }
+
+  .my-reviews__delete-actions,
+  .my-reviews__edit-actions {
+    flex-direction: column;
+  }
+
+  .my-reviews__btn {
+    width: 100%;
+  }
+
+  .my-reviews__edit-form {
+    padding: 16px;
+  }
+}

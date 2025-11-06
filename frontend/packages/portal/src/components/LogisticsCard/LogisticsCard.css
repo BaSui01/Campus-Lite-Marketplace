@@ -1,0 +1,111 @@
+/**
+ * LogisticsCard 样式
+ * @author BaSui 😎
+ */
+
+.logistics-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.logistics-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.logistics-card__info {
+  flex: 1;
+}
+
+.logistics-card__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.logistics-card__tracking {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logistics-card__copy-btn {
+  padding: 2px 8px;
+  font-size: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #1890ff;
+  cursor: pointer;
+}
+
+.logistics-card__copy-btn:hover {
+  border-color: #1890ff;
+}
+
+.logistics-card__status {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  background-color: #52c41a;
+  color: #fff;
+}
+
+.logistics-card__latest {
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.logistics-card__latest p {
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.logistics-card__latest span {
+  font-size: 12px;
+  color: #999;
+}
+
+.logistics-card__toggle {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #1890ff;
+  cursor: pointer;
+}
+
+.logistics-card__toggle:hover {
+  border-color: #1890ff;
+}
+
+.logistics-card__timeline {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+@media (max-width: 768px) {
+  .logistics-card {
+    padding: 16px;
+  }
+
+  .logistics-card__title {
+    font-size: 16px;
+  }
+}
