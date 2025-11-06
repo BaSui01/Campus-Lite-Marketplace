@@ -26,7 +26,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/admin/soft-delete")
+@RequestMapping("/admin/soft-delete")
 @RequiredArgsConstructor
 @Tag(name = "软删除治理", description = "管理端恢复与彻底删除接口")
 public class SoftDeleteAdminController {

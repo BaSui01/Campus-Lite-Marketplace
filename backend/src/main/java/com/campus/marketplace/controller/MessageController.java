@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/messages")
 @RequiredArgsConstructor
 @Tag(name = "消息管理", description = "私信发送、查询、未读消息数等接口")
 public class MessageController {

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/disputes/statistics")
+@RequestMapping("/disputes/statistics")
 @RequiredArgsConstructor
 @Tag(name = "Dispute Statistics", description = "Dispute statistics and analytics")
 public class DisputeStatisticsController {

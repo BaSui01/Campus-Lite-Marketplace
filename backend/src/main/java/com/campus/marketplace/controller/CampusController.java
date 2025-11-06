@@ -28,7 +28,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/api/admin/campuses")
+@RequestMapping("/admin/campuses")
 @RequiredArgsConstructor
 @Tag(name = "校区管理", description = "校区CRUD与用户迁移")
 public class CampusController {

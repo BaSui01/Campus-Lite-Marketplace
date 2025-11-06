@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2025-10-27
  */
 @RestController
-@RequestMapping("/api/favorites")
+@RequestMapping("/favorites")
 @RequiredArgsConstructor
 @Tag(name = "收藏管理", description = "物品收藏、取消收藏、查询收藏列表等接口")
 public class FavoriteController {

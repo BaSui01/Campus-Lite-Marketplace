@@ -30,7 +30,7 @@ import java.math.BigDecimal;
  */
 
 @RestController
-@RequestMapping("/api/goods")
+@RequestMapping("/goods")
 @RequiredArgsConstructor
 @Tag(name = "物品管理", description = "物品发布、查询、审核等接口")
 public class GoodsController {

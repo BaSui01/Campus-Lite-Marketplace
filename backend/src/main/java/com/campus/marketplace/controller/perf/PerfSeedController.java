@@ -23,7 +23,7 @@ import java.util.Map;
 @Profile("perf")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/perf/orders/timeout")
+@RequestMapping("/perf/orders/timeout")
 @Tag(name = "性能环境数据", description = "压测专用数据初始化与清理")
 public class PerfSeedController {
 

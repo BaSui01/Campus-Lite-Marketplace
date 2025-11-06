@@ -81,6 +81,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理加密解密异常
+     * 
+     * @param e CryptoException
+     * @return 错误响应
+     */
+    @ExceptionHandler(CryptoException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleCryptoException(CryptoException e) {
+        log.error("❌ 密码解密失败: {}", e.getMessage());
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(), "密码格式错误，请重试");
+    }
+
+    /**
      * 处理参数校验异常（@Valid）
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)

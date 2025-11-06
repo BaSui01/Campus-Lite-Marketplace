@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Tag(name = "商品批量操作")
 @RestController
-@RequestMapping("/api/goods/batch")
+@RequestMapping("/goods/batch")
 @RequiredArgsConstructor
 public class GoodsBatchController {
 

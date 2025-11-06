@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 @Tag(name = "订单管理", description = "订单创建、买卖家查询与取消")
 public class OrderController {

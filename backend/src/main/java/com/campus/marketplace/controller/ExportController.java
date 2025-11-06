@@ -24,7 +24,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/api/exports")
+@RequestMapping("/exports")
 @RequiredArgsConstructor
 @Tag(name = "导出管理", description = "数据导出任务申请、查询与下载")
 public class ExportController {

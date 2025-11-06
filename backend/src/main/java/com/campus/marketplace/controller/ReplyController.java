@@ -27,7 +27,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/api/replies")
+@RequestMapping("/replies")
 @RequiredArgsConstructor
 @Tag(name = "回复管理", description = "帖子回复相关接口")
 public class ReplyController {

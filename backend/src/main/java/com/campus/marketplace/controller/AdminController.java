@@ -28,7 +28,7 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 @Tag(name = "管理员", description = "管理员后台管理相关接口")
 public class AdminController {

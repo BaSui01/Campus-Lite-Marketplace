@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Tag(name = "申诉材料")
 @RestController
-@RequestMapping("/api/appeals/materials")
+@RequestMapping("/appeals/materials")
 @RequiredArgsConstructor
 public class AppealMaterialController {
 

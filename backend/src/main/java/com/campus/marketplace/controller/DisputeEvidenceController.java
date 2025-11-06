@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/disputes/evidence")
+@RequestMapping("/disputes/evidence")
 @RequiredArgsConstructor
 @Tag(name = "纠纷证据", description = "证据上传、查询与评估")
 public class DisputeEvidenceController {

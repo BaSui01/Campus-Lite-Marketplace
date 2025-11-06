@@ -34,13 +34,13 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/api/categories/tree")
+    @GetMapping("/categories/tree")
     @Operation(summary = "获取分类树", description = "按层级返回完整的分类树结构")
     public ApiResponse<List<CategoryNodeResponse>> getCategoryTree() {
         return ApiResponse.success(categoryService.getCategoryTree());
     }
 
-    @PostMapping("/api/admin/categories")
+    @PostMapping("/admin/categories")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CATEGORY_MANAGE)")
     @Operation(summary = "创建分类", description = "管理员创建新的分类节点")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -65,7 +65,7 @@ public class CategoryController {
         return ApiResponse.success(categoryService.createCategory(request));
     }
 
-    @PutMapping("/api/admin/categories/{id}")
+    @PutMapping("/admin/categories/{id}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CATEGORY_MANAGE)")
     @Operation(summary = "更新分类", description = "管理员更新分类信息")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -92,7 +92,7 @@ public class CategoryController {
         return ApiResponse.success(null);
     }
 
-    @DeleteMapping("/api/admin/categories/{id}")
+    @DeleteMapping("/admin/categories/{id}")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CATEGORY_MANAGE)")
     @Operation(summary = "删除分类", description = "管理员删除分类节点，删除前需确保无子节点及关联商品")
     public ApiResponse<Void> deleteCategory(@Parameter(description = "分类ID", example = "201") @PathVariable Long id) {

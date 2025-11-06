@@ -31,7 +31,7 @@ import jakarta.validation.Valid;
  */
 @Tag(name = "申诉管理(管理员)", description = "管理员申诉审核和管理接口")
 @RestController
-@RequestMapping("/api/admin/appeals")
+@RequestMapping("/admin/appeals")
 @RequiredArgsConstructor
 @Validated
 public class AppealAdminController {

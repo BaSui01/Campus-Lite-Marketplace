@@ -22,7 +22,7 @@ import java.util.Map;
  * @since 2025-11-03
  */
 @RestController
-@RequestMapping("/api/behavior-analysis")
+@RequestMapping("/behavior-analysis")
 @RequiredArgsConstructor
 @Tag(name = "行为分析", description = "用户行为追踪和画像分析")
 public class BehaviorAnalysisController {

@@ -24,7 +24,7 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("/api/admin/notification-templates")
+@RequestMapping("/admin/notification-templates")
 @RequiredArgsConstructor
 @Tag(name = "通知模板管理", description = "模板CRUD与渲染调试")
 public class NotificationTemplateAdminController {

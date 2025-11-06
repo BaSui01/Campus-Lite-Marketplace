@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/payment")
 @RequiredArgsConstructor
 @Tag(name = "支付管理", description = "支付创建、状态查询与第三方回调处理")
 public class PaymentController {

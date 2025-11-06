@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/goods")
+@RequestMapping("/goods")
 @RequiredArgsConstructor
 @Tag(name = "商品详情", description = "商品详情页相关接口")
 public class GoodsDetailController {

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/disputes")
+@RequestMapping("/disputes")
 @RequiredArgsConstructor
 @Tag(name = "纠纷管理", description = "纠纷提交、查询与处理")
 public class DisputeController {

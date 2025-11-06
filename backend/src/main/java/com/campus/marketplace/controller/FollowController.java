@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("")
 @Tag(name = "关注订阅", description = "关注卖家与取消关注接口")
 public class FollowController {
 

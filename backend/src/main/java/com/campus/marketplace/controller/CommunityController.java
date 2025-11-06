@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/community")
+@RequestMapping("/community")
 @RequiredArgsConstructor
 @Tag(name = "社区广场", description = "社区广场相关接口")
 public class CommunityController {

@@ -27,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("")
 @Tag(name = "关键词订阅", description = "关键词订阅与取消接口")
 public class SubscriptionController {
 

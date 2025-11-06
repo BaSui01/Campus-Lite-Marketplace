@@ -30,7 +30,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/search")
 @RequiredArgsConstructor
 @Tag(name = "搜索功能", description = "智能搜索相关接口")
 public class SearchController {

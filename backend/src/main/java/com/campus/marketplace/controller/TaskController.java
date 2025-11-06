@@ -20,7 +20,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/tasks")
 @RequiredArgsConstructor
 @Tag(name = "任务调度", description = "定时任务列表、触发、暂停与恢复")
 public class TaskController {

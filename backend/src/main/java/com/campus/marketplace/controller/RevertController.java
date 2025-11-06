@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Tag(name = "操作撤销")
 @RestController
-@RequestMapping("/api/revert")
+@RequestMapping("/revert")
 @RequiredArgsConstructor
 public class RevertController {
 

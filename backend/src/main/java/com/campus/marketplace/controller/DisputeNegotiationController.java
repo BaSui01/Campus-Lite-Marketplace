@@ -29,7 +29,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/disputes/negotiations")
+@RequestMapping("/disputes/negotiations")
 @RequiredArgsConstructor
 @Tag(name = "纠纷协商", description = "协商消息、解决方案提议与响应")
 public class DisputeNegotiationController {

@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/posts")
 @RequiredArgsConstructor
 @Tag(name = "论坛管理", description = "帖子发布、查询、审核等接口")
 public class PostController {

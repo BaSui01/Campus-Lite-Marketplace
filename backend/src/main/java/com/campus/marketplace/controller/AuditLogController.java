@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  */
 
 @RestController
-@RequestMapping("/api/audit-logs")
+@RequestMapping("/audit-logs")
 @RequiredArgsConstructor
 @Tag(name = "审计日志", description = "系统操作审计日志相关接口")
 public class AuditLogController {

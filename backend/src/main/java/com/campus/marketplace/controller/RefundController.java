@@ -28,7 +28,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 @Tag(name = "退款管理", description = "退款申请、审批与详情查询")
 public class RefundController {

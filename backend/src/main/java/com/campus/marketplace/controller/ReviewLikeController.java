@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/reviews")
 @RequiredArgsConstructor
 @Tag(name = "评价点赞管理", description = "评价点赞、取消点赞、状态查询接口")
 public class ReviewLikeController {

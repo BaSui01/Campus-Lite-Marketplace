@@ -21,7 +21,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/api/feature-flags")
+@RequestMapping("/feature-flags")
 @RequiredArgsConstructor
 @Tag(name = "功能开关", description = "特性开关的新增、更新、删除与刷新")
 public class FeatureFlagController {

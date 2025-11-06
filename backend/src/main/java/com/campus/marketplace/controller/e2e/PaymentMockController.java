@@ -39,7 +39,7 @@ import java.math.BigDecimal;
 @RestController
 @Profile("e2e")
 @RequiredArgsConstructor
-@RequestMapping("/api/payment/mock")
+@RequestMapping("/payment/mock")
 @Tag(name = "模拟支付", description = "端到端测试专用的支付回调模拟接口，仅 e2e Profile 可用")
 public class PaymentMockController {
 

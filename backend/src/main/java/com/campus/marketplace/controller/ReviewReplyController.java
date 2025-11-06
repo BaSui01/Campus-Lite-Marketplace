@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/reviews")
 @RequiredArgsConstructor
 @Tag(name = "评价回复管理", description = "卖家回复、管理员回复、已读标记接口")
 public class ReviewReplyController {
