@@ -25,6 +25,7 @@ const GoodsDetail = lazy(() => import('../pages/Goods/Detail'));
 const Publish = lazy(() => import('../pages/Publish'));
 const Chat = lazy(() => import('../pages/Chat'));
 const Orders = lazy(() => import('../pages/Orders'));
+const OrderCreate = lazy(() => import('../pages/Order/Create'));
 const OrderDetail = lazy(() => import('../pages/OrderDetail'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Community = lazy(() => import('../pages/Community'));
@@ -157,6 +158,16 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <Orders />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'order/create',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <OrderCreate />
             </LazyLoadWrapper>
           </RequireAuth>
         ),
