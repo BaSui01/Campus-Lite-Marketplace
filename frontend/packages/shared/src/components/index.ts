@@ -173,3 +173,48 @@ export {
   type ValidationResult,
   type ValidationLevel
 } from './RevertPreviewModal';
+
+// ==================== Spec #11 新增组件 ====================
+
+/**
+ * StarRating - 星级评分组件
+ * @description 支持只读/可编辑、半星、多尺寸的星级评分组件
+ * @example
+ * ```tsx
+ * // 只读展示
+ * <StarRating value={4.5} readonly showValue />
+ * 
+ * // 可编辑模式
+ * <StarRating 
+ *   value={rating} 
+ *   onChange={setRating} 
+ *   allowHalf 
+ *   size="large" 
+ * />
+ * ```
+ */
+export { StarRating, type StarRatingProps, type StarSize } from './StarRating';
+
+/**
+ * Timeline - 时间轴组件
+ * @description 支持垂直/水平布局、多种状态、自定义图标的时间轴组件
+ * @example
+ * ```tsx
+ * // 垂直时间轴（默认）
+ * <Timeline items={logisticsTrack} activeIndex={0} />
+ * 
+ * // 水平时间轴
+ * <Timeline 
+ *   items={orderSteps} 
+ *   direction="horizontal"
+ *   showTime={false}
+ * />
+ * ```
+ */
+export {
+  Timeline,
+  type TimelineProps,
+  type TimelineItem,
+  type TimelineStatus,
+  type TimelineDirection,
+} from './Timeline';

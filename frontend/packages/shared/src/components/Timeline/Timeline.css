@@ -1,0 +1,280 @@
+/**
+ * Timeline 组件样式
+ * @author BaSui 😎
+ * @description 时间轴组件的样式定义
+ */
+
+/* ==================== 容器 ==================== */
+
+.timeline {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* ==================== 垂直布局 ==================== */
+
+.timeline--vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline--vertical .timeline__item {
+  position: relative;
+  padding-bottom: 24px;
+}
+
+.timeline--vertical .timeline__item:last-child {
+  padding-bottom: 0;
+}
+
+/* 垂直连接线 */
+.timeline--vertical .timeline__line {
+  position: absolute;
+  left: 5px;
+  top: 16px;
+  width: 2px;
+  height: calc(100% - 16px);
+  background-color: #e0e0e0;
+}
+
+.timeline--vertical .timeline__item:last-child .timeline__line {
+  display: none;
+}
+
+/* ==================== 水平布局 ==================== */
+
+.timeline--horizontal {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  padding-bottom: 16px;
+}
+
+.timeline--horizontal .timeline__item {
+  position: relative;
+  flex: 0 0 auto;
+  padding-right: 40px;
+  min-width: 120px;
+}
+
+.timeline--horizontal .timeline__item:last-child {
+  padding-right: 0;
+}
+
+/* 水平连接线 */
+.timeline--horizontal .timeline__line {
+  position: absolute;
+  left: 16px;
+  top: 5px;
+  width: calc(100% - 16px);
+  height: 2px;
+  background-color: #e0e0e0;
+}
+
+.timeline--horizontal .timeline__item:last-child .timeline__line {
+  display: none;
+}
+
+/* ==================== 时间轴节点 ==================== */
+
+.timeline__item {
+  display: flex;
+}
+
+.timeline--vertical .timeline__item {
+  flex-direction: row;
+  gap: 16px;
+}
+
+.timeline--horizontal .timeline__item {
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+}
+
+/* ==================== 节点图标容器 ==================== */
+
+.timeline__node-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.timeline--vertical .timeline__node-wrapper {
+  padding-top: 4px;
+}
+
+/* ==================== 节点圆点 ==================== */
+
+.timeline__node {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #1890ff;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* 节点状态颜色 */
+.timeline__node--default {
+  border-color: #d9d9d9;
+}
+
+.timeline__node--pending {
+  border-color: #d9d9d9;
+  background-color: #f5f5f5;
+}
+
+.timeline__node--processing {
+  border-color: #1890ff;
+  background-color: #e6f7ff;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.timeline__node--success {
+  border-color: #52c41a;
+  background-color: #f6ffed;
+}
+
+.timeline__node--error {
+  border-color: #ff4d4f;
+  background-color: #fff2f0;
+}
+
+/* 处理中动画 */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* 自定义图标 */
+.timeline__node--custom {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+}
+
+/* ==================== 内容区域 ==================== */
+
+.timeline__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline--vertical .timeline__content {
+  padding-top: 2px;
+}
+
+/* ==================== 时间 ==================== */
+
+.timeline__time {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.timeline--horizontal .timeline__time {
+  order: 3;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+/* ==================== 标题 ==================== */
+
+.timeline__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+/* ==================== 描述 ==================== */
+
+.timeline__description {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* ==================== 高亮状态 ==================== */
+
+.timeline__item--active .timeline__node {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 0 4px rgba(24, 144, 255, 0.2);
+}
+
+.timeline__item--active .timeline__title {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+/* ==================== 响应式 ==================== */
+
+@media (max-width: 768px) {
+  .timeline--vertical .timeline__item {
+    padding-bottom: 20px;
+  }
+
+  .timeline--vertical {
+    gap: 12px;
+  }
+
+  .timeline__title {
+    font-size: 13px;
+  }
+
+  .timeline__description {
+    font-size: 12px;
+  }
+
+  .timeline--horizontal {
+    padding-bottom: 12px;
+  }
+
+  .timeline--horizontal .timeline__item {
+    min-width: 100px;
+    padding-right: 32px;
+  }
+}
+
+/* ==================== 可访问性 ==================== */
+
+.timeline__item:focus {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+  .timeline__node {
+    border-width: 3px;
+  }
+
+  .timeline__line {
+    width: 3px;
+  }
+
+  .timeline--horizontal .timeline__line {
+    height: 3px;
+    width: calc(100% - 16px);
+  }
+}

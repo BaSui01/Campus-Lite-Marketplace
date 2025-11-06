@@ -16,13 +16,29 @@ export type { UserService } from './user';
 export { goodsService } from './goods';
 export type { GoodsService } from './goods';
 
+// ==================== 评价服务 ====================
+export { reviewService } from './goods/review';
+export type {
+  ReviewService,
+  CreateReviewRequest,
+  ReviewListQuery,
+  ReviewListResponse,
+  ReviewDetail,
+  ReviewStatistics,
+} from './goods/review';
+
 // ==================== 订单服务 ====================
 export { orderService } from './order';
 export type { OrderService } from './order';
 
 // ==================== 退款服务 ====================
 export { refundService, RefundStatus } from './refund';
-export type { RefundService, RefundRequest, ApplyRefundRequest, RefundListQuery } from './refund';
+export type { 
+  RefundService, 
+  Refund,
+  RefundListParams,
+  RefundReviewRequest
+} from './refund';
 
 // ==================== 消息服务 ====================
 export { messageService } from './message';
@@ -75,3 +91,126 @@ export type {
   RevertExecutionResult, 
   RevertRequestParams 
 } from './revert';
+
+// ==================== 申诉服务 ====================
+export { appealService } from './appeal';
+export type { 
+  AppealService,
+  Appeal,
+  AppealDetail,
+  AppealMaterial,
+  AppealListParams,
+  AppealReviewRequest,
+  BatchAppealReviewRequest,
+  AppealStatistics
+} from './appeal';
+
+// ==================== 校园管理服务 ====================
+export { campusService, CampusStatus } from './campus';
+export type {
+  CampusService,
+  Campus,
+  CampusListParams,
+  CampusStatistics,
+  CampusRequest
+} from './campus';
+
+// ==================== 分类管理服务 ====================
+export { categoryService, CategoryStatus } from './category';
+export type {
+  CategoryService,
+  Category,
+  CategoryTreeNode,
+  CategoryListParams,
+  CategoryRequest,
+  CategorySortRequest,
+  CategoryStatistics
+} from './category';
+
+// ==================== 标签管理服务 ====================
+export { tagService, TagType, TagStatus } from './tag';
+export type {
+  TagService,
+  Tag,
+  TagListParams,
+  TagRequest,
+  TagMergeRequest,
+  HotTag
+} from './tag';
+
+// ==================== 功能开关服务 ====================
+export { featureFlagService, FeatureFlagStatus, GrayStrategy, Environment } from './featureFlag';
+export type {
+  FeatureFlagService,
+  FeatureFlag,
+  FeatureFlagListParams,
+  FeatureFlagRequest,
+  GrayRuleConfig,
+  FeatureFlagLog
+} from './featureFlag';
+
+// ==================== 系统监控服务 ====================
+export { monitorService, ErrorSeverity } from './monitor';
+export type {
+  MonitorService,
+  HealthCheckResponse,
+  SystemMetrics,
+  HealthCheckRecord,
+  ApiPerformanceLog,
+  EndpointStats,
+  QpsData,
+  ErrorLog,
+  PerformanceReport
+} from './monitor';
+
+// ==================== 任务调度服务 ====================
+export { taskService, TaskStatus } from './task';
+export type {
+  TaskService,
+  ScheduledTask,
+  TaskExecutionLog,
+  TaskStatistics
+} from './task';
+
+// ==================== 话题管理服务 ====================
+export { topicService } from './topic';
+export type {
+  TopicService,
+  Topic,
+  TopicStatistics,
+  CreateTopicRequest,
+  UpdateTopicRequest
+} from './topic';
+
+// ==================== 纠纷统计服务 ====================
+export { disputeStatisticsService } from './disputeStatistics';
+export type {
+  DisputeStatisticsService,
+  DisputeStatistics
+} from './disputeStatistics';
+
+// ==================== 社区广场服务 ====================
+export { communityService } from './community';
+export type {
+  CommunityService,
+  UserFeed,
+  PostTopicTag,
+  PostInteractionStats
+} from './community';
+
+// ==================== 物流服务 ====================
+export { logisticsService } from './logistics';
+export type {
+  LogisticsService,
+  Logistics,
+  LogisticsTrack,
+  LogisticsStatistics
+} from './logistics';
+
+// ==================== 推荐服务 ====================
+export { recommendService } from './recommend';
+export type {
+  RecommendService,
+  RecommendParams,
+  RecommendResult
+} from './recommend';
