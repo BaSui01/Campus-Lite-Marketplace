@@ -40,6 +40,156 @@
   margin: 0;
 }
 
+/* ==================== 统计卡片 ==================== */
+
+.favorites-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #636e72;
+}
+
+/* 不同状态的卡片颜色 */
+.stat-card--total {
+  border-left: 4px solid #fdcb6e;
+}
+
+.stat-card--total .stat-value {
+  color: #fdcb6e;
+}
+
+.stat-card--onsale {
+  border-left: 4px solid #00b894;
+}
+
+.stat-card--onsale .stat-value {
+  color: #00b894;
+}
+
+.stat-card--soldout {
+  border-left: 4px solid #0984e3;
+}
+
+.stat-card--soldout .stat-value {
+  color: #0984e3;
+}
+
+.stat-card--offshelf {
+  border-left: 4px solid #b2bec3;
+}
+
+.stat-card--offshelf .stat-value {
+  color: #b2bec3;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .favorites-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-icon {
+    font-size: 32px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
+  }
+}
+
+/* ==================== 工具栏（排序） ==================== */
+
+.favorites-toolbar {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sort-btn {
+  padding: 8px 20px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #636e72;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-btn:hover {
+  border-color: #fdcb6e;
+  color: #fdcb6e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(253, 203, 110, 0.2);
+}
+
+.sort-btn.active {
+  border-color: #fdcb6e;
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  color: #2d3436;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(253, 203, 110, 0.3);
+}
+
+.sort-icon {
+  font-size: 16px;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
 /* ==================== 内容区域 ==================== */
 
 .favorites-content {

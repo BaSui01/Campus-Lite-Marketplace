@@ -39,6 +39,18 @@ const Favorites: React.FC = () => {
   const [page, setPage] = useState(0);
   const [pageSize] = useState(12);
   const [total, setTotal] = useState(0);
+  
+  // 排序状态
+  const [sortBy, setSortBy] = useState<'createdAt' | 'price' | 'viewCount'>('createdAt');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  
+  // 统计数据
+  const [statistics, setStatistics] = useState({
+    total: 0,
+    onSale: 0,
+    soldOut: 0,
+    offShelf: 0,
+  });
 
   // ==================== 数据加载 ====================
 
@@ -53,8 +65,8 @@ const Favorites: React.FC = () => {
       const response = await favoriteService.listFavorites({
         page,
         size: pageSize,
-        sortBy: 'createdAt',
-        sortDirection: 'desc',
+        sortBy,
+        sortDirection,
       });
 
       const apiFavorites: FavoriteGoods[] = (response.content || []).map((item) => ({
@@ -71,6 +83,9 @@ const Favorites: React.FC = () => {
 
       setGoods(apiFavorites);
       setTotal(response.totalElements || 0);
+      
+      // 加载统计数据
+      loadStatistics();
     } catch (err: any) {
       console.error('加载收藏列表失败:', err);
       toast.error(err.response?.data?.message || '加载收藏列表失败!😭');
@@ -79,9 +94,21 @@ const Favorites: React.FC = () => {
     }
   };
 
+  /**
+   * 加载统计数据
+   */
+  const loadStatistics = async () => {
+    try {
+      const stats = await favoriteService.getFavoriteStatistics();
+      setStatistics(stats);
+    } catch (err: any) {
+      console.error('加载统计数据失败:', err);
+    }
+  };
+
   useEffect(() => {
     loadFavorites();
-  }, [page]);
+  }, [page, sortBy, sortDirection]);
 
   // ==================== 事件处理 ====================
 
@@ -126,6 +153,21 @@ const Favorites: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  /**
+   * 切换排序方式
+   */
+  const handleSortChange = (newSortBy: typeof sortBy) => {
+    if (newSortBy === sortBy) {
+      // 同一字段，切换排序方向
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // 不同字段，使用默认方向
+      setSortBy(newSortBy);
+      setSortDirection(newSortBy === 'price' ? 'asc' : 'desc');
+    }
+    setPage(0); // 重置到第一页
+  };
+
   // ==================== 渲染 ====================
 
   return (
@@ -138,6 +180,75 @@ const Favorites: React.FC = () => {
             {total > 0 ? `共收藏了 ${total} 个宝贝` : '还没有收藏任何商品哦~'}
           </p>
         </div>
+
+        {/* ==================== 统计卡片 ==================== */}
+        {total > 0 && (
+          <div className="favorites-stats">
+            <div className="stat-card stat-card--total">
+              <div className="stat-icon">🌟</div>
+              <div className="stat-info">
+                <div className="stat-value">{statistics.total}</div>
+                <div className="stat-label">总收藏</div>
+              </div>
+            </div>
+            <div className="stat-card stat-card--onsale">
+              <div className="stat-icon">🛒</div>
+              <div className="stat-info">
+                <div className="stat-value">{statistics.onSale}</div>
+                <div className="stat-label">在售中</div>
+              </div>
+            </div>
+            <div className="stat-card stat-card--soldout">
+              <div className="stat-icon">✅</div>
+              <div className="stat-info">
+                <div className="stat-value">{statistics.soldOut}</div>
+                <div className="stat-label">已售出</div>
+              </div>
+            </div>
+            <div className="stat-card stat-card--offshelf">
+              <div className="stat-icon">📦</div>
+              <div className="stat-info">
+                <div className="stat-value">{statistics.offShelf}</div>
+                <div className="stat-label">已下架</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== 排序选择器 ==================== */}
+        {total > 0 && (
+          <div className="favorites-toolbar">
+            <div className="sort-buttons">
+              <button
+                className={`sort-btn ${sortBy === 'createdAt' ? 'active' : ''}`}
+                onClick={() => handleSortChange('createdAt')}
+              >
+                按收藏时间
+                {sortBy === 'createdAt' && (
+                  <span className="sort-icon">{sortDirection === 'desc' ? '↓' : '↑'}</span>
+                )}
+              </button>
+              <button
+                className={`sort-btn ${sortBy === 'price' ? 'active' : ''}`}
+                onClick={() => handleSortChange('price')}
+              >
+                按价格
+                {sortBy === 'price' && (
+                  <span className="sort-icon">{sortDirection === 'desc' ? '↓' : '↑'}</span>
+                )}
+              </button>
+              <button
+                className={`sort-btn ${sortBy === 'viewCount' ? 'active' : ''}`}
+                onClick={() => handleSortChange('viewCount')}
+              >
+                按热度
+                {sortBy === 'viewCount' && (
+                  <span className="sort-icon">{sortDirection === 'desc' ? '↓' : '↑'}</span>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ==================== 收藏列表 ==================== */}
         <div className="favorites-content">
