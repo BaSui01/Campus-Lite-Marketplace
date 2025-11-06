@@ -31,6 +31,7 @@ const Profile = lazy(() => import('../pages/Profile'));
 const Community = lazy(() => import('../pages/Community'));
 const Search = lazy(() => import('../pages/Search'));
 const Settings = lazy(() => import('../pages/Settings'));
+const NotificationSettings = lazy(() => import('../pages/Settings/NotificationSettings'));
 const Notifications = lazy(() => import('../pages/Notifications'));
 const Favorites = lazy(() => import('../pages/Favorites'));
 const Following = lazy(() => import('../pages/Following'));
@@ -218,6 +219,16 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <Settings />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'settings/notifications',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <NotificationSettings />
             </LazyLoadWrapper>
           </RequireAuth>
         ),

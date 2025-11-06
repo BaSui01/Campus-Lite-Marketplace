@@ -298,11 +298,16 @@ const Notifications: React.FC = () => {
         {/* ==================== 头部 ==================== */}
         <div className="notifications-header">
           <h1 className="notifications-header__title">🔔 通知中心</h1>
-          {unreadCount > 0 && (
-            <Button type="primary" size="small" onClick={handleMarkAllAsRead}>
-              全部已读 ({unreadCount})
+          <div className="notifications-header__actions">
+            <Button type="default" size="small" onClick={() => navigate('/settings/notifications')}>
+              ⚙️ 通知设置
             </Button>
-          )}
+            {unreadCount > 0 && (
+              <Button type="primary" size="small" onClick={handleMarkAllAsRead}>
+                全部已读 ({unreadCount})
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* ==================== 标签切换 ==================== */}
