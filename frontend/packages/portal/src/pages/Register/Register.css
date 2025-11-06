@@ -1,260 +1,178 @@
 /**
- * 注册页面样式 - 让注册变得轻松愉快！🎨
+ * 注册页面样式
  * @author BaSui 😎
- * @updated 2025-11-01 - 优化配色与布局（参考设计稿）
  */
 
 .register-page {
-  /* 🎨 不需要额外背景，使用外层 AuthLayout 的背景 */
-  width: 100%;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px 20px;
 }
 
 .register-container {
-  display: flex;
   width: 100%;
-  /* 📐 合理宽度 - 从 1200px → 950px，更紧凑 */
-  max-width: 950px;
-  min-height: 600px;
-  background: #ffffff;
+  max-width: 480px;
+}
+
+.register-card {
+  background: white;
   border-radius: 16px;
-  /* 🎨 柔和阴影 - 适配深色背景 */
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.3),
-    0 20px 80px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
+  padding: 48px 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-/* ==================== 左侧欢迎区域 ==================== */
-
-.register-welcome {
-  /* 📐 左侧占 35% - 给右侧表单更多空间！ */
-  flex: 0 0 35%;
-  padding: 60px 40px;
-  /* 🌸 优雅粉紫渐变 - 与参考图一致！ */
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
+/* ==================== 头部 ==================== */
+.register-header {
+  text-align: center;
+  margin-bottom: 32px;
 }
 
-/* 左侧装饰圆圈 */
-.register-welcome::before {
-  content: '';
-  position: absolute;
-  top: -100px;
-  left: -100px;
-  width: 300px;
-  height: 300px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
+.register-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px;
 }
 
-.register-welcome::after {
-  content: '';
-  position: absolute;
-  bottom: -150px;
-  right: -150px;
-  width: 400px;
-  height: 400px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-}
-
-.register-welcome__title {
-  font-size: 36px;
-  font-weight: bold;
-  margin: 0 0 10px 0;
-  line-height: 1.2;
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.register-welcome__subtitle {
-  font-size: 18px;
-  font-weight: 300;
-  margin: 0 0 30px 0;
-  opacity: 0.95;
-  position: relative;
-  z-index: 1;
-}
-
-.register-welcome__desc {
-  font-size: 16px;
-  line-height: 1.8;
-  opacity: 0.9;
-  position: relative;
-  z-index: 1;
-}
-
-/* ==================== 右侧注册表单 ==================== */
-
-.register-form {
-  /* 📐 右侧占 65% - 更宽敞的表单空间！ */
-  flex: 0 0 65%;
-  padding: 45px 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-height: 100vh;
-  overflow-y: auto;
-  background: #ffffff;
-}
-
-.register-form__title {
-  font-size: 32px;
-  font-weight: bold;
-  color: #262626;
-  margin: 0 0 8px 0;
-  /* 🎯 添加渐变文字效果 */
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.register-form__subtitle {
+.register-subtitle {
   font-size: 14px;
-  color: #8c8c8c;
-  margin: 0 0 32px 0;
+  color: #999;
+  margin: 0;
 }
 
-/* 表单错误提示 */
-.register-form__error {
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  background: #fff1f0;
-  border: 1px solid #ffa39e;
-  border-radius: 4px;
-  color: #cf1322;
-  font-size: 14px;
-  line-height: 1.5;
+/* ==================== 标签切换 ==================== */
+.register-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  padding: 4px;
+  background: #f5f5f5;
+  border-radius: 8px;
 }
 
-/* 表单字段 */
-.register-form__field {
-  margin-bottom: 18px;
-}
-
-.register-form__label {
-  display: block;
+.register-tab {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #666;
   font-size: 14px;
   font-weight: 500;
-  color: #262626;
-  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.register-form__field-error {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #ff4d4f;
+.register-tab:hover {
+  color: #667eea;
 }
 
-/* 验证码输入区域 */
-.register-form__code-input {
+.register-tab.active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== 表单 ==================== */
+.register-form {
   display: flex;
-  gap: 10px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.register-form__code-input > div {
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-field-error {
+  font-size: 13px;
+  color: #f5222d;
+  padding-left: 4px;
+}
+
+.form-submit-error {
+  padding: 12px 16px;
+  background: #fff1f0;
+  border: 1px solid #ffccc7;
+  border-radius: 6px;
+  color: #f5222d;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ==================== 验证码字段 ==================== */
+.verification-code-field {
+  display: flex;
+  gap: 8px;
+}
+
+.verification-code-field > div {
   flex: 1;
 }
 
-.register-form__code-button {
-  flex-shrink: 0;
-  min-width: 120px;
+.send-code-btn {
+  padding: 0 20px;
+  white-space: nowrap;
+  background: #667eea;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-/* 页脚 */
-.register-form__footer {
+.send-code-btn:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.send-code-btn:disabled {
+  background: #d9d9d9;
+  cursor: not-allowed;
+}
+
+/* ==================== 底部链接 ==================== */
+.register-footer {
   margin-top: 24px;
   text-align: center;
   font-size: 14px;
-  color: #8c8c8c;
+  color: #666;
 }
 
-.register-form__link {
-  font-size: 14px;
-  color: #1890ff;
+.register-footer-link {
+  color: #667eea;
   text-decoration: none;
+  font-weight: 500;
+  margin-left: 8px;
   transition: color 0.3s ease;
 }
 
-.register-form__link:hover {
-  color: #40a9ff;
+.register-footer-link:hover {
+  color: #5568d3;
   text-decoration: underline;
 }
 
-.register-form__footer .register-form__link {
-  margin-left: 8px;
-}
-
-/* ==================== 响应式适配 ==================== */
-
-@media (max-width: 768px) {
-  .register-container {
-    flex-direction: column;
-    max-width: 450px;
+/* ==================== 响应式 ==================== */
+@media (max-width: 767px) {
+  .register-page {
+    padding: 20px 16px;
   }
 
-  .register-welcome {
-    padding: 40px 30px;
+  .register-card {
+    padding: 32px 24px;
   }
 
-  .register-welcome__title {
-    font-size: 28px;
-  }
-
-  .register-welcome__subtitle {
-    font-size: 16px;
-  }
-
-  .register-welcome__desc {
-    font-size: 14px;
-  }
-
-  .register-form {
-    padding: 40px 30px;
-    max-height: none;
-  }
-
-  .register-form__title {
+  .register-title {
     font-size: 24px;
   }
 
-  .register-form__code-input {
+  .register-tabs {
     flex-direction: column;
-  }
-
-  .register-form__code-button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .register-page {
-    padding: 10px;
-  }
-
-  .register-welcome {
-    padding: 30px 20px;
-  }
-
-  .register-form {
-    padding: 30px 20px;
-  }
-
-  .register-form__title {
-    font-size: 22px;
   }
 }
