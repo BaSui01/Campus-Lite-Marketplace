@@ -51,28 +51,66 @@ export interface TodayStatistics {
 export class StatisticsService {
   async getSystemOverview(): Promise<SystemOverview> {
     const res = await http.get<ApiResponse<SystemOverview>>('/api/admin/statistics/overview');
-    return res.data;
+    return res.data || {} as SystemOverview;
   }
 
   async getTrendStatistics(days = 7): Promise<TrendStatistics> {
     const res = await http.get<ApiResponse<TrendStatistics>>('/api/admin/statistics/trend', {
       params: { days },
     });
-    return res.data;
+    return res.data || { userTrend: [], goodsTrend: [], orderTrend: [] };
+  }
+
+  async getUserTrend(days = 30): Promise<{ name: string; value: number }[]> {
+    const res = await http.get<ApiResponse<any>>('/api/admin/statistics/trend', {
+      params: { days },
+    });
+    // 后端返回的 trend 数据包含多个维度，这里提取用户趋势
+    const trendData = res.data || {};
+    const userTrend = trendData.userTrend || [];
+    return userTrend.map((item: any) => ({
+      name: item.date || item.name || '',
+      value: item.value || item.count || 0,
+    }));
+  }
+
+  async getRevenueTrend(days = 30): Promise<{ name: string; value: number }[]> {
+    const res = await http.get<ApiResponse<any>>('/api/admin/statistics/revenue', {
+      params: { months: Math.ceil(days / 30) },
+    });
+    // 将收入数据转换为图表格式
+    const revenueData = res.data || {};
+    return Object.entries(revenueData).map(([month, value]) => ({
+      name: month,
+      value: Number(value) || 0,
+    }));
   }
 
   async getTopGoods(limit = 10): Promise<RankingItem[]> {
-    const res = await http.get<ApiResponse<RankingItem[]>>('/api/admin/statistics/top-goods', {
+    const res = await http.get<ApiResponse<any[]>>('/api/admin/statistics/top-goods', {
       params: { limit },
     });
-    return res.data;
+    const data = res.data || [];
+    return data.map((item: any) => ({
+      id: item.id || item.goodsId || 0,
+      name: item.name || item.title || '未知商品',
+      value: item.value || item.viewCount || item.count || 0,
+      category: item.category || item.categoryName,
+      count: item.count || item.value || 0,
+    }));
   }
 
   async getTopUsers(limit = 10): Promise<RankingItem[]> {
-    const res = await http.get<ApiResponse<RankingItem[]>>('/api/admin/statistics/top-users', {
+    const res = await http.get<ApiResponse<any[]>>('/api/admin/statistics/top-users', {
       params: { limit },
     });
-    return res.data;
+    const data = res.data || [];
+    return data.map((item: any) => ({
+      id: item.id || item.userId || 0,
+      name: item.name || item.username || item.nickname || '未知用户',
+      value: item.value || item.points || item.score || 0,
+      avatar: item.avatar || item.avatarUrl,
+    }));
   }
 
   async getCategoryStatistics(): Promise<CategoryStat[]> {

@@ -19,9 +19,12 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { LineChart, BarChart } from '@/components/Charts';
-import StatCard from '@/components/StatCard';
-import { statisticsService } from '@campus/shared';
+import { 
+  StatCard, 
+  LineChart, 
+  BarChart, 
+  statisticsService 
+} from '@campus/shared';
 import './Dashboard.css';
 
 const { Title, Text } = Typography;
@@ -31,6 +34,7 @@ const Dashboard: React.FC = () => {
   const { data: overview, isLoading: overviewLoading } = useQuery({
     queryKey: ['system-overview'],
     queryFn: () => statisticsService.getSystemOverview(),
+    retry: 0, // 禁用重试，直接失败
   });
 
   // ===== 查询热门商品排行 =====

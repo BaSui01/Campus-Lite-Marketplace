@@ -25,5 +25,8 @@ export * from './websocket';
 // 🌐 HTTP 请求封装
 export * from './http';
 
+// 🔐 加密工具
+export * from './crypto';
+
 // 🚧 TODO: 后续添加工具函数
 // export * from './upload';

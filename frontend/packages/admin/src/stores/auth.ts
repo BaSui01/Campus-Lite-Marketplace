@@ -86,16 +86,22 @@ export const useAuthStore = createAuthStore<AdminUser, LoginRequest>({
       throw new Error(response.message || '登录失败');
     }
 
-    const { accessToken, refreshToken, user } = response.data;
+    // 后端返回的字段：token, tokenType, expiresIn, userInfo
+    // 需要映射为前端期望的格式：accessToken, refreshToken, user
+    const { token, userInfo } = response.data;
 
-    if (!accessToken) {
+    if (!token) {
       throw new Error('登录失败：未获取到访问令牌');
     }
 
+    if (!userInfo) {
+      throw new Error('登录失败：未获取到用户信息');
+    }
+
     return {
-      accessToken,
-      refreshToken,
-      user: normalizeUser(user as RawUser),
+      accessToken: token,
+      refreshToken: undefined, // 后端暂未提供 refreshToken
+      user: normalizeUser(userInfo as RawUser),
     };
   },
 

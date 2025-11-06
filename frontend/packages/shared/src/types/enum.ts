@@ -172,23 +172,9 @@ export enum MessageStatus {
   RECALLED = 'RECALLED',
 }
 
-/**
- * 通知类型枚举
- */
-export enum NotificationType {
-  /** 系统通知 */
-  SYSTEM = 'SYSTEM',
-  /** 订单通知 */
-  ORDER = 'ORDER',
-  /** 消息通知 */
-  MESSAGE = 'MESSAGE',
-  /** 评价通知 */
-  REVIEW = 'REVIEW',
-  /** 收藏通知 */
-  FAVORITE = 'FAVORITE',
-  /** 举报通知 */
-  REPORT = 'REPORT',
-}
+// 通知类型枚举已移至 services/notificationPreference.ts
+// 请从 @campus/shared/services 导入
+export { NotificationType } from '../services/notificationPreference';
 
 // ==================== 审核相关枚举 ====================
 
@@ -456,14 +442,5 @@ export const MessageTypeLabel: Record<MessageType, string> = {
   [MessageType.FILE]: '文件消息',
 };
 
-/**
- * 通知类型中文映射
- */
-export const NotificationTypeLabel: Record<NotificationType, string> = {
-  [NotificationType.SYSTEM]: '系统通知',
-  [NotificationType.ORDER]: '订单通知',
-  [NotificationType.MESSAGE]: '消息通知',
-  [NotificationType.REVIEW]: '评价通知',
-  [NotificationType.FAVORITE]: '收藏通知',
-  [NotificationType.REPORT]: '举报通知',
-};
+// NotificationType 相关映射已移至 constants/status.ts
+// 请使用 NOTIFICATION_TYPE_LABELS, NOTIFICATION_TYPE_ICONS, NOTIFICATION_TYPE_COLORS

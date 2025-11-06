@@ -7,7 +7,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",`n    "test:e2e": "playwright test",`n    "test:e2e:ui": "playwright test --ui",`n    "test:e2e:headed": "playwright test --headed",`n    "test:e2e:debug": "playwright test --debug",`n    "test:e2e:report": "playwright show-report",
+    "dev": "vite",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
@@ -17,8 +22,10 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.1.0",
     "@campus/shared": "workspace:*",
     "@tanstack/react-query": "^5.51.0",
+    "antd": "^5.27.6",
     "axios": "^1.7.2",
     "dayjs": "^1.11.12",
     "echarts": "^5.4.3",
@@ -50,4 +57,3 @@
     "vitest": "^2.1.1"
   }
 }
-

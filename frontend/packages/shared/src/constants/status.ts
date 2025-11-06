@@ -228,36 +228,42 @@ export const MESSAGE_TYPE_ICONS: Record<MessageType, string> = {
  * 通知类型标签映射
  */
 export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
-  [NotificationType.SYSTEM]: '系统通知',
   [NotificationType.ORDER]: '订单通知',
-  [NotificationType.MESSAGE]: '消息通知',
-  [NotificationType.REVIEW]: '评价通知',
-  [NotificationType.FAVORITE]: '收藏通知',
-  [NotificationType.REPORT]: '举报通知',
+  [NotificationType.PAYMENT]: '支付通知',
+  [NotificationType.MESSAGE]: '站内消息',
+  [NotificationType.LIKE]: '点赞通知',
+  [NotificationType.COMMENT]: '评论通知',
+  [NotificationType.FOLLOW]: '关注通知',
+  [NotificationType.PRICE_ALERT]: '价格提醒',
+  [NotificationType.SYSTEM]: '系统公告',
 };
 
 /**
  * 通知类型图标映射
  */
 export const NOTIFICATION_TYPE_ICONS: Record<NotificationType, string> = {
-  [NotificationType.SYSTEM]: '🔔',
-  [NotificationType.ORDER]: '📦',
+  [NotificationType.ORDER]: '🛒',
+  [NotificationType.PAYMENT]: '💰',
   [NotificationType.MESSAGE]: '💬',
-  [NotificationType.REVIEW]: '⭐',
-  [NotificationType.FAVORITE]: '❤️',
-  [NotificationType.REPORT]: '⚠️',
+  [NotificationType.LIKE]: '👍',
+  [NotificationType.COMMENT]: '💬',
+  [NotificationType.FOLLOW]: '👤',
+  [NotificationType.PRICE_ALERT]: '💲',
+  [NotificationType.SYSTEM]: '📢',
 };
 
 /**
  * 通知类型颜色映射
  */
 export const NOTIFICATION_TYPE_COLORS: Record<NotificationType, string> = {
-  [NotificationType.SYSTEM]: 'blue',
   [NotificationType.ORDER]: 'green',
+  [NotificationType.PAYMENT]: 'blue',
   [NotificationType.MESSAGE]: 'purple',
-  [NotificationType.REVIEW]: 'orange',
-  [NotificationType.FAVORITE]: 'red',
-  [NotificationType.REPORT]: 'yellow',
+  [NotificationType.LIKE]: 'orange',
+  [NotificationType.COMMENT]: 'cyan',
+  [NotificationType.FOLLOW]: 'magenta',
+  [NotificationType.PRICE_ALERT]: 'gold',
+  [NotificationType.SYSTEM]: 'blue',
 };
 
 // ==================== 审核状态 ====================

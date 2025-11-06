@@ -214,27 +214,36 @@ export interface LoginRequest {
 
 /**
  * 登录响应数据
+ * @description 后端实际返回的字段：token, tokenType, expiresIn, userInfo
  */
 export interface LoginResponse {
   /**
+   * JWT Token（访问令牌）
+   */
+  token: string;
+
+  /**
+   * Token 类型（默认 "Bearer"）
+   */
+  tokenType?: string;
+
+  /**
+   * Token 过期时间（毫秒）
+   */
+  expiresIn?: number;
+
+  /**
    * 用户信息
    */
-  user: User;
-
-  /**
-   * 访问令牌
-   */
-  accessToken: string;
-
-  /**
-   * 刷新令牌
-   */
-  refreshToken: string;
-
-  /**
-   * Token 过期时间（秒）
-   */
-  expiresIn: number;
+  userInfo: {
+    id: number;
+    username: string;
+    email?: string;
+    avatar?: string;
+    points?: number;
+    roles?: string[];
+    permissions?: string[];
+  };
 }
 
 /**

@@ -10,6 +10,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/Layout';
 import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
+// import DashboardTest from '@/pages/Dashboard/Dashboard.test'; // 临时测试用
 import UserList from '@/pages/Users/UserList';
 import UserDetail from '@/pages/Users/UserDetail';
 // import { ReportList } from '@/pages/Content'; // TODO: 实现 ReportList 组件

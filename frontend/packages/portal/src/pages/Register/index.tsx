@@ -9,6 +9,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { Input, Button } from '@campus/shared/components';
 import { authService } from '@campus/shared/services';
+import { encryptPassword } from '@campus/shared/utils';
 import { useAuthStore } from '../../store';
 import './Register.css';
 
@@ -64,16 +65,25 @@ export const Register: React.FC = () => {
   // 注册
   const registerMutation = useMutation({
     mutationFn: async () => {
+      // 🔐 加密密码（防止明文传输）
+      let encryptedPassword: string;
+      try {
+        encryptedPassword = encryptPassword(formData.password);
+      } catch (error) {
+        console.error('❌ 密码加密失败:', error);
+        throw new Error('密码加密失败，请重试');
+      }
+      
       const data = registerType === 'phone' 
         ? {
             phone: formData.phone,
-            password: formData.password,
+            password: encryptedPassword,
             verificationCode: formData.verificationCode,
             username: formData.username,
           }
         : {
             email: formData.email,
-            password: formData.password,
+            password: encryptedPassword,
             verificationCode: formData.verificationCode,
             username: formData.username,
           };

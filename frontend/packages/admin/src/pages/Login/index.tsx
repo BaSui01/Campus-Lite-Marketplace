@@ -3,13 +3,15 @@
  *
  * @author BaSui 😎
  * @date 2025-11-01
+ * @updated 2025-11-06 - 添加密码加密传输
  */
 
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message } from 'antd';
+import { Form, Input, Button, Card, Typography, App } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { encryptPassword } from '@campus/shared/utils/crypto';
 import type { LoginRequest } from '@campus/shared';
 import './Login.css';
 
@@ -18,6 +20,7 @@ const { Title, Text } = Typography;
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { message } = App.useApp(); // ✅ 使用 App 提供的 message 实例
   const [loading, setLoading] = useState(false);
 
   // ===== 提交登录 =====
@@ -25,7 +28,16 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(values);
+      // 🔐 加密密码
+      const encryptedPassword = encryptPassword(values.password);
+      console.log('✅ 密码已加密传输');
+      
+      // 发送加密后的密码
+      await login({
+        username: values.username,
+        password: encryptedPassword,
+      });
+      
       message.success('欢迎回来，管理员！😎');
 
       // 跳转到仪表盘

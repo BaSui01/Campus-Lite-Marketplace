@@ -218,3 +218,43 @@ export {
   type TimelineStatus,
   type TimelineDirection,
 } from './Timeline';
+
+// ==================== 数据可视化组件 ====================
+
+/**
+ * StatCard - 统计卡片组件
+ * @description 用于展示统计数据，支持图标、趋势、加载状态
+ * @example
+ * ```tsx
+ * <StatCard 
+ *   title="总用户数" 
+ *   value={1234} 
+ *   icon={<UserOutlined />}
+ *   color="#1677ff"
+ *   trend={12}
+ *   trendLabel="较上月"
+ * />
+ * ```
+ */
+export { StatCard, type StatCardProps } from './StatCard';
+
+/**
+ * Charts - 图表组件集合
+ * @description 简化版图表组件（LineChart、BarChart），使用纯 CSS 实现
+ * @example
+ * ```tsx
+ * // 折线图
+ * <LineChart 
+ *   data={[{ name: '1月', value: 100 }, { name: '2月', value: 200 }]} 
+ *   height={300}
+ *   color="#1677ff"
+ * />
+ * 
+ * // 柱状图
+ * <BarChart 
+ *   data={[{ name: '分类A', value: 50 }, { name: '分类B', value: 80 }]} 
+ *   color="#52c41a"
+ * />
+ * ```
+ */
+export { LineChart, BarChart, type ChartData, type ChartProps } from './Charts';

@@ -180,12 +180,6 @@ export const MENU_ITEMS: MenuItem[] = [
         permission: PERMISSION_CODES.SYSTEM_CAMPUS_MANAGE,
       },
       {
-        key: 'system-campuses',
-        label: '校园管理',
-        path: '/admin/system/campuses',
-        permission: PERMISSION_CODES.SYSTEM_CAMPUS_MANAGE,
-      },
-      {
         key: 'system-categories',
         label: '分类管理',
         path: '/admin/system/categories',

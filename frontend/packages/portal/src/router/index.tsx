@@ -32,6 +32,8 @@ const Community = lazy(() => import('../pages/Community'));
 const Search = lazy(() => import('../pages/Search'));
 const Settings = lazy(() => import('../pages/Settings'));
 const NotificationSettings = lazy(() => import('../pages/Settings/NotificationSettings'));
+const NotificationTypes = lazy(() => import('../pages/Settings/NotificationTypes'));
+const BlacklistSettings = lazy(() => import('../pages/Settings/BlacklistSettings'));
 const Notifications = lazy(() => import('../pages/Notifications'));
 const Favorites = lazy(() => import('../pages/Favorites'));
 const Following = lazy(() => import('../pages/Following'));
@@ -234,6 +236,26 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <NotificationSettings />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'settings/notifications/types',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <NotificationTypes />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'settings/blacklist',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <BlacklistSettings />
             </LazyLoadWrapper>
           </RequireAuth>
         ),

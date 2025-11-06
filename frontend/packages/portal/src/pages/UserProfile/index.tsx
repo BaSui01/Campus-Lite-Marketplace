@@ -10,6 +10,7 @@ import { Button, Skeleton, Tabs, GoodsCard } from '@campus/shared/components';
 import { creditService, CreditLevel, CREDIT_LEVEL_CONFIG } from '@campus/shared/services';
 import { useAuthStore, useNotificationStore } from '../../store';
 import { getApi } from '@campus/shared/utils';
+import { BlacklistButton } from '../../components/BlacklistButton';
 import './UserProfile.css';
 
 // ==================== 类型定义 ====================
@@ -270,6 +271,11 @@ const UserProfile: React.FC = () => {
                 <Button type="default" onClick={handleSendMessage}>
                   💬 发消息
                 </Button>
+                <BlacklistButton
+                  userId={profile.id}
+                  userName={profile.username}
+                  size="middle"
+                />
               </div>
             )}
           </div>
