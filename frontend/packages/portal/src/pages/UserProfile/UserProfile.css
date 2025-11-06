@@ -213,3 +213,40 @@
     gap: 12px;
   }
 }
+
+
+/* ==================== \u4fe1\u7528\u5fbd\u7ae0 ==================== */
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.profile-credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 50px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-credit-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.profile-credit-badge .credit-icon {
+  font-size: 16px;
+}
+
+.profile-credit-badge .credit-name {
+  font-size: 13px;
+}

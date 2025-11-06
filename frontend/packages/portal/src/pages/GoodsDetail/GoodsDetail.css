@@ -537,3 +537,47 @@
     font-size: 20px;
   }
 }
+
+
+/* ==================== \u5356\u5bb6\u4fe1\u7528\u5fbd\u7ae0 ==================== */
+
+.seller-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.seller-credit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.seller-credit-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.seller-credit-badge .credit-icon {
+  font-size: 14px;
+}
+
+.seller-credit-badge .credit-name {
+  font-size: 11px;
+}
+
+.seller-credit-info {
+  font-size: 13px;
+  color: #636e72;
+  margin-top: 4px;
+}

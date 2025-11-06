@@ -9,6 +9,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@campus/shared/components';
 import { goodsService } from '@campus/shared/services/goods';
 import { orderService } from '@campus/shared/services/order';
+import { creditService, CreditLevel, CREDIT_LEVEL_CONFIG, UserCreditInfo } from '@campus/shared/services';
 import { useNotificationStore } from '../../store';
 import type { GoodsDetailResponse } from '@campus/shared/api/models';
 import './GoodsDetail.css';
@@ -30,6 +31,7 @@ const GoodsDetail: React.FC = () => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
+  const [sellerCredit, setSellerCredit] = useState<UserCreditInfo | null>(null);
 
   // ==================== 数据加载 ====================
 
@@ -56,6 +58,17 @@ const GoodsDetail: React.FC = () => {
       // 🚀 调用真实后端 API 检查收藏状态
       const favorited = await goodsService.isFavorited(goodsId);
       setIsFavorited(favorited);
+
+      // 🚀 加载卖家信用信息
+      if (detail.seller?.id) {
+        try {
+          const credit = await creditService.getUserCredit(detail.seller.id);
+          setSellerCredit(credit);
+        } catch (creditErr: any) {
+          console.error('加载卖家信用失败:', creditErr);
+          // 不影响主流程，继续显示商品
+        }
+      }
     } catch (err: any) {
       console.error('加载商品详情失败：', err);
       setError(err.response?.data?.message || '加载商品详情失败，请稍后重试！😭');
@@ -404,8 +417,31 @@ const GoodsDetail: React.FC = () => {
                   )}
                 </div>
                 <div className="seller-details">
-                  <div className="seller-name">{goods.seller.username}</div>
+                  <div className="seller-header">
+                    <div className="seller-name">{goods.seller.username}</div>
+                    {sellerCredit && (
+                      <div 
+                        className="seller-credit-badge" 
+                        style={{ backgroundColor: CREDIT_LEVEL_CONFIG[sellerCredit.creditLevel].color }}
+                        title={`信用分: ${sellerCredit.creditScore}`}
+                        onClick={() => navigate(`/user/${goods.seller!.id}`)}
+                      >
+                        <span className="credit-icon">{CREDIT_LEVEL_CONFIG[sellerCredit.creditLevel].icon}</span>
+                        <span className="credit-name">{CREDIT_LEVEL_CONFIG[sellerCredit.creditLevel].levelName}</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="seller-points">⭐ 积分：{goods.seller.points || 0}</div>
+                  {sellerCredit && (
+                    <>
+                      <div className="seller-credit-info">
+                        📦 完成订单：{sellerCredit.orderCount} 单
+                      </div>
+                      <div className="seller-credit-info">
+                        ⭐ 好评率：{(sellerCredit.positiveRate * 100).toFixed(1)}%
+                      </div>
+                    </>
+                  )}
                   {goods.seller.phone && (
                     <div className="seller-contact">📱 {goods.seller.phone}</div>
                   )}

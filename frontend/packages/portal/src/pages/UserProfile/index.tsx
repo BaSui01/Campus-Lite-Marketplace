@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Tabs, GoodsCard } from '@campus/shared/components';
+import { creditService, CreditLevel, CREDIT_LEVEL_CONFIG } from '@campus/shared/services';
 import { useAuthStore, useNotificationStore } from '../../store';
 import { getApi } from '@campus/shared/utils';
 import './UserProfile.css';
@@ -23,6 +24,8 @@ interface UserProfile {
   followingCount: number;
   followerCount: number;
   isFollowing: boolean;
+  creditScore?: number;
+  creditLevel?: CreditLevel;
 }
 
 interface Goods {
@@ -224,7 +227,20 @@ const UserProfile: React.FC = () => {
           </div>
 
           <div className="user-profile-card__info">
-            <h1 className="user-profile-card__name">{profile.username}</h1>
+            <div className="profile-header">
+              <h1 className="user-profile-card__name">{profile.username}</h1>
+              {profile.creditLevel && (
+                <div 
+                  className="profile-credit-badge" 
+                  style={{ backgroundColor: CREDIT_LEVEL_CONFIG[profile.creditLevel].color }}
+                  title={`信用分: ${profile.creditScore || 100}`}
+                  onClick={() => !isOwnProfile ? navigate(`/user/${userId}/credit`) : navigate('/credit')}
+                >
+                  <span className="credit-icon">{CREDIT_LEVEL_CONFIG[profile.creditLevel].icon}</span>
+                  <span className="credit-name">{CREDIT_LEVEL_CONFIG[profile.creditLevel].levelName}</span>
+                </div>
+              )}
+            </div>
             {profile.campusName && <p className="user-profile-card__campus">🏫 {profile.campusName}</p>}
             {profile.bio && <p className="user-profile-card__bio">{profile.bio}</p>}
 

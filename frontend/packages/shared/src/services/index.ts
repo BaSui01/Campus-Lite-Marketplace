@@ -245,3 +245,12 @@ export type {
   CreateSubscriptionParams,
   SubscriptionMatch
 } from './subscription';
+
+
+export { creditService, CreditLevel, CREDIT_LEVEL_CONFIG } from './credit';
+export type { 
+  UserCreditInfo, 
+  CreditLevelInfo, 
+  CreditHistoryItem, 
+  CreditStatistics 
+} from './credit';
