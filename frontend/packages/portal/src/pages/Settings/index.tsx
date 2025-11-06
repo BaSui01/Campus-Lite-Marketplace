@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input, Button, Tabs } from '@campus/shared/components';
 import { useAuthStore, useNotificationStore } from '../../store';
 import { authService } from '@campus/shared/services';
+import { encryptPassword } from '@campus/shared/utils';
 import './Settings.css';
 
 /**
@@ -73,10 +74,25 @@ const Settings: React.FC = () => {
     setChangingPassword(true);
 
     try {
+      // 🔐 加密旧密码和新密码（防止明文传输）
+      let encryptedOldPassword: string;
+      let encryptedNewPassword: string;
+      
+      try {
+        encryptedOldPassword = encryptPassword(oldPassword);
+        encryptedNewPassword = encryptPassword(newPassword);
+        console.log('[Settings] 🔐 密码已加密');
+      } catch (error) {
+        console.error('[Settings] ❌ 密码加密失败:', error);
+        toast.error('密码加密失败，请重试！😭');
+        setChangingPassword(false);
+        return;
+      }
+
       // 🚀 调用真实后端 API 修改密码
       await authService.updatePassword({
-        oldPassword,
-        newPassword,
+        oldPassword: encryptedOldPassword,
+        newPassword: encryptedNewPassword,
       });
 
       toast.success('密码修改成功！请重新登录。🎉');
@@ -175,6 +191,7 @@ const Settings: React.FC = () => {
               { label: '🔐 账户设置', value: 'account' },
               { label: '🔒 隐私设置', value: 'privacy' },
               { label: '🔔 通知设置', value: 'notification' },
+              { label: '🚫 黑名单', value: 'blacklist' },
             ]}
           />
         </div>
@@ -332,8 +349,28 @@ const Settings: React.FC = () => {
         {/* ==================== 通知设置 ==================== */}
         {activeTab === 'notification' && (
           <div className="settings-content">
+            {/* 高级通知设置入口 */}
             <div className="settings-section">
-              <h2 className="settings-section__title">通知设置</h2>
+              <h2 className="settings-section__title">🔔 高级通知设置</h2>
+              <div className="settings-section__content">
+                <div className="settings-info-box">
+                  <p className="info-text">
+                    💡 您可以在高级设置中管理：通知渠道开关、免打扰时段、通知类型订阅等
+                  </p>
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={() => navigate('/settings/notifications')}
+                  >
+                    前往高级通知设置 →
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {/* 快捷通知开关 */}
+            <div className="settings-section">
+              <h2 className="settings-section__title">快捷通知开关</h2>
               <div className="settings-section__content">
                 {/* 订单通知 */}
                 <div className="settings-item">
@@ -407,6 +444,29 @@ const Settings: React.FC = () => {
                 >
                   {savingNotification ? '保存中...' : '保存设置'}
                 </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== 黑名单设置 ==================== */}
+        {activeTab === 'blacklist' && (
+          <div className="settings-content">
+            <div className="settings-section">
+              <h2 className="settings-section__title">🚫 黑名单管理</h2>
+              <div className="settings-section__content">
+                <div className="settings-info-box">
+                  <p className="info-text">
+                    💡 黑名单功能可以帮助您屏蔽骚扰用户的消息和内容，打造清净的社交环境
+                  </p>
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={() => navigate('/settings/blacklist')}
+                  >
+                    前往黑名单管理 →
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

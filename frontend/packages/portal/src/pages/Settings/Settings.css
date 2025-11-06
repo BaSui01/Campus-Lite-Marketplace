@@ -265,3 +265,31 @@
     font-size: 13px;
   }
 }
+
+/* 信息提示框 */
+.settings-info-box {
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-text {
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.settings-info-box button {
+  background: white;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.settings-info-box button:hover {
+  background: #f0f0f0;
+  color: #764ba2;
+}

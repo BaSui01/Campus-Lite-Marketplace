@@ -1,0 +1,102 @@
+/**
+ * 黑名单按钮样式
+ * @author BaSui 😎
+ */
+
+.blacklist-button {
+  font-weight: 500;
+}
+
+.blacklist-button.block {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+}
+
+.blacklist-button.block:hover {
+  background: #fff1f0;
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+}
+
+.blacklist-button.unblock {
+  background: #f0f0f0;
+  border-color: #d9d9d9;
+  color: #666;
+}
+
+.blacklist-button.unblock:hover {
+  background: #e0e0e0;
+  border-color: #d9d9d9;
+  color: #666;
+}
+
+/* ==================== 拉黑确认弹窗 ==================== */
+
+.block-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.block-info {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: #fff7e6;
+  border-radius: 8px;
+  border-left: 4px solid #faad14;
+}
+
+.warning-icon {
+  font-size: 24px;
+  color: #faad14;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-text {
+  flex: 1;
+}
+
+.target-user {
+  font-size: 15px;
+  color: #262626;
+  margin: 0 0 8px 0;
+}
+
+.target-user strong {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.block-effect {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.reason-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reason-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+}
+
+.reason-label .required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+/* ==================== 解除拉黑确认弹窗 ==================== */
+
+.unblock-hint {
+  font-size: 13px;
+  color: #666;
+  margin-top: 8px;
+}
