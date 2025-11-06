@@ -145,15 +145,22 @@ const Subscriptions: React.FC = () => {
       <div className="subscriptions-container">
         {/* ==================== 头部 ==================== */}
         <div className="subscriptions-header">
-          <h1 className="subscriptions-header__title">🔔 我的订阅</h1>
-          <p className="subscriptions-header__subtitle">
-            {subscriptions.length > 0
-              ? `订阅了 ${subscriptions.length} 个关键词，不错过心仪商品！`
-              : '还没有订阅哦，快去添加吧！'}
-          </p>
-          <Button type="primary" size="large" onClick={() => setShowAddModal(true)}>
-            ➕ 新增订阅
-          </Button>
+          <div className="subscriptions-header__info">
+            <h1 className="subscriptions-header__title">🔔 我的订阅</h1>
+            <p className="subscriptions-header__subtitle">
+              {subscriptions.length > 0
+                ? `订阅了 ${subscriptions.length} 个关键词，不错过心仪商品！`
+                : '还没有订阅哦，快去添加吧！'}
+            </p>
+          </div>
+          <div className="subscriptions-header__actions">
+            <Button type="default" size="large" onClick={() => navigate('/subscriptions/feed')}>
+              📰 查看动态流
+            </Button>
+            <Button type="primary" size="large" onClick={() => setShowAddModal(true)}>
+              ➕ 新增订阅
+            </Button>
+          </div>
         </div>
 
         {/* ==================== 订阅列表 ==================== */}

@@ -41,6 +41,7 @@ const RefundApply = lazy(() => import('../pages/RefundApply'));
 const RefundList = lazy(() => import('../pages/RefundList'));
 const RefundDetail = lazy(() => import('../pages/RefundDetail'));
 const Subscriptions = lazy(() => import('../pages/Subscriptions'));
+const SubscriptionFeed = lazy(() => import('../pages/Subscriptions/SubscriptionFeed'));
 
 // 数据撤销相关页面
 const RevertOperations = lazy(() => import('../pages/RevertOperations'));
@@ -317,6 +318,16 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <Subscriptions />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'subscriptions/feed',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <SubscriptionFeed />
             </LazyLoadWrapper>
           </RequireAuth>
         ),
