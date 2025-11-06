@@ -171,7 +171,7 @@ management:
 
 # 服务器配置
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8200}  # 修改默认端口为 8200
   servlet:
     # BaSui临时修复：直接硬编码 /api，跳过环境变量
     context-path: /api
@@ -375,7 +375,7 @@ springdoc:
   swagger-ui:
     enabled: false
 server:
-  port: ${TEST_SERVER_PORT:${SERVER_PORT:8080}}
+  port: ${TEST_SERVER_PORT:${SERVER_PORT:8200}}  # 测试环境也使用 8200
 management:
   endpoints:
     enabled-by-default: false  # ✅ BaSui: 测试环境禁用所有 Actuator 端点
@@ -446,7 +446,7 @@ management:
     tags:
       environment: ${DEPLOY_ENV:prod}
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8200}  # 生产环境默认端口 8200
   servlet:
     context-path: ${APP_CONTEXT_PATH:/api}
   tomcat:
