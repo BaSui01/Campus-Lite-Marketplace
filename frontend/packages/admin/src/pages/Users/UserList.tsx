@@ -36,7 +36,6 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Table } from '@campus/shared';
 import { userService, adminUserService } from '@campus/shared';
 import type { User, UserListQuery } from '@campus/shared';
 import dayjs from 'dayjs';

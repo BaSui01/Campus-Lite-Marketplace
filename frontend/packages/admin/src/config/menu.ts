@@ -26,6 +26,98 @@ export const MENU_ITEMS: MenuItem[] = [
     permission: PERMISSION_CODES.SYSTEM_STATISTICS_VIEW,
   },
   {
+    key: 'goods',
+    label: '商品管理',
+    icon: 'ShoppingOutlined',
+    permission: PERMISSION_CODES.SYSTEM_GOODS_VIEW,
+    children: [
+      {
+        key: 'goods-list',
+        label: '商品列表',
+        path: '/admin/goods/list',
+      },
+      {
+        key: 'goods-audit',
+        label: '商品审核',
+        path: '/admin/content/goods',
+        permission: PERMISSION_CODES.SYSTEM_GOODS_APPROVE,
+      },
+    ],
+  },
+  {
+    key: 'orders',
+    label: '订单管理',
+    icon: 'ShoppingCartOutlined',
+    permission: PERMISSION_CODES.SYSTEM_ORDER_VIEW,
+    children: [
+      {
+        key: 'orders-list',
+        label: '订单列表',
+        path: '/admin/orders/list',
+      },
+      {
+        key: 'orders-refunds',
+        label: '退款管理',
+        path: '/admin/orders/refunds',
+        permission: PERMISSION_CODES.SYSTEM_ORDER_MANAGE,
+      },
+    ],
+  },
+  {
+    key: 'appeals',
+    label: '申诉管理',
+    icon: 'FileProtectOutlined',
+    children: [
+      {
+        key: 'appeals-list',
+        label: '申诉列表',
+        path: '/admin/appeals/list',
+      },
+    ],
+  },
+  {
+    key: 'disputes',
+    label: '纠纷仲裁',
+    icon: 'SafetyCertificateOutlined',
+    children: [
+      {
+        key: 'disputes-list',
+        label: '纠纷列表',
+        path: '/admin/disputes/list',
+      },
+      {
+        key: 'disputes-statistics',
+        label: '纠纷统计',
+        path: '/admin/disputes/statistics',
+        permission: PERMISSION_CODES.SYSTEM_DISPUTE_STATISTICS,
+      },
+    ],
+  },
+  {
+    key: 'reviews',
+    label: '评价管理',
+    icon: 'StarOutlined',
+    children: [
+      {
+        key: 'reviews-list',
+        label: '评价列表',
+        path: '/admin/reviews/list',
+      },
+    ],
+  },
+  {
+    key: 'batch',
+    label: '批量操作',
+    icon: 'ThunderboltOutlined',
+    children: [
+      {
+        key: 'batch-tasks',
+        label: '任务列表',
+        path: '/admin/batch/tasks',
+      },
+    ],
+  },
+  {
     key: 'users',
     label: '用户管理',
     icon: 'UserOutlined',
@@ -82,6 +174,48 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: 'SettingOutlined',
     children: [
       {
+        key: 'system-campuses',
+        label: '校园管理',
+        path: '/admin/system/campuses',
+        permission: PERMISSION_CODES.SYSTEM_CAMPUS_MANAGE,
+      },
+      {
+        key: 'system-campuses',
+        label: '校园管理',
+        path: '/admin/system/campuses',
+        permission: PERMISSION_CODES.SYSTEM_CAMPUS_MANAGE,
+      },
+      {
+        key: 'system-categories',
+        label: '分类管理',
+        path: '/admin/system/categories',
+        permission: PERMISSION_CODES.SYSTEM_CATEGORY_MANAGE,
+      },
+      {
+        key: 'system-tags',
+        label: '标签管理',
+        path: '/admin/system/tags',
+        permission: PERMISSION_CODES.SYSTEM_TAG_MANAGE,
+      },
+      {
+        key: 'system-features',
+        label: '功能开关',
+        path: '/admin/system/features',
+        permission: PERMISSION_CODES.SYSTEM_CONFIG_UPDATE,
+      },
+      {
+        key: 'system-monitor',
+        label: '系统监控',
+        path: '/admin/system/monitor',
+        permission: PERMISSION_CODES.SYSTEM_MONITOR_VIEW,
+      },
+      {
+        key: 'system-tasks',
+        label: '任务管理',
+        path: '/admin/system/tasks',
+        permission: PERMISSION_CODES.SYSTEM_TASK_MANAGE,
+      },
+      {
         key: 'system-rate-limit',
         label: '限流管理',
         path: '/admin/system/rate-limit',
@@ -108,6 +242,25 @@ export const MENU_ITEMS: MenuItem[] = [
         label: '数据撤销',
         path: '/admin/system/revert',
         permission: PERMISSION_CODES.SYSTEM_DATA_REVERT,
+      },
+    ],
+  },
+  {
+    key: 'community',
+    label: '社区管理',
+    icon: 'TeamOutlined',
+    children: [
+      {
+        key: 'community-topics',
+        label: '话题管理',
+        path: '/admin/community/topics',
+        permission: PERMISSION_CODES.SYSTEM_TOPIC_MANAGE,
+      },
+      {
+        key: 'community-list',
+        label: '社区广场',
+        path: '/admin/community/list',
+        permission: PERMISSION_CODES.SYSTEM_COMMUNITY_MANAGE,
       },
     ],
   },

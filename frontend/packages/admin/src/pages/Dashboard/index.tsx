@@ -19,7 +19,6 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Card, Badge } from '@campus/shared';
 import { LineChart, BarChart } from '@/components/Charts';
 import StatCard from '@/components/StatCard';
 import { statisticsService } from '@campus/shared';

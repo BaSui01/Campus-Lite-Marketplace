@@ -210,3 +210,5 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     </Layout>
   );
 };
+
+export default AdminLayout;

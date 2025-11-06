@@ -24,7 +24,7 @@ import {
   PlusOutlined,
   DeleteOutlined,
   EyeOutlined,
-  ShieldOutlined,
+  SafetyOutlined,
   FileSearchOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -259,7 +259,7 @@ const Compliance: React.FC = () => {
           <Card 
             title={
               <Space>
-                <ShieldOutlined />
+                <SafetyOutlined />
                 <span>合规白名单</span>
                 <PermissionGuard permission={PERMISSION_CODES.SYSTEM_COMPLIANCE_REVIEW}>
                   <Button
