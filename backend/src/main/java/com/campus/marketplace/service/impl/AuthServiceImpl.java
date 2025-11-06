@@ -45,32 +45,49 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
     private final com.campus.marketplace.service.VerificationCodeService verificationCodeService;
+    private final com.campus.marketplace.common.utils.CryptoUtil cryptoUtil;
 
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
 
     /**
-     * 用户注册
+     * 用户注册（支持密码加密传输）
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long register(RegisterRequest request) {
         log.info("用户注册: username={}, email={}", request.username(), request.email());
 
-        // 1. 检查用户名是否已存在
+        // 1. 🔐 解密密码（如果是加密密码）
+        String plainPassword;
+        try {
+            if (cryptoUtil.isEncrypted(request.password())) {
+                plainPassword = cryptoUtil.decryptPassword(request.password());
+                log.debug("✅ 注册密码解密成功");
+            } else {
+                // 兼容明文密码
+                plainPassword = request.password();
+                log.warn("⚠️ 注册接收到明文密码");
+            }
+        } catch (com.campus.marketplace.common.exception.CryptoException e) {
+            log.error("❌ 注册密码解密失败: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "密码格式错误，请重试");
+        }
+
+        // 2. 检查用户名是否已存在
         if (userRepository.existsByUsername(request.username())) {
             throw new BusinessException(ErrorCode.USERNAME_EXISTS);
         }
 
-        // 2. 检查邮箱是否已存在
+        // 3. 检查邮箱是否已存在
         if (userRepository.existsByEmail(request.email())) {
             throw new BusinessException(ErrorCode.EMAIL_EXISTS);
         }
 
-        // 3. 创建用户
+        // 4. 创建用户（使用解密后的明文密码）
         User user = User.builder()
                 .username(request.username())
-                .password(passwordEncoder.encode(request.password()))
+                .password(passwordEncoder.encode(plainPassword))
                 .email(request.email())
                 .status(UserStatus.ACTIVE)
                 .points(100) // 注册赠送 100 积分
@@ -124,9 +141,25 @@ public class AuthServiceImpl implements AuthService {
         if (!verificationCodeService.validateEmailCode(request.email(), "RESET", request.code())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "验证码错误或已过期");
         }
+        
+        // 🔐 解密新密码（如果是加密密码）
+        String plainNewPassword;
+        try {
+            if (cryptoUtil.isEncrypted(request.newPassword())) {
+                plainNewPassword = cryptoUtil.decryptPassword(request.newPassword());
+                log.debug("✅ 重置密码解密成功");
+            } else {
+                plainNewPassword = request.newPassword();
+                log.warn("⚠️ 重置密码接收到明文");
+            }
+        } catch (com.campus.marketplace.common.exception.CryptoException e) {
+            log.error("❌ 重置密码解密失败: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "密码格式错误，请重试");
+        }
+        
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.setPassword(passwordEncoder.encode(plainNewPassword));
         userRepository.save(user);
     }
 
@@ -167,12 +200,28 @@ public class AuthServiceImpl implements AuthService {
         String credential = request.username();
         log.info("用户登录: credential={}", credential);
 
-        // 1. 🔍 自动识别凭证类型并查询用户（包含角色和权限）
+        // 1. 🔐 解密密码（如果是加密密码）
+        String plainPassword;
+        try {
+            if (cryptoUtil.isEncrypted(request.password())) {
+                plainPassword = cryptoUtil.decryptPassword(request.password());
+                log.debug("✅ 密码解密成功，用户名: {}", credential);
+            } else {
+                // 兼容旧客户端明文密码（过渡期）
+                plainPassword = request.password();
+                log.warn("⚠️ 接收到明文密码，用户名: {}", credential);
+            }
+        } catch (com.campus.marketplace.common.exception.CryptoException e) {
+            log.error("❌ 密码解密失败: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "密码格式错误，请重试");
+        }
+
+        // 2. 🔍 自动识别凭证类型并查询用户（包含角色和权限）
         User user = findUserByCredential(credential)
                 .orElseThrow(() -> new BusinessException(ErrorCode.PASSWORD_ERROR));
 
-        // 2. 验证密码
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        // 3. 验证密码（使用解密后的明文密码）
+        if (!passwordEncoder.matches(plainPassword, user.getPassword())) {
             throw new BusinessException(ErrorCode.PASSWORD_ERROR);
         }
 
