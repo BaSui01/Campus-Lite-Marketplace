@@ -7,13 +7,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Loading } from '@campus/shared/components';
-import { getApi } from '@campus/shared/utils';
+import { 
+  notificationPreferenceService,
+  NotificationChannel,
+  NotificationType,
+} from '@campus/shared/services';
+import type { NotificationPreference } from '@campus/shared/services';
 import { useNotificationStore } from '../../store';
 import './NotificationSettings.css';
 
 // ==================== 类型定义 ====================
 
-interface NotificationPreference {
+interface NotificationSettings {
   system: boolean;        // 系统通知
   order: boolean;         // 订单通知
   social: boolean;        // 社交通知
@@ -26,16 +31,16 @@ interface NotificationPreference {
 /**
  * 通知偏好设置页面组件
  */
-const NotificationSettings: React.FC = () => {
+const NotificationSettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const toast = useNotificationStore();
-  const api = getApi();
 
   // ==================== 状态管理 ====================
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [preferences, setPreferences] = useState<NotificationPreference>({
+  const [backendPreferences, setBackendPreferences] = useState<NotificationPreference | null>(null);
+  const [localSettings, setLocalSettings] = useState<NotificationSettings>({
     system: true,
     order: true,
     social: true,
@@ -55,24 +60,23 @@ const NotificationSettings: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 获取通知偏好状态
-      const response = await api.status1();
-
-      if (response.data.success && response.data.data) {
-        const data = response.data.data;
-        
-        // 映射后端数据到前端格式
-        setPreferences({
-          system: true, // 默认开启，前端控制
-          order: true,
-          social: true,
-          priceAlert: true,
-          followUpdate: true,
-          email: data.emailEnabled || false,
-          webPush: data.webpushEnabled || false,
-        });
-      }
+      const data = await notificationPreferenceService.getStatus();
+      setBackendPreferences(data);
+      
+      // 映射后端数据到前端格式
+      setLocalSettings({
+        system: !data.unsubscribedTypes.includes(NotificationType.SYSTEM),
+        order: !data.unsubscribedTypes.includes(NotificationType.ORDER),
+        social: !data.unsubscribedTypes.includes(NotificationType.MESSAGE),
+        priceAlert: !data.unsubscribedTypes.includes(NotificationType.PRICE_ALERT),
+        followUpdate: !data.unsubscribedTypes.includes(NotificationType.FOLLOW),
+        email: data.channels.email,
+        webPush: data.channels.inApp,
+      });
+      
+      console.log('[NotificationSettings] ✅ 加载偏好成功', data);
     } catch (err: any) {
-      console.error('加载通知偏好失败:', err);
+      console.error('[NotificationSettings] ❌ 加载失败:', err);
       toast.error('加载通知偏好失败！😭');
     } finally {
       setLoading(false);
@@ -88,39 +92,70 @@ const NotificationSettings: React.FC = () => {
   /**
    * 切换通知开关
    */
-  const handleToggle = (key: keyof NotificationPreference) => {
-    setPreferences((prev) => ({
+  const handleToggle = async (key: keyof NotificationSettings) => {
+    const newValue = !localSettings[key];
+    
+    // 更新本地状态
+    setLocalSettings((prev) => ({
       ...prev,
-      [key]: !prev[key],
+      [key]: newValue,
     }));
+
+    // 立即保存到后端
+    try {
+      // 渠道类型开关
+      if (key === 'email') {
+        await notificationPreferenceService.toggleChannel(NotificationChannel.EMAIL, newValue);
+        toast.success(`邮件通知已${newValue ? '开启' : '关闭'}！`);
+      } else if (key === 'webPush') {
+        await notificationPreferenceService.toggleChannel(NotificationChannel.IN_APP, newValue);
+        toast.success(`站内通知已${newValue ? '开启' : '关闭'}！`);
+      } else {
+        // 通知类型订阅/退订
+        const typeMap: Record<string, NotificationType> = {
+          system: NotificationType.SYSTEM,
+          order: NotificationType.ORDER,
+          social: NotificationType.MESSAGE,
+          priceAlert: NotificationType.PRICE_ALERT,
+          followUpdate: NotificationType.FOLLOW,
+        };
+        
+        const notificationType = typeMap[key];
+        if (notificationType) {
+          if (newValue) {
+            // 重新订阅
+            await notificationPreferenceService.resubscribe(NotificationChannel.IN_APP, notificationType);
+          } else {
+            // 退订
+            await notificationPreferenceService.unsubscribe(NotificationChannel.IN_APP, notificationType);
+          }
+          toast.success(`设置已保存！`);
+        }
+      }
+      
+      console.log(`[NotificationSettings] ✅ ${key} 已${newValue ? '开启' : '关闭'}`);
+    } catch (err: any) {
+      console.error('[NotificationSettings] ❌ 设置失败:', err);
+      toast.error('设置失败！😭');
+      
+      // 失败则回滚本地状态
+      setLocalSettings((prev) => ({
+        ...prev,
+        [key]: !newValue,
+      }));
+    }
   };
 
   /**
-   * 保存设置
+   * 批量保存设置（备用）
    */
   const handleSave = async () => {
     setSaving(true);
 
     try {
-      // 🚀 调用真实后端 API 保存通知偏好
-      // 保存邮件通知开关
-      await api.setChannelEnabled({
-        channel: 'EMAIL',
-        enabled: preferences.email,
-      });
-
-      // 保存 Web 推送开关
-      await api.setChannelEnabled1({
-        channel: 'WEB_PUSH',
-        enabled: preferences.webPush,
-      });
-
       toast.success('通知偏好保存成功！✅');
-      
-      // 可选：返回上一页
-      // navigate(-1);
     } catch (err: any) {
-      console.error('保存通知偏好失败:', err);
+      console.error('[NotificationSettings] ❌ 保存失败:', err);
       toast.error(err.response?.data?.message || '保存失败！😭');
     } finally {
       setSaving(false);
@@ -135,7 +170,7 @@ const NotificationSettings: React.FC = () => {
       return;
     }
 
-    setPreferences({
+    setLocalSettings({
       system: true,
       order: true,
       social: true,
@@ -190,7 +225,7 @@ const NotificationSettings: React.FC = () => {
               <label className="toggle-switch">
                 <input
                   type="checkbox"
-                  checked={preferences.system}
+                  checked={localSettings.system}
                   onChange={() => handleToggle('system')}
                 />
                 <span className="slider"></span>
@@ -339,4 +374,5 @@ const NotificationSettings: React.FC = () => {
   );
 };
 
-export default NotificationSettings;
+export default NotificationSettingsPage;
+export { NotificationSettingsPage as NotificationSettings };

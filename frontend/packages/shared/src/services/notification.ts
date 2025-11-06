@@ -6,6 +6,7 @@
 
 import { getApi } from '../utils/apiClient';
 import type { NotificationResponse } from '../api/models';
+import { NotificationType } from './notificationPreference';
 
 /**
  * 通知状态枚举
@@ -13,19 +14,6 @@ import type { NotificationResponse } from '../api/models';
 export enum NotificationStatus {
   UNREAD = 'UNREAD',
   READ = 'READ',
-}
-
-/**
- * 通知类型枚举
- */
-export enum NotificationType {
-  SYSTEM = 'SYSTEM',         // 系统通知
-  ORDER = 'ORDER',           // 订单通知
-  MESSAGE = 'MESSAGE',       // 消息通知
-  LIKE = 'LIKE',             // 点赞通知
-  COMMENT = 'COMMENT',       // 评论通知
-  FOLLOW = 'FOLLOW',         // 关注通知
-  PRICE_ALERT = 'PRICE_ALERT', // 价格提醒
 }
 
 /**

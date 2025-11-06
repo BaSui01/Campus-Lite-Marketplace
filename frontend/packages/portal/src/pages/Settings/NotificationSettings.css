@@ -1,269 +1,254 @@
 /**
- * 通知偏好设置页面样式 - 掌控你的通知!🔔
+ * 通知设置页面样式
  * @author BaSui 😎
- * @description 清爽的设置界面设计
  */
 
-.notification-settings-page {
-  min-height: 100vh;
-  background: #f5f5f5;
-  padding: 20px 0;
-}
-
-.notification-settings-container {
+.notification-settings {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 24px;
 }
 
-/* ==================== 头部 ==================== */
+/* 加载状态 */
+.notification-settings.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
 
+/* 页面头部 */
 .settings-header {
   margin-bottom: 32px;
-  padding: 32px 24px;
-  background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
-  position: relative;
-}
-
-.back-btn {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateX(-4px);
 }
 
 .settings-title {
-  font-size: 32px;
-  font-weight: bold;
-  margin: 0 0 12px 0;
-  color: white;
-  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
 }
 
 .settings-subtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  color: #666;
   margin: 0;
-  text-align: center;
 }
 
-/* ==================== 加载状态 ==================== */
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  gap: 16px;
-}
-
-.loading-container p {
-  color: #636e72;
-  font-size: 16px;
-}
-
-/* ==================== 设置区块 ==================== */
-
+/* 设置区块 */
 .settings-section {
-  margin-bottom: 24px;
-  padding: 24px;
-  background: white;
+  background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .section-title {
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
   margin: 0 0 8px 0;
-  color: #2d3436;
 }
 
-.section-desc {
+.section-description {
   font-size: 14px;
-  color: #636e72;
+  color: #999;
   margin: 0 0 20px 0;
 }
 
-/* ==================== 设置列表 ==================== */
-
-.settings-list {
+/* 通知渠道列表 */
+.channel-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 16px;
 }
 
-.setting-item {
+.channel-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.channel-item:hover {
+  background: #f0f0f0;
+}
+
+.channel-info {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.channel-icon {
+  font-size: 24px;
+}
+
+.channel-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.channel-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.channel-hint {
+  font-size: 13px;
+  color: #999;
+}
+
+/* 免打扰时段 */
+.quiet-hours {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quiet-hours-switch {
+  display: flex;
   justify-content: space-between;
-  padding: 20px 0;
-  border-bottom: 1px solid #e0e0e0;
+  align-items: center;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
 }
 
-.setting-item:last-child {
-  border-bottom: none;
+.switch-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
 }
 
-.setting-info {
+.quiet-hours-time {
   display: flex;
   align-items: center;
   gap: 16px;
-  flex: 1;
+  padding: 16px;
+  background: #f0f8ff;
+  border-radius: 8px;
+  border: 1px dashed #1890ff;
 }
 
-.setting-icon {
-  font-size: 32px;
-  line-height: 1;
-  flex-shrink: 0;
+.time-picker-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.setting-content {
-  flex: 1;
+.time-picker-group label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
 }
 
-.setting-name {
+.time-separator {
   font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-  color: #2d3436;
+  color: #999;
+  margin-top: 20px;
 }
 
-.setting-desc {
-  font-size: 14px;
-  color: #636e72;
+.save-quiet-hours-btn {
+  align-self: flex-start;
+}
+
+.quiet-hours-hint {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  padding: 12px;
+  background: #fffbe6;
+  border-radius: 6px;
+  border-left: 3px solid #faad14;
+}
+
+/* 通知类型预览 */
+.types-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preview-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stat-item {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+/* 管理按钮 */
+.manage-types-btn {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+}
+
+/* 底部提示 */
+.settings-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.footer-hint {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
   margin: 0;
 }
 
-/* ==================== 切换开关 ==================== */
-
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 52px;
-  height: 28px;
-  flex-shrink: 0;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.4s;
-  border-radius: 28px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-input:checked + .slider {
-  background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #6c5ce7;
-}
-
-input:checked + .slider:before {
-  transform: translateX(24px);
-}
-
-/* ==================== 操作按钮 ==================== */
-
-.settings-actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 32px;
-  padding: 24px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.settings-actions button {
-  min-width: 160px;
-}
-
-/* ==================== 响应式 ==================== */
-
+/* 响应式设计 */
 @media (max-width: 768px) {
-  .notification-settings-container {
-    padding: 0 16px;
-  }
-
-  .settings-header {
-    padding: 48px 16px 24px;
+  .notification-settings {
+    padding: 16px;
   }
 
   .settings-title {
     font-size: 24px;
   }
 
-  .settings-subtitle {
-    font-size: 14px;
-  }
-
   .settings-section {
     padding: 16px;
   }
 
-  .setting-info {
+  .quiet-hours-time {
+    flex-direction: column;
     gap: 12px;
   }
 
-  .setting-icon {
-    font-size: 24px;
+  .time-separator {
+    margin-top: 0;
+    transform: rotate(90deg);
   }
 
-  .setting-name {
-    font-size: 14px;
-  }
-
-  .setting-desc {
-    font-size: 12px;
-  }
-
-  .settings-actions {
-    flex-direction: column;
-    padding: 16px;
-  }
-
-  .settings-actions button {
+  .time-picker-group {
     width: 100%;
   }
 }

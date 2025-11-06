@@ -224,7 +224,7 @@ export type {
 } from './favorite';
 
 // ==================== 通知服务 ====================
-export { notificationService, NotificationStatus, NotificationType } from './notification';
+export { notificationService, NotificationStatus } from './notification';
 export type {
   NotificationService,
   NotificationListParams,
@@ -275,3 +275,20 @@ export type {
   CampaignListParams,
   CampaignStatistics
 } from './marketing';
+
+// ==================== 通知偏好服务 ====================
+export { notificationPreferenceService, NotificationChannel, NotificationType } from './notificationPreference';
+export type {
+  NotificationPreference,
+  QuietHoursConfig,
+  NotificationTypeInfo
+} from './notificationPreference';
+
+// ==================== 黑名单服务 ====================
+export { blacklistService } from './blacklist';
+export type {
+  BlacklistItem,
+  BlacklistListParams,
+  BlacklistListResponse,
+  BlockUserRequest
+} from './blacklist';
