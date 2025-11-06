@@ -1,11 +1,12 @@
 /**
- * 管理端布局组件
+ * 管理端布局组件 - 响应式设计
  * @author BaSui 😎
  * @date 2025-11-02
+ * @updated 2025-11-06 - 添加响应式支持（手机/平板/桌面）
  */
 
 import React from 'react';
-import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography } from 'antd';
+import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -13,7 +14,7 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { useAuth, usePermission } from '@/hooks';
+import { useAuth, usePermission, useBreakpoint } from '@/hooks';
 import { UserAvatar, Badge } from '@campus/shared';
 import { MENU_ITEMS } from '@/config/menu';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -41,9 +42,29 @@ interface AdminLayoutProps {
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const { hasPermission } = usePermission();
-  const [collapsed, setCollapsed] = React.useState(false);
+  const { isMobile, isTablet, isDesktop } = useBreakpoint();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // 响应式collapsed状态：桌面端默认展开，平板端默认收起，手机端用Drawer
+  const [collapsed, setCollapsed] = React.useState(() => {
+    return !isDesktop; // 非桌面端默认收起
+  });
+
+  // 手机端用Drawer的显示状态
+  const [drawerVisible, setDrawerVisible] = React.useState(false);
+
+  // 响应式切换时更新collapsed状态
+  React.useEffect(() => {
+    if (isMobile) {
+      setCollapsed(true); // 手机端强制收起（实际用Drawer）
+      setDrawerVisible(false); // 关闭Drawer
+    } else if (isTablet) {
+      setCollapsed(true); // 平板端默认收起
+    } else {
+      setCollapsed(false); // 桌面端默认展开
+    }
+  }, [isMobile, isTablet, isDesktop]);
 
   const handleLogout = async () => {
     try {
@@ -89,6 +110,19 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const path = findMenuItem(MENU_ITEMS, key);
     if (path) {
       navigate(path);
+      // 手机端点击菜单后关闭Drawer
+      if (isMobile) {
+        setDrawerVisible(false);
+      }
+    }
+  };
+
+  // 切换侧边栏/Drawer显示状态
+  const toggleMenu = () => {
+    if (isMobile) {
+      setDrawerVisible(!drawerVisible);
+    } else {
+      setCollapsed(!collapsed);
     }
   };
 
@@ -130,36 +164,58 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     },
   ];
 
+  // 菜单内容组件（Sider和Drawer共用）
+  const MenuContent = () => (
+    <>
+      <div style={{ padding: '16px', textAlign: 'center' }}>
+        <Title level={4} style={{ color: 'white', margin: 0 }}>
+          {collapsed && !isMobile ? '管理' : '校园集市管理系统'}
+        </Title>
+      </div>
+      <Menu
+        theme="dark"
+        mode="inline"
+        selectedKeys={getSelectedKeys()}
+        items={filterMenuByPermission(MENU_ITEMS)}
+        onClick={handleMenuClick}
+      />
+    </>
+  );
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider
-        trigger={null}
-        collapsible
-        collapsed={collapsed}
-        style={{
-          position: 'fixed',
-          height: '100vh',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          zIndex: 999,
-        }}
-      >
-        <div style={{ padding: '16px', textAlign: 'center' }}>
-          <Title level={4} style={{ color: 'white', margin: 0 }}>
-            {collapsed ? '管理' : '校园集市管理系统'}
-          </Title>
-        </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={getSelectedKeys()}
-          items={filterMenuByPermission(MENU_ITEMS)}
-          onClick={handleMenuClick}
-        />
-      </Sider>
+      {/* 手机端：使用Drawer */}
+      {isMobile ? (
+        <Drawer
+          placement="left"
+          closable={false}
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+          styles={{ body: { padding: 0, background: '#001529' } }}
+          width={250}
+        >
+          <MenuContent />
+        </Drawer>
+      ) : (
+        /* 平板/桌面端：使用Sider */
+        <Sider
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
+          style={{
+            position: 'fixed',
+            height: '100vh',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            zIndex: 999,
+          }}
+        >
+          <MenuContent />
+        </Sider>
+      )}
       
-      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
+      <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 80 : 200) }}>
         <Header
           style={{
             padding: '0 16px',
@@ -171,8 +227,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         >
           <Button
             type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
+            icon={isMobile ? <MenuFoldOutlined /> : (collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />)}
+            onClick={toggleMenu}
             style={{
               fontSize: '16px',
               width: 64,
