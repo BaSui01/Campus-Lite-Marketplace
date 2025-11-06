@@ -1,0 +1,309 @@
+/**
+ * 商家数据看板样式 - 数据驱动决策！📊
+ * @author BaSui 😎
+ * @description ECharts图表集成、数据卡片展示
+ */
+
+.seller-dashboard-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+  padding: 20px 0;
+}
+
+.seller-dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.header-content {
+  color: white;
+}
+
+.dashboard-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.dashboard-header__subtitle {
+  font-size: 16px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* ==================== 今日数据概览 ==================== */
+
+.dashboard-overview {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 0 20px 0;
+  color: #2d3436;
+}
+
+.overview-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.overview-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-label {
+  font-size: 14px;
+  color: #95a5a6;
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #2d3436;
+  margin-bottom: 4px;
+}
+
+.card-growth {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.card-tip {
+  font-size: 12px;
+  color: #95a5a6;
+  margin-top: 4px;
+}
+
+/* 不同卡片颜色边框 */
+.overview-card--sales {
+  border-left: 4px solid #1890ff;
+}
+
+.overview-card--orders {
+  border-left: 4px solid #52c41a;
+}
+
+.overview-card--visitors {
+  border-left: 4px solid #faad14;
+}
+
+.overview-card--conversion {
+  border-left: 4px solid #f5222d;
+}
+
+/* ==================== 图表区域 ==================== */
+
+.dashboard-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chart-container {
+  width: 100%;
+}
+
+/* ==================== 双列布局 ==================== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* ==================== 访客统计 ==================== */
+
+.visitor-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #95a5a6;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2d3436;
+}
+
+/* ==================== 错误状态 ==================== */
+
+.dashboard-error {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.error-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+}
+
+.error-text {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 24px 0;
+  color: #2d3436;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+@media (max-width: 1200px) {
+  .overview-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .visitor-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .seller-dashboard-container {
+    padding: 0 16px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px 16px;
+    text-align: center;
+  }
+
+  .dashboard-header__title {
+    font-size: 24px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .header-actions button {
+    width: 100%;
+  }
+
+  .overview-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-section {
+    padding: 16px;
+  }
+
+  .visitor-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .card-value {
+    font-size: 24px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .chart-container {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .overview-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px 16px;
+  }
+
+  .card-icon {
+    font-size: 40px;
+  }
+
+  .visitor-stats {
+    grid-template-columns: 1fr;
+  }
+}

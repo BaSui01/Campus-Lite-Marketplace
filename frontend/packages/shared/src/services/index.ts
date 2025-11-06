@@ -254,3 +254,14 @@ export type {
   CreditHistoryItem, 
   CreditStatistics 
 } from './credit';
+
+
+export { sellerStatisticsService, ReportType } from './sellerStatistics';
+export type {
+  TodayOverview,
+  SalesTrend,
+  GoodsRankingItem,
+  GoodsRanking,
+  VisitorAnalysis,
+  DataReport
+} from './sellerStatistics';
