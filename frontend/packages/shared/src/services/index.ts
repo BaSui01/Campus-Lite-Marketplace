@@ -265,3 +265,13 @@ export type {
   VisitorAnalysis,
   DataReport
 } from './sellerStatistics';
+
+
+export { marketingService, CampaignType, CampaignStatus, DiscountType, CAMPAIGN_TYPE_CONFIG, CAMPAIGN_STATUS_CONFIG } from './marketing';
+export type {
+  MarketingCampaign,
+  DiscountConfig,
+  CreateCampaignRequest,
+  CampaignListParams,
+  CampaignStatistics
+} from './marketing';

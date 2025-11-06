@@ -44,6 +44,8 @@ const Subscriptions = lazy(() => import('../pages/Subscriptions'));
 const SubscriptionFeed = lazy(() => import('../pages/Subscriptions/SubscriptionFeed'));
 const Credit = lazy(() => import('../pages/Credit'));
 const SellerDashboard = lazy(() => import('../pages/Seller/Dashboard'));
+const Activities = lazy(() => import('../pages/Seller/Activities'));
+const CreateActivity = lazy(() => import('../pages/Seller/Activities/Create'));
 
 // 数据撤销相关页面
 const RevertOperations = lazy(() => import('../pages/RevertOperations'));
@@ -252,6 +254,26 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <SellerDashboard />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'seller/activities',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <Activities />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'seller/activities/create',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <CreateActivity />
             </LazyLoadWrapper>
           </RequireAuth>
         ),
