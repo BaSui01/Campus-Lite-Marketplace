@@ -4,7 +4,7 @@
  * @description 社区帖子、回复、点赞等接口
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type {
   ApiResponse,
   PageInfo,

@@ -4,7 +4,7 @@
  * @description 分类树、添加、编辑、删除、排序等接口
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { BaseResponse } from '@campus/shared/api';
 
 /**

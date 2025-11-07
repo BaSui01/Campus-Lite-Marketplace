@@ -4,7 +4,7 @@
  * @description 用户黑名单管理：拉黑、解除拉黑、查询黑名单
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 
 /**
  * 黑名单项

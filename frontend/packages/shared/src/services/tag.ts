@@ -4,7 +4,7 @@
  * @description 标签列表、添加、编辑、删除、合并、热门标签等接口
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { BaseResponse } from '@campus/shared/api';
 
 /**

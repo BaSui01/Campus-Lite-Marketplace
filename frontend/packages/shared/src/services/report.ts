@@ -2,7 +2,7 @@
  * 举报管理服务（管理端）
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { ApiResponse, PageResponse } from '../types';
 
 export interface ReportSummary {

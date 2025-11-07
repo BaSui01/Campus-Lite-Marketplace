@@ -4,7 +4,7 @@
  * @description 退款申请、审核、查询等接口
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { ApiResponse, PageInfo } from '../types';
 
 /**

@@ -4,7 +4,7 @@
  * @description 用户资料、密码修改、用户列表等接口
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type {
   ApiResponse,
   PageInfo,

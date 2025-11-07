@@ -4,7 +4,7 @@
  * @description 图片、文件上传等接口
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { ApiResponse, UploadResponse } from '../types';
 import { IMAGE_UPLOAD_URL, FILE_UPLOAD_URL } from '../constants';
 

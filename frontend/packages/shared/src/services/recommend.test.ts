@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { recommendService } from './recommend';
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { GoodsResponse } from '../api/models';
 
 // Mock http

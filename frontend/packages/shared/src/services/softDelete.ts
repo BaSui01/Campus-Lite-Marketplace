@@ -2,7 +2,7 @@
  * 软删除治理服务
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { ApiResponse } from '../types';
 
 export class SoftDeleteService {

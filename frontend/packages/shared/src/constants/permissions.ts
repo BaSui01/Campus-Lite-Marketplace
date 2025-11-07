@@ -36,6 +36,39 @@ export const PERMISSION_CODES = {
   SYSTEM_COMPLIANCE_REVIEW: 'system:compliance:review',
   SYSTEM_REPORT_HANDLE: 'system:report:handle',
 
+  // ===== 纠纷仲裁 =====
+  SYSTEM_DISPUTE_VIEW: 'system:dispute:view',
+  SYSTEM_DISPUTE_MANAGE: 'system:dispute:manage',
+  SYSTEM_DISPUTE_STATISTICS: 'system:dispute:statistics',
+
+  // ===== 申诉管理 =====
+  SYSTEM_APPEAL_VIEW: 'system:appeal:view',
+  SYSTEM_APPEAL_HANDLE: 'system:appeal:handle',
+
+  // ===== 订单管理 =====
+  SYSTEM_ORDER_VIEW: 'system:order:view',
+  SYSTEM_ORDER_MANAGE: 'system:order:manage',
+
+  // ===== 评价管理 =====
+  SYSTEM_REVIEW_MANAGE: 'system:review:manage',
+
+  // ===== 批量任务 =====
+  SYSTEM_BATCH_MANAGE: 'system:batch:manage',
+
+  // ===== 商品管理 =====
+  SYSTEM_GOODS_VIEW: 'system:goods:view',
+
+  // ===== 系统监控 =====
+  SYSTEM_MONITOR_VIEW: 'system:monitor:view',
+  SYSTEM_TASK_MANAGE: 'system:task:manage',
+
+  // ===== 社区管理 =====
+  SYSTEM_TOPIC_MANAGE: 'system:topic:manage',
+  SYSTEM_COMMUNITY_MANAGE: 'system:community:manage',
+
+  // ===== 数据治理 =====
+  SYSTEM_DATA_REVERT: 'system:data:revert',
+
   // ===== 市场运营 =====
   MARKET_GOODS_APPROVE: 'market:goods:approve',
   MARKET_ORDER_REFUND: 'market:order:refund',
@@ -69,6 +102,30 @@ export const PERMISSION_DESCRIPTIONS: Record<PermissionCode, string> = {
 
   [PERMISSION_CODES.SYSTEM_COMPLIANCE_REVIEW]: '审核隐私请求',
   [PERMISSION_CODES.SYSTEM_REPORT_HANDLE]: '处理用户举报',
+
+  [PERMISSION_CODES.SYSTEM_DISPUTE_VIEW]: '查看纠纷',
+  [PERMISSION_CODES.SYSTEM_DISPUTE_MANAGE]: '管理纠纷仲裁',
+  [PERMISSION_CODES.SYSTEM_DISPUTE_STATISTICS]: '查看纠纷统计',
+
+  [PERMISSION_CODES.SYSTEM_APPEAL_VIEW]: '查看申诉',
+  [PERMISSION_CODES.SYSTEM_APPEAL_HANDLE]: '处理申诉',
+
+  [PERMISSION_CODES.SYSTEM_ORDER_VIEW]: '查看订单',
+  [PERMISSION_CODES.SYSTEM_ORDER_MANAGE]: '管理订单',
+
+  [PERMISSION_CODES.SYSTEM_REVIEW_MANAGE]: '管理评价',
+
+  [PERMISSION_CODES.SYSTEM_BATCH_MANAGE]: '管理批量任务',
+
+  [PERMISSION_CODES.SYSTEM_GOODS_VIEW]: '查看商品',
+
+  [PERMISSION_CODES.SYSTEM_MONITOR_VIEW]: '查看系统监控',
+  [PERMISSION_CODES.SYSTEM_TASK_MANAGE]: '管理定时任务',
+
+  [PERMISSION_CODES.SYSTEM_TOPIC_MANAGE]: '管理话题',
+  [PERMISSION_CODES.SYSTEM_COMMUNITY_MANAGE]: '管理社区',
+
+  [PERMISSION_CODES.SYSTEM_DATA_REVERT]: '数据回滚权限',
 
   [PERMISSION_CODES.MARKET_GOODS_APPROVE]: '运营商品审核',
   [PERMISSION_CODES.MARKET_ORDER_REFUND]: '处理订单退款',

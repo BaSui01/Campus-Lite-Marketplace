@@ -4,7 +4,7 @@
  * @description 即时消息、会话管理等接口
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type {
   ApiResponse,
   PageInfo,

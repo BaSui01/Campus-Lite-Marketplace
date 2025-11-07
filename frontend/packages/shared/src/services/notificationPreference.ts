@@ -4,7 +4,7 @@
  * @description 通知渠道开关、免打扰时段、通知类型订阅管理
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 
 /**
  * 通知渠道枚举

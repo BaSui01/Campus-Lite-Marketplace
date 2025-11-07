@@ -182,6 +182,20 @@ export type {
   UpdateTopicRequest
 } from './topic';
 
+// ==================== 纠纷管理服务 ====================
+export { disputeService, DisputeStatus, DisputeType } from './dispute';
+export type {
+  DisputeService,
+  Dispute,
+  DisputeDetail,
+  DisputeEvidence,
+  ArbitrationRecord,
+  DisputeMessage,
+  DisputeListParams,
+  DisputeArbitrationRequest,
+  SubmitEvidenceRequest
+} from './dispute';
+
 // ==================== 纠纷统计服务 ====================
 export { disputeStatisticsService } from './disputeStatistics';
 export type {

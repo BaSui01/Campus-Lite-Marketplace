@@ -189,7 +189,7 @@ export interface MonitorService {
 // ==================== 服务实现 ====================
 
 class MonitorServiceImpl implements MonitorService {
-  private readonly BASE_PATH = '/api/monitor';
+  private readonly BASE_PATH = '/api/admin/monitor';
 
   async healthCheck(): Promise<HealthCheckResponse> {
     const response = await http.get<BaseResponse<HealthCheckResponse>>(`${this.BASE_PATH}/health`);

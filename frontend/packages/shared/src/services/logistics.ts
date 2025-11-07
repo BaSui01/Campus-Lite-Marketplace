@@ -4,7 +4,7 @@
  * @description 查询订单物流信息、追踪物流轨迹
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 
 // ==================== 类型定义 ====================
 

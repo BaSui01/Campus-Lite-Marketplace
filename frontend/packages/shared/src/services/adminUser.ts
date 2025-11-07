@@ -2,7 +2,7 @@
  * 管理端用户治理服务
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { ApiResponse } from '../types';
 
 export interface BanUserPayload {

@@ -2,7 +2,7 @@
  * 角色与权限管理服务（管理端）
  */
 
-import { http } from '../utils/http';
+import { http } from '../utils/apiClient';
 import type { ApiResponse } from '../types';
 
 export interface RoleSummary {
