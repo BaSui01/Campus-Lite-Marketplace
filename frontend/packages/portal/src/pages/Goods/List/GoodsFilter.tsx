@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 import { Skeleton } from '@campus/shared/components';
 import './GoodsFilter.css';
 

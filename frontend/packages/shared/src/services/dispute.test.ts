@@ -6,11 +6,11 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { disputeService, DisputeStatus, DisputeType } from './dispute';
-import { http } from '../utils/apiClient';
+import { axiosInstance } from '../utils/apiClient';
 
-// Mock http module
+// Mock axiosInstance
 vi.mock('../utils/apiClient', () => ({
-  http: {
+  axiosInstance: {
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),

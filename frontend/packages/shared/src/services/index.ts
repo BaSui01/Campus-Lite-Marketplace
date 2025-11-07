@@ -1,22 +1,27 @@
 /**
  * API 服务导出入口
  * @author BaSui 😎
- * @description 导出所有 API 服务
+ * @description 只导出真正两端共享的服务和通用工具服务
+ *
+ * ⚠️ 重构说明：
+ * - 管理端专属服务已移至 admin/src/services
+ * - 客户端专属服务已移至 portal/src/services
+ * - 此处仅保留两端都使用的核心服务
  */
 
-// ==================== 认证服务 ====================
+// ==================== 认证服务（两端共享）====================
 export { authService } from './auth';
 export type { AuthService } from './auth';
 
-// ==================== 用户服务 ====================
+// ==================== 用户服务（两端共享）====================
 export { userService } from './user';
 export type { UserService } from './user';
 
-// ==================== 物品服务 ====================
+// ==================== 商品服务（两端共享）====================
 export { goodsService } from './goods';
 export type { GoodsService } from './goods';
 
-// ==================== 评价服务 ====================
+// ==================== 评价服务（两端共享）====================
 export { reviewService } from './goods/review';
 export type {
   ReviewService,
@@ -27,95 +32,15 @@ export type {
   ReviewStatistics,
 } from './goods/review';
 
-// ==================== 订单服务 ====================
+// ==================== 订单服务（两端共享）====================
 export { orderService } from './order';
 export type { OrderService } from './order';
 
-// ==================== 退款服务 ====================
-export { refundService, RefundStatus } from './refund';
-export type { 
-  RefundService, 
-  Refund,
-  RefundListParams,
-  RefundReviewRequest
-} from './refund';
-
-// ==================== 消息服务 ====================
+// ==================== 消息服务（两端共享）====================
 export { messageService } from './message';
 export type { MessageService } from './message';
 
-// ==================== 帖子服务 ====================
-export { postService } from './post';
-export type { PostService } from './post';
-
-// ==================== 文件上传服务 ====================
-export { uploadService } from './upload';
-export type { UploadService } from './upload';
-
-// ==================== 管理端统计服务 ====================
-export { statisticsService } from './statistics';
-export type { StatisticsService } from './statistics';
-
-// ==================== 举报管理服务 ====================
-export { reportService } from './report';
-export type { ReportService } from './report';
-
-// ==================== 角色权限服务 ====================
-export { roleService } from './role';
-export type { RoleService } from './role';
-
-// ==================== 限流管理服务 ====================
-export { rateLimitService } from './rateLimit';
-export type { RateLimitService } from './rateLimit';
-
-// ==================== 通知模板服务 ====================
-export { notificationTemplateService } from './notificationTemplate';
-export type { NotificationTemplateService } from './notificationTemplate';
-
-// ==================== 合规审计服务 ====================
-export { complianceService } from './compliance';
-export type { ComplianceService } from './compliance';
-
-// ==================== 软删除治理服务 ====================
-export { softDeleteService } from './softDelete';
-export type { SoftDeleteService } from './softDelete';
-
-// ==================== 管理端用户服务 ====================
-export { adminUserService } from './adminUser';
-export type { AdminUserService } from './adminUser';
-
-// ==================== 撤销操作服务 ====================
-export { revertService, RevertService } from './revert';
-export type { 
-  CreateRevertRequest, 
-  RevertExecutionResult, 
-  RevertRequestParams 
-} from './revert';
-
-// ==================== 申诉服务 ====================
-export { appealService } from './appeal';
-export type { 
-  AppealService,
-  Appeal,
-  AppealDetail,
-  AppealMaterial,
-  AppealListParams,
-  AppealReviewRequest,
-  BatchAppealReviewRequest,
-  AppealStatistics
-} from './appeal';
-
-// ==================== 校园管理服务 ====================
-export { campusService, CampusStatus } from './campus';
-export type {
-  CampusService,
-  Campus,
-  CampusListParams,
-  CampusStatistics,
-  CampusRequest
-} from './campus';
-
-// ==================== 分类管理服务 ====================
+// ==================== 分类服务（两端共享）====================
 export { categoryService, CategoryStatus } from './category';
 export type {
   CategoryService,
@@ -127,7 +52,45 @@ export type {
   CategoryStatistics
 } from './category';
 
-// ==================== 标签管理服务 ====================
+// ==================== 物流服务（两端共享）====================
+export { logisticsService } from './logistics';
+export type {
+  LogisticsService,
+  Logistics,
+  LogisticsTrack,
+  LogisticsStatistics
+} from './logistics';
+
+// ==================== 通用工具服务 ====================
+
+// 文件上传服务
+export { uploadService } from './upload';
+export type { UploadService } from './upload';
+
+// 退款服务
+export { refundService, RefundStatus } from './refund';
+export type {
+  RefundService,
+  Refund,
+  RefundListParams,
+  RefundReviewRequest
+} from './refund';
+
+// 帖子服务
+export { postService } from './post';
+export type { PostService } from './post';
+
+// 校园服务
+export { campusService, CampusStatus } from './campus';
+export type {
+  CampusService,
+  Campus,
+  CampusListParams,
+  CampusStatistics,
+  CampusRequest
+} from './campus';
+
+// 标签服务
 export { tagService, TagType, TagStatus } from './tag';
 export type {
   TagService,
@@ -138,41 +101,16 @@ export type {
   HotTag
 } from './tag';
 
-// ==================== 功能开关服务 ====================
-export { featureFlagService, FeatureFlagStatus, GrayStrategy, Environment } from './featureFlag';
+// 社区服务
+export { communityService } from './community';
 export type {
-  FeatureFlagService,
-  FeatureFlag,
-  FeatureFlagListParams,
-  FeatureFlagRequest,
-  GrayRuleConfig,
-  FeatureFlagLog
-} from './featureFlag';
+  CommunityService,
+  UserFeed,
+  PostTopicTag,
+  PostInteractionStats
+} from './community';
 
-// ==================== 系统监控服务 ====================
-export { monitorService, ErrorSeverity } from './monitor';
-export type {
-  MonitorService,
-  HealthCheckResponse,
-  SystemMetrics,
-  HealthCheckRecord,
-  ApiPerformanceLog,
-  EndpointStats,
-  QpsData,
-  ErrorLog,
-  PerformanceReport
-} from './monitor';
-
-// ==================== 任务调度服务 ====================
-export { taskService, TaskStatus } from './task';
-export type {
-  TaskService,
-  ScheduledTask,
-  TaskExecutionLog,
-  TaskStatistics
-} from './task';
-
-// ==================== 话题管理服务 ====================
+// 话题服务
 export { topicService } from './topic';
 export type {
   TopicService,
@@ -182,62 +120,16 @@ export type {
   UpdateTopicRequest
 } from './topic';
 
-// ==================== 纠纷管理服务 ====================
-export { disputeService, DisputeStatus, DisputeType } from './dispute';
+// 任务服务
+export { taskService, TaskStatus } from './task';
 export type {
-  DisputeService,
-  Dispute,
-  DisputeDetail,
-  DisputeEvidence,
-  ArbitrationRecord,
-  DisputeMessage,
-  DisputeListParams,
-  DisputeArbitrationRequest,
-  SubmitEvidenceRequest
-} from './dispute';
+  TaskService,
+  ScheduledTask,
+  TaskExecutionLog,
+  TaskStatistics
+} from './task';
 
-// ==================== 纠纷统计服务 ====================
-export { disputeStatisticsService } from './disputeStatistics';
-export type {
-  DisputeStatisticsService,
-  DisputeStatistics
-} from './disputeStatistics';
-
-// ==================== 社区广场服务 ====================
-export { communityService } from './community';
-export type {
-  CommunityService,
-  UserFeed,
-  PostTopicTag,
-  PostInteractionStats
-} from './community';
-
-// ==================== 物流服务 ====================
-export { logisticsService } from './logistics';
-export type {
-  LogisticsService,
-  Logistics,
-  LogisticsTrack,
-  LogisticsStatistics
-} from './logistics';
-
-// ==================== 推荐服务 ====================
-export { recommendService } from './recommend';
-export type {
-  RecommendService,
-  RecommendParams,
-  RecommendResult
-} from './recommend';
-
-// ==================== 收藏服务 ====================
-export { favoriteService } from './favorite';
-export type {
-  FavoriteService,
-  FavoriteListParams,
-  FavoriteStatistics
-} from './favorite';
-
-// ==================== 通知服务 ====================
+// 通知服务
 export { notificationService, NotificationStatus } from './notification';
 export type {
   NotificationService,
@@ -245,52 +137,7 @@ export type {
   PageNotificationResponse
 } from './notification';
 
-// ==================== 关注服务 ====================
-export { followService } from './follow';
-export type {
-  FollowService,
-  FollowingActivity
-} from './follow';
-
-// ==================== 订阅服务 ====================
-export { subscriptionService, SubscriptionType } from './subscription';
-export type {
-  SubscriptionService,
-  CreateSubscriptionParams,
-  SubscriptionMatch
-} from './subscription';
-
-
-export { creditService, CreditLevel, CREDIT_LEVEL_CONFIG } from './credit';
-export type { 
-  UserCreditInfo, 
-  CreditLevelInfo, 
-  CreditHistoryItem, 
-  CreditStatistics 
-} from './credit';
-
-
-export { sellerStatisticsService, ReportType } from './sellerStatistics';
-export type {
-  TodayOverview,
-  SalesTrend,
-  GoodsRankingItem,
-  GoodsRanking,
-  VisitorAnalysis,
-  DataReport
-} from './sellerStatistics';
-
-
-export { marketingService, CampaignType, CampaignStatus, DiscountType, CAMPAIGN_TYPE_CONFIG, CAMPAIGN_STATUS_CONFIG } from './marketing';
-export type {
-  MarketingCampaign,
-  DiscountConfig,
-  CreateCampaignRequest,
-  CampaignListParams,
-  CampaignStatistics
-} from './marketing';
-
-// ==================== 通知偏好服务 ====================
+// 通知偏好服务
 export { notificationPreferenceService, NotificationChannel, NotificationType } from './notificationPreference';
 export type {
   NotificationPreference,
@@ -298,11 +145,51 @@ export type {
   NotificationTypeInfo
 } from './notificationPreference';
 
-// ==================== 黑名单服务 ====================
-export { blacklistService } from './blacklist';
+// 通知模板服务
+export { notificationTemplateService } from './notificationTemplate';
+export type { NotificationTemplateService } from './notificationTemplate';
+
+// 软删除服务
+export { softDeleteService } from './softDelete';
+export type { SoftDeleteService } from './softDelete';
+
+// 撤销操作服务
+export { revertService, RevertService } from './revert';
 export type {
-  BlacklistItem,
-  BlacklistListParams,
-  BlacklistListResponse,
-  BlockUserRequest
-} from './blacklist';
+  CreateRevertRequest,
+  RevertExecutionResult,
+  RevertRequestParams
+} from './revert';
+
+// 限流服务
+export { rateLimitService } from './rateLimit';
+export type { RateLimitService } from './rateLimit';
+
+// ==================== ❌ 已移除的服务导出 ====================
+//
+// 以下服务已移至对应的包，不再从 shared 导出：
+//
+// 📦 移至 admin/services:
+// - statistics (管理端统计)
+// - adminUser (管理员用户管理)
+// - adminGoods (管理员商品管理)
+// - adminCategory (管理员分类管理)
+// - monitor (系统监控)
+// - compliance (合规审计)
+// - dispute (纠纷管理)
+// - disputeStatistics (纠纷统计)
+// - appeal (申诉管理)
+// - blacklist (黑名单管理)
+// - report (举报管理)
+// - featureFlag (功能开关)
+// - role (角色权限)
+//
+// 📦 移至 portal/services:
+// - favorite (收藏)
+// - follow (关注)
+// - credit (信用)
+// - recommend (推荐)
+// - marketing (营销活动)
+// - sellerStatistics (卖家统计)
+// - subscription (订阅)
+//

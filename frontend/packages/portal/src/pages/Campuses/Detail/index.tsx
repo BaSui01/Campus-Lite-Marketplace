@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Badge } from '@campus/shared/components';
-import { campusService, CampusStatus, type Campus, type CampusStatistics } from '@campus/shared/services';
+import { campusService, CampusStatus, type Campus, type CampusStatistics } from '@campus/shared/services';;
 import { useNotificationStore } from '../../../store';
 import './CampusDetail.css';
 

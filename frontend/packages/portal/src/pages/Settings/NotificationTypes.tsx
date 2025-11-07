@@ -8,11 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Switch, Button, Input, Spin, Checkbox, message as antMessage } from 'antd';
 import { SearchOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import {
-  notificationPreferenceService,
-  NotificationChannel,
-  NotificationType,
-} from '@campus/shared/services';
+import { notificationPreferenceService, NotificationChannel, NotificationType,  } from '@campus/shared/services';;
 import type { NotificationPreference, NotificationTypeInfo } from '@campus/shared/services';
 import './NotificationTypes.css';
 

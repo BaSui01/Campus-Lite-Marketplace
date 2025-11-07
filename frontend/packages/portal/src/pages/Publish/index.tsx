@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 import BasicInfoStep from './BasicInfoStep';
 import ImageUploadStep from './ImageUploadStep';
 import ConfirmStep from './ConfirmStep';

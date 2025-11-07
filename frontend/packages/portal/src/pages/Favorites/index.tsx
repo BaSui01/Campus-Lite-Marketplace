@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Pagination, GoodsCard } from '@campus/shared/components';
-import { favoriteService } from '@campus/shared/services';
+import { favoriteService } from '../../services/favorite';
 import { useNotificationStore } from '../../store';
 import './Favorites.css';
 

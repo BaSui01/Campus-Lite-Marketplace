@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Tabs, Input, Modal } from '@campus/shared/components';
-import { topicService, type Topic } from '@campus/shared/services';
+import { topicService, type Topic } from '@campus/shared/services';;
 import { useAuthStore, useNotificationStore } from '../../store';
 import './Topics.css';
 

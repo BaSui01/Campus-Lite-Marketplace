@@ -6,11 +6,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { reviewService } from './review';
-import { http } from '../../utils/http';
+import { axiosInstance } from '../../utils/apiClient';
 
-// Mock http 模块
-vi.mock('../../utils/http', () => ({
-  http: {
+// Mock axiosInstance
+vi.mock('../../utils/apiClient', () => ({
+  axiosInstance: {
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),

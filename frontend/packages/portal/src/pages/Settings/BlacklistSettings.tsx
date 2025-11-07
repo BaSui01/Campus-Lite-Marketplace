@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Spin, Checkbox, Empty, Pagination, Modal, message as antMessage } from 'antd';
 import { SearchOutlined, ArrowLeftOutlined, UserDeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { blacklistService } from '@campus/shared/services';
+import { blacklistService } from '@campus/shared/services';;
 import type { BlacklistItem, BlacklistListParams } from '@campus/shared/services';
 import './BlacklistSettings.css';
 

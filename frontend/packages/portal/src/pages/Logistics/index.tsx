@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Input, Skeleton, Timeline } from '@campus/shared/components';
-import { logisticsService, type Logistics, type LogisticsTrack } from '@campus/shared/services';
+import { logisticsService, type Logistics, type LogisticsTrack } from '@campus/shared/services';;
 import { useNotificationStore } from '../../store';
 import './Logistics.css';
 

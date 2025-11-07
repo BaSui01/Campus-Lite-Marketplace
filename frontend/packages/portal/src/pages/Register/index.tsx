@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { Input, Button } from '@campus/shared/components';
-import { authService } from '@campus/shared/services';
+import { authService } from '@campus/shared/services';;
 import { encryptPassword } from '@campus/shared/utils';
 import { useAuthStore } from '../../store';
 import './Register.css';

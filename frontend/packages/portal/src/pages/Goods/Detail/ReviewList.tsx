@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, Empty, Skeleton, Pagination } from '@campus/shared/components';
-import { reviewService } from '@campus/shared/services';
+import { reviewService } from '@campus/shared/services';;
 import { useReviewStore } from '../../../store/useReviewStore';
 import { ReviewCard } from '../../../components/ReviewCard';
 import type { TabItem } from '@campus/shared/components';

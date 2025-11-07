@@ -254,6 +254,5 @@ export const getApi = (): DefaultApi => {
 // ==================== 导出 ====================
 
 export const apiClient = axiosInstance; // 导出 axios 实例，供服务层使用
-export const http = axiosInstance; // 别名导出，兼容旧代码
 export { DefaultApi, Configuration, DEFAULT_BASE_PATH as BASE_PATH };
 export default getApi;

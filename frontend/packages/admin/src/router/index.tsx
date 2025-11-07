@@ -27,6 +27,7 @@ import { AuditLogList, OperationLogList } from '@/pages/Logs';
 import { BannedUserList, BlacklistManagement } from '@/pages/Users';
 import { PostAuditList, ReportList } from '@/pages/Content';
 import { TopicList, CommunityList } from '@/pages/Community';
+import { StatisticsDashboard } from '@/pages/Statistics';
 import { PermissionGuard } from '@/components';
 import { PERMISSION_CODES } from '@campus/shared';
 

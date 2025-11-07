@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Tabs } from '@campus/shared/components';
 import { useAuthStore, useNotificationStore } from '../../store';
-import { authService } from '@campus/shared/services';
+import { authService } from '@campus/shared/services';;
 import { encryptPassword } from '@campus/shared/utils';
 import './Settings.css';
 

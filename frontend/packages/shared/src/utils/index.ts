@@ -22,9 +22,6 @@ export * from './highlight';
 // 🔌 WebSocket 工具
 export * from './websocket';
 
-// 🌐 HTTP 请求封装
-export * from './http';
-
 // 🔐 加密工具
 export * from './crypto';
 

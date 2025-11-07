@@ -57,8 +57,8 @@ logging:
   level:
     root: INFO
     com.campus.marketplace: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:WARN}  # ✅ BaSui: 改为读取环境变量,默认WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:WARN}  # ✅ BaSui: 参数绑定也降低日志级别
     org.springframework.security: DEBUG
     org.redisson: WARN  # Redisson 日志太吵，降低级别
   pattern:

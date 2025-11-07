@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Input, message as antMessage } from 'antd';
 import { UserDeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { blacklistService } from '@campus/shared/services';
+import { blacklistService } from '@campus/shared/services';;
 import './index.css';
 
 const { confirm } = Modal;

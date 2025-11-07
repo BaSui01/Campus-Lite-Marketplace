@@ -12,7 +12,7 @@ import {
 } from 'antd';
 import { ArrowLeftOutlined, CheckOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { appealService } from '@campus/shared/services/appeal';
+import { appealService } from '../../services/appeal';
 
 const STATUS_MAP: Record<string, { text: string; color: string }> = {
   PENDING: { text: '待审核', color: 'orange' },

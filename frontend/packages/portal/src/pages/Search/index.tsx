@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Input, Button, Skeleton, Tabs } from '@campus/shared/components';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 import { highlightText } from '@campus/shared/utils/highlight';
 import { useNotificationStore } from '../../store';
 import type { GoodsResponse, CategoryNodeResponse, TagResponse } from '@campus/shared/api/models';

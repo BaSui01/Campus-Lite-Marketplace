@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Input, Button, Skeleton, Empty } from '@campus/shared/components';
-import { goodsService, orderService } from '@campus/shared/services';
+import { goodsService, orderService } from '@campus/shared/services';;
 import './OrderCreate.css';
 
 interface AddressInfo {

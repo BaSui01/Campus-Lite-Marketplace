@@ -7,13 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton } from '@campus/shared/components';
-import {
-  marketingService,
-  MarketingCampaign,
-  CampaignStatus,
-  CAMPAIGN_TYPE_CONFIG,
-  CAMPAIGN_STATUS_CONFIG,
-} from '@campus/shared/services';
+import { marketingService, CampaignStatus, CAMPAIGN_TYPE_CONFIG, CAMPAIGN_STATUS_CONFIG } from '../../services/marketing';
+import { MarketingCampaign,  } from '@campus/shared/services';;
 import { useNotificationStore } from '../../../store';
 import './Activities.css';
 

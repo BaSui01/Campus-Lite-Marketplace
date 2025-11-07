@@ -5,11 +5,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { recommendService } from './recommend';
-import { http } from '../utils/apiClient';
+import { axiosInstance } from '../utils/apiClient';
 import type { GoodsResponse } from '../api/models';
 
-// Mock http
-vi.mock('../utils/http');
+// Mock axiosInstance
+vi.mock('../utils/apiClient');
 
 describe('RecommendService', () => {
   beforeEach(() => {

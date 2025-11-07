@@ -8,7 +8,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { GoodsCard, Skeleton, Empty } from '@campus/shared/components';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 import type { GoodsResponse } from '@campus/shared/api/models';
 
 /**

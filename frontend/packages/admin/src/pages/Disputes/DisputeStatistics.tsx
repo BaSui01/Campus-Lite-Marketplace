@@ -32,8 +32,8 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { disputeStatisticsService } from '@campus/shared/services/disputeStatistics';
-import type { DisputeStatistics } from '@campus/shared/services/disputeStatistics';
+import { disputeStatisticsService } from '../../services/disputeStatistics';
+import type { DisputeStatistics } from '../../services/disputeStatistics';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption } from 'echarts';
 

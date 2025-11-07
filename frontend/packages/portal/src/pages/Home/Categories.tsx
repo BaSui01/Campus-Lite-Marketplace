@@ -8,7 +8,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton, Empty } from '@campus/shared/components';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 
 // 分类图标映射（根据分类名称）
 const CATEGORY_ICONS: Record<string, string> = {
