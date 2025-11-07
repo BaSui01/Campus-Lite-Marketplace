@@ -24,7 +24,7 @@ import java.util.Map;
  * @date 2025-11-03
  */
 @RestController
-@RequestMapping("/monitor")
+@RequestMapping("/admin/monitor")
 @RequiredArgsConstructor
 @Tag(name = "系统监控", description = "系统健康检查与性能监控")
 public class SystemMonitorController {
