@@ -1,7 +1,7 @@
 # 后端接口分类清单 (更新版)
 
-> **生成时间**: 2025-11-06  
-> **更新时间**: 2025-11-06 (BaSui 😎)  
+> **生成时间**: 2025-11-06
+> **更新时间**: 2025-11-07 (BaSui 😎)
 > **目的**: 区分门户接口(Portal)和管理接口(Admin) + 追踪前端使用情况
 
 ---
@@ -10,10 +10,10 @@
 
 | 分类 | Controller数量 | 估算接口数 | 前端对接情况 | 覆盖率 |
 |------|--------------|-----------|------------|--------|
-| **门户接口** | 31 | ~145 | ✅ **85%已对接** | 🟢 85% |
-| **管理接口** | 8 | ~40 | ✅ **75%已对接** | 🟢 75% |
+| **门户接口** | 31 | ~145 | ✅ **87%已对接** | 🟢 87% |
+| **管理接口** | 16 | ~96 | ✅ **100%已对接** | 🟢 100% |
 | **混合接口** | 0 | 0 | - | - |
-| **总计** | 39 | ~185 | ✅ **82%已对接** | 🟢 82% |
+| **总计** | 47 | ~241 | ✅ **91%已对接** | 🟢 91% |
 
 **图例说明**：
 - ✅ = 已完全对接（前端服务已实现）
@@ -462,17 +462,17 @@
 
 ---
 
-#### ❌ BlacklistController - `/api/blacklist` 【❌ 未对接】
-**用户群**: 已登录用户  
-**前端服务**: ❌ 无（需要创建）  
-**对接状态**: ❌ 未对接  
+#### ✅ BlacklistController - `/api/blacklist` 【✅ 100%已对接】
+**用户群**: 已登录用户
+**前端服务**: `shared/services/blacklist.ts` (BlacklistService)
+**对接状态**: ✅ 完全对接
 **接口列表**:
-- ❌ POST `/block/{blockedUserId}` - 拉黑用户
-- ❌ DELETE `/unblock/{blockedUserId}` - 解除拉黑
-- ❌ GET `/list` - 我的黑名单
-- ❌ GET `/check/{blockedUserId}` - 检查是否拉黑
+- ✅ POST `/block/{blockedUserId}` - 拉黑用户
+- ✅ DELETE `/unblock/{blockedUserId}` - 解除拉黑
+- ✅ GET `/list` - 我的黑名单
+- ✅ GET `/check/{blockedUserId}` - 检查是否拉黑
 
-**说明**: 黑名单功能为 P3 优先级，暂未实现
+**说明**: 黑名单用户端功能已完整实现 🎉
 
 ---
 
@@ -521,26 +521,32 @@
 
 ---
 
-### 2. 用户管理 (1个Controller)
+### 2. 用户管理 (2个Controller)
 
-#### ✅ AdminController - `/api/admin` 【✅ 100%已对接】
-**用户群**: 管理员  
-**前端服务**: `shared/services/statistics.ts` + `shared/services/adminUser.ts`  
-**对接状态**: ✅ 完全对接  
+#### ✅ AdminController - `/api/admin/users` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/adminUser.ts` (AdminUserService)
+**对接状态**: ✅ 完全对接
 **接口列表**:
-- ✅ POST `/users/ban` - 封禁用户
-- ✅ POST `/users/{userId}/unban` - 解封用户
-- ✅ POST `/users/auto-unban` - 自动解封
-- ✅ GET `/statistics/overview` - 概览统计
-- ✅ GET `/statistics/users` - 用户统计
-- ✅ GET `/statistics/goods` - 商品统计
-- ✅ GET `/statistics/orders` - 订单统计
-- ✅ GET `/statistics/today` - 今日统计
-- ✅ GET `/statistics/categories` - 分类统计
-- ✅ GET `/statistics/trend` - 趋势统计
-- ✅ GET `/statistics/top-goods` - 热门商品
-- ✅ GET `/statistics/top-users` - 活跃用户
-- ✅ GET `/statistics/revenue` - 收入统计
+- ✅ POST `/admin/users/ban` - 封禁用户
+- ✅ POST `/admin/users/{userId}/unban` - 解封用户
+- ✅ POST `/admin/users/auto-unban` - 自动解封过期用户
+- ✅ PUT `/admin/users/{userId}/roles` - 更新用户角色
+
+---
+
+#### ✅ AdminStatisticsController - `/api/admin/statistics` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/statistics.ts` (StatisticsService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/statistics/overview` - 系统概览统计
+- ✅ GET `/admin/statistics/trend` - 趋势统计数据
+- ✅ GET `/admin/statistics/revenue` - 收入趋势
+- ✅ GET `/admin/statistics/top-goods` - 热门商品排行
+- ✅ GET `/admin/statistics/top-users` - 活跃用户排行
+- ✅ GET `/admin/statistics/categories` - 分类统计
+- ✅ GET `/admin/statistics/today` - 今日统计
 
 ---
 
@@ -567,9 +573,33 @@
 
 ---
 
-### 5. 纠纷管理 (1个Controller)
+### 5. 纠纷管理 (2个Controller)
 
-已包含在上述 DisputeController 中（未对接）
+#### ✅ AdminDisputeController - `/api/admin/disputes` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/dispute.ts` (DisputeService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/disputes` - 查询纠纷列表（分页）
+- ✅ GET `/admin/disputes/{id}` - 获取纠纷详情
+- ✅ GET `/admin/disputes/pending` - 查询待处理纠纷
+- ✅ GET `/admin/disputes/my` - 查询我的仲裁纠纷
+- ✅ POST `/admin/disputes/{id}/claim` - 认领纠纷
+- ✅ POST `/admin/disputes/{id}/arbitrate` - 仲裁纠纷
+- ✅ POST `/admin/disputes/{id}/evidence` - 提交证据材料
+- ✅ POST `/admin/disputes/{id}/close` - 关闭纠纷
+- ✅ POST `/admin/disputes/batch-assign` - 批量分配仲裁员
+
+**说明**: 纠纷管理完整功能已实现 🎉
+
+---
+
+#### ✅ DisputeStatisticsController - `/api/disputes/statistics` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/dispute.ts` (DisputeService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/disputes/statistics` - 纠纷统计数据
 
 ---
 
@@ -579,12 +609,18 @@
 
 ---
 
-### 7. 系统管理 (7个Controller)
+### 7. 系统管理 (14个Controller)
 
 #### ✅ RoleAdminController - `/api/admin/roles` 【✅ 100%已对接】
-**用户群**: 超级管理员  
-**前端服务**: `shared/services/role.ts` (RoleService)  
-**对接状态**: ✅ 完全对接  
+**用户群**: 超级管理员
+**前端服务**: `shared/services/role.ts` (RoleService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/roles` - 查询角色列表
+- ✅ GET `/admin/roles/{roleId}` - 获取角色详情
+- ✅ POST `/admin/roles` - 创建角色
+- ✅ PUT `/admin/roles/{roleId}` - 更新角色
+- ✅ DELETE `/admin/roles/{roleId}` - 删除角色
 
 ---
 
@@ -594,16 +630,28 @@
 ---
 
 #### ✅ CampusController - `/api/admin/campuses` 【✅ 100%已对接】
-**用户群**: 管理员  
-**前端服务**: `shared/services/campus.ts` (CampusService)  
-**对接状态**: ✅ 完全对接  
+**用户群**: 管理员
+**前端服务**: `shared/services/campus.ts` (CampusService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/campuses` - 查询校园列表
+- ✅ POST `/admin/campuses` - 创建校园
+- ✅ PUT `/admin/campuses/{id}` - 更新校园信息
+- ✅ DELETE `/admin/campuses/{id}` - 删除校园
+- ✅ POST `/admin/campuses/migrate-users/validate` - 校区迁移验证
+- ✅ POST `/admin/campuses/migrate-users` - 执行校区用户迁移
 
 ---
 
 #### ✅ TagController - `/api/admin/tags` 【✅ 100%已对接】
-**用户群**: 管理员  
-**前端服务**: `shared/services/tag.ts` (TagService)  
-**对接状态**: ✅ 完全对接  
+**用户群**: 管理员
+**前端服务**: `shared/services/tag.ts` (TagService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ POST `/admin/tags` - 创建标签
+- ✅ PUT `/admin/tags/{id}` - 更新标签
+- ✅ DELETE `/admin/tags/{id}` - 删除标签
+- ✅ POST `/admin/tags/merge` - 合并标签
 
 ---
 
@@ -613,15 +661,115 @@
 ---
 
 #### ✅ RateLimitAdminController - `/api/admin/rate-limit` 【✅ 100%已对接】
-**用户群**: 管理员  
-**前端服务**: `shared/services/rateLimit.ts` (RateLimitService)  
-**对接状态**: ✅ 完全对接  
+**用户群**: 管理员
+**前端服务**: `shared/services/rateLimit.ts` (RateLimitService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/rate-limit/rules` - 获取限流规则
+- ✅ POST `/admin/rate-limit/enabled/{enabled}` - 切换限流开关
+- ✅ POST `/admin/rate-limit/whitelist/users/{userId}` - 添加用户白名单
+- ✅ DELETE `/admin/rate-limit/whitelist/users/{userId}` - 移除用户白名单
+- ✅ POST `/admin/rate-limit/whitelist/ips/{ip}` - 添加IP白名单
+- ✅ DELETE `/admin/rate-limit/whitelist/ips/{ip}` - 移除IP白名单
+- ✅ POST `/admin/rate-limit/blacklist/ips/{ip}` - 添加IP黑名单
+- ✅ DELETE `/admin/rate-limit/blacklist/ips/{ip}` - 移除IP黑名单
 
 ---
 
 #### ✅ NotificationTemplateAdminController - `/api/admin/notification-templates` 【✅ 100%已对接】
-**用户群**: 管理员  
-**前端服务**: `shared/services/notificationTemplate.ts` (NotificationTemplateService)  
+**用户群**: 管理员
+**前端服务**: `shared/services/notificationTemplate.ts` (NotificationTemplateService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/notification-templates` - 获取通知模板列表
+- ✅ POST `/admin/notification-templates` - 创建通知模板
+- ✅ DELETE `/admin/notification-templates/{id}` - 删除通知模板
+- ✅ POST `/admin/notification-templates/render/{code}` - 渲染通知模板
+
+---
+
+#### ✅ ComplianceAdminController - `/api/admin/compliance` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/compliance.ts` (ComplianceService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ POST `/admin/compliance/whitelist` - 添加合规白名单
+- ✅ DELETE `/admin/compliance/whitelist/{id}` - 移除合规白名单
+- ✅ GET `/admin/compliance/audit` - 查询合规审计日志
+
+---
+
+#### ✅ SoftDeleteAdminController - `/api/admin/soft-delete` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/softDelete.ts` (SoftDeleteService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/soft-delete/targets` - 获取支持软删除的实体类型
+- ✅ POST `/admin/soft-delete/{entity}/{id}/restore` - 恢复软删除数据
+- ✅ DELETE `/admin/soft-delete/{entity}/{id}/purge` - 彻底删除数据
+
+---
+
+#### ✅ FeatureFlagController - `/api/admin/feature-flags` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/featureFlag.ts` (FeatureFlagService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/feature-flags` - 查询功能开关列表
+- ✅ POST `/admin/feature-flags` - 创建/更新功能开关
+- ✅ POST `/admin/feature-flags/refresh` - 刷新开关缓存
+- ✅ DELETE `/admin/feature-flags/{key}` - 删除功能开关
+
+**说明**: ✅ 路径已从 `/feature-flags` 修复为 `/admin/feature-flags`
+
+---
+
+#### ✅ SystemMonitorController - `/api/admin/monitor` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/monitor.ts` (MonitorService)
+**对接状态**: ✅ 完全对接
+
+**健康检查**:
+- ✅ GET `/admin/monitor/health` - 系统健康检查
+- ✅ GET `/admin/monitor/metrics` - 获取系统指标
+- ✅ GET `/admin/monitor/health/history` - 健康检查历史
+
+**API 性能监控**:
+- ✅ GET `/admin/monitor/api/slow-queries` - 慢查询日志
+- ✅ GET `/admin/monitor/api/statistics` - 端点性能统计
+- ✅ GET `/admin/monitor/api/errors` - 错误请求日志
+- ✅ GET `/admin/monitor/api/qps` - QPS 统计
+
+**错误日志监控**:
+- ✅ GET `/admin/monitor/errors/unresolved` - 未解决错误
+- ✅ GET `/admin/monitor/errors/by-severity` - 按严重级别筛选
+- ✅ GET `/admin/monitor/errors/statistics` - 错误统计
+- ✅ POST `/admin/monitor/errors/{errorId}/resolve` - 标记错误已解决
+
+**性能报表**:
+- ✅ GET `/admin/monitor/report` - 生成性能报表
+- ✅ GET `/admin/monitor/health-score` - 健康度评分
+
+**数据清理**:
+- ✅ DELETE `/admin/monitor/cleanup` - 清理历史数据
+
+**说明**: ✅ 路径已从 `/monitor` 修复为 `/admin/monitor`
+
+---
+
+#### ✅ BlacklistAdminController - `/api/admin/blacklist` 【✅ 100%已对接】
+**用户群**: 管理员
+**前端服务**: `shared/services/blacklist.ts` (BlacklistService)
+**对接状态**: ✅ 完全对接
+**接口列表**:
+- ✅ GET `/admin/blacklist` - 查询所有黑名单记录（分页）
+- ✅ GET `/admin/blacklist/by-user/{userId}` - 查询指定用户的黑名单
+- ✅ GET `/admin/blacklist/blocked-by/{blockedUserId}` - 查询谁拉黑了指定用户
+- ✅ POST `/admin/blacklist/batch-unblock` - 批量解除黑名单
+- ✅ GET `/admin/blacklist/statistics` - 黑名单统计数据
+- ✅ GET `/admin/blacklist/check-relation` - 检查用户黑名单关系
+
+**说明**: 🆕 管理员黑名单批量操作已完整实现 🎉  
 **对接状态**: ✅ 完全对接  
 
 ---
@@ -677,13 +825,13 @@
 | 纠纷申诉 | DisputeArbitrationController | ❌ 未对接 | 0% | 无 |
 | 纠纷申诉 | AppealController | ✅ 完全对接 | 100% | appeal.ts |
 | 举报黑名单 | ReportController | ✅ 完全对接 | 100% | report.ts |
-| 举报黑名单 | BlacklistController | ❌ 未对接 | 0% | 无 |
+| 举报黑名单 | BlacklistController | ✅ 完全对接 | 100% | blacklist.ts |
 | 其他 | FileController | ✅ 完全对接 | 100% | upload.ts |
 | 其他 | RevertController | ✅ 完全对接 | 100% | revert.ts |
 | 其他 | PrivacyController | ❌ 未对接 | 0% | 无 |
 
-**总计**: 31个Controller，26个完全对接，1个部分对接，4个未对接  
-**覆盖率**: **85%**
+**总计**: 31个Controller，27个完全对接，1个部分对接，3个未对接
+**覆盖率**: **87%**
 
 ---
 
@@ -691,19 +839,26 @@
 
 | 模块 | Controller | 对接状态 | 覆盖率 | 前端服务 |
 |------|-----------|---------|--------|---------|
-| 用户管理 | AdminController | ✅ 完全对接 | 100% | statistics.ts + adminUser.ts |
+| 用户管理 | AdminController | ✅ 完全对接 | 100% | adminUser.ts |
+| 统计分析 | AdminStatisticsController | ✅ 完全对接 | 100% | statistics.ts |
 | 申诉审核 | AppealAdminController | ✅ 完全对接 | 100% | appeal.ts |
+| 纠纷管理 | AdminDisputeController | ✅ 完全对接 | 100% | dispute.ts |
+| 纠纷管理 | DisputeStatisticsController | ✅ 完全对接 | 100% | dispute.ts |
 | 退款审核 | RefundController (Admin) | ✅ 完全对接 | 100% | refund.ts |
 | 举报管理 | ReportController (Admin) | ✅ 完全对接 | 100% | report.ts |
+| 黑名单管理 | BlacklistAdminController | ✅ 完全对接 | 100% | blacklist.ts |
 | 系统管理 | RoleAdminController | ✅ 完全对接 | 100% | role.ts |
 | 系统管理 | CampusController | ✅ 完全对接 | 100% | campus.ts |
+| 系统管理 | CategoryController | ✅ 完全对接 | 100% | category.ts |
 | 系统管理 | TagController | ✅ 完全对接 | 100% | tag.ts |
+| 系统管理 | FeatureFlagController | ✅ 完全对接 | 100% | featureFlag.ts |
+| 系统管理 | SystemMonitorController | ✅ 完全对接 | 100% | monitor.ts |
 | 系统管理 | RateLimitAdminController | ✅ 完全对接 | 100% | rateLimit.ts |
 | 系统管理 | NotificationTemplateAdminController | ✅ 完全对接 | 100% | notificationTemplate.ts |
 | 系统管理 | ComplianceAdminController | ✅ 完全对接 | 100% | compliance.ts |
 | 系统管理 | SoftDeleteAdminController | ✅ 完全对接 | 100% | softDelete.ts |
 
-**总计**: 8个模块，8个完全对接  
+**总计**: 16个模块，16个完全对接
 **覆盖率**: **100%**
 
 ---
@@ -721,15 +876,16 @@
 ### P2 - 低优先级（增强功能）
 
 1. ❌ **NotificationPreferenceController** - 通知偏好设置
-2. ❌ **DisputeController** - 纠纷处理（完整流程）
+2. ❌ **DisputeController** - 纠纷处理（门户端发起纠纷，建议P2优先级）
 3. ❌ **DisputeNegotiationController** - 纠纷协商
 4. ❌ **DisputeEvidenceController** - 纠纷证据
 5. ❌ **DisputeArbitrationController** - 纠纷仲裁
 
+**说明**: DisputeController 系列为门户端用户发起纠纷的接口，管理端纠纷管理（AdminDisputeController）已完整实现 ✅
+
 ### P3 - 最低优先级（可选功能）
 
-1. ❌ **BlacklistController** - 黑名单管理
-2. ❌ **PrivacyController** - 隐私设置（数据导出/账号注销）
+1. ❌ **PrivacyController** - 隐私设置（数据导出/账号注销）
 
 ---
 
@@ -757,24 +913,35 @@
 ## 🎉 总结
 
 **当前状态**：
-- 📊 **门户接口覆盖率**: 85% (26/31 完全对接)
-- 📊 **管理接口覆盖率**: 100% (8/8 完全对接)
-- 📊 **总体覆盖率**: 82% (34/39 完全对接)
+- 📊 **门户接口覆盖率**: 87% (27/31 完全对接)
+- 📊 **管理接口覆盖率**: 100% (16/16 完全对接)
+- 📊 **总体覆盖率**: 91% (43/47 完全对接)
 
 **主要成就**：
 - ✅ 所有核心功能（认证、商品、订单、支付）100%对接
 - ✅ 评价系统（Review 系列）100%对接
 - ✅ 社交系统（Post/Community/Topic）100%对接
 - ✅ 管理功能（Admin 系列）100%对接
+- ✅ 黑名单功能（用户端+管理端）100%对接 🎉
+- ✅ 纠纷管理（管理端）100%对接 🎉
+- ✅ 系统监控功能100%对接 🎉
+- ✅ 功能开关管理100%对接 🎉
 - ✅ 密码加密传输系统已集成
 
+**最近更新（2025-11-07）**：
+- ✅ 修复路径前缀：FeatureFlagController 和 SystemMonitorController
+- ✅ 新增管理端纠纷管理：AdminDisputeController + DisputeStatisticsController
+- ✅ 新增管理端黑名单管理：BlacklistAdminController
+- ✅ 新增统计分析：AdminStatisticsController
+- ✅ 前端服务路径同步更新：featureFlag.ts、monitor.ts、blacklist.ts、dispute.ts
+
 **待完善**：
-- ⏳ 纠纷处理系统（P2优先级，5个Controller）
-- ⏳ 黑名单功能（P3优先级）
+- ⏳ 门户端纠纷处理系统（P2优先级，用户发起纠纷功能）
+- ⏳ 通知偏好设置（P2优先级）
 - ⏳ 隐私设置（P3优先级）
 
 ---
 
-**文档维护者**: BaSui 😎  
-**最后更新**: 2025-11-06  
-**下次审查**: 2025-12-06
+**文档维护者**: BaSui 😎
+**最后更新**: 2025-11-07
+**下次审查**: 2025-12-07
