@@ -26,7 +26,10 @@
       "Bash(taskkill:*)",
       "Bash(findstr:*)",
       "Bash(docker stop:*)",
-      "Bash(docker rm:*)"
+      "Bash(docker rm:*)",
+      "mcp__filesystem__read_text_file",
+      "mcp__filesystem__edit_file",
+      "mcp__filesystem__create_directory"
     ],
     "deny": [],
     "ask": []
