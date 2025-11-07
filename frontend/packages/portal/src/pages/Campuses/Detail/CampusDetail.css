@@ -1,0 +1,426 @@
+/**
+ * 校区详情页面样式 - 深入了解校区！🏫
+ * @author BaSui 😎
+ * @description 美观的校区详情界面设计
+ */
+
+.campus-detail-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.campus-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 返回按钮 ==================== */
+
+.campus-detail-back {
+  margin-bottom: 20px;
+}
+
+/* ==================== 校区头部 ==================== */
+
+.campus-detail-header {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border-radius: 16px;
+  padding: 40px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(79, 172, 254, 0.3);
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.campus-detail-header__icon {
+  font-size: 64px;
+  flex-shrink: 0;
+}
+
+.campus-detail-header__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.campus-detail-header__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.campus-detail-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  word-wrap: break-word;
+}
+
+.campus-detail-header__code {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.campus-detail-header__address,
+.campus-detail-header__phone {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.campus-detail-header__meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.campus-detail-header__meta .meta-item {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.campus-detail-header__actions {
+  flex-shrink: 0;
+}
+
+/* ==================== 统计数据 ==================== */
+
+.campus-detail-stats {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2d3436;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  background: #f0f5ff;
+  box-shadow: 0 2px 8px rgba(79, 172, 254, 0.2);
+  transform: translateY(-2px);
+}
+
+.stat-card__icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.stat-card__value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #4facfe;
+  margin-bottom: 4px;
+}
+
+.stat-card__label {
+  font-size: 13px;
+  color: #636e72;
+}
+
+.stats-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.stats-empty .empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.stats-empty .empty-text {
+  font-size: 15px;
+  color: #636e72;
+  margin: 0;
+}
+
+/* ==================== 校区介绍 ==================== */
+
+.campus-detail-intro {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.intro-content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #2d3436;
+}
+
+.intro-text {
+  margin: 0 0 16px 0;
+}
+
+.intro-item {
+  margin-bottom: 12px;
+}
+
+.intro-item strong {
+  color: #636e72;
+  margin-right: 8px;
+}
+
+.intro-item span {
+  color: #2d3436;
+}
+
+/* ==================== 温馨提示 ==================== */
+
+.campus-detail-tips {
+  background: #e6f7ff;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 4px solid #1890ff;
+}
+
+.campus-detail-tips__title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #0050b3;
+  margin: 0 0 12px 0;
+}
+
+.campus-detail-tips__list {
+  margin: 0;
+  padding-left: 20px;
+  color: #096dd9;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.campus-detail-tips__list li {
+  margin-bottom: 4px;
+}
+
+/* ==================== 错误状态 ==================== */
+
+.campus-detail-error {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.campus-detail-error .error-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.campus-detail-error .error-text {
+  font-size: 24px;
+  color: #2d3436;
+  font-weight: bold;
+  margin: 0 0 32px 0;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .campus-detail-page {
+    padding: 10px 0;
+  }
+
+  .campus-detail-container {
+    padding: 0 10px;
+  }
+
+  .campus-detail-header {
+    flex-direction: column;
+    padding: 32px 24px;
+    gap: 16px;
+  }
+
+  .campus-detail-header__icon {
+    font-size: 56px;
+    text-align: center;
+  }
+
+  .campus-detail-header__title {
+    font-size: 28px;
+  }
+
+  .campus-detail-header__code {
+    font-size: 15px;
+  }
+
+  .campus-detail-header__address,
+  .campus-detail-header__phone {
+    font-size: 14px;
+  }
+
+  .campus-detail-header__actions {
+    width: 100%;
+  }
+
+  .campus-detail-header__actions button {
+    width: 100%;
+  }
+
+  .campus-detail-stats {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-card__icon {
+    font-size: 32px;
+  }
+
+  .stat-card__value {
+    font-size: 24px;
+  }
+
+  .stat-card__label {
+    font-size: 12px;
+  }
+
+  .campus-detail-intro {
+    padding: 20px;
+  }
+
+  .intro-content {
+    font-size: 14px;
+  }
+
+  .campus-detail-error {
+    padding: 60px 16px;
+  }
+
+  .campus-detail-error .error-icon {
+    font-size: 64px;
+  }
+
+  .campus-detail-error .error-text {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .campus-detail-header {
+    padding: 24px 20px;
+  }
+
+  .campus-detail-header__icon {
+    font-size: 48px;
+  }
+
+  .campus-detail-header__title {
+    font-size: 24px;
+  }
+
+  .campus-detail-header__code {
+    font-size: 14px;
+  }
+
+  .campus-detail-header__meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .campus-detail-stats {
+    padding: 16px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-card__icon {
+    font-size: 28px;
+  }
+
+  .stat-card__value {
+    font-size: 22px;
+  }
+
+  .campus-detail-intro {
+    padding: 16px;
+  }
+
+  .intro-content {
+    font-size: 13px;
+  }
+
+  .campus-detail-tips {
+    padding: 16px;
+  }
+
+  .campus-detail-tips__title {
+    font-size: 14px;
+  }
+
+  .campus-detail-tips__list {
+    font-size: 13px;
+  }
+
+  .campus-detail-error {
+    padding: 40px 12px;
+  }
+
+  .campus-detail-error .error-icon {
+    font-size: 56px;
+  }
+
+  .campus-detail-error .error-text {
+    font-size: 18px;
+  }
+}

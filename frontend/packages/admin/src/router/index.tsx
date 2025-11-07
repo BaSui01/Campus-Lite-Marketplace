@@ -21,7 +21,7 @@ import { OrderList, OrderDetail, RefundManagement } from '@/pages/Orders';
 import { AppealList, AppealDetail } from '@/pages/Appeals';
 import { ReviewList } from '@/pages/Reviews';
 import { BatchTaskList } from '@/pages/Batch';
-import { DisputeList, DisputeStatistics } from '@/pages/Disputes';
+import { DisputeList, DisputeDetail, DisputeStatistics } from '@/pages/Disputes';
 import { AuditLogList } from '@/pages/Logs';
 import { BannedUserList } from '@/pages/Users';
 import { PostAuditList } from '@/pages/Content';
@@ -160,6 +160,14 @@ export const router = createBrowserRouter([
         element: (
           <PermissionGuard permission={PERMISSION_CODES.SYSTEM_DISPUTE_MANAGE}>
             <DisputeList />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'disputes/:id',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_DISPUTE_MANAGE}>
+            <DisputeDetail />
           </PermissionGuard>
         ),
       },

@@ -1,104 +1,170 @@
 /**
  * GoodsCard 组件样式
  * @author BaSui 😎
- * @description 商品卡片组件样式
+ * @updated 2025-11-06 - 现代化美化升级
+ * @description 商品卡片组件样式 - 精致优雅的设计
  */
 
 /* ==================== GoodsCard 容器 ==================== */
 .campus-goods-card {
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.campus-goods-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 6px 12px rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.2);
 }
 
 /* ==================== 图片区域 ==================== */
 .campus-goods-card__image-wrapper {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
-  background-color: #f5f5f5;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
 }
 
 .campus-goods-card__image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.campus-goods-card:hover .campus-goods-card__image {
+  transform: scale(1.08);
+}
+
+/* 图片遮罩层 */
+.campus-goods-card__image-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.campus-goods-card:hover .campus-goods-card__image-wrapper::after {
+  opacity: 1;
 }
 
 /* 状态标签 */
 .campus-goods-card__status {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 1;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* 折扣标签 */
 .campus-goods-card__discount {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 1;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 /* ==================== 内容区域 ==================== */
 .campus-goods-card__content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  padding: 18px;
 }
 
 /* 商品名称 */
 .campus-goods-card__name {
   margin: 0;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.5;
-  color: #000000d9;
+  color: var(--text-primary, #1a1a1a);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.campus-goods-card:hover .campus-goods-card__name {
+  color: #667eea;
 }
 
 /* 商品描述 */
 .campus-goods-card__description {
   margin: 0;
   font-size: 13px;
-  line-height: 1.5;
-  color: #00000073;
+  line-height: 1.6;
+  color: var(--text-secondary, #666);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  min-height: 38px;
 }
 
 /* ==================== 价格区域 ==================== */
 .campus-goods-card__price-wrapper {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .campus-goods-card__price {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: #ff4d4f;
   line-height: 1;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(255, 77, 79, 0.2);
 }
 
 .campus-goods-card__original-price {
   font-size: 14px;
-  color: #00000073;
+  color: var(--text-tertiary, #999);
   text-decoration: line-through;
   line-height: 1;
+  opacity: 0.8;
 }
 
 /* ==================== 标签区域 ==================== */
 .campus-goods-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
+  margin-top: 2px;
 }
 
 /* ==================== 底部信息 ==================== */
@@ -106,88 +172,115 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 4px;
-  padding-top: 8px;
-  border-top: 1px solid #f0f0f0;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* 卖家信息 */
 .campus-goods-card__seller {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin: -4px -8px;
 }
 
 .campus-goods-card__seller:hover {
-  opacity: 0.8;
+  background: rgba(102, 126, 234, 0.08);
 }
 
 .campus-goods-card__seller-avatar {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  transition: border-color 0.2s ease;
+}
+
+.campus-goods-card__seller:hover .campus-goods-card__seller-avatar {
+  border-color: #667eea;
 }
 
 .campus-goods-card__seller-name {
-  font-size: 12px;
-  color: #00000073;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary, #666);
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.campus-goods-card__seller:hover .campus-goods-card__seller-name {
+  color: #667eea;
 }
 
 /* 已售数量 */
 .campus-goods-card__sold-count {
   font-size: 12px;
-  color: #00000073;
+  font-weight: 500;
+  color: var(--text-tertiary, #999);
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
 }
 
 /* ==================== 操作按钮 ==================== */
 .campus-goods-card__action-btn {
   flex: 1;
-  padding: 8px 16px;
+  padding: 10px 18px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  letter-spacing: 0.3px;
 }
 
 .campus-goods-card__action-btn--primary {
-  background-color: #1890ff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .campus-goods-card__action-btn--primary:hover {
-  background-color: #40a9ff;
+  background: linear-gradient(135deg, #5568d3 0%, #6a4190 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
 }
 
 .campus-goods-card__action-btn--primary:active {
-  background-color: #096dd9;
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .campus-goods-card__action-btn--secondary {
-  background-color: #ffffff;
-  color: #1890ff;
-  border: 1px solid #1890ff;
+  background-color: transparent;
+  color: #667eea;
+  border: 2px solid #667eea;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.15);
 }
 
 .campus-goods-card__action-btn--secondary:hover {
-  background-color: #f0f7ff;
-  border-color: #40a9ff;
-  color: #40a9ff;
+  background-color: rgba(102, 126, 234, 0.08);
+  border-color: #5568d3;
+  color: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
 }
 
 .campus-goods-card__action-btn--secondary:active {
-  background-color: #e6f4ff;
-  border-color: #096dd9;
-  color: #096dd9;
+  transform: translateY(0);
+  background-color: rgba(102, 126, 234, 0.15);
+  box-shadow: 0 1px 4px rgba(102, 126, 234, 0.2);
 }
 
 /* ==================== 响应式设计 ==================== */
@@ -195,11 +288,15 @@
 /* 平板适配 */
 @media (max-width: 1024px) {
   .campus-goods-card {
-    max-width: 280px;
+    max-width: 300px;
+  }
+
+  .campus-goods-card__content {
+    padding: 16px;
   }
 
   .campus-goods-card__image-wrapper {
-    height: 180px;
+    height: 200px;
   }
 
   .campus-goods-card__name {
@@ -207,7 +304,7 @@
   }
 
   .campus-goods-card__price {
-    font-size: 18px;
+    font-size: 22px;
   }
 }
 
@@ -215,10 +312,35 @@
 @media (max-width: 768px) {
   .campus-goods-card {
     max-width: 100%;
+    border-radius: 14px;
+  }
+
+  .campus-goods-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .campus-goods-card__content {
+    padding: 14px;
+    gap: 8px;
   }
 
   .campus-goods-card__image-wrapper {
-    height: 160px;
+    height: 180px;
+  }
+
+  .campus-goods-card:hover .campus-goods-card__image {
+    transform: scale(1.05);
+  }
+
+  .campus-goods-card__status,
+  .campus-goods-card__discount {
+    top: 10px;
+    left: 10px;
+  }
+
+  .campus-goods-card__discount {
+    right: 10px;
+    left: auto;
   }
 
   .campus-goods-card__name {
@@ -228,18 +350,58 @@
   .campus-goods-card__description {
     font-size: 12px;
     -webkit-line-clamp: 1;
+    min-height: 18px;
   }
 
   .campus-goods-card__price {
-    font-size: 16px;
+    font-size: 20px;
   }
 
   .campus-goods-card__original-price {
     font-size: 12px;
   }
 
+  .campus-goods-card__tags {
+    gap: 6px;
+  }
+
+  .campus-goods-card__footer {
+    margin-top: 6px;
+    padding-top: 10px;
+  }
+
+  .campus-goods-card__seller-avatar {
+    width: 20px;
+    height: 20px;
+  }
+
+  .campus-goods-card__seller-name {
+    font-size: 12px;
+  }
+
+  .campus-goods-card__sold-count {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
   .campus-goods-card__action-btn {
-    padding: 6px 12px;
+    padding: 8px 14px;
     font-size: 13px;
+    border-radius: 8px;
+  }
+}
+
+/* 超小屏幕适配 */
+@media (max-width: 374px) {
+  .campus-goods-card__image-wrapper {
+    height: 150px;
+  }
+
+  .campus-goods-card__name {
+    font-size: 13px;
+  }
+
+  .campus-goods-card__price {
+    font-size: 18px;
   }
 }

@@ -56,6 +56,17 @@ const RevertOperations = lazy(() => import('../pages/RevertOperations'));
 const ReviewCreate = lazy(() => import('../pages/Review/Create'));
 const MyReviews = lazy(() => import('../pages/Review/MyReviews'));
 
+// 话题相关页面
+const Topics = lazy(() => import('../pages/Topics'));
+const TopicDetail = lazy(() => import('../pages/Topics/Detail'));
+
+// 物流相关页面
+const Logistics = lazy(() => import('../pages/Logistics'));
+
+// 校区相关页面
+const Campuses = lazy(() => import('../pages/Campuses'));
+const CampusDetail = lazy(() => import('../pages/Campuses/Detail'));
+
 // ==================== 路由守卫组件 ====================
 
 /**
@@ -426,6 +437,46 @@ export const router = createBrowserRouter(
               <MyReviews />
             </LazyLoadWrapper>
           </RequireAuth>
+        ),
+      },
+      {
+        path: 'topics',
+        element: (
+          <LazyLoadWrapper>
+            <Topics />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'topics/:id',
+        element: (
+          <LazyLoadWrapper>
+            <TopicDetail />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'logistics/track',
+        element: (
+          <LazyLoadWrapper>
+            <Logistics />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'campuses',
+        element: (
+          <LazyLoadWrapper>
+            <Campuses />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'campuses/:id',
+        element: (
+          <LazyLoadWrapper>
+            <CampusDetail />
+          </LazyLoadWrapper>
         ),
       },
     ],

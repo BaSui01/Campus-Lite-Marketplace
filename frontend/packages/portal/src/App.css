@@ -1,6 +1,7 @@
 /**
  * 应用全局样式
  * @author BaSui 😎
+ * @updated 2025-11-06 - 现代化美化升级，与布局风格统一
  */
 
 /* ==================== 全局重置 ==================== */
@@ -17,13 +18,36 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ==================== 滚动条美化 ==================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.5);
 }
 
 /* ==================== Toast 容器 ==================== */
 
 .toast-container {
   position: fixed;
-  top: 24px;
+  top: 84px; /* 避开顶部导航栏 */
   right: 24px;
   z-index: 9999;
   display: flex;
@@ -34,14 +58,42 @@ body {
 
 .toast-container > * {
   pointer-events: auto;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==================== 通用工具类 ==================== */
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ==================== 响应式设计 ==================== */
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .toast-container {
-    top: 16px;
+    top: 72px; /* 移动端顶部导航栏更小 */
     right: 16px;
     left: 16px;
+    max-width: calc(100vw - 32px);
   }
 }

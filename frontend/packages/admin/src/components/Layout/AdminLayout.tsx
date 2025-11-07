@@ -12,13 +12,24 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
   LogoutOutlined,
+  DashboardOutlined,
+  FileTextOutlined,
+  SafetyOutlined,
+  SettingOutlined,
+  FileSearchOutlined,
+  ShoppingOutlined,
+  ShoppingCartOutlined,
+  FileProtectOutlined,
+  SafetyCertificateOutlined,
+  StarOutlined,
+  ThunderboltOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth, usePermission, useBreakpoint } from '@/hooks';
 import { UserAvatar, Badge } from '@campus/shared';
 import { MENU_ITEMS } from '@/config/menu';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { DashboardOutlined, FileTextOutlined, SafetyOutlined, SettingOutlined, FileSearchOutlined } from '@ant-design/icons';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -31,15 +42,18 @@ const getIcon = (iconName: string) => {
     SafetyOutlined: <SafetyOutlined />,
     SettingOutlined: <SettingOutlined />,
     FileSearchOutlined: <FileSearchOutlined />,
+    ShoppingOutlined: <ShoppingOutlined />,
+    ShoppingCartOutlined: <ShoppingCartOutlined />,
+    FileProtectOutlined: <FileProtectOutlined />,
+    SafetyCertificateOutlined: <SafetyCertificateOutlined />,
+    StarOutlined: <StarOutlined />,
+    ThunderboltOutlined: <ThunderboltOutlined />,
+    TeamOutlined: <TeamOutlined />,
   };
   return icons[iconName];
 };
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
-}
-
-export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const { hasPermission } = usePermission();
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
@@ -260,7 +274,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             background: '#fff',
           }}
         >
-          {children}
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

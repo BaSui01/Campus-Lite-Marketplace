@@ -34,7 +34,6 @@ const Dashboard: React.FC = () => {
   const { data: overview, isLoading: overviewLoading } = useQuery({
     queryKey: ['system-overview'],
     queryFn: () => statisticsService.getSystemOverview(),
-    retry: 0, // 禁用重试，直接失败
   });
 
   // ===== 查询热门商品排行 =====
