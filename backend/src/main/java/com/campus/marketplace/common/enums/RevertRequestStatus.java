@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 撤销请求状态枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-11-03
  */
 @Getter
-@RequiredArgsConstructor
 public enum RevertRequestStatus {
     
     PENDING("待处理"),
@@ -21,4 +19,8 @@ public enum RevertRequestStatus {
     CANCELLED("已取消");
     
     private final String description;
+
+    RevertRequestStatus(String description) {
+        this.description = description;
+    }
 }

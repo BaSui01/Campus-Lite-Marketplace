@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 举报状态枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-10-27
  */
 @Getter
-@RequiredArgsConstructor
 public enum ReportStatus {
     
     /**
@@ -29,4 +27,8 @@ public enum ReportStatus {
     REJECTED("已驳回");
     
     private final String description;
+
+    ReportStatus(String description) {
+        this.description = description;
+    }
 }

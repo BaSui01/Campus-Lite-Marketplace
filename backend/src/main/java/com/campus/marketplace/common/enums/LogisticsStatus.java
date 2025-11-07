@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 物流状态枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @since 2025-11-03
  */
 @Getter
-@RequiredArgsConstructor
 public enum LogisticsStatus {
 
     /**
@@ -49,4 +47,8 @@ public enum LogisticsStatus {
     LOST("疑似丢失");
 
     private final String description;
+
+    LogisticsStatus(String description) {
+        this.description = description;
+    }
 }

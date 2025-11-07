@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 用户行为类型枚举
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
  * @since 2025-11-03
  */
 @Getter
-@RequiredArgsConstructor
 public enum BehaviorType {
 
     /**
@@ -70,4 +68,13 @@ public enum BehaviorType {
      * 是否为高价值行为（购买和收藏）
      */
     private final boolean highValue;
+
+    /**
+     * 枚举构造器（私有）
+     */
+    BehaviorType(String displayName, int weight, boolean highValue) {
+        this.displayName = displayName;
+        this.weight = weight;
+        this.highValue = highValue;
+    }
 }

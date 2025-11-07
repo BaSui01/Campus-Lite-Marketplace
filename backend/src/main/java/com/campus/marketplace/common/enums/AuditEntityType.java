@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 审计实体类型枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-11-02
  */
 @Getter
-@RequiredArgsConstructor
 public enum AuditEntityType {
     
     USER("用户"),
@@ -27,4 +25,8 @@ public enum AuditEntityType {
     PERMISSION("权限");
     
     private final String description;
+
+    AuditEntityType(String description) {
+        this.description = description;
+    }
 }

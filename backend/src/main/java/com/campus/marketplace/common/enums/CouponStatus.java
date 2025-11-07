@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 优惠券状态枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-10-27
  */
 @Getter
-@RequiredArgsConstructor
 public enum CouponStatus {
     
     AVAILABLE("可用"),
@@ -18,4 +16,8 @@ public enum CouponStatus {
     EXPIRED("已过期");
     
     private final String description;
+
+    CouponStatus(String description) {
+        this.description = description;
+    }
 }

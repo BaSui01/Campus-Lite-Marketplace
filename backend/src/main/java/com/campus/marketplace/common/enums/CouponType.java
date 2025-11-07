@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 优惠券类型枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-10-27
  */
 @Getter
-@RequiredArgsConstructor
 public enum CouponType {
     
     FIXED("满减券"),      // 满100减10
@@ -18,4 +16,8 @@ public enum CouponType {
     FREE_SHIPPING("包邮券");
     
     private final String description;
+
+    CouponType(String description) {
+        this.description = description;
+    }
 }

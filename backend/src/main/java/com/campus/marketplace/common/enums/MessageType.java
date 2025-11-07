@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 消息类型枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-10-27
  */
 @Getter
-@RequiredArgsConstructor
 public enum MessageType {
 
     /**
@@ -37,4 +35,8 @@ public enum MessageType {
      * 类型描述
      */
     private final String description;
+
+    MessageType(String description) {
+        this.description = description;
+    }
 }

@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 申诉状态枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-11-02
  */
 @Getter
-@RequiredArgsConstructor
 public enum AppealStatus {
     
     PENDING("待处理"),
@@ -21,4 +19,8 @@ public enum AppealStatus {
     EXPIRED("已过期");
     
     private final String description;
+
+    AppealStatus(String description) {
+        this.description = description;
+    }
 }
