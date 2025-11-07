@@ -1,6 +1,5 @@
 package com.campus.marketplace.common.config;
 
-import com.campus.marketplace.common.security.PermissionCodes;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

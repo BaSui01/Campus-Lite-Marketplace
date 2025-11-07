@@ -67,9 +67,6 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DATABASE:0}
-      # 使用 Redisson 的独立配置文件，避免误触发哨兵模式
-      redisson:
-        file: classpath:redisson.yaml
       lettuce:
         pool:
           max-active: ${REDIS_POOL_MAX_ACTIVE:50}
@@ -78,11 +75,6 @@ spring:
           max-wait: 3000ms
       repositories:
         enabled: false
-
-  # 供 Redisson Starter 读取的旧前缀（与 Spring Boot 3 兼容）
-  redis:
-    redisson:
-      file: classpath:redisson.yaml
   
   # 文件上传配置
   servlet:
@@ -110,7 +102,7 @@ spring:
 
 # JWT 配置
 jwt:
-  secret: ${JWT_SECRET:5bwzFhN2dpPiac1wgPaFgb5iu_lEB5JrSxZqv-WIOwRiE_dQOE-fMFxy24-iOXgWm1NxybaJMrkbCXG9mY0a4Q}
+  secret: ${JWT_SECRET:9K2X7pRhqJYbkbs8pNgEUpNLefMRNOySx2dWFOBxr-sTVZq_nb191fPLvLNaLUN3jkUumjU70TlhQTt5SQOQJA}
   expiration: ${JWT_EXPIRATION:7200000}
   header: ${JWT_HEADER:Authorization}
   prefix: ${JWT_PREFIX:Bearer }
@@ -125,8 +117,8 @@ logging:
   level:
     root: ${LOG_LEVEL_ROOT:INFO}
     com.campus.marketplace: ${LOG_LEVEL_APP:DEBUG}
-    org.hibernate.SQL: ${LOG_LEVEL_SQL:DEBUG}
-    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:TRACE}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:INFO}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:INFO}
     org.springframework.security: ${LOG_LEVEL_SPRING_SECURITY:DEBUG}
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

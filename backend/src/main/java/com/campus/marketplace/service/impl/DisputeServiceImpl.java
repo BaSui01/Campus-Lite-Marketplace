@@ -156,6 +156,16 @@ public class DisputeServiceImpl implements DisputeService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<DisputeDTO> getArbitratorDisputes(Long arbitratorId, DisputeStatus status, Pageable pageable) {
+        log.debug("查询仲裁员纠纷列表: arbitratorId={}, status={}", arbitratorId, status);
+
+        // 调用 Repository 的按仲裁员ID查询方法 🎯
+        Page<Dispute> disputes = disputeRepository.findByArbitratorIdWithStatus(arbitratorId, status, pageable);
+        return disputes.map(DisputeDTO::from);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public DisputeDetailDTO getDisputeDetail(Long disputeId) {
         log.debug("查询纠纷详情: disputeId={}", disputeId);
 

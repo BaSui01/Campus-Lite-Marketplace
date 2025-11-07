@@ -38,6 +38,16 @@ public interface DisputeService {
     Page<DisputeDTO> getUserDisputes(Long userId, DisputeStatus status, Pageable pageable);
 
     /**
+     * 查询仲裁员处理的纠纷列表
+     *
+     * @param arbitratorId 仲裁员ID
+     * @param status 纠纷状态（可选，null表示查询全部）
+     * @param pageable 分页参数
+     * @return 仲裁员的纠纷列表（分页）
+     */
+    Page<DisputeDTO> getArbitratorDisputes(Long arbitratorId, DisputeStatus status, Pageable pageable);
+
+    /**
      * 查询纠纷详情
      *
      * @param disputeId 纠纷ID
