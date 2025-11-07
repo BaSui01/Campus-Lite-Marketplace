@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 方案状态枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @since 2025-11-03
  */
 @Getter
-@RequiredArgsConstructor
 public enum ProposalStatus {
 
     PENDING("待响应"),
@@ -18,4 +16,8 @@ public enum ProposalStatus {
     REJECTED("已拒绝");
 
     private final String description;
+
+    ProposalStatus(String description) {
+        this.description = description;
+    }
 }
