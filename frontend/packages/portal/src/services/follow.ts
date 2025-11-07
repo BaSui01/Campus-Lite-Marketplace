@@ -4,8 +4,8 @@
  * @description 关注卖家、取消关注、查询关注列表等接口
  */
 
-import { getApi } from '../utils/apiClient';
-import type { FollowResponse, GoodsResponse } from '../api/models';
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { FollowResponse, GoodsResponse } from '@campus/shared/api/models';
 
 /**
  * 关注用户动态项

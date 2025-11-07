@@ -11,8 +11,8 @@
  * 合规管理服务
  */
 
-import { getApi } from '../utils/apiClient';
-import type { ApiResponse, PageResponse } from '../types';
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { ApiResponse, PageResponse } from '@campus/shared/types';
 
 export interface ComplianceWhitelistItem {
   id: number;

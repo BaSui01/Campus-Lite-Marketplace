@@ -13,8 +13,8 @@
  * @description 商品推荐算法服务（基于协同过滤、热度排序）
  */
 
-import { getApi } from '../utils/apiClient';
-import type { GoodsResponse } from '../api/models';
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { GoodsResponse } from '@campus/shared/api/models';
 
 // ==================== 类型定义 ====================
 

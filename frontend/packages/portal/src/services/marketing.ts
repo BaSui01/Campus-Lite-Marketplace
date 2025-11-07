@@ -4,7 +4,7 @@
  * @description 限时折扣、满减优惠、秒杀活动管理
  */
 
-import { apiClient } from '../utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 
 // ==================== 类型定义 ====================
 

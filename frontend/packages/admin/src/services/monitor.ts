@@ -13,7 +13,7 @@
  * @description 系统健康检查、性能监控、错误日志
  */
 
-import { getApi } from '../utils/apiClient';
+import { getApi } from '@campus/shared/utils/apiClient';
 import type { PageResponse, BaseResponse } from '@campus/shared/api';
 
 // ==================== 类型定义 ====================

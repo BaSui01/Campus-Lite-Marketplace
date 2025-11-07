@@ -4,8 +4,8 @@
  * @description 关键词订阅、取消订阅、查询订阅列表等接口
  */
 
-import { getApi } from '../utils/apiClient';
-import type { SubscriptionResponse, CreateSubscriptionRequest } from '../api/models';
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { SubscriptionResponse, CreateSubscriptionRequest } from '@campus/shared/api/models';
 
 /**
  * 订阅类型枚举

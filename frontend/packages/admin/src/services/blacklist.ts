@@ -13,7 +13,7 @@
  * @description 用户黑名单管理：拉黑、解除拉黑、查询黑名单
  */
 
-import { getApi } from '../utils/apiClient';
+import { getApi } from '@campus/shared/utils/apiClient';
 
 /**
  * 黑名单项

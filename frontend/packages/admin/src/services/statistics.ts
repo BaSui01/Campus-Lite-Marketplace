@@ -5,8 +5,8 @@
  * 后端接口路径：/api/admin/statistics/*
  */
 
-import { getApi } from '../utils/apiClient';
-import type { ApiResponse } from '../types';
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { ApiResponse } from '@campus/shared/types';
 
 export interface SystemOverview {
   totalUsers: number;

@@ -4,8 +4,8 @@
  * @description 商品收藏、取消收藏、查询收藏列表等接口
  */
 
-import { getApi } from '../utils/apiClient';
-import type { GoodsResponse, PageGoodsResponse } from '../api/models';
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { GoodsResponse, PageGoodsResponse } from '@campus/shared/api/models';
 
 /**
  * 收藏列表查询参数

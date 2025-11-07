@@ -13,7 +13,7 @@
  * @description 纠纷数据统计与分析
  */
 
-import { getApi } from '../utils/apiClient';
+import { getApi } from '@campus/shared/utils/apiClient';
 import type { BaseResponse } from '@campus/shared/api';
 
 // ==================== 类型定义 ====================

@@ -13,8 +13,8 @@
  * @description 申诉提交、审核、查询等接口
  */
 
-import { getApi } from '../utils/apiClient';
-import type { ApiResponse, PageInfo } from '../types';
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { ApiResponse, PageInfo } from '@campus/shared/types';
 
 /**
  * 申诉信息接口
