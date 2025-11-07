@@ -13,10 +13,10 @@ import lombok.*;
  */
 @Entity
 @Table(name = "t_batch_task_item", indexes = {
-    @Index(name = "idx_batch_task_id", columnList = "batch_task_id"),
-    @Index(name = "idx_status", columnList = "status"),
-    @Index(name = "idx_shard_key", columnList = "shard_key"),
-    @Index(name = "idx_target", columnList = "target_type,target_id")
+    @Index(name = "idx_batch_task_item_task_id", columnList = "batch_task_id"),
+    @Index(name = "idx_batch_task_item_status", columnList = "status"),
+    @Index(name = "idx_batch_task_item_shard", columnList = "shard_key"),
+    @Index(name = "idx_batch_task_item_target", columnList = "target_type,target_id")
 })
 @Getter
 @Setter

@@ -50,9 +50,12 @@ public class DataBackup extends BaseEntity {
 
     /**
      * 备份数据（JSON格式的完整数据快照）
+     *
+     * 注意：PostgreSQL 的 TEXT 类型可以存储最大 1GB 的数据
+     * 远超 MySQL 的 MEDIUMTEXT（16MB），完全够用！😎
      */
     @Lob
-    @Column(name = "backup_data", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "backup_data", columnDefinition = "TEXT")
     private String backupData;
 
     /**
