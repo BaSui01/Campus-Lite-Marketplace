@@ -10,7 +10,7 @@
 import React from 'react';
 import { List, Avatar, Tag, Empty } from 'antd';
 import { TrophyOutlined, FireOutlined } from '@ant-design/icons';
-import type { RankingItem } from '@campus/shared/services/statistics';
+import type { RankingItem } from '../../services/statistics';
 
 interface RankingListProps {
   data: RankingItem[];

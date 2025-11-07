@@ -27,13 +27,13 @@ import {
 } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { statisticsService } from '@campus/shared/services/statistics';
+import { statisticsService } from '../../services/statistics';
 import type {
   SystemOverview,
   TrendStatistics,
   RankingItem,
   CategoryStat,
-} from '@campus/shared/services/statistics';
+} from '../../services/statistics';
 import TrendChart from './components/TrendChart';
 import RevenueChart from './components/RevenueChart';
 import RankingList from './components/RankingList';

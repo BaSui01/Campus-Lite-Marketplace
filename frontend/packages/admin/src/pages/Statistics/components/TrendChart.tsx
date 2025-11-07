@@ -9,7 +9,7 @@
 
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
-import type { TrendStatistics } from '@campus/shared/services/statistics';
+import type { TrendStatistics } from '../../services/statistics';
 import { Empty } from 'antd';
 
 interface TrendChartProps {

@@ -10,7 +10,7 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
 import { Empty } from 'antd';
-import type { CategoryStat } from '@campus/shared/services/statistics';
+import type { CategoryStat } from '../../services/statistics';
 
 interface CategoryChartProps {
   data: CategoryStat[];
