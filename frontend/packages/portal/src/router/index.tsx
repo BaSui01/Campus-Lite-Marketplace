@@ -72,6 +72,11 @@ const AppealList = lazy(() => import('../pages/Appeals'));
 const AppealCreate = lazy(() => import('../pages/Appeals/AppealCreate'));
 const AppealDetail = lazy(() => import('../pages/Appeals/AppealDetail'));
 
+// 支付相关页面
+const PaymentStatus = lazy(() => import('../pages/Payment/PaymentStatus'));
+const PaymentResult = lazy(() => import('../pages/Payment/PaymentResult'));
+const PaymentMethods = lazy(() => import('../pages/Payment/PaymentMethods'));
+
 // ==================== 路由守卫组件 ====================
 
 /**
@@ -511,6 +516,37 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <AppealDetail />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      // ==================== 支付管理 ====================
+      {
+        path: 'payment',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <PaymentStatus />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'payment/result',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <PaymentResult />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'payment/methods',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <PaymentMethods />
             </LazyLoadWrapper>
           </RequireAuth>
         ),

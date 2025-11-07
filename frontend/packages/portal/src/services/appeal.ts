@@ -14,7 +14,9 @@ import type {
   ApiResponseAppealDetailResponse,
   ApiResponseVoid,
   ApiResponseBoolean,
+  ApiResponseMaterialUploadResponse,
   CreateAppealRequest,
+  AppealMaterial,
 } from '@campus/shared/api';
 
 /**
@@ -108,6 +110,62 @@ export class AppealService {
     }
 
     return false;
+  }
+
+  /**
+   * 上传申诉材料 📤
+   *
+   * POST /api/appeals/{appealId}/materials
+   *
+   * @param appealId 申诉ID
+   * @param files 文件列表
+   * @returns 上传结果
+   */
+  async uploadAppealMaterials(appealId: number, files: File[]): Promise<AppealMaterial[]> {
+    const response = await this.api.uploadMaterials(appealId.toString(), files);
+    const result = response.data as ApiResponseMaterialUploadResponse;
+
+    if (result.code === 200 && result.successMaterials) {
+      return result.successMaterials;
+    }
+
+    throw new Error(result.message || '上传申诉材料失败');
+  }
+
+  /**
+   * 获取申诉材料列表 📋
+   *
+   * GET /api/appeals/{appealId}/materials
+   *
+   * @param appealId 申诉ID
+   * @returns 材料列表
+   */
+  async getAppealMaterials(appealId: number): Promise<AppealMaterial[]> {
+    const response = await this.api.getAppealMaterials(appealId.toString());
+    const result = response.data as any; // 这里需要根据实际的API响应类型调整
+
+    if (result.code === 200 && result.data) {
+      return result.data;
+    }
+
+    return [];
+  }
+
+  /**
+   * 删除申诉材料 🗑️
+   *
+   * DELETE /api/appeals/materials/{materialId}
+   *
+   * @param materialId 材料ID
+   * @returns 是否成功
+   */
+  async deleteAppealMaterial(materialId: number): Promise<void> {
+    const response = await this.api.deleteMaterial(materialId);
+    const result = response.data as any;
+
+    if (result.code !== 200) {
+      throw new Error(result.message || '删除申诉材料失败');
+    }
   }
 }
 

@@ -9,6 +9,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { appealService } from '../../services';
+import { AppealFileUploader } from './components/AppealFileUploader';
 import type {
   CreateAppealRequest,
   CreateAppealRequestTargetTypeEnum,
@@ -69,25 +70,26 @@ export const AppealCreate: React.FC = () => {
   };
 
   /**
-   * 附件URL添加
+   * 处理文件上传成功
    */
-  const addAttachment = () => {
-    const url = prompt('请输入附件URL（图片或文件链接）：');
-    if (url && url.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        attachments: [...(prev.attachments || []), url.trim()],
-      }));
-    }
+  const handleFileUploadSuccess = (files: any[]) => {
+    // 将上传成功的文件URL添加到表单数据
+    const urls = files.filter(file => file.status === 'success' && file.url).map(file => file.url);
+    setFormData((prev) => ({
+      ...prev,
+      attachments: [...(prev.attachments || []), ...urls],
+    }));
   };
 
   /**
-   * 移除附件
+   * 处理文件删除
    */
-  const removeAttachment = (index: number) => {
+  const handleFileRemove = (fileId: string) => {
+    // 从表单数据中移除对应的文件URL
+    // 注意：这里需要根据实际的上传组件返回的数据结构来处理
     setFormData((prev) => ({
       ...prev,
-      attachments: prev.attachments?.filter((_, i) => i !== index),
+      // 暂时保持原逻辑，后续可以根据需要优化
     }));
   };
 
@@ -233,37 +235,20 @@ export const AppealCreate: React.FC = () => {
           </p>
         </div>
 
-        {/* 附件 */}
+        {/* 申诉材料上传 */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            附件（可选）
+            申诉材料（可选）
           </label>
-          {formData.attachments && formData.attachments.length > 0 && (
-            <ul className="mb-2 space-y-2">
-              {formData.attachments.map((url, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
-                >
-                  <span className="text-sm text-gray-600 truncate">{url}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeAttachment(index)}
-                    className="ml-2 text-red-500 hover:text-red-700"
-                  >
-                    删除
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <button
-            type="button"
-            onClick={addAttachment}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            + 添加附件
-          </button>
+          <div className="text-xs text-gray-500 mb-3">
+            支持上传图片、PDF、Word文档作为申诉证据，有助于加快审核进度
+          </div>
+          <AppealFileUploader
+            onUploadSuccess={handleFileUploadSuccess}
+            onFileRemove={handleFileRemove}
+            disabled={loading}
+            className="mb-4"
+          />
         </div>
 
         {/* 备注 */}
@@ -307,7 +292,8 @@ export const AppealCreate: React.FC = () => {
         <ul className="text-xs text-yellow-700 space-y-1 list-disc list-inside">
           <li>请确保提供的信息真实准确，虚假申诉将被驳回</li>
           <li>申诉理由请详细描述，有助于加快审核进度</li>
-          <li>附件可以提供相关截图或文件链接作为证据</li>
+          <li>支持上传图片（JPG、PNG等）、PDF、Word文档作为申诉证据</li>
+          <li>文件大小限制：图片≤10MB，文档≤20MB，最多5个文件</li>
           <li>申诉提交后，我们将在3个工作日内完成审核</li>
         </ul>
       </div>

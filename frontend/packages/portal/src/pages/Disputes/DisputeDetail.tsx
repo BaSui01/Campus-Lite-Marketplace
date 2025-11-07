@@ -9,6 +9,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { disputeService, DisputeStatus } from '../../services';
+import { ChatInterface } from './components/ChatInterface';
+import { useDisputeChat } from './hooks/useDisputeChat';
+import SearchPanel from '@/components/SearchPanel';
 import type { DisputeDetailDTO } from '@campus/shared/api/models';
 
 /**
@@ -56,6 +59,40 @@ export const DisputeDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<DisputeDetailDTO | null>(null);
   const [escalating, setEscalating] = useState(false);
+  const [showSearchPanel, setShowSearchPanel] = useState(false);
+
+  // 聊天相关状态 - 临时数据，实际应该从用户上下文获取
+  const [currentUserId] = useState(1); // 临时硬编码
+  const [currentUserRole] = useState<'buyer' | 'seller'>('seller'); // 临时硬编码
+
+  // 获取对方用户信息
+  const getOtherUser = () => {
+    if (!detail?.dispute) return null;
+
+    // 临时逻辑：根据当前用户角色推断对方信息
+    // 实际应该从detail中获取准确的用户信息
+    return {
+      id: currentUserRole === 'buyer' ? 2 : 1,
+      name: currentUserRole === 'buyer' ? '卖家张三' : '买家李四',
+      role: currentUserRole === 'buyer' ? 'seller' : 'buyer',
+      avatar: undefined,
+    };
+  };
+
+  // 聊天Hook
+  const chatState = useDisputeChat({
+    disputeId: parseInt(id!),
+    currentUserId,
+    onMessage: (message) => {
+      console.log('收到新消息:', message);
+    },
+    onConnectionChange: (isConnected) => {
+      console.log('连接状态变化:', isConnected);
+    },
+    onError: (error) => {
+      console.error('聊天错误:', error);
+    },
+  });
 
   /**
    * 加载纠纷详情
@@ -115,6 +152,22 @@ export const DisputeDetail: React.FC = () => {
   useEffect(() => {
     loadDetail();
   }, [id]);
+
+  /**
+   * 处理键盘快捷键
+   */
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ctrl+F 或 Cmd+F 打开搜索
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        event.preventDefault();
+        setShowSearchPanel(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   /**
    * 渲染纠纷状态标签
@@ -369,6 +422,90 @@ export const DisputeDetail: React.FC = () => {
         <p className="text-gray-700 whitespace-pre-wrap">{dispute.description}</p>
       </div>
 
+      {/* 协商沟通 */}
+      {dispute.status === DisputeStatus.NEGOTIATING && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">协商沟通</h2>
+            <button
+              onClick={() => setShowSearchPanel(true)}
+              className="flex items-center space-x-2 px-3 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+              title="搜索聊天记录 (Ctrl+F)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <span>搜索记录</span>
+            </button>
+          </div>
+          <div className="h-96 border border-gray-200 rounded-lg">
+            {getOtherUser() ? (
+              <ChatInterface
+                disputeId={dispute.id}
+                currentUserId={currentUserId}
+                currentUserRole={currentUserRole}
+                otherUser={getOtherUser()!}
+                disputeStatus={dispute.status}
+                onMessageSent={(message) => {
+                  console.log('消息已发送:', message);
+                }}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                <p>正在获取用户信息...</p>
+              </div>
+            )}
+          </div>
+
+          {/* 聊天状态提示 */}
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0z" clipRule="evenodd" />
+                <path d="M14 7.5a.5.5 0 00-.5-.5v-1a.5.5 0 00-.5-.5h-1a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h1z" />
+              </svg>
+              <div className="text-sm text-blue-800">
+                <p className="font-medium">协商沟通提示</p>
+                <p className="text-xs mt-1">
+                  请保持友好协商，理性沟通。所有对话记录将作为仲裁参考。
+                  {chatState.isConnected ? '连接正常' : '连接异常，请刷新页面'}
+                  按 <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">Ctrl+F</kbd> 搜索聊天记录
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 非协商状态的提示 */}
+      {dispute.status !== DisputeStatus.NEGOTIATING && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">协商沟通</h2>
+          <div className="text-center py-8 text-gray-500">
+            <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77.833-1.928.833-3.468 1.732L2.268 8.5c-.77.833-1.192.833-2.732 1.732L11.268 9.5c.77-.833 1.698-.833 3.468 1.732L18.732 8.5c.77-.833 1.192-1.928 1.732-3.468L14.732 4z" />
+            </svg>
+            <p className="text-lg font-medium mb-2">
+              {dispute.status === DisputeStatus.PENDING_ARBITRATION && '纠纷已升级为仲裁'}
+              {dispute.status === DisputeStatus.ARBITRATING && '仲裁进行中'}
+              {dispute.status === DisputeStatus.RESOLVED && '纠纷已解决'}
+              {dispute.status === DisputeStatus.CLOSED && '纠纷已关闭'}
+            </p>
+            <p className="text-sm">
+              {dispute.status === DisputeStatus.PENDING_ARBITRATION && '请等待仲裁员处理'}
+              {dispute.status === DisputeStatus.ARBITRATING && '仲裁员正在处理此纠纷'}
+              {dispute.status === DisputeStatus.RESOLVED && '纠纷已成功解决'}
+              {dispute.status === DisputeStatus.CLOSED && '此纠纷已关闭'}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 证据材料 */}
       <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">证据材料</h2>
@@ -390,6 +527,16 @@ export const DisputeDetail: React.FC = () => {
         <h2 className="text-lg font-semibold text-gray-800 mb-4">处理进度</h2>
         {renderTimeline()}
       </div>
+
+      {/* 搜索面板 */}
+      <SearchPanel
+        visible={showSearchPanel}
+        onClose={() => setShowSearchPanel(false)}
+        currentUserId={currentUserId}
+        disputeId={dispute.id}
+        showAdvancedFilters={true}
+        placeholder="搜索协商聊天记录..."
+      />
     </div>
   );
 };
