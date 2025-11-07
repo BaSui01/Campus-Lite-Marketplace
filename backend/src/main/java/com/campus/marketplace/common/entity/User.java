@@ -152,6 +152,12 @@ public class User {
     private LocalDateTime updatedAt;
 
     /**
+     * 最后登录时间
+     */
+    @Column(name = "last_login_time")
+    private LocalDateTime lastLoginTime;
+
+    /**
      * 注销时间（软删除时间）
      */
     @Column(name = "deleted_at")

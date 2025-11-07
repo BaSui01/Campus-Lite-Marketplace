@@ -44,6 +44,7 @@ CREATE TABLE t_user (
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login_time TIMESTAMP,
     deleted_at TIMESTAMP,
     CONSTRAINT fk_user_campus FOREIGN KEY (campus_id) REFERENCES t_campus(id)
 );
@@ -54,6 +55,7 @@ COMMENT ON COLUMN t_user.password IS '密码（加密存储）';
 COMMENT ON COLUMN t_user.points IS '用户积分';
 COMMENT ON COLUMN t_user.credit_score IS '信誉分（0-200，初始100）';
 COMMENT ON COLUMN t_user.status IS '用户状态：ACTIVE=正常, BANNED=封禁, DELETED=注销';
+COMMENT ON COLUMN t_user.last_login_time IS '最后登录时间';
 
 -- =====================================================
 -- 3. 角色表 (t_role)
