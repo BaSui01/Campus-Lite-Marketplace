@@ -4,7 +4,7 @@
  * @description 分类的创建、更新、删除、排序等管理员专属功能
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 import type {
   Category,
   CategoryRequest,

@@ -5,7 +5,7 @@
  * 后端接口路径：/api/admin/statistics/*
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 import type { ApiResponse } from '@campus/shared/types';
 
 export interface SystemOverview {
@@ -64,7 +64,7 @@ export class StatisticsService {
   async getSystemOverview(): Promise<SystemOverview> {
     try {
       // 使用 axios 直接调用（因为 OpenAPI 可能还没生成这个接口）
-      const response = await this.api.axiosInstance.get<ApiResponse<SystemOverview>>(
+      const response = await this.api.get<ApiResponse<SystemOverview>>(
         '/admin/statistics/overview'
       );
       return response.data.data as SystemOverview;
@@ -80,7 +80,7 @@ export class StatisticsService {
    */
   async getTrendStatistics(days = 7): Promise<TrendStatistics> {
     try {
-      const response = await this.api.axiosInstance.get<ApiResponse<any>>(
+      const response = await this.api.get<ApiResponse<any>>(
         '/admin/statistics/trend',
         { params: { days } }
       );
@@ -116,7 +116,7 @@ export class StatisticsService {
    */
   async getRevenueTrend(months = 1): Promise<{ name: string; value: number }[]> {
     try {
-      const response = await this.api.axiosInstance.get<ApiResponse<any>>(
+      const response = await this.api.get<ApiResponse<any>>(
         '/admin/statistics/revenue',
         { params: { months } }
       );
@@ -144,7 +144,7 @@ export class StatisticsService {
    */
   async getTopGoods(limit = 10): Promise<RankingItem[]> {
     try {
-      const response = await this.api.axiosInstance.get<ApiResponse<any[]>>(
+      const response = await this.api.get<ApiResponse<any[]>>(
         '/admin/statistics/top-goods',
         { params: { limit } }
       );
@@ -169,7 +169,7 @@ export class StatisticsService {
    */
   async getTopUsers(limit = 10): Promise<RankingItem[]> {
     try {
-      const response = await this.api.axiosInstance.get<ApiResponse<any[]>>(
+      const response = await this.api.get<ApiResponse<any[]>>(
         '/admin/statistics/top-users',
         { params: { limit } }
       );
@@ -204,7 +204,7 @@ export class StatisticsService {
    */
   async getCategoryStatistics(): Promise<CategoryStat[]> {
     try {
-      const response = await this.api.axiosInstance.get<ApiResponse<Record<string, number>>>(
+      const response = await this.api.get<ApiResponse<Record<string, number>>>(
         '/admin/statistics/categories'
       );
 
@@ -228,7 +228,7 @@ export class StatisticsService {
    */
   async getTodayStatistics(): Promise<TodayStatistics> {
     try {
-      const response = await this.api.axiosInstance.get<ApiResponse<TodayStatistics>>(
+      const response = await this.api.get<ApiResponse<TodayStatistics>>(
         '/admin/statistics/today'
       );
       return response.data.data as TodayStatistics;

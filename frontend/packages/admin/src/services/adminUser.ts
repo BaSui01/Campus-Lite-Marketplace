@@ -4,7 +4,7 @@
  * @description 用户列表、封禁/解封、自动解封等管理员专属功能
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 import type { ApiResponse, PageInfo, User, UserListQuery } from '@campus/shared/types';
 
 export interface BanUserPayload {

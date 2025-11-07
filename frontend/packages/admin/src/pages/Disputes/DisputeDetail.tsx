@@ -36,7 +36,7 @@ import {
   InfoCircleOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { disputeService, DisputeStatus } from '@campus/shared';
+import { disputeService, DisputeStatus } from '@/services';
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;

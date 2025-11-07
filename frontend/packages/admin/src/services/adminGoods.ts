@@ -4,7 +4,7 @@
  * @description 商品审核、状态管理、批量操作等管理员专属功能
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 import type { PageGoodsResponse } from '@campus/shared/api/models';
 
 /**

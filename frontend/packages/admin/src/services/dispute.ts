@@ -13,7 +13,7 @@
  * @description 纠纷提交、仲裁、查询等接口
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 import type { ApiResponse, PageInfo } from '@campus/shared/types';
 
 /**

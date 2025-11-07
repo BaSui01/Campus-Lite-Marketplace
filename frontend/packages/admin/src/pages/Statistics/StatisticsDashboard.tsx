@@ -27,7 +27,7 @@ import {
 } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { statisticsService } from '../../services/statistics';
+import { statisticsService } from '@/services';
 import type {
   SystemOverview,
   TrendStatistics,

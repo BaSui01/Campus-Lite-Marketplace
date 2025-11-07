@@ -11,7 +11,7 @@
  * 举报管理服务（管理端）
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 import type { ApiResponse, PageResponse } from '@campus/shared/types';
 
 export interface ReportSummary {

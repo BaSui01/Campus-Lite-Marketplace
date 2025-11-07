@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@campus/shared/components';
-import { marketingService, CampaignType, DiscountType, CAMPAIGN_TYPE_CONFIG } from '../../services/marketing';
+import { marketingService, CampaignType, DiscountType, CAMPAIGN_TYPE_CONFIG } from '../../services';
 import { CreateCampaignRequest,  } from '@campus/shared/services';;
 import { useNotificationStore } from '../../../store';
 import './Activities.css';

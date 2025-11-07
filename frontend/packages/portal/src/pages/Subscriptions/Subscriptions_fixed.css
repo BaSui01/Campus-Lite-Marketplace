@@ -248,18 +248,7 @@
 
   .subscriptions-header {
     padding: 24px 20px;
-  }
-
-  .subscriptions-header__info {
-    flex: 1;
-  }
-
-  .subscriptions-header__actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-shrink: 0;
-  }
+  }.subscriptions-header__info {  flex: 1;}.subscriptions-header__actions {  display: flex;  gap: 12px;  align-items: center;  flex-shrink: 0;}
 
   .subscriptions-header__title {
     font-size: 28px;
@@ -304,18 +293,7 @@
 @media (max-width: 480px) {
   .subscriptions-header {
     padding: 20px 16px;
-  }
-
-  .subscriptions-header__info {
-    flex: 1;
-  }
-
-  .subscriptions-header__actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    flex-shrink: 0;
-  }
+  }.subscriptions-header__info {  flex: 1;}.subscriptions-header__actions {  display: flex;  gap: 12px;  align-items: center;  flex-shrink: 0;}
 
   .subscriptions-header__title {
     font-size: 24px;

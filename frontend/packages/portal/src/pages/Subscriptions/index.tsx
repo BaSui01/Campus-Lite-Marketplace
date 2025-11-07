@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Input, Skeleton, Modal } from '@campus/shared/components';
-import { subscriptionService } from '../../services/subscription';;
+import { subscriptionService } from '../../services';;
 import { useNotificationStore } from '../../store';
 import type { SubscriptionResponse } from '@campus/shared/api/models';
 import './Subscriptions.css';

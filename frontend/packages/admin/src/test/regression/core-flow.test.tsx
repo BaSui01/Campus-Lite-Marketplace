@@ -136,21 +136,32 @@ describe('管理端核心流程回归测试', () => {
 
   describe('共享服务测试', () => {
     test('shared层服务应该正确导入', () => {
-      // 测试关键服务是否正确导入
+      // 测试关键服务是否正确导入（仅包含两端共享的服务）
       const sharedServices = [
         'authService',
         'userService',
-        'roleService',
-        'statisticsService',
-        'reportService',
-        'rateLimitService',
-        'softDeleteService',
+        'goodsService',
+        'orderService',
+        'messageService',
+        'categoryService',
+        'uploadService',
+        'refundService',
+        'postService',
+        'campusService',
+        'tagService',
+        'communityService',
+        'topicService',
+        'taskService',
+        'notificationService',
+        'notificationPreferenceService',
         'notificationTemplateService',
-        'complianceService'
+        'softDeleteService',
+        'revertService',
+        'rateLimitService',
       ];
-      
+
       const { default: sharedObject } = require('@campus/shared');
-      
+
       sharedServices.forEach(serviceName => {
         expect(sharedObject[serviceName]).toBeDefined();
         expect(typeof sharedObject[serviceName]).toBe('object');

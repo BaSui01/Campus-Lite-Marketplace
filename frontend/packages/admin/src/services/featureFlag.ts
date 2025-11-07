@@ -13,7 +13,7 @@
  * @description 功能开关列表、添加、编辑、删除、灰度策略等接口
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 import type { BaseResponse } from '@campus/shared/api';
 
 /**

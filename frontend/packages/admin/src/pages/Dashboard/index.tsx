@@ -19,12 +19,8 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  StatCard, 
-  LineChart, 
-  BarChart, 
-  statisticsService 
-} from '@campus/shared';
+import { StatCard, LineChart, BarChart } from '@campus/shared';
+import { statisticsService } from '@/services';
 import './Dashboard.css';
 
 const { Title, Text } = Typography;

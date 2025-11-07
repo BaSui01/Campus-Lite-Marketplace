@@ -49,8 +49,8 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { featureFlagService, FeatureFlagStatus, GrayStrategy, Environment } from '@campus/shared/services';
-import type { FeatureFlag, FeatureFlagRequest, GrayRuleConfig } from '@campus/shared/services';
+import { featureFlagService, FeatureFlagStatus, GrayStrategy, Environment } from '@/services';
+import type { FeatureFlag, FeatureFlagRequest, GrayRuleConfig } from '@/services';
 
 const { Option } = Select;
 const { TextArea } = Input;

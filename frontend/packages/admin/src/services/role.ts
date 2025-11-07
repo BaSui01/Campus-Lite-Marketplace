@@ -11,7 +11,7 @@
  * 角色与权限管理服务（管理端）
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 import type { ApiResponse } from '@campus/shared/types';
 
 export interface RoleSummary {

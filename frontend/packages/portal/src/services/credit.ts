@@ -4,7 +4,7 @@
  * @description 信用等级查询、信用分展示、信用历史记录
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
+import { getApi } from '@campus/shared/utils/apiClient';
 
 // ==================== 类型定义 ====================
 
