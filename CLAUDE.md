@@ -23,13 +23,35 @@
 ## 🧠 工作流程（三步走战略）
 
 ### 1. 三思而后行 😰
-**遇到任务先思考：**
+**遇到任务先使用sequentialthinking进行结构化思考：**
+
+```javascript
+// 调用逐步思考工具
+mcp__sequentialthinking__sequentialthinking({
+  thought: "🤔 第一思：任务边界和核心功能？",
+  nextThoughtNeeded: true,
+  thoughtNumber: 1,
+  totalThoughts: 3
+})
+
+// 继续第二步思考
+mcp__sequentialthinking__sequentialthinking({
+  thought: "🤔 第二思：如何拆分3-5个子任务？",
+  nextThoughtNeeded: true,
+  thoughtNumber: 2,
+  totalThoughts: 3
+})
+
+// 最后第三步思考
+mcp__sequentialthinking__sequentialthinking({
+  thought: "🤔 第三思：验收标准和回滚方案？",
+  nextThoughtNeeded: false,
+  thoughtNumber: 3,
+  totalThoughts: 3
+})
 ```
-🤔 第一思：任务边界和核心功能？
-🤔 第二思：如何拆分3-5个子任务？  
-🤔 第三思：验收标准和回滚方案？
-```
-**别一上来就干！先想清楚！**
+
+**别一上来就干！先用sequentialthinking工具想清楚！**
 
 ### 2. 禁用模拟数据 🔥
 **❌ 绝不允许：**
@@ -318,17 +340,444 @@ implementation 'com.fasterxml.jackson.core:jackson-databind'
 
 ---
 
+---
+
+## 🤖 MCP工具工作流 🛠️
+
+### 🎯 MCP工具清单（基于.claude.json配置）
+
+| 服务器名 | 功能描述 | 优先级 | 调用时机 |
+|---------|---------|--------|----------|
+| `acemcp` | 🎯 项目上下文搜索 | ⭐⭐⭐⭐⭐ | 代码分析、架构理解、重构 |
+| `filesystem` | 📂 文件系统操作 | ⭐⭐⭐⭐⭐ | 文件读写、配置管理 |
+| `memory` | 🧠 知识图谱管理 | ⭐⭐⭐⭐ | 知识积累、架构记录 |
+| `sequentialthinking` | 🤔 逐步思考分析 | ⭐⭐⭐ | 复杂推理、技术方案 |
+| `chrome-mcp-server` | 🌐 浏览器自动化 | ⭐⭐ | UI测试、截图、交互 |
+| `open-websearch` | 🔍 网络搜索 | ⭐⭐ | 技术研究、问题解决 |
+| `fetch` | 🌐 网页内容获取 | ⭐⭐ | API测试、内容抓取 |
+| `mcp-deepwiki` | 📚 深度Wiki文档 | ⭐ | GitHub文档分析 |
+| `Playwright` | 🧪 端到端测试 | ⭐ | 专业自动化测试 |
+
+### 🔄 MCP调用五步工作流
+
+```
+🔍 第1步：需求分析 → 确定需要哪种MCP工具
+🎯 第2步：工具选择 → 根据功能选择合适的MCP服务器
+⚙️ 第3步：参数配置 → 准备工具调用所需的参数
+🛠️ 第4步：执行调用 → 使用工具完成任务
+📋 第5步：结果验证 → 检查调用结果并进行后续处理
+```
+
+### 📋 任务类型与MCP工具映射
+
+#### 🎯 开发任务映射表
+
+| 任务类型 | 推荐工具组合 | 调用顺序 |
+|---------|-------------|----------|
+| **代码重构** | acemcp + filesystem + memory | 1️⃣ acemcp搜索 → 2️⃣ filesystem编辑 → 3️⃣ memory记录 |
+| **新功能开发** | acemcp + sequentialthinking + filesystem | 1️⃣ acemcp分析 → 2️⃣ sequentialthinking设计 → 3️⃣ filesystem实现 |
+| **Bug修复** | acemcp + sequentialthinking + filesystem | 1️⃣ acemcp定位 → 2️⃣ sequentialthinking分析 → 3️⃣ filesystem修复 |
+| **文档编写** | acemcp + memory + filesystem | 1️⃣ acemcp收集信息 → 2️⃣ memory整理 → 3️⃣ filesystem编写 |
+| **测试验证** | chrome-mcp-server + Playwright + filesystem | 1️⃣ chrome操作 → 2️⃣ Playwright测试 → 3️⃣ filesystem报告 |
+| **技术研究** | open-websearch + fetch + memory | 1️⃣ websearch搜索 → 2️⃣ fetch获取 → 3️⃣ memory整理 |
+
+### 🛠️ 核心MCP工具使用规范
+
+#### 🎯 acemcp（项目上下文搜索）⭐核心推荐
+
+**标准用法**：
+```javascript
+// 搜索用户认证相关代码
+mcp__acemcp__search_context(
+  project_root_path: "D:\\code\\campus-lite-marketplace",
+  query: "用户认证登录JWT Token管理"
+)
+```
+
+**使用原则**：
+- ✅ 使用描述性的中文查询
+- ✅ 查询包含业务关键词和技术关键词
+- ✅ 项目路径使用绝对路径
+- ❌ 避免过于宽泛的查询
+
+#### 📂 filesystem（文件系统操作）
+
+**权限配置**：已配置alwaysAllow权限
+```javascript
+// 读取文件
+mcp__filesystem__read_text_file(path: "文件路径")
+
+// 编辑文件
+mcp__filesystem__edit_file(
+  path: "文件路径",
+  edits: [{oldText: "旧代码", newText: "新代码"}]
+)
+```
+
+#### 🧠 memory（知识图谱管理）
+
+**标准用法**：
+```javascript
+// 创建实体
+mcp__memory__create_entities({
+  entities: [{
+    name: "实体名称",
+    entityType: "Service/Entity/Component",
+    observations: ["关键特征描述"]
+  }]
+})
+
+// 创建关系
+mcp__memory__create_relations({
+  relations: [{
+    from: "源实体",
+    to: "目标实体",
+    relationType: "关系类型"
+  }]
+})
+```
+
+#### 🤔 sequentialthinking（逐步思考）
+
+**适用场景**：复杂算法设计、系统架构分析、复杂bug排查
+```javascript
+mcp__sequentialthinking__sequentialthinking({
+  thought: "当前思考的具体内容...",
+  nextThoughtNeeded: true,
+  thoughtNumber: 1,
+  totalThoughts: 5
+})
+```
+
+### ⚡ MCP调用最佳实践
+
+#### 🎯 工具选择原则
+1. **单一职责原则**: 一个工具专注一个功能
+2. **最小权限原则**: 只使用必要的工具权限
+3. **链式调用**: 合理组合多个工具完成复杂任务
+4. **结果验证**: 每次调用后验证结果正确性
+
+#### 🔧 错误处理模式
+```javascript
+try {
+  const result = await mcp__acemcp__search_context(projectPath, query);
+  if (result && result.length > 0) {
+    // 处理搜索结果
+    processSearchResults(result);
+  }
+} catch (error) {
+  console.error("MCP调用失败:", error);
+  // 降级处理逻辑
+}
+```
+
+### 🔒 安全与权限管理
+
+#### 🛡️ 权限级别
+- **安全级**: memory, sequentialthinking → 自动批准
+- **标准级**: acemcp, filesystem, fetch → 用户确认
+- **高级级**: chrome-mcp-server, Playwright → 明确授权
+- **网络级**: open-websearch → 用户确认
+
+#### 🚨 安全注意事项
+1. **路径验证**: 文件操作前验证路径合法性
+2. **输入检查**: 避免SQL注入、XSS等安全问题
+3. **权限最小化**: 只请求必要的权限
+4. **日志记录**: 记录关键操作用于审计
+
+### 🚀 典型工作流示例
+
+#### 🔄 新功能开发完整流程
+```javascript
+// 第1步：需求分析 - acemcp搜索现有实现
+const existingCode = await mcp__acemcp__search_context(
+  project_root_path,
+  "相似功能实现"
+);
+
+// 第2步：技术方案设计 - sequentialthinking逐步推理
+const solution = await mcp__sequentialthinking__sequentialthinking({
+  thought: "基于现有代码分析，设计方案...",
+  nextThoughtNeeded: true,
+  thoughtNumber: 1,
+  totalThoughts: 3
+});
+
+// 第3步：代码实现 - filesystem编辑文件
+await mcp__filesystem__edit_file(filePath, edits);
+
+// 第4步：知识记录 - memory保存设计决策
+await mcp__memory__create_entities({
+  entities: [{
+    name: "新功能",
+    entityType: "Feature",
+    observations: ["实现方案", "关键代码位置", "依赖关系"]
+  }]
+});
+```
+
+### 🐛 故障排除指南
+
+#### 常见问题速查表
+| 问题 | 可能原因 | 解决方案 |
+|------|---------|----------|
+| **MCP工具无响应** | 服务未启动 | 检查`.claude.json`配置 |
+| **权限被拒绝** | 权限配置错误 | 更新`alwaysAllow`列表 |
+| **搜索结果为空** | 查询词不准确 | 优化查询关键词 |
+| **文件操作失败** | 路径错误 | 验证文件路径格式 |
+
+### 💡 BaSui的MCP使用心得 🎯
+
+#### 🌟 三大黄金法则
+1. **🎯 精准选择** - 不是工具越多越好，而是越精准越好！
+2. **🔗 链式思维** - 善用工具组合，1+1>2的效果！
+3. **📊 结果验证** - 每次调用都要验证结果，质量第一！
+
+#### 🚀 高阶技巧
+```
+💡 技巧1: 并行调用 → 无依赖的操作同时执行，节省时间
+💡 技巧2: 缓存复用 → 相同查询结果缓存，避免重复调用
+💡 技巧3: 降级处理 → 主工具失败时，有备选方案
+💡 技巧4: 批量操作 → 多个小操作合并成一个大操作
+```
+
+---
+
+## 📋 MCP规则使用工作流 ⚙️
+
+### 🎯 MCP规则调用决策树
+
+```
+开始任务 → 分析任务类型？
+├── 🔍 **需要搜索项目代码** → acemcp (优先级⭐⭐⭐⭐⭐)
+│   ├── 搜索现有实现 → mcp__acemcp__search_context()
+│   ├── 分析代码结构 → 获得上下文信息
+│   └── 理解业务逻辑 → 用于后续开发
+│
+├── 📂 **需要操作文件** → filesystem (优先级⭐⭐⭐⭐⭐)
+│   ├── 读取文件 → mcp__filesystem__read_text_file()
+│   ├── 编辑文件 → mcp__filesystem__edit_file()
+│   ├── 创建文件 → mcp__filesystem__write_file()
+│   └── 目录操作 → mcp__filesystem__create_directory()
+│
+├── 🤔 **需要复杂思考** → sequentialthinking (优先级⭐⭐⭐)
+│   ├── 三思而后行 → 按步骤调用thoughtNumber: 1,2,3
+│   ├── 技术方案设计 → nextThoughtNeeded: true逐步推理
+│   ├── 问题分析排查 → 拆解复杂问题
+│   └── 架构设计规划 → 系统性思考
+│
+├── 🧠 **需要知识管理** → memory (优先级⭐⭐⭐⭐)
+│   ├── 记录设计决策 → mcp__memory__create_entities()
+│   ├── 建立关系图谱 → mcp__memory__create_relations()
+│   ├── 积累项目知识 → 长期记忆存储
+│   └── 搜索已有知识 → mcp__memory__search_nodes()
+│
+├── 🌐 **需要网络资源** → fetch/open-websearch (优先级⭐⭐)
+│   ├── 搜索技术文档 → mcp__open-websearch__search()
+│   ├── 获取网页内容 → mcp__fetch__fetch()
+│   ├── 查找解决方案 → 研究最佳实践
+│   └── 学习新技术 → 获取最新信息
+│
+└── 🧪 **需要测试验证** → chrome/Playwright (优先级⭐⭐)
+    ├── UI自动化测试 → mcp__chrome_* 或 mcp__Playwright_*
+    ├── 功能验证测试 → 端到端测试流程
+    ├── 截图记录 → mcp__chrome-mcp-server__chrome_screenshot()
+    └── 性能测试 → 自动化性能检测
+```
+
+### 🔧 MCP工具组合模式
+
+#### 🚀 模式1：标准开发流程 (90%任务适用)
+```
+1️⃣ sequentialthinking (思考规划)
+   ↓
+2️⃣ acemcp (搜索现有代码)
+   ↓
+3️⃣ filesystem (实现代码)
+   ↓
+4️⃣ memory (记录知识)
+```
+
+#### 🔄 模式2：代码重构流程
+```
+1️⃣ acemcp (分析影响范围)
+   ↓
+2️⃣ sequentialthinking (制定重构方案)
+   ↓
+3️⃣ filesystem (执行重构)
+   ↓
+4️⃣ memory (记录重构决策)
+```
+
+#### 🐛 模式3：问题排查流程
+```
+1️⃣ acemcp (定位问题代码)
+   ↓
+2️⃣ sequentialthinking (分析问题根因)
+   ↓
+3️⃣ open-websearch (查找解决方案)
+   ↓
+4️⃣ filesystem (实施修复)
+```
+
+#### 📚 模式4：技术研究流程
+```
+1️⃣ open-websearch (搜索资料)
+   ↓
+2️⃣ fetch (获取详细内容)
+   ↓
+3️⃣ sequentialthinking (分析整理)
+   ↓
+4️⃣ memory (存储研究成果)
+```
+
+### ⚡ MCP调用时序规则
+
+#### 🎯 规则1：优先级调用顺序
+```javascript
+// ✅ 正确的调用优先级
+1. sequentialthinking    // 先思考
+2. acemcp              // 再搜索
+3. filesystem/memory   // 后执行
+4. chrome/web          // 最后验证
+
+// ❌ 错误：直接执行不思考
+filesystem.edit_file()  // 没有分析就直接写代码！
+```
+
+#### 🔄 规则2：依赖链调用
+```javascript
+// ✅ 正确：有依赖关系的顺序调用
+const searchResult = await mcp__acemcp__search_context(projectPath, query);
+if (searchResult.length > 0) {
+  const analysis = await mcp__sequentialthinking_thought({
+    thought: `基于搜索结果，分析实现方案...`,
+    nextThoughtNeeded: true
+  });
+  // 最后才执行文件操作
+  await mcp__filesystem__edit_file(filePath, edits);
+}
+
+// ❌ 错误：并行调用有依赖的操作
+// 同时调用这些可能会导致数据不一致
+```
+
+#### 🚀 规则3：错误处理模式
+```javascript
+// ✅ 正确：每个MCP调用都有错误处理
+try {
+  const result = await mcp__acemcp__search_context(projectPath, query);
+  if (result && result.length > 0) {
+    return processResult(result);
+  } else {
+    // 降级：搜索无结果时的备选方案
+    console.log("搜索无结果，尝试其他方案...");
+    return await fallbackPlan();
+  }
+} catch (error) {
+  console.error("MCP调用失败:", error);
+  return await handleMCPError(error);
+}
+```
+
+### 📊 MCP工具选择矩阵
+
+| 任务复杂度 | 时间要求 | 推荐工具组合 | 预期效果 |
+|-----------|---------|-------------|----------|
+| **简单任务** | 紧急 | filesystem + acemcp | 快速完成 |
+| **中等任务** | 正常 | sequentialthinking + acemcp + filesystem | 质量平衡 |
+| **复杂任务** | 充裕 | 全工具链调用 | 高质量输出 |
+| **研究任务** | 充裕 | web-search + fetch + memory + sequentialthinking | 深度研究 |
+
+### 🎯 MCP调用检查清单
+
+#### ✅ 调用前检查
+- [ ] 任务目标是否明确？
+- [ ] 是否需要先用sequentialthinking思考？
+- [ ] 选择最合适的MCP工具？
+- [ ] 准备好调用参数？
+
+#### ✅ 调用中检查
+- [ ] 工具响应是否正常？
+- [ ] 返回结果是否符合预期？
+- [ ] 是否需要错误处理？
+- [ ] 是否有后续工具调用？
+
+#### ✅ 调用后检查
+- [ ] 结果是否验证正确？
+- [ ] 是否需要用memory记录？
+- [ ] 任务是否完全完成？
+- [ ] 是否需要清理临时数据？
+
+### 🚨 MCP调用禁忌（绝对禁止）
+
+#### ❌ 禁止模式1：无思考直接执行
+```javascript
+// ❌ 错误：没有分析就直接写代码
+mcp__filesystem__edit_file("SomeClass.java", edits);  // 危险！
+
+// ✅ 正确：先分析再执行
+await mcp__sequentialthinking_sequentialthinking({
+  thought: "分析这个修改的影响范围和风险...",
+  nextThoughtNeeded: false
+});
+// 然后再执行文件操作
+```
+
+#### ❌ 禁止模式2：跳过搜索直接实现
+```javascript
+// ❌ 错误：重复造轮子
+// 直接写新的实现，可能已有类似功能
+
+// ✅ 正确：先搜索复用现有代码
+const existing = await mcp__acemcp__search_context(projectPath, "相似功能");
+if (existing.length > 0) {
+  // 复用现有实现
+} else {
+  // 才考虑新建
+}
+```
+
+#### ❌ 禁止模式3：无错误处理调用
+```javascript
+// ❌ 错误：裸调用，无错误处理
+const result = await mcp__acemcp__search_context(path, query);
+processResult(result);  // 如果result为空会出错
+
+// ✅ 正确：完整的错误处理
+try {
+  const result = await mcp__acemcp__search_context(path, query);
+  if (result && result.length > 0) {
+    processResult(result);
+  } else {
+    handleEmptyResult();
+  }
+} catch (error) {
+  handleMCPError(error);
+}
+```
+
+---
+
 ## 💝 BaSui 的最后叮嘱 🎯
 
-**记住五条黄金法则：**
+**记住六条黄金法则：**
 1. 🎯 **三思而后行** - 别一上来就干，先想清楚再动手！
-2. 🚫 **禁用模拟数据** - 生产代码必须真实完整实现！  
-3. 🤖 **善用 MCP 服务** - 有工具不用是傻瓜！
+2. 🚫 **禁用模拟数据** - 生产代码必须真实完整实现！
+3. 🤖 **善用 MCP 工具** - 有工具不用是傻瓜！遵循上述工作流
 4. 📋 **优先 Specs 开发** - 文档驱动、TDD 验证、质量第一！
 5. 📂 **文档精简创建** - 在 docs 文件夹分类创建，避免冗余！
+6. 🔧 **工具组合优化** - 合理使用MCP工具组合，1+1>2的效果！
+
+**MCP工具调用优先级**：
+> 🎯 **acemcp** → 项目代码搜索，**优先使用**！
+> 📂 **filesystem** → 文件操作，谨慎权限！
+> 🧠 **memory** → 知识管理，长期积累！
+> 🤔 **sequentialthinking** → 复杂推理，逐步分析！
+> 🌐 **chrome/web** → 外部工具，按需使用！
 
 **座右铭**：
-> 代码要写得漂亮，但过程可以很欢乐！  
-> Specs 是导航，TDD 是引擎，质量是生命！💪✨
+> 代码要写得漂亮，但过程可以很欢乐！
+> Specs 是导航，TDD 是引擎，MCP 是加速器，质量是生命！💪✨
 
 ---
