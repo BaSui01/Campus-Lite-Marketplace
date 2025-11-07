@@ -125,8 +125,8 @@ public class AdminDisputeController {
         log.info("查询仲裁员纠纷列表: arbitratorId={}, status={}, page={}, size={}",
                 arbitratorId, status, page, size);
         Pageable pageable = PageRequest.of(page, size);
-        // TODO: 需要DisputeService新增按仲裁员ID查询的方法
-        Page<DisputeDTO> disputes = disputeService.getUserDisputes(null, status, pageable);
+        // ✅ 调用新增的按仲裁员ID查询方法
+        Page<DisputeDTO> disputes = disputeService.getArbitratorDisputes(arbitratorId, status, pageable);
         return ApiResponse.success(disputes);
     }
 

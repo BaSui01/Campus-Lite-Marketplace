@@ -1,8 +1,10 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.CampusCreateRequest;
+import com.campus.marketplace.common.dto.request.CampusMigrationRequest;
 import com.campus.marketplace.common.dto.request.CampusUpdateRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
+import com.campus.marketplace.common.dto.response.CampusMigrationValidationResponse;
 import com.campus.marketplace.common.dto.response.CampusStatisticsResponse;
 import com.campus.marketplace.common.entity.Campus;
 import com.campus.marketplace.service.CampusService;
@@ -22,6 +24,7 @@ import java.util.List;
  * 功能范围：
  * - 🏫 校园管理：查询、创建、编辑、删除、批量删除
  * - 📊 统计分析：校园用户/商品/订单统计
+ * - 🔄 用户迁移：校园间用户迁移功能
  *
  * ⚠️ 注意：
  * - 所有接口仅管理员可访问
@@ -103,5 +106,21 @@ public class CampusAdminController {
     ) {
         int count = campusService.batchDelete(ids);
         return ApiResponse.success(count);
+    }
+
+    @PostMapping("/migrate-users/validate")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CAMPUS_MANAGE)")
+    @Operation(summary = "校区迁移验证", description = "迁移前的影响评估与校验")
+    public ApiResponse<CampusMigrationValidationResponse> validateMigration(@Valid @RequestBody CampusMigrationRequest req) {
+        CampusMigrationValidationResponse res = campusService.validateUserMigration(req.getFromCampusId(), req.getToCampusId());
+        return ApiResponse.success(res);
+    }
+
+    @PostMapping("/migrate-users")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_CAMPUS_MANAGE)")
+    @Operation(summary = "执行校区迁移", description = "将用户从源校区迁移至目标校区")
+    public ApiResponse<Integer> migrateUsers(@Valid @RequestBody CampusMigrationRequest req) {
+        int moved = campusService.migrateUsers(req.getFromCampusId(), req.getToCampusId());
+        return ApiResponse.success(moved);
     }
 }
