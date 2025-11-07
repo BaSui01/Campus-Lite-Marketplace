@@ -6,12 +6,13 @@
  */
 
 import React from 'react';
-import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer } from 'antd';
+import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer, Modal } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
   LogoutOutlined,
+  ExclamationCircleOutlined,
   DashboardOutlined,
   FileTextOutlined,
   SafetyOutlined,
@@ -81,10 +82,38 @@ export const AdminLayout: React.FC = () => {
   }, [isMobile, isTablet, isDesktop]);
 
   const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('登出失败:', error);
+    Modal.confirm({
+      title: '确认退出登录',
+      icon: <ExclamationCircleOutlined />,
+      content: (
+        <div>
+          <p>确定要退出登录吗？</p>
+          <p style={{ color: '#999', fontSize: 12, marginTop: 8 }}>
+            退出后需要重新登录才能访问系统
+          </p>
+        </div>
+      ),
+      okText: '确认退出',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await logout();
+          navigate('/admin/login', { replace: true });
+        } catch (error) {
+          console.error('登出失败:', error);
+        }
+      },
+    });
+  };
+
+  // ===== 用户菜单点击处理 =====
+  const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'profile') {
+      // 跳转到个人信息页面（可选：使用Modal显示）
+      navigate('/admin/profile');
+    } else if (key === 'logout') {
+      handleLogout();
     }
   };
 
@@ -174,7 +203,7 @@ export const AdminLayout: React.FC = () => {
       key: 'logout',
       label: '退出登录',
       icon: <LogoutOutlined />,
-      onClick: handleLogout,
+      danger: true, // 红色样式表示危险操作
     },
   ];
 
@@ -252,14 +281,14 @@ export const AdminLayout: React.FC = () => {
           
           <Space>
             <Badge dot>
-              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+              <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenuClick }} placement="bottomRight">
                 <Space style={{ cursor: 'pointer' }}>
-                  <UserAvatar 
+                  <UserAvatar
                     src={user?.avatar}
                     alt={user?.nickname || user?.username}
                     size="small"
                   />
-                  <span>{user?.nickname || user?.username}</span>
+                  {!isMobile && <span>{user?.nickname || user?.username}</span>}
                 </Space>
               </Dropdown>
             </Badge>

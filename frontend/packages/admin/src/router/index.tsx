@@ -10,6 +10,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/Layout';
 import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
+import ProfilePage from '@/pages/Profile';
 // import DashboardTest from '@/pages/Dashboard/Dashboard.test'; // 临时测试用
 import UserList from '@/pages/Users/UserList';
 import UserDetail from '@/pages/Users/UserDetail';
@@ -22,9 +23,9 @@ import { AppealList, AppealDetail } from '@/pages/Appeals';
 import { ReviewList } from '@/pages/Reviews';
 import { BatchTaskList } from '@/pages/Batch';
 import { DisputeList, DisputeDetail, DisputeStatistics } from '@/pages/Disputes';
-import { AuditLogList } from '@/pages/Logs';
-import { BannedUserList } from '@/pages/Users';
-import { PostAuditList } from '@/pages/Content';
+import { AuditLogList, OperationLogList } from '@/pages/Logs';
+import { BannedUserList, BlacklistManagement } from '@/pages/Users';
+import { PostAuditList, ReportList } from '@/pages/Content';
 import { TopicList, CommunityList } from '@/pages/Community';
 import { PermissionGuard } from '@/components';
 import { PERMISSION_CODES } from '@campus/shared';
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <Dashboard />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
       },
       {
         path: 'goods/list',
@@ -108,6 +113,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'users/blacklist',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_USER_VIEW}>
+            <BlacklistManagement />
+          </PermissionGuard>
+        ),
+      },
+      {
         path: 'content/posts',
         element: (
           <PermissionGuard permission={PERMISSION_CODES.SYSTEM_POST_APPROVE}>
@@ -120,6 +133,14 @@ export const router = createBrowserRouter([
         element: (
           <PermissionGuard permission={PERMISSION_CODES.SYSTEM_AUDIT_VIEW}>
             <AuditLogList />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'logs/operation',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_AUDIT_VIEW}>
+            <OperationLogList />
           </PermissionGuard>
         ),
       },
@@ -187,15 +208,14 @@ export const router = createBrowserRouter([
           </PermissionGuard>
         ),
       },
-      // TODO: 实现 ReportList 组件后取消注释
-      // {
-      //   path: 'content/reports',
-      //   element: (
-      //     <PermissionGuard permission={PERMISSION_CODES.SYSTEM_REPORT_HANDLE}>
-      //       <ReportList />
-      //     </PermissionGuard>
-      //   ),
-      // },
+      {
+        path: 'content/reports',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_REPORT_HANDLE}>
+            <ReportList />
+          </PermissionGuard>
+        ),
+      },
       {
         path: 'roles',
         element: (

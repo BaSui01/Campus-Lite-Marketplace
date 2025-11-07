@@ -134,6 +134,12 @@ export const MENU_ITEMS: MenuItem[] = [
         path: '/admin/users/banned',
         permission: PERMISSION_CODES.SYSTEM_USER_BAN,
       },
+      {
+        key: 'users-blacklist',
+        label: '黑名单管理',
+        path: '/admin/users/blacklist',
+        permission: PERMISSION_CODES.SYSTEM_USER_VIEW,
+      },
     ],
   },
   {
