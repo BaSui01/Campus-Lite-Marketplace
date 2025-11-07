@@ -276,11 +276,11 @@ app:
       url: ${APP_ALERT_WEBHOOK_URL:}
   # 安全配置
   security:
-    # 密码加密密钥（AES-256，32字节）
+    # 密码加密密钥（AES-256，32字节，Base64编码）
     # ⚠️ 注意：此密钥必须与前端配置保持一致
-    # 开发环境：dev-test-key-32-bytes-length!
+    # 开发环境：随机生成的安全密钥
     # 生产环境：通过环境变量 BACKEND_ENCRYPT_KEY 注入
-    encrypt-key: ${BACKEND_ENCRYPT_KEY:dev-test-key-32-bytes-length!}
+    encrypt-key: ${BACKEND_ENCRYPT_KEY:JMMgf1RSDLBNksxUSNKl/2q94N6cIY7voJRXqlzcCBA=}
     # 历史密钥列表（用于密钥轮换，支持解密旧密文）
     # 格式：逗号分隔的密钥列表
     # 示例：old-key-1,old-key-2,old-key-3

@@ -2,6 +2,7 @@ package com.campus.marketplace.service.impl;
 
 import com.campus.marketplace.common.entity.Campus;
 import com.campus.marketplace.common.dto.response.CampusMigrationValidationResponse;
+import com.campus.marketplace.common.dto.response.CampusStatisticsResponse;
 import com.campus.marketplace.common.enums.CampusStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -38,6 +40,13 @@ public class CampusServiceImpl implements com.campus.marketplace.service.CampusS
     @Override
     public List<Campus> listAll() {
         return campusRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Campus getById(Long id) {
+        return campusRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "校区不存在"));
     }
 
     @Override
@@ -78,6 +87,48 @@ public class CampusServiceImpl implements com.campus.marketplace.service.CampusS
             throw new BusinessException(ErrorCode.OPERATION_FAILED, "存在关联数据，禁止删除");
         }
         campusRepository.delete(campus);
+    }
+
+    @Override
+    @Transactional
+    public int batchDelete(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        int successCount = 0;
+        for (Long id : ids) {
+            try {
+                delete(id);
+                successCount++;
+            } catch (BusinessException e) {
+                log.warn("批量删除校园失败: campusId={}, error={}", id, e.getMessage());
+            }
+        }
+        return successCount;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CampusStatisticsResponse getStatistics(Long id) {
+        Campus campus = getById(id);
+
+        // 统计校园数据
+        long userCount = userRepository.countByCampusId(id);
+        long goodsCount = goodsRepository.countByCampusId(id);
+        long orderCount = orderRepository.countByCampusId(id);
+
+        // 统计活跃用户数（30天内登录过的用户）
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        long activeUserCount = userRepository.countActiveByCampusIdSince(id, thirtyDaysAgo);
+
+        return CampusStatisticsResponse.builder()
+                .campusId(id)
+                .campusName(campus.getName())
+                .userCount(userCount)
+                .goodsCount(goodsCount)
+                .orderCount(orderCount)
+                .activeUserCount(activeUserCount)
+                .build();
     }
 
     @Override

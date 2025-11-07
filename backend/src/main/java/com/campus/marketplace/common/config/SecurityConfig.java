@@ -90,9 +90,8 @@ public class SecurityConfig {
                         .requestMatchers(matchersWithContext("/swagger-ui/**")).permitAll()
                         .requestMatchers(matchersWithContext("/v3/api-docs/**")).permitAll()
 
-                        // 管理后台必须具备明确权限
-                        .requestMatchers(matchersWithContext("/admin/**"))
-                        .hasAuthority(PermissionCodes.SYSTEM_STATISTICS_VIEW)
+                        // 管理后台需要认证（具体权限由 @PreAuthorize 控制）
+                        .requestMatchers(matchersWithContext("/admin/**")).authenticated()
                         
                         // 物品查询接口（公开）
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/goods/**")).permitAll()

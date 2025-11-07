@@ -4,6 +4,7 @@ import com.campus.marketplace.common.dto.request.CreateTagRequest;
 import com.campus.marketplace.common.dto.request.MergeTagRequest;
 import com.campus.marketplace.common.dto.request.UpdateTagRequest;
 import com.campus.marketplace.common.dto.response.TagResponse;
+import com.campus.marketplace.common.dto.response.TagStatisticsResponse;
 import com.campus.marketplace.common.entity.GoodsTag;
 import com.campus.marketplace.common.entity.Tag;
 import com.campus.marketplace.common.exception.BusinessException;
@@ -83,7 +84,7 @@ public class TagServiceImpl implements TagService {
 
         long bindingCount = goodsTagRepository.countByTagId(id);
         if (bindingCount > 0) {
-            throw new BusinessException(ErrorCode.OPERATION_FAILED, "仍有商品绑定该标签，无法删除");
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "仍有商品绑定该标签,无法删除");
         }
 
         tagRepository.delete(tag);
@@ -125,6 +126,58 @@ public class TagServiceImpl implements TagService {
                 .map(this::toResponse)
                 .toList();
     }
+
+    // 🎯 BaSui 新增方法实现（标签管理扩展）
+
+    @Override
+    @Transactional(readOnly = true)
+    public Tag getById(Long id) {
+        return tagRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TAG_NOT_FOUND, "标签不存在"));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void toggleEnabled(Long id) {
+        Tag tag = getById(id);
+        tag.setEnabled(!tag.getEnabled());
+        tagRepository.save(tag);
+        log.info("切换标签启用状态成功 tagId={}, enabled={}", id, tag.getEnabled());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int batchDelete(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        int successCount = 0;
+        for (Long id : ids) {
+            try {
+                deleteTag(id);
+                successCount++;
+            } catch (BusinessException e) {
+                log.warn("批量删除标签失败: tagId={}, error={}", id, e.getMessage());
+            }
+        }
+        return successCount;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TagStatisticsResponse getStatistics(Long id) {
+        Tag tag = getById(id);
+        long goodsCount = goodsTagRepository.countByTagId(id);
+
+        return TagStatisticsResponse.builder()
+                .tagId(id)
+                .tagName(tag.getName())
+                .goodsCount(goodsCount)
+                .enabled(tag.getEnabled())
+                .build();
+    }
+
+    // 🔧 私有辅助方法
 
     private String normalizeName(String name) {
         return name.trim();

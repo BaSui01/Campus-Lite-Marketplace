@@ -123,4 +123,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * 统计绑定指定角色的用户数量。
      */
     long countByRoles_Name(String roleName);
+
+    /**
+     * 统计校区下活跃用户数量（指定时间后登录过的用户）
+     *
+     * @param campusId 校区ID
+     * @param since 截止时间
+     * @return 活跃用户数量
+     */
+    @Query("SELECT COUNT(u) FROM User u WHERE u.campusId = :campusId AND u.lastLoginTime >= :since")
+    long countActiveByCampusIdSince(@Param("campusId") Long campusId,
+                                   @Param("since") java.time.LocalDateTime since);
 }
