@@ -87,6 +87,10 @@ spring:
       max-request-size: ${FILE_MAX_REQUEST_SIZE:10MB}
       enabled: ${FILE_UPLOAD_ENABLED:true}
 
+  # MVC 配置 - 静态资源路径模式
+  mvc:
+    static-path-pattern: /uploads/**  # 只匹配 /uploads/** 路径，避免覆盖 API 路径
+
   # 邮件配置（使用真实 SMTP）
   mail:
     host: ${MAIL_HOST:}
@@ -383,8 +387,11 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: false
+  mvc:
+    static-path-pattern: /uploads/**  # 只匹配 /uploads/** 路径，避免覆盖 API 路径
 server:
   port: ${TEST_SERVER_PORT:${SERVER_PORT:8200}}  # 测试环境也使用 8200
+  # 测试环境不设置 context-path，因为测试代码中已经包含了 /api 前缀
 management:
   endpoints:
     enabled-by-default: false  # ✅ BaSui: 测试环境禁用所有 Actuator 端点

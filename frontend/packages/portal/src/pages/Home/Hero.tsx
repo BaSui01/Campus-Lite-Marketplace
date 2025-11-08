@@ -17,24 +17,25 @@ interface CarouselItem {
 }
 
 // 轮播图数据（后续可以从后端API获取）
+// 🎨 BaSui: 临时使用 Unsplash 免费图片，正式图片待设计
 const CAROUSEL_DATA: CarouselItem[] = [
   {
     id: 1,
     title: '校园轻享集市',
     description: '让闲置物品找到新主人，让环保成为生活方式',
-    imageUrl: '/images/hero-1.jpg',
+    imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&h=500&fit=crop&q=80',
   },
   {
     id: 2,
     title: '安全交易，放心购物',
     description: '实名认证，交易保障，让每一笔交易都安心',
-    imageUrl: '/images/hero-2.jpg',
+    imageUrl: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&h=500&fit=crop&q=80',
   },
   {
     id: 3,
     title: '社区互动，分享生活',
     description: '不仅是交易平台，更是校园生活的分享社区',
-    imageUrl: '/images/hero-3.jpg',
+    imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&h=500&fit=crop&q=80',
   },
 ];
 
