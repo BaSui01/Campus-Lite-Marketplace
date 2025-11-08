@@ -15,6 +15,7 @@ import com.campus.marketplace.service.CouponService;
 import com.campus.marketplace.service.ExportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +43,7 @@ public class CouponServiceImpl implements CouponService {
 
     private final CouponRepository couponRepository;
     private final CouponUserRelationRepository relationRepository;
-    private final @org.springframework.context.annotation.Lazy ExportService exportService;
+    private final ObjectProvider<ExportService> exportServiceProvider;
     private final ExportJobRepository exportJobRepository;
 
     @Override
@@ -512,6 +513,10 @@ public class CouponServiceImpl implements CouponService {
             String paramsJson = mapper.writeValueAsString(params);
 
             // 创建导出任务
+            ExportService exportService = exportServiceProvider.getIfAvailable();
+            if (exportService == null) {
+                throw new BusinessException(ErrorCode.OPERATION_FAILED, "导出服务不可用");
+            }
             Long jobId = exportService.requestExport("COUPON_STATISTICS", paramsJson);
 
             log.info("✅ 导出任务已创建: jobId={}, params={}", jobId, paramsJson);

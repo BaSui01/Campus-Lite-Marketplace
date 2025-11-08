@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,7 +54,7 @@ public class ExportServiceImpl implements ExportService, InitializingBean {
     private final ExportJobRepository jobRepo;
     private final GoodsRepository goodsRepository;
     private final OrderRepository orderRepository;
-    private final @org.springframework.context.annotation.Lazy CouponService couponService;
+    private final ObjectProvider<CouponService> couponServiceProvider;
     private final TaskService taskService;
 
     // 可通过测试反射或配置覆盖
@@ -570,6 +571,11 @@ public class ExportServiceImpl implements ExportService, InitializingBean {
     @Cacheable(value = "coupon:statistics", key = "#params.cacheKey()", unless = "#result == null || #result.isEmpty()")
     private List<CouponStatisticsResponse> fetchCouponStatistics(ExportParams params) {
         log.info("📊 获取优惠券统计数据: params={}", params);
+
+        CouponService couponService = couponServiceProvider.getIfAvailable();
+        if (couponService == null) {
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "优惠券服务不可用");
+        }
 
         List<CouponStatisticsResponse> statistics;
 
