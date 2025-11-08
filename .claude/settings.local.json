@@ -29,7 +29,8 @@
       "Bash(docker rm:*)",
       "mcp__filesystem__read_text_file",
       "mcp__filesystem__edit_file",
-      "mcp__filesystem__create_directory"
+      "mcp__filesystem__create_directory",
+      "mcp__acemcp__search_context"
     ],
     "deny": [],
     "ask": []
