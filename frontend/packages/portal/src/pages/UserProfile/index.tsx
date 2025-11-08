@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Tabs, GoodsCard } from '@campus/shared/components';
-import { creditService, CreditLevel, CREDIT_LEVEL_CONFIG } from '@campus/shared/services';
+import { creditService, CreditLevel, CREDIT_LEVEL_CONFIG } from '../../services';;
 import { useAuthStore, useNotificationStore } from '../../store';
 import { getApi } from '@campus/shared/utils';
 import { BlacklistButton } from '../../components/BlacklistButton';

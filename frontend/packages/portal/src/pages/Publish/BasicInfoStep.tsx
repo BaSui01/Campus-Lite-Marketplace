@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Input, Select, Skeleton } from '@campus/shared/components';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 import type { GoodsFormData } from './index';
 import './BasicInfoStep.css';
 

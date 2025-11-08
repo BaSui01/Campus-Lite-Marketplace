@@ -8,7 +8,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Skeleton, Empty } from '@campus/shared/components';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 import ImageGallery from './ImageGallery';
 import GoodsInfo from './GoodsInfo';
 import SellerCard from './SellerCard';

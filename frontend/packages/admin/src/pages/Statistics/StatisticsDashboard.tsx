@@ -1,0 +1,336 @@
+/**
+ * 📊 统计数据 Dashboard - BaSui 搞笑专业版 😎
+ *
+ * 功能：
+ * - 系统概览统计卡片
+ * - 趋势折线图（用户、物品、订单）
+ * - 收入柱状图
+ * - 热门商品排行榜
+ * - 活跃用户排行榜
+ * - 分类统计饼图
+ * - 今日数据快速查看
+ *
+ * @author BaSui
+ * @date 2025-11-07
+ */
+
+import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Statistic, Select, Button, Spin, message, DatePicker } from 'antd';
+import {
+  UserOutlined,
+  ShoppingOutlined,
+  ShoppingCartOutlined,
+  DollarOutlined,
+  ReloadOutlined,
+  RiseOutlined,
+  FallOutlined,
+} from '@ant-design/icons';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { statisticsService } from '@/services';
+import type {
+  SystemOverview,
+  TrendStatistics,
+  RankingItem,
+  CategoryStat,
+} from '../../services/statistics';
+import TrendChart from './components/TrendChart';
+import RevenueChart from './components/RevenueChart';
+import RankingList from './components/RankingList';
+import CategoryChart from './components/CategoryChart';
+
+const { RangePicker } = DatePicker;
+
+/**
+ * 统计 Dashboard 主页面
+ */
+const StatisticsDashboard: React.FC = () => {
+  // ========== 状态管理 ==========
+  const [loading, setLoading] = useState(false);
+  const [overviewData, setOverviewData] = useState<SystemOverview | null>(null);
+  const [trendData, setTrendData] = useState<TrendStatistics | null>(null);
+  const [revenueData, setRevenueData] = useState<{ name: string; value: number }[]>([]);
+  const [topGoods, setTopGoods] = useState<RankingItem[]>([]);
+  const [topUsers, setTopUsers] = useState<RankingItem[]>([]);
+  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
+
+  // 筛选条件
+  const [trendDays, setTrendDays] = useState(7); // 趋势天数
+  const [revenueMonths, setRevenueMonths] = useState(12); // 收入月数
+
+  // ========== 数据加载 ==========
+
+  /**
+   * 加载所有统计数据
+   */
+  const loadAllStatistics = async () => {
+    setLoading(true);
+    try {
+      // 并行加载所有数据
+      const [overview, trend, revenue, goods, users, categories] = await Promise.all([
+        statisticsService.getSystemOverview(),
+        statisticsService.getTrendStatistics(trendDays),
+        statisticsService.getRevenueTrend(revenueMonths),
+        statisticsService.getTopGoods(10),
+        statisticsService.getTopUsers(10),
+        statisticsService.getCategoryStatistics(),
+      ]);
+
+      setOverviewData(overview);
+      setTrendData(trend);
+      setRevenueData(revenue);
+      setTopGoods(goods);
+      setTopUsers(users);
+      setCategoryStats(categories);
+
+      message.success('数据加载成功！');
+    } catch (error: any) {
+      console.error('❌ 加载统计数据失败:', error);
+      message.error(error.message || '加载统计数据失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * 刷新数据
+   */
+  const handleRefresh = () => {
+    loadAllStatistics();
+  };
+
+  /**
+   * 趋势天数改变
+   */
+  const handleTrendDaysChange = (days: number) => {
+    setTrendDays(days);
+  };
+
+  /**
+   * 收入月数改变
+   */
+  const handleRevenueMonthsChange = (months: number) => {
+    setRevenueMonths(months);
+  };
+
+  // 初始加载
+  useEffect(() => {
+    loadAllStatistics();
+  }, []);
+
+  // 趋势天数改变时重新加载趋势数据
+  useEffect(() => {
+    if (trendDays) {
+      statisticsService.getTrendStatistics(trendDays).then(setTrendData);
+    }
+  }, [trendDays]);
+
+  // 收入月数改变时重新加载收入数据
+  useEffect(() => {
+    if (revenueMonths) {
+      statisticsService.getRevenueTrend(revenueMonths).then(setRevenueData);
+    }
+  }, [revenueMonths]);
+
+  // ========== 渲染 ==========
+
+  return (
+    <div style={{ padding: '24px', background: '#f0f2f5', minHeight: '100vh' }}>
+      {/* 页面标题和操作栏 */}
+      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+        <Col>
+          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>📊 数据统计中心</h1>
+          <p style={{ margin: '8px 0 0', color: '#666' }}>
+            实时查看系统运营数据，洞察业务趋势 😎
+          </p>
+        </Col>
+        <Col>
+          <Button
+            type="primary"
+            icon={<ReloadOutlined />}
+            onClick={handleRefresh}
+            loading={loading}
+          >
+            刷新数据
+          </Button>
+        </Col>
+      </Row>
+
+      <Spin spinning={loading}>
+        {/* 系统概览卡片 */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="总用户数"
+                value={overviewData?.totalUsers || 0}
+                prefix={<UserOutlined />}
+                valueStyle={{ color: '#3f8600' }}
+                suffix={
+                  <span style={{ fontSize: 14, color: '#666' }}>
+                    今日 +{overviewData?.todayNewUsers || 0}
+                  </span>
+                }
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="总物品数"
+                value={overviewData?.totalGoods || 0}
+                prefix={<ShoppingOutlined />}
+                valueStyle={{ color: '#1890ff' }}
+                suffix={
+                  <span style={{ fontSize: 14, color: '#666' }}>
+                    今日 +{overviewData?.todayNewGoods || 0}
+                  </span>
+                }
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="总订单数"
+                value={overviewData?.totalOrders || 0}
+                prefix={<ShoppingCartOutlined />}
+                valueStyle={{ color: '#cf1322' }}
+                suffix={
+                  <span style={{ fontSize: 14, color: '#666' }}>
+                    今日 +{overviewData?.todayNewOrders || 0}
+                  </span>
+                }
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="总收入"
+                value={overviewData?.totalRevenue || 0}
+                prefix={<DollarOutlined />}
+                precision={2}
+                valueStyle={{ color: '#fa8c16' }}
+              />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* 趋势图表 */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={24} lg={16}>
+            <Card
+              title="📈 数据趋势"
+              extra={
+                <Select
+                  value={trendDays}
+                  onChange={handleTrendDaysChange}
+                  style={{ width: 120 }}
+                  options={[
+                    { label: '最近7天', value: 7 },
+                    { label: '最近15天', value: 15 },
+                    { label: '最近30天', value: 30 },
+                    { label: '最近90天', value: 90 },
+                  ]}
+                />
+              }
+            >
+              <TrendChart data={trendData} />
+            </Card>
+          </Col>
+          <Col xs={24} lg={8}>
+            <Card
+              title="💰 收入趋势"
+              extra={
+                <Select
+                  value={revenueMonths}
+                  onChange={handleRevenueMonthsChange}
+                  style={{ width: 120 }}
+                  options={[
+                    { label: '最近3个月', value: 3 },
+                    { label: '最近6个月', value: 6 },
+                    { label: '最近12个月', value: 12 },
+                  ]}
+                />
+              }
+            >
+              <RevenueChart data={revenueData} />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* 排行榜 */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={24} lg={12}>
+            <Card title="🏆 热门商品 Top 10">
+              <RankingList data={topGoods} type="goods" />
+            </Card>
+          </Col>
+          <Col xs={24} lg={12}>
+            <Card title="👥 活跃用户 Top 10">
+              <RankingList data={topUsers} type="users" />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* 分类统计 */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            <Card title="📂 分类统计">
+              <CategoryChart data={categoryStats} />
+            </Card>
+          </Col>
+          <Col xs={24} lg={12}>
+            <Card title="📅 今日数据快报">
+              <Row gutter={[16, 16]}>
+                <Col span={12}>
+                  <Statistic
+                    title="新增用户"
+                    value={overviewData?.todayNewUsers || 0}
+                    prefix={<RiseOutlined />}
+                    valueStyle={{ color: '#3f8600' }}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="新增物品"
+                    value={overviewData?.todayNewGoods || 0}
+                    prefix={<RiseOutlined />}
+                    valueStyle={{ color: '#1890ff' }}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="新增订单"
+                    value={overviewData?.todayNewOrders || 0}
+                    prefix={<RiseOutlined />}
+                    valueStyle={{ color: '#cf1322' }}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="活跃用户"
+                    value={overviewData?.activeUsers || 0}
+                    prefix={<UserOutlined />}
+                    valueStyle={{ color: '#722ed1' }}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="待审核物品"
+                    value={overviewData?.pendingGoods || 0}
+                    prefix={<ShoppingOutlined />}
+                    valueStyle={{ color: '#fa8c16' }}
+                  />
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+      </Spin>
+    </div>
+  );
+};
+
+export default StatisticsDashboard;

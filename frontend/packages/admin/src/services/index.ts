@@ -1,0 +1,20 @@
+/**
+ * Admin Services 统一导出
+ * @author BaSui 😎
+ * @description 管理端服务层统一导出入口
+ */
+
+// ========== 管理端专属服务 ==========
+export * from './statistics';
+export * from './adminUser';
+export * from './adminGoods';
+export * from './adminCategory';
+export * from './monitor';
+export * from './compliance';
+export * from './dispute';
+export * from './disputeStatistics';
+export * from './appeal';
+export * from './blacklist';
+export * from './report';
+export * from './featureFlag';
+export * from './role';

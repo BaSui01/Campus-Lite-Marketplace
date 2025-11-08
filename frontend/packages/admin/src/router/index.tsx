@@ -27,6 +27,8 @@ import { AuditLogList, OperationLogList } from '@/pages/Logs';
 import { BannedUserList, BlacklistManagement } from '@/pages/Users';
 import { PostAuditList, ReportList } from '@/pages/Content';
 import { TopicList, CommunityList } from '@/pages/Community';
+import { StatisticsDashboard } from '@/pages/Statistics';
+import { NotificationTemplateList } from '@/pages/NotificationTemplates';
 import { PermissionGuard } from '@/components';
 import { PERMISSION_CODES } from '@campus/shared';
 
@@ -55,6 +57,14 @@ export const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfilePage />,
+      },
+      {
+        path: 'statistics',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_STATISTICS_VIEW}>
+            <StatisticsDashboard />
+          </PermissionGuard>
+        ),
       },
       {
         path: 'goods/list',
@@ -301,6 +311,14 @@ export const router = createBrowserRouter([
         element: (
           <PermissionGuard permission={PERMISSION_CODES.SYSTEM_TASK_MANAGE}>
             <TaskList />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'system/notification-templates',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_RATE_LIMIT_MANAGE}>
+            <NotificationTemplateList />
           </PermissionGuard>
         ),
       },

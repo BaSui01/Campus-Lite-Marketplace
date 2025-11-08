@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Skeleton, Modal, Tabs } from '@campus/shared/components';
-import { postService } from '@campus/shared/services';
+import { postService } from '@campus/shared/services';;
 import { useAuthStore, useNotificationStore } from '../../store';
 import './Community.css';
 

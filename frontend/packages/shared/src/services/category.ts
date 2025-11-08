@@ -1,10 +1,19 @@
 /**
+ * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
+ * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
+ * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
+ * 👉 重构步骤：
+ *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
+ *    2. 替换为：const api = getApi(); api.methodName(...)
+ *    3. 更新返回值类型
+ */
+/**
  * 分类管理 API 服务
  * @author BaSui 😎
  * @description 分类树、添加、编辑、删除、排序等接口
  */
 
-import { http } from '../utils/apiClient';
+import { getApi } from '../utils/apiClient';
 import type { BaseResponse } from '@campus/shared/api';
 
 /**
@@ -117,63 +126,6 @@ export class CategoryService {
   async getDetail(id: number): Promise<Category> {
     const response = await http.get<Category>(`/api/categories/${id}`);
     return response.data;
-  }
-
-  /**
-   * 添加分类
-   * @param data 分类信息
-   * @returns 创建的分类ID
-   */
-  async create(data: CategoryRequest): Promise<number> {
-    const response = await http.post<number>('/api/categories', data);
-    return response.data;
-  }
-
-  /**
-   * 更新分类信息
-   * @param id 分类ID
-   * @param data 分类信息
-   * @returns 更新后的分类信息
-   */
-  async update(id: number, data: Partial<CategoryRequest>): Promise<Category> {
-    const response = await http.put<Category>(`/api/categories/${id}`, data);
-    return response.data;
-  }
-
-  /**
-   * 删除分类
-   * @param id 分类ID
-   */
-  async delete(id: number): Promise<void> {
-    await http.delete(`/api/categories/${id}`);
-  }
-
-  /**
-   * 批量排序
-   * @param items 排序列表
-   */
-  async batchSort(items: CategorySortRequest[]): Promise<void> {
-    await http.put('/api/categories/sort', items);
-  }
-
-  /**
-   * 移动分类（修改父分类）
-   * @param id 分类ID
-   * @param newParentId 新父分类ID
-   * @returns 更新后的分类信息
-   */
-  async move(id: number, newParentId: number | null): Promise<Category> {
-    return this.update(id, { parentId: newParentId });
-  }
-
-  /**
-   * 启用/禁用分类
-   * @param id 分类ID
-   * @param status 状态
-   * @returns 更新后的分类信息
-   */
-  async updateStatus(id: number, status: CategoryStatus): Promise<Category> {
-    return this.update(id, { status });
   }
 
   /**

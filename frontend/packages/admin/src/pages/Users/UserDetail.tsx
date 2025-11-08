@@ -28,8 +28,8 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userService, adminUserService } from '@campus/shared';
-import { UserAvatar } from '@campus/shared';
+import { userService, UserAvatar } from '@campus/shared';
+import { adminUserService } from '@/services';
 import dayjs from 'dayjs';
 import type { User } from '@campus/shared';
 

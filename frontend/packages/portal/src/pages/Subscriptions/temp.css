@@ -1,0 +1,322 @@
+/**
+ * 订阅管理页面样式 - 不错过任何心仪商品！🔔
+ * @author BaSui 😎
+ * @description 紫色主题的订阅管理界面设计
+ */
+
+.subscriptions-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.subscriptions-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.subscriptions-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(155, 89, 182, 0.3);
+}
+
+.subscriptions-header__info {
+  flex: 1;
+}
+
+.subscriptions-header__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.subscriptions-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+  color: #ffffff;
+}
+
+.subscriptions-header__subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 24px 0;
+}
+
+/* ==================== 内容区域 ==================== */
+
+.subscriptions-content {
+  min-height: 400px;
+}
+
+.subscriptions-loading {
+  padding: 20px 0;
+}
+
+.subscriptions-empty {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.subscriptions-empty .empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.subscriptions-empty .empty-text {
+  font-size: 24px;
+  color: #2d3436;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+}
+
+.subscriptions-empty .empty-tip {
+  font-size: 16px;
+  color: #636e72;
+  margin: 0 0 32px 0;
+}
+
+/* ==================== 订阅列表 ==================== */
+
+.subscriptions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.subscription-item {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.subscription-item:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.subscription-item__icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.subscription-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.subscription-item__keyword {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2d3436;
+  margin-bottom: 6px;
+}
+
+.subscription-item__meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #636e72;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+}
+
+.subscription-item__actions {
+  flex-shrink: 0;
+}
+
+/* ==================== 温馨提示 ==================== */
+
+.subscriptions-section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 16px 0;
+}
+
+.subscriptions-tips {
+  background: #f0e6ff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 32px;
+  border-left: 4px solid #9b59b6;
+}
+
+.tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tips-list li {
+  font-size: 14px;
+  color: #595959;
+  line-height: 1.8;
+  margin-bottom: 8px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.tips-list li:before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #9b59b6;
+  font-weight: bold;
+}
+
+.tips-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* ==================== 新增订阅表单 ==================== */
+
+.subscription-form {
+  padding: 8px 0;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 15px;
+  font-weight: bold;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.form-label .required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+.form-tip {
+  font-size: 13px;
+  color: #8c8c8c;
+  margin: 6px 0 0 0;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: 4px;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .subscriptions-page {
+    padding: 10px 0;
+  }
+
+  .subscriptions-container {
+    padding: 0 10px;
+  }
+
+  .subscriptions-header {
+    padding: 24px 20px;
+  }nn.subscriptions-header__info {n  flex: 1;n}nn.subscriptions-header__actions {n  display: flex;n  gap: 12px;n  align-items: center;n  flex-shrink: 0;n}
+
+  .subscriptions-header__title {
+    font-size: 28px;
+  }
+
+  .subscription-item {
+    padding: 16px 20px;
+    flex-wrap: wrap;
+  }
+
+  .subscription-item__icon {
+    font-size: 28px;
+  }
+
+  .subscription-item__actions {
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .subscription-item__actions button {
+    width: 100%;
+  }
+
+  .subscription-item__meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .subscriptions-empty .empty-icon {
+    font-size: 64px;
+  }
+
+  .subscriptions-empty .empty-text {
+    font-size: 20px;
+  }
+
+  .subscriptions-empty .empty-tip {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .subscriptions-header {
+    padding: 20px 16px;
+  }nn.subscriptions-header__info {n  flex: 1;n}nn.subscriptions-header__actions {n  display: flex;n  gap: 12px;n  align-items: center;n  flex-shrink: 0;n}
+
+  .subscriptions-header__title {
+    font-size: 24px;
+  }
+
+  .subscription-item {
+    padding: 12px 16px;
+  }
+
+  .subscription-item__keyword {
+    font-size: 16px;
+  }
+
+  .subscriptions-empty {
+    padding: 60px 16px;
+  }
+
+  .subscriptions-empty .empty-icon {
+    font-size: 56px;
+  }
+
+  .subscriptions-empty .empty-text {
+    font-size: 18px;
+  }
+}
+

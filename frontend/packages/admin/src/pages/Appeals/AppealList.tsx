@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Select, Space, Tag, Card, Row, Col, Statistic } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { appealService } from '@campus/shared/services/appeal';
+import { appealService } from '../../services/appeal';
 
 const { Option } = Select;
 

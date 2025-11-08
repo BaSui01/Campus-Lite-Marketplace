@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton, Empty, OrderCard } from '@campus/shared/components';
-import { orderService } from '@campus/shared/services';
+import { orderService } from '@campus/shared/services';;
 import './Orders.css';
 
 type OrderType = 'buyer' | 'seller';

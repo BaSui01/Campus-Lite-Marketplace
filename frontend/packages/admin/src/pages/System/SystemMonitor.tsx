@@ -38,14 +38,14 @@ import {
   ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { monitorService, ErrorSeverity } from '@campus/shared/services/monitor';
+import { monitorService, ErrorSeverity } from '../../services/monitor';
 import type { 
   SystemMetrics, 
   ApiPerformanceLog, 
   EndpointStats, 
   ErrorLog,
   QpsData,
-} from '@campus/shared/services/monitor';
+} from '../../services/monitor';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption } from 'echarts';
 

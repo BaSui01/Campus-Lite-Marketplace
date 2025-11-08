@@ -1,10 +1,19 @@
 /**
+ * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
+ * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
+ * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
+ * 👉 重构步骤：
+ *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
+ *    2. 替换为：const api = getApi(); api.methodName(...)
+ *    3. 更新返回值类型
+ */
+/**
  * 社区广场服务
  * @author BaSui 😎
  * @description 社区广场话题标签、动态流、互动功能
  */
 
-import { http } from '@campus/shared/utils/http';
+import { getApi } from '../utils/apiClient';
 import type { BaseResponse } from '@campus/shared/api';
 
 // ==================== 类型定义 ====================

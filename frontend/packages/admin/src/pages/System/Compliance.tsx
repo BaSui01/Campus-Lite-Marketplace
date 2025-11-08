@@ -29,7 +29,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { complianceService } from '@campus/shared';
+import { complianceService } from '@/services';
 import { PermissionGuard } from '@/components';
 import { PERMISSION_CODES } from '@campus/shared';
 import type { ComplianceWhitelistItem, ComplianceAuditLog } from '@campus/shared';

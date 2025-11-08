@@ -27,10 +27,10 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { roleService } from '@campus/shared';
+import { roleService } from '@/services';
 import { PermissionGuard } from '@/components';
 import { PERMISSION_CODES } from '@campus/shared';
-import type { RoleSummary, RoleDetail } from '@campus/shared';
+import type { RoleSummary, RoleDetail } from '@/services'; // ✅ 修复：类型也从本地 services 导入
 
 const { Title } = Typography;
 const { TextArea } = Input;

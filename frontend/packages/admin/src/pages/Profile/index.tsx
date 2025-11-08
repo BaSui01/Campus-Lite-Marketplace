@@ -20,7 +20,7 @@ import {
   Input,
   Button,
   Space,
-  message,
+  App,
   Tabs,
   Avatar,
   Upload,
@@ -80,6 +80,7 @@ interface LoginDevice {
 }
 
 export const ProfilePage: React.FC = () => {
+  const { message } = App.useApp(); // ✅ 使用 App 提供的 message 实例
   const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
 

@@ -5,10 +5,14 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // 🎯 BaSui优化：从根目录加载环境变量
-  const env = loadEnv(mode, path.resolve(__dirname, '../../..'), 'VITE_');
+  const rootDir = path.resolve(__dirname, '../../..');
+  const env = loadEnv(mode, rootDir, 'VITE_');
 
   return {
     plugins: [react()],
+
+    // 🌍 环境变量目录配置（关键！让 Vite 从根目录读取 .env）
+    envDir: rootDir,
 
     // 🌐 开发服务器配置
     server: {

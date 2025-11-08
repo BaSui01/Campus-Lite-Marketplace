@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Timeline, Skeleton, Empty, toast } from '@campus/shared/components';
-import { logisticsService } from '@campus/shared/services';
+import { logisticsService } from '@campus/shared/services';;
 import type { TimelineItem } from '@campus/shared/components';
 import './LogisticsCard.css';
 

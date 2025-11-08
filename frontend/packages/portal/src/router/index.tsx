@@ -67,6 +67,16 @@ const Logistics = lazy(() => import('../pages/Logistics'));
 const Campuses = lazy(() => import('../pages/Campuses'));
 const CampusDetail = lazy(() => import('../pages/Campuses/Detail'));
 
+// 申诉相关页面
+const AppealList = lazy(() => import('../pages/Appeals'));
+const AppealCreate = lazy(() => import('../pages/Appeals/AppealCreate'));
+const AppealDetail = lazy(() => import('../pages/Appeals/AppealDetail'));
+
+// 支付相关页面
+const PaymentStatus = lazy(() => import('../pages/Payment/PaymentStatus'));
+const PaymentResult = lazy(() => import('../pages/Payment/PaymentResult'));
+const PaymentMethods = lazy(() => import('../pages/Payment/PaymentMethods'));
+
 // ==================== 路由守卫组件 ====================
 
 /**
@@ -477,6 +487,68 @@ export const router = createBrowserRouter(
           <LazyLoadWrapper>
             <CampusDetail />
           </LazyLoadWrapper>
+        ),
+      },
+      // ==================== 申诉管理 ====================
+      {
+        path: 'appeals',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <AppealList />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'appeals/create',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <AppealCreate />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'appeals/:id',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <AppealDetail />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      // ==================== 支付管理 ====================
+      {
+        path: 'payment',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <PaymentStatus />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'payment/result',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <PaymentResult />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'payment/methods',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <PaymentMethods />
+            </LazyLoadWrapper>
+          </RequireAuth>
         ),
       },
     ],

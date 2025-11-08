@@ -1,15 +1,17 @@
 /**
  * 搜索结果页面 - 快速找到你想要的！🔍
  * @author BaSui 😎
- * @description 支持商品搜索、用户搜索、筛选排序
+ * @description 支持商品搜索、用户搜索、筛选排序 + 新手引导
  */
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Input, Button, Skeleton, Tabs } from '@campus/shared/components';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 import { highlightText } from '@campus/shared/utils/highlight';
 import { useNotificationStore } from '../../store';
+import { SearchGuide } from '../../components/SearchGuide';
+import { useLocalStorage } from '@campus/shared/hooks';
 import type { GoodsResponse, CategoryNodeResponse, TagResponse } from '@campus/shared/api/models';
 import './Search.css';
 
@@ -61,6 +63,10 @@ const Search: React.FC = () => {
   const [hotSearches] = useState<string[]>(['二手电脑', '自行车', '教材', '吉他', '台灯']);
   const [showHistory, setShowHistory] = useState(false);
 
+  // 🎯 搜索引导状态
+  const { getValue: getGuideCompleted, setValue: setGuideCompleted } = useLocalStorage('search-guide-completed', false);
+  const [showSearchGuide, setShowSearchGuide] = useState(false);
+
   // 商品搜索结果
   const [goodsResults, setGoodsResults] = useState<GoodsResponse[]>([]);
   const [goodsLoading, setGoodsLoading] = useState(false);
@@ -81,6 +87,25 @@ const Search: React.FC = () => {
   const [pageSize] = useState(20);
 
   // ==================== 数据加载 ====================
+
+  /**
+   * 检查是否需要显示搜索引导
+   */
+  useEffect(() => {
+    const shouldShowGuide = !getGuideCompleted() &&
+                           !searchParams.get('q') &&
+                           !keyword.trim() &&
+                           searchHistory.length === 0;
+
+    if (shouldShowGuide) {
+      // 延迟显示引导，给用户时间看到页面
+      const timer = setTimeout(() => {
+        setShowSearchGuide(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [getGuideCompleted, searchParams, keyword, searchHistory]);
 
   /**
    * 搜索商品
@@ -477,6 +502,22 @@ const Search: React.FC = () => {
   };
 
   /**
+   * 🎯 处理搜索引导完成
+   */
+  const handleGuideComplete = () => {
+    setGuideCompleted(true);
+    setShowSearchGuide(false);
+    toast.success('搜索引导完成！现在试试搜索功能吧！🎉');
+  };
+
+  /**
+   * 🎯 手动显示搜索引导
+   */
+  const handleShowGuide = () => {
+    setShowSearchGuide(true);
+  };
+
+  /**
    * 格式化价格
    */
   const formatPrice = (price?: number) => {
@@ -492,6 +533,19 @@ const Search: React.FC = () => {
   return (
     <div className="search-page">
       <div className="search-container">
+        {/* ==================== 搜索引导帮助按钮 ==================== */}
+        <div className="search-help-btn">
+          <Button
+            type="text"
+            size="small"
+            onClick={handleShowGuide}
+            className="help-guide-btn"
+            title="搜索功能帮助"
+          >
+            🧭 搜索帮助
+          </Button>
+        </div>
+
         {/* ==================== 搜索栏 ==================== */}
         <div className="search-header">
           <div className="search-header__input">
@@ -693,6 +747,15 @@ const Search: React.FC = () => {
               <div className="empty-icon">🔍</div>
               <p className="empty-text">输入关键词开始搜索</p>
               <p className="empty-tip">试试搜索"自行车"、"书籍"等关键词</p>
+              {!getGuideCompleted() && (
+                <Button
+                  type="primary"
+                  onClick={handleShowGuide}
+                  className="guide-cta-btn"
+                >
+                  🧭 查看搜索引导
+                </Button>
+              )}
             </div>
           )}
 
@@ -791,6 +854,14 @@ const Search: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* ==================== 搜索引导组件 ==================== */}
+      {showSearchGuide && (
+        <SearchGuide
+          visible={showSearchGuide}
+          onComplete={handleGuideComplete}
+        />
+      )}
     </div>
   );
 };

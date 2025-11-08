@@ -1,10 +1,19 @@
 /**
+ * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
+ * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
+ * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
+ * 👉 重构步骤：
+ *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
+ *    2. 替换为：const api = getApi(); api.methodName(...)
+ *    3. 更新返回值类型
+ */
+/**
  * Logistics Service - 物流服务
  * @author BaSui 😎
  * @description 查询订单物流信息、追踪物流轨迹
  */
 
-import { http } from '../utils/apiClient';
+import { getApi } from '../utils/apiClient';
 
 // ==================== 类型定义 ====================
 
