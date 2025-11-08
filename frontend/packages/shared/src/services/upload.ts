@@ -1,21 +1,21 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * 文件上传 API 服务
+ * ✅ 文件上传 API 服务 - 已重构为 OpenAPI
  * @author BaSui 😎
- * @description 图片、文件上传等接口
+ * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
+ *
+ * 功能：
+ * - 图片上传（单张/批量）
+ * - 文件上传（支持进度回调）
+ * - 文件删除
+ *
+ * ⚠️ 注意：
+ * - uploadBase64Image() 方法暂未实现（后端接口缺失）
+ * - 文件上传支持进度回调（onProgress）
+ *
+ * 📋 API 路径：/api/files/*
  */
 
-import { apiClient } from '../utils/apiClient';
-import type { ApiResponse, UploadResponse } from '../types';
-import { IMAGE_UPLOAD_URL, FILE_UPLOAD_URL } from '../constants';
+import { getApi } from '../utils/apiClient';
 
 /**
  * 上传选项
@@ -26,42 +26,52 @@ export interface UploadOptions {
 }
 
 /**
+ * 上传响应
+ */
+export interface UploadResponse {
+  url: string;
+  thumbnailUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+}
+
+/**
  * 文件上传 API 服务类
  */
 export class UploadService {
   /**
    * 上传图片
-   * @param file 图片文件或FormData
+   * POST /api/files/upload
+   * @param file 图片文件
    * @param options 上传选项（category、onProgress）
    * @returns 上传结果（包含图片URL）
    */
   async uploadImage(
-    file: File | FormData,
+    file: File,
     options?: UploadOptions
-  ): Promise<ApiResponse<UploadResponse>> {
-    const { category = 'general', onProgress } = options || {};
-
-    const formData = file instanceof FormData ? file : new FormData();
-    if (file instanceof File) {
-      formData.append('file', file);
-    }
-
-    const response = await apiClient.post(
-      `${IMAGE_UPLOAD_URL}?category=${category}`,
-      formData,
+  ): Promise<UploadResponse> {
+    const api = getApi();
+    const response = await api.uploadFile(
+      { file },
       {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
         onUploadProgress: (progressEvent) => {
-          if (onProgress && progressEvent.total) {
+          if (options?.onProgress && progressEvent.total) {
             const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            onProgress(percent);
+            options.onProgress(percent);
           }
         },
       }
     );
-    return response.data;
+
+    const data = response.data.data as Record<string, string>;
+    return {
+      url: data.url || '',
+      thumbnailUrl: data.thumbnailUrl,
+      fileName: data.fileName,
+      fileSize: data.fileSize ? parseInt(data.fileSize) : undefined,
+      mimeType: data.mimeType,
+    };
   }
 
   /**
@@ -73,68 +83,65 @@ export class UploadService {
   async uploadImages(
     files: File[],
     options?: UploadOptions
-  ): Promise<ApiResponse<UploadResponse[]>> {
+  ): Promise<UploadResponse[]> {
     const results = await Promise.all(
       files.map((file) => this.uploadImage(file, options))
     );
-    return {
-      code: 200,
-      message: 'success',
-      data: results.map((r) => r.data),
-    } as ApiResponse<UploadResponse[]>;
+    return results;
   }
 
   /**
-   * 上传文件
+   * 上传文件（带缩略图）
+   * POST /api/files/upload-with-thumbnail
    * @param file 文件
    * @param options 上传选项（category、onProgress）
-   * @returns 上传结果（包含文件URL）
+   * @returns 上传结果（包含文件URL和缩略图URL）
    */
   async uploadFile(
     file: File,
     options?: UploadOptions
-  ): Promise<ApiResponse<UploadResponse>> {
-    const { category = 'general', onProgress } = options || {};
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await apiClient.post(
-      `${FILE_UPLOAD_URL}?category=${category}`,
-      formData,
+  ): Promise<UploadResponse> {
+    const api = getApi();
+    const response = await api.uploadFileWithThumbnail(
+      { file },
       {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
         onUploadProgress: (progressEvent) => {
-          if (onProgress && progressEvent.total) {
+          if (options?.onProgress && progressEvent.total) {
             const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            onProgress(percent);
+            options.onProgress(percent);
           }
         },
       }
     );
-    return response.data;
+
+    const data = response.data.data as Record<string, string>;
+    return {
+      url: data.url || '',
+      thumbnailUrl: data.thumbnailUrl,
+      fileName: data.fileName,
+      fileSize: data.fileSize ? parseInt(data.fileSize) : undefined,
+      mimeType: data.mimeType,
+    };
   }
 
   /**
-   * 上传Base64图片
-   * @param base64 Base64编码的图片数据
-   * @returns 上传结果（包含图片URL）
+   * ⚠️ 上传Base64图片（暂未实现）
+   * TODO: 等待后端实现 POST /api/files/upload/base64
    */
-  async uploadBase64Image(base64: string): Promise<ApiResponse<UploadResponse>> {
-    const response = await apiClient.post(`${IMAGE_UPLOAD_URL}/base64`, { base64 });
-    return response.data;
+  async uploadBase64Image(base64: string): Promise<UploadResponse> {
+    throw new Error('uploadBase64Image() 方法暂未实现，等待后端接口');
   }
 
   /**
    * 删除文件
+   * DELETE /api/files/delete
    * @param url 文件URL
    * @returns 删除结果
    */
-  async deleteFile(url: string): Promise<ApiResponse<void>> {
-    const response = await apiClient.delete('/upload/delete', { data: { url } });
-    return response.data;
+  async deleteFile(url: string): Promise<boolean> {
+    const api = getApi();
+    const response = await api.deleteFile({ url });
+    return response.data.data as boolean;
   }
 }
 
