@@ -1,10 +1,16 @@
 package com.campus.marketplace.service.impl;
 
+import com.campus.marketplace.common.dto.MessageSearchHistory;
+import com.campus.marketplace.common.dto.MessageSearchStatistics;
+import com.campus.marketplace.common.dto.MessageSearchSuggestion;
+import com.campus.marketplace.common.dto.request.MessageSearchRequest;
 import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.dto.response.ConversationResponse;
 import com.campus.marketplace.common.dto.response.MessageResponse;
+import com.campus.marketplace.common.dto.response.MessageSearchResponse;
 import com.campus.marketplace.common.entity.Conversation;
 import com.campus.marketplace.common.entity.Message;
+import com.campus.marketplace.common.entity.MessageSearchHistoryEntity;
 import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.MessageStatus;
 import com.campus.marketplace.common.enums.MessageType;
@@ -21,6 +27,10 @@ import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.MessageService;
 import com.campus.marketplace.websocket.WebSocketSessionManager;
 import com.campus.marketplace.common.dto.websocket.WebSocketMessage;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -67,6 +77,7 @@ public class MessageServiceImpl implements MessageService {
     private final WebSocketSessionManager sessionManager;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final com.campus.marketplace.repository.MessageSearchHistoryRepository searchHistoryRepository;
 
     /**
      * Redis Key 前缀：未读消息数
@@ -532,5 +543,78 @@ public class MessageServiceImpl implements MessageService {
         } catch (Exception e) {
             log.error("❌ WebSocket 通知撤回失败：receiverId={}, messageId={}", receiverId, messageId, e);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<MessageSearchResponse> searchMessages(MessageSearchRequest request, Long currentUserId) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Message> messages = messageRepository.findByConversationIdOrderByCreatedAtDesc(request.getDisputeId(), pageable);
+
+        searchHistoryRepository.save(MessageSearchHistoryEntity.builder()
+                .userId(currentUserId)
+                .disputeId(request.getDisputeId())
+                .keyword(request.getKeyword())
+                .resultCount((int) messages.getTotalElements())
+                .build());
+
+        return messages.map(msg -> MessageSearchResponse.builder()
+                .messageId(msg.getId())
+                .content(msg.getContent())
+                .senderId(msg.getSenderId())
+                .timestamp(msg.getCreatedAt())
+                .isOwn(msg.getSenderId().equals(currentUserId))
+                .isRecalled(msg.getIsRecalled())
+                .build());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MessageSearchSuggestion> getSearchSuggestions(Long disputeId, String keyword, String type, int limit, Long currentUserId) {
+        List<String> keywords = searchHistoryRepository.findSimilarKeywords(currentUserId, disputeId, keyword);
+        return keywords.stream()
+                .limit(limit)
+                .map(k -> MessageSearchSuggestion.builder()
+                        .text(k)
+                        .type("keyword")
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MessageSearchHistory> getSearchHistory(Long disputeId, int limit, Long currentUserId) {
+        List<MessageSearchHistoryEntity> entities = searchHistoryRepository
+                .findTop10ByUserIdAndDisputeIdOrderBySearchedAtDesc(currentUserId, disputeId);
+        return entities.stream()
+                .limit(limit)
+                .map(e -> MessageSearchHistory.builder()
+                        .id(e.getId())
+                        .keyword(e.getKeyword())
+                        .searchedAt(e.getSearchedAt())
+                        .resultCount(e.getResultCount())
+                        .filters(e.getFilters())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void clearSearchHistory(Long disputeId, Long currentUserId) {
+        searchHistoryRepository.deleteByUserIdAndDisputeId(currentUserId, disputeId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MessageSearchStatistics getSearchStatistics(Long disputeId, Long currentUserId) {
+        Long total = searchHistoryRepository.countUserSearches(currentUserId, disputeId);
+        Long successful = searchHistoryRepository.countSuccessfulSearches(currentUserId, disputeId);
+
+        return MessageSearchStatistics.builder()
+                .totalSearches(total)
+                .successRate(total > 0 ? (double) successful / total : 0.0)
+                .recentSearches(getSearchHistory(disputeId, 5, currentUserId))
+                .popularKeywords(new ArrayList<>())
+                .build();
     }
 }

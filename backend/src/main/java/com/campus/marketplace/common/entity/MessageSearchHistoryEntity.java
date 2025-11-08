@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -28,7 +28,8 @@ public class MessageSearchHistoryEntity {
 
     @Id
     @Column(length = 36)
-    private String id;
+    @Builder.Default
+    private String id = UUID.randomUUID().toString();
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -42,12 +43,13 @@ public class MessageSearchHistoryEntity {
     @Column(name = "result_count", nullable = false)
     private Integer resultCount;
 
-    @Column(name = "filters", columnDefinition = "TEXT")
-    @Type(com.hibernate.type.JdbcType.JSON)
+    @Column(name = "filters", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> filters;
 
     @Column(name = "searched_at", nullable = false)
-    private LocalDateTime searchedAt;
+    @Builder.Default
+    private LocalDateTime searchedAt = LocalDateTime.now();
 
     @PrePersist
     protected void onCreate() {
@@ -57,11 +59,5 @@ public class MessageSearchHistoryEntity {
         if (searchedAt == null) {
             searchedAt = LocalDateTime.now();
         }
-    }
-
-    @Builder
-    public static class MessageSearchHistoryEntityBuilder {
-        private String id = UUID.randomUUID().toString();
-        private LocalDateTime searchedAt = LocalDateTime.now();
     }
 }
