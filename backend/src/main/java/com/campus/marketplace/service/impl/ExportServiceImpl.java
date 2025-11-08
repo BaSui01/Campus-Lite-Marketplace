@@ -53,7 +53,7 @@ public class ExportServiceImpl implements ExportService, InitializingBean {
     private final ExportJobRepository jobRepo;
     private final GoodsRepository goodsRepository;
     private final OrderRepository orderRepository;
-    private final CouponService couponService;
+    private final @org.springframework.context.annotation.Lazy CouponService couponService;
     private final TaskService taskService;
 
     // 可通过测试反射或配置覆盖
