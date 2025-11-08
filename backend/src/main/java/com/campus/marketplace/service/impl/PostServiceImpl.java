@@ -31,10 +31,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.springframework.data.domain.PageImpl;
 
 /**
  * 帖子服务实现类
@@ -54,6 +56,8 @@ public class PostServiceImpl implements PostService {
     private final PostTagRepository postTagRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
+    private final com.campus.marketplace.repository.PostLikeRepository postLikeRepository;
+    private final com.campus.marketplace.repository.PostCollectRepository postCollectRepository;
     private final SensitiveWordFilter sensitiveWordFilter;
     private final com.campus.marketplace.service.ComplianceService complianceService;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -407,6 +411,167 @@ public class PostServiceImpl implements PostService {
                 PostTag.builder().postId(postId).tagId(tagId).build()
         ));
 
-        log.info("帖子标签同步成功: postId={}, tagIds={}", postId, distinct);
+        log.info("帖子标签同步成功: postId=, tagIds={}", postId, distinct);
+    }
+
+    // ==================== 新增方法实现（2025-11-09 - BaSui 😎）====================
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> listPendingPosts(int page, int size) {
+        log.info("查询待审核帖子列表: page={}, size={}", page, size);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Post> posts = postRepository.findByStatus(GoodsStatus.PENDING, pageable);
+
+        return posts.map(PostResponse::fromWithAuthor);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> listHotPosts(int page, int size) {
+        log.info("查询热门帖子列表: page={}, size={}", page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postRepository.findHotPostsWithAuthor(GoodsStatus.APPROVED, pageable);
+
+        return posts.map(PostResponse::fromWithAuthor);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> listUserLikes(Long userId, int page, int size) {
+        log.info("查询用户点赞列表: userId={}, page={}, size={}", userId, page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Long> postIds = postRepository.findLikedPostIdsByUserId(userId, pageable);
+
+        if (postIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // 查询帖子详情（保持点赞顺序）
+        List<Post> posts = postRepository.findByIdInWithAuthor(postIds.getContent());
+        Map<Long, Post> postMap = posts.stream().collect(Collectors.toMap(Post::getId, p -> p));
+
+        // 按点赞顺序排列
+        List<PostResponse> responses = postIds.getContent().stream()
+                .map(postMap::get)
+                .filter(Objects::nonNull)
+                .map(PostResponse::fromWithAuthor)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, postIds.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> listUserCollects(Long userId, int page, int size) {
+        log.info("查询用户收藏列表: userId={}, page={}, size={}", userId, page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Long> postIds = postRepository.findCollectedPostIdsByUserId(userId, pageable);
+
+        if (postIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // 查询帖子详情（保持收藏顺序）
+        List<Post> posts = postRepository.findByIdInWithAuthor(postIds.getContent());
+        Map<Long, Post> postMap = posts.stream().collect(Collectors.toMap(Post::getId, p -> p));
+
+        // 按收藏顺序排列
+        List<PostResponse> responses = postIds.getContent().stream()
+                .map(postMap::get)
+                .filter(Objects::nonNull)
+                .map(PostResponse::fromWithAuthor)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, postIds.getTotalElements());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void toggleTopPost(Long id, boolean isTop) {
+        log.info("置顶/取消置顶帖子: postId={}, isTop={}", id, isTop);
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        post.setIsTop(isTop);
+        postRepository.save(post);
+
+        log.info("帖子置顶状态更新成功: postId={}, isTop={}", id, isTop);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int batchApprovePosts(List<Long> ids, boolean approved, String reason) {
+        log.info("批量审核帖子: ids={}, approved={}, reason={}", ids, approved, reason);
+
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+
+        int successCount = 0;
+        for (Long id : ids) {
+            try {
+                approvePost(id, approved, reason);
+                successCount++;
+            } catch (Exception e) {
+                log.warn("批量审核失败: postId={}, error={}", id, e.getMessage());
+            }
+        }
+
+        log.info("批量审核完成: total={}, success={}", ids.size(), successCount);
+        return successCount;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public com.campus.marketplace.common.dto.response.PostStatsResponse getPostStats(Long id) {
+        log.info("获取帖子统计信息: postId={}", id);
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        // 查询点赞用户（最多10个）
+        List<com.campus.marketplace.common.dto.response.PostStatsResponse.UserBriefInfo> likeUsers =
+                postLikeRepository.findByPostId(id).stream()
+                        .limit(10)
+                        .map(like -> {
+                            User user = like.getUser();
+                            return com.campus.marketplace.common.dto.response.PostStatsResponse.UserBriefInfo.builder()
+                                    .userId(user.getId())
+                                    .username(user.getUsername())
+                                    .avatar(user.getAvatar())
+                                    .build();
+                        })
+                        .collect(Collectors.toList());
+
+        // 查询收藏用户（最多10个）
+        List<com.campus.marketplace.common.dto.response.PostStatsResponse.UserBriefInfo> collectUsers =
+                postCollectRepository.findByPostId(id).stream()
+                        .limit(10)
+                        .map(collect -> {
+                            User user = collect.getUser();
+                            return com.campus.marketplace.common.dto.response.PostStatsResponse.UserBriefInfo.builder()
+                                    .userId(user.getId())
+                                    .username(user.getUsername())
+                                    .avatar(user.getAvatar())
+                                    .build();
+                        })
+                        .collect(Collectors.toList());
+
+        return com.campus.marketplace.common.dto.response.PostStatsResponse.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .viewCount(post.getViewCount())
+                .replyCount(post.getReplyCount())
+                .likeCount(post.getLikeCount())
+                .collectCount(post.getCollectCount())
+                .likeUsers(likeUsers)
+                .collectUsers(collectUsers)
+                .build();
     }
 }

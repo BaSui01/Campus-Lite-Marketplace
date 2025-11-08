@@ -89,6 +89,42 @@ public class Post extends BaseEntity {
     private Integer replyCount = 0;
 
     /**
+     * 点赞数（前端显示必需！）
+     *
+     * @since 2025-11-09 - BaSui 😎
+     */
+    @Column(name = "like_count", nullable = false)
+    @Builder.Default
+    private Integer likeCount = 0;
+
+    /**
+     * 收藏数（前端显示必需！）
+     *
+     * @since 2025-11-09 - BaSui 😎
+     */
+    @Column(name = "collect_count", nullable = false)
+    @Builder.Default
+    private Integer collectCount = 0;
+
+    /**
+     * 是否置顶（管理功能）
+     *
+     * @since 2025-11-09 - BaSui 😎
+     */
+    @Column(name = "is_top", nullable = false)
+    @Builder.Default
+    private Boolean isTop = false;
+
+    /**
+     * 是否热门（推荐算法）
+     *
+     * @since 2025-11-09 - BaSui 😎
+     */
+    @Column(name = "is_hot", nullable = false)
+    @Builder.Default
+    private Boolean isHot = false;
+
+    /**
      * 图片 URL 数组
      */
     @Column(name = "images", columnDefinition = "TEXT[]")
@@ -106,6 +142,46 @@ public class Post extends BaseEntity {
      */
     public void incrementReplyCount() {
         this.replyCount++;
+    }
+
+    /**
+     * 增加点赞数
+     *
+     * @since 2025-11-09 - BaSui 😎
+     */
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    /**
+     * 减少点赞数
+     *
+     * @since 2025-11-09 - BaSui 😎
+     */
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
+    }
+
+    /**
+     * 增加收藏数
+     *
+     * @since 2025-11-09 - BaSui 😎
+     */
+    public void incrementCollectCount() {
+        this.collectCount++;
+    }
+
+    /**
+     * 减少收藏数
+     *
+     * @since 2025-11-09 - BaSui 😎
+     */
+    public void decrementCollectCount() {
+        if (this.collectCount > 0) {
+            this.collectCount--;
+        }
     }
 
     /**

@@ -22,6 +22,11 @@ public interface PostCollectRepository extends JpaRepository<PostCollect, Long> 
     Optional<PostCollect> findByPostIdAndUserId(Long postId, Long userId);
 
     /**
+     * 根据帖子ID查询所有收藏记录
+     */
+    List<PostCollect> findByPostId(Long postId);
+
+    /**
      * 根据用户ID查询所有收藏记录
      */
     List<PostCollect> findByUserId(Long userId);
