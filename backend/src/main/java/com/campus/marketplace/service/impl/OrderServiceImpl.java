@@ -281,6 +281,39 @@ public class OrderServiceImpl implements OrderService {
                             goods.getId(), order.getOrderNo());
                 }
 
+                // 🎯 BaSui 新增：发送超时取消通知
+                try {
+                    // 通知买家：订单超时未支付已自动取消
+                    if (notificationDispatcher != null) {
+                        java.util.Map<String, Object> params = new java.util.HashMap<>();
+                        params.put("orderNo", order.getOrderNo());
+                        params.put("reason", "超时未支付");
+
+                        notificationDispatcher.enqueueTemplate(
+                                order.getBuyerId(),
+                                "ORDER_TIMEOUT_CANCELLED",
+                                params,
+                                com.campus.marketplace.common.enums.NotificationType.ORDER_CANCELLED.name(),
+                                order.getId(),
+                                "ORDER",
+                                "/orders/" + order.getOrderNo()
+                        );
+
+                        // 通知卖家：订单超时未支付已自动取消
+                        notificationDispatcher.enqueueTemplate(
+                                order.getSellerId(),
+                                "ORDER_TIMEOUT_CANCELLED_SELLER",
+                                params,
+                                com.campus.marketplace.common.enums.NotificationType.ORDER_CANCELLED.name(),
+                                order.getId(),
+                                "ORDER",
+                                "/orders/" + order.getOrderNo()
+                        );
+                    }
+                } catch (Exception e) {
+                    log.warn("发送超时取消通知失败: orderNo={}, error={}", order.getOrderNo(), e.getMessage());
+                }
+
                 cancelledCount++;
                 log.info("订单已取消: orderNo={}, createdAt={}",
                         order.getOrderNo(), order.getCreatedAt());

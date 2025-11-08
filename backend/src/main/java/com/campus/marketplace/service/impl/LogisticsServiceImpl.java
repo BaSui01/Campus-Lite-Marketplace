@@ -12,6 +12,9 @@ import com.campus.marketplace.logistics.LogisticsApiException;
 import com.campus.marketplace.logistics.LogisticsProvider;
 import com.campus.marketplace.logistics.LogisticsProviderFactory;
 import com.campus.marketplace.repository.LogisticsRepository;
+import com.campus.marketplace.repository.OrderRepository;
+import com.campus.marketplace.common.component.NotificationDispatcher;
+import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.service.LogisticsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +47,8 @@ public class LogisticsServiceImpl implements LogisticsService {
 
     private final LogisticsRepository logisticsRepository;
     private final LogisticsProviderFactory providerFactory;
+    private final OrderRepository orderRepository;
+    private final NotificationDispatcher notificationDispatcher;
 
     /**
      * 同步间隔时间（小时）
@@ -306,6 +311,9 @@ public class LogisticsServiceImpl implements LogisticsService {
      */
     private void syncLogisticsInternal(Logistics logistics) {
         try {
+            // 记录旧状态，用于判断是否需要发送通知
+            LogisticsStatus oldStatus = logistics.getStatus();
+
             // 1. 获取快递公司的API实现
             LogisticsProvider provider = providerFactory.getProvider(logistics.getLogisticsCompany());
 
@@ -314,8 +322,8 @@ public class LogisticsServiceImpl implements LogisticsService {
             logistics.setTrackRecords(trackRecords);
 
             // 3. 查询物流状态
-            LogisticsStatus status = provider.queryStatus(logistics.getTrackingNumber());
-            logistics.setStatus(status);
+            LogisticsStatus newStatus = provider.queryStatus(logistics.getTrackingNumber());
+            logistics.setStatus(newStatus);
 
             // 4. 更新当前位置（取最新一条轨迹的位置）
             if (!trackRecords.isEmpty()) {
@@ -324,7 +332,7 @@ public class LogisticsServiceImpl implements LogisticsService {
             }
 
             // 5. 如果已签收，记录实际送达时间
-            if (status == LogisticsStatus.DELIVERED && logistics.getActualDeliveryTime() == null) {
+            if (newStatus == LogisticsStatus.DELIVERED && logistics.getActualDeliveryTime() == null) {
                 logistics.setActualDeliveryTime(LocalDateTime.now());
             }
 
@@ -333,12 +341,94 @@ public class LogisticsServiceImpl implements LogisticsService {
             logistics.setLastSyncTime(LocalDateTime.now());
 
             log.info("同步物流信息成功: orderId={}, status={}, syncCount={}",
-                    logistics.getOrderId(), status, logistics.getSyncCount());
+                    logistics.getOrderId(), newStatus, logistics.getSyncCount());
+
+            // 🎯 BaSui 新增：物流状态变更通知
+            if (oldStatus != newStatus) {
+                sendLogisticsStatusChangeNotification(logistics, oldStatus, newStatus);
+            }
 
         } catch (LogisticsApiException e) {
             log.error("调用快递API失败: orderId={}, error={}", logistics.getOrderId(), e.getMessage());
             throw new BusinessException(ErrorCode.OPERATION_FAILED, "物流信息同步失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 发送物流状态变更通知
+     *
+     * @param logistics 物流实体
+     * @param oldStatus 旧状态
+     * @param newStatus 新状态
+     */
+    private void sendLogisticsStatusChangeNotification(Logistics logistics, LogisticsStatus oldStatus, LogisticsStatus newStatus) {
+        try {
+            // 查询订单信息
+            Order order = orderRepository.findById(logistics.getOrderId()).orElse(null);
+            if (order == null) {
+                log.warn("订单不存在，跳过物流通知: orderId={}", logistics.getOrderId());
+                return;
+            }
+
+            // 构建通知参数
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("orderNo", order.getOrderNo());
+            params.put("trackingNumber", logistics.getTrackingNumber());
+            params.put("expressCompany", logistics.getLogisticsCompany().getDisplayName());
+            params.put("oldStatus", oldStatus.getDescription());
+            params.put("newStatus", newStatus.getDescription());
+            params.put("currentLocation", logistics.getCurrentLocation());
+
+            // 根据新状态发送不同的通知
+            String templateCode = getNotificationTemplateCode(newStatus);
+            com.campus.marketplace.common.enums.NotificationType notificationType = getNotificationType(newStatus);
+
+            // 通知买家
+            if (notificationDispatcher != null) {
+                notificationDispatcher.enqueueTemplate(
+                        order.getBuyerId(),
+                        templateCode,
+                        params,
+                        notificationType.name(),
+                        order.getId(),
+                        "ORDER",
+                        "/orders/" + order.getOrderNo()
+                );
+            }
+
+            log.info("物流状态变更通知已发送: orderId={}, oldStatus={}, newStatus={}",
+                    logistics.getOrderId(), oldStatus, newStatus);
+
+        } catch (Exception e) {
+            log.warn("发送物流状态变更通知失败: orderId={}, error={}",
+                    logistics.getOrderId(), e.getMessage());
+        }
+    }
+
+    /**
+     * 根据物流状态获取通知模板代码
+     */
+    private String getNotificationTemplateCode(LogisticsStatus status) {
+        return switch (status) {
+            case PICKED_UP -> "LOGISTICS_PICKED_UP";
+            case IN_TRANSIT -> "LOGISTICS_IN_TRANSIT";
+            case DELIVERING -> "LOGISTICS_DELIVERING";
+            case DELIVERED -> "LOGISTICS_DELIVERED";
+            case REJECTED -> "LOGISTICS_REJECTED";
+            case LOST -> "LOGISTICS_LOST";
+            default -> "LOGISTICS_STATUS_CHANGED";
+        };
+    }
+
+    /**
+     * 根据物流状态获取通知类型
+     */
+    private com.campus.marketplace.common.enums.NotificationType getNotificationType(LogisticsStatus status) {
+        return switch (status) {
+            case DELIVERED -> com.campus.marketplace.common.enums.NotificationType.ORDER_DELIVERED;
+            case REJECTED, LOST -> com.campus.marketplace.common.enums.NotificationType.ORDER_EXCEPTION;
+            default -> com.campus.marketplace.common.enums.NotificationType.ORDER_SHIPPED;
+        };
     }
 
     /**
