@@ -45,7 +45,7 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
-
+.spec-workflow/
 # 编译输出
 *.class
 *.jar
