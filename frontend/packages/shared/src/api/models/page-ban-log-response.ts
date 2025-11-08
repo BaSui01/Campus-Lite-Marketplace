@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { BanLogResponse } from './ban-log-response';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { PageableObject } from './pageable-object';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -23,73 +26,73 @@ import type { SortObject } from './sort-object';
 /**
  * 业务数据载荷
  * @export
- * @interface PageObject
+ * @interface PageBanLogResponse
  */
-export interface PageObject {
+export interface PageBanLogResponse {
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'totalElements'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'totalPages'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'size'?: number;
     /**
      * 
-     * @type {Array<object>}
-     * @memberof PageObject
+     * @type {Array<BanLogResponse>}
+     * @memberof PageBanLogResponse
      */
-    'content'?: Array<object>;
+    'content'?: Array<BanLogResponse>;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'number'?: number;
     /**
      * 
      * @type {Array<SortObject>}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'sort'?: Array<SortObject>;
     /**
      * 
      * @type {boolean}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'first'?: boolean;
     /**
      * 
      * @type {boolean}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'last'?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'numberOfElements'?: number;
     /**
      * 
      * @type {PageableObject}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageObject
+     * @memberof PageBanLogResponse
      */
     'empty'?: boolean;
 }

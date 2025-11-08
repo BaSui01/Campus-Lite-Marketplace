@@ -106,6 +106,30 @@ export interface User {
     'status'?: UserStatusEnum;
     /**
      * 
+     * @type {boolean}
+     * @memberof User
+     */
+    'emailVerified'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof User
+     */
+    'phoneVerified'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof User
+     */
+    'twoFactorEnabled'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'twoFactorSecret'?: string;
+    /**
+     * 
      * @type {Set<Role>}
      * @memberof User
      */

@@ -176,6 +176,8 @@ import type { ApiResponsePageAppealMaterial } from '../models';
 // @ts-ignore
 import type { ApiResponsePageAuditLogResponse } from '../models';
 // @ts-ignore
+import type { ApiResponsePageBanLogResponse } from '../models';
+// @ts-ignore
 import type { ApiResponsePageBatchTaskResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageBlacklist } from '../models';
@@ -253,6 +255,10 @@ import type { BanUserRequest } from '../models';
 import type { BatchReviewRequest } from '../models';
 // @ts-ignore
 import type { BatchUnblockRequest } from '../models';
+// @ts-ignore
+import type { BindEmailRequest } from '../models';
+// @ts-ignore
+import type { BindPhoneRequest } from '../models';
 // @ts-ignore
 import type { CampusCreateRequest } from '../models';
 // @ts-ignore
@@ -333,6 +339,8 @@ import type { ReviewRequest } from '../models';
 import type { SendMessageRequest } from '../models';
 // @ts-ignore
 import type { SendNegotiationRequest } from '../models';
+// @ts-ignore
+import type { TwoFactorRequest } from '../models';
 // @ts-ignore
 import type { UpdateCategoryRequest } from '../models';
 // @ts-ignore
@@ -1568,6 +1576,94 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 使用验证码绑定邮箱到用户账户。
+         * @summary 绑定邮箱
+         * @param {number} userId 用户 ID
+         * @param {BindEmailRequest} bindEmailRequest 绑定邮箱请求
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        bindEmail: async (userId: number, bindEmailRequest: BindEmailRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('bindEmail', 'userId', userId)
+            // verify required parameter 'bindEmailRequest' is not null or undefined
+            assertParamExists('bindEmail', 'bindEmailRequest', bindEmailRequest)
+            const localVarPath = `/users/{userId}/email`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(bindEmailRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 使用验证码绑定手机号到用户账户。
+         * @summary 绑定手机号
+         * @param {number} userId 用户 ID
+         * @param {BindPhoneRequest} bindPhoneRequest 绑定手机号请求
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        bindPhone: async (userId: number, bindPhoneRequest: BindPhoneRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('bindPhone', 'userId', userId)
+            // verify required parameter 'bindPhoneRequest' is not null or undefined
+            assertParamExists('bindPhone', 'bindPhoneRequest', bindPhoneRequest)
+            const localVarPath = `/users/{userId}/phone`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(bindPhoneRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3826,6 +3922,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 关闭用户的两步验证功能。
+         * @summary 关闭两步验证
+         * @param {number} userId 用户 ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        disableTwoFactor: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('disableTwoFactor', 'userId', userId)
+            const localVarPath = `/users/{userId}/2fa/disable`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 下载导出文件
          * @param {string} token 下载令牌
@@ -3883,6 +4017,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             }
 
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 生成 TOTP 密钥和二维码 URL，用户需要使用 Google Authenticator 等应用扫描二维码。
+         * @summary 启用两步验证
+         * @param {number} userId 用户 ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enableTwoFactor: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('enableTwoFactor', 'userId', userId)
+            const localVarPath = `/users/{userId}/2fa/enable`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -5946,6 +6118,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          */
         getHotTopics1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/community/topics/hot`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 查看用户的所有登录设备记录，包括设备类型、浏览器、IP 地址等信息。
+         * @summary 获取用户登录设备列表
+         * @param {number} userId 用户 ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLoginDevices: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getLoginDevices', 'userId', userId)
+            const localVarPath = `/users/{userId}/devices`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8425,6 +8635,48 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 删除指定的登录设备记录，该设备将无法继续访问（需要重新登录）。
+         * @summary 踢出登录设备
+         * @param {number} userId 用户 ID
+         * @param {number} deviceId 设备 ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kickDevice: async (userId: number, deviceId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('kickDevice', 'userId', userId)
+            // verify required parameter 'deviceId' is not null or undefined
+            assertParamExists('kickDevice', 'deviceId', deviceId)
+            const localVarPath = `/users/{userId}/devices/{deviceId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)))
+                .replace(`{${"deviceId"}}`, encodeURIComponent(String(deviceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 点赞帖子
          * @param {number} postId 帖子ID
@@ -8815,6 +9067,60 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 localVarQueryParameter['endTime'] = (endTime as any instanceof Date) ?
                     (endTime as any).toISOString() :
                     endTime;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理员查询用户封禁记录（支持分页和筛选）
+         * @summary 查询封禁记录列表
+         * @param {number} [userId] 用户ID（可选）
+         * @param {boolean} [isUnbanned] 是否已解封（可选）
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listBannedUsers: async (userId?: number, isUnbanned?: boolean, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/users/banned`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (isUnbanned !== undefined) {
+                localVarQueryParameter['isUnbanned'] = isUnbanned;
             }
 
             if (page !== undefined) {
@@ -9538,6 +9844,74 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (status !== undefined) {
                 localVarQueryParameter['status'] = status;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理员查询系统操作日志（支持分页和筛选）
+         * @summary 查询操作日志列表
+         * @param {number} [operatorId] 操作人ID
+         * @param {ListOperationLogsActionTypeEnum} [actionType] 操作类型
+         * @param {string} [startTime] 开始时间
+         * @param {string} [endTime] 结束时间
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listOperationLogs: async (operatorId?: number, actionType?: ListOperationLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/logs/operations`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (operatorId !== undefined) {
+                localVarQueryParameter['operatorId'] = operatorId;
+            }
+
+            if (actionType !== undefined) {
+                localVarQueryParameter['actionType'] = actionType;
+            }
+
+            if (startTime !== undefined) {
+                localVarQueryParameter['startTime'] = (startTime as any instanceof Date) ?
+                    (startTime as any).toISOString() :
+                    startTime;
+            }
+
+            if (endTime !== undefined) {
+                localVarQueryParameter['endTime'] = (endTime as any instanceof Date) ?
+                    (endTime as any).toISOString() :
+                    endTime;
             }
 
             if (page !== undefined) {
@@ -12330,6 +12704,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 向指定邮箱发送验证码，用于绑定邮箱。
+         * @summary 发送邮箱验证码
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendEmailCode: async (email: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'email' is not null or undefined
+            assertParamExists('sendEmailCode', 'email', email)
+            const localVarPath = `/users/email/code`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (email !== undefined) {
+                localVarQueryParameter['email'] = email;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 发送私信给指定用户，支持文本/图片/商品卡片
          * @summary 发送消息
          * @param {SendMessageRequest} sendMessageRequest 
@@ -12403,6 +12818,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(sendNegotiationRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 向指定手机号发送验证码，用于绑定手机号。
+         * @summary 发送手机验证码
+         * @param {string} phone 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendPhoneCode: async (phone: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'phone' is not null or undefined
+            assertParamExists('sendPhoneCode', 'phone', phone)
+            const localVarPath = `/users/phone/code`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (phone !== undefined) {
+                localVarQueryParameter['phone'] = phone;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -12646,15 +13102,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             if (start !== undefined) {
-                localVarQueryParameter['start'] = (start as any instanceof Date) ?
-                    (start as any).toISOString() :
-                    start;
+                localVarQueryParameter['start'] = start;
             }
 
             if (end !== undefined) {
-                localVarQueryParameter['end'] = (end as any instanceof Date) ?
-                    (end as any).toISOString() :
-                    end;
+                localVarQueryParameter['end'] = end;
             }
 
 
@@ -14254,6 +14706,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 输入 Google Authenticator 中的 6 位验证码，验证成功后启用两步验证。
+         * @summary 验证并确认两步验证
+         * @param {number} userId 用户 ID
+         * @param {TwoFactorRequest} twoFactorRequest 两步验证请求
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyTwoFactor: async (userId: number, twoFactorRequest: TwoFactorRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('verifyTwoFactor', 'userId', userId)
+            // verify required parameter 'twoFactorRequest' is not null or undefined
+            assertParamExists('verifyTwoFactor', 'twoFactorRequest', twoFactorRequest)
+            const localVarPath = `/users/{userId}/2fa/verify`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(twoFactorRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 微信支付回调通知
          * @param {*} [options] Override http request option.
@@ -14692,6 +15188,34 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.batchVirusScan(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchVirusScan']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 使用验证码绑定邮箱到用户账户。
+         * @summary 绑定邮箱
+         * @param {number} userId 用户 ID
+         * @param {BindEmailRequest} bindEmailRequest 绑定邮箱请求
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async bindEmail(userId: number, bindEmailRequest: BindEmailRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.bindEmail(userId, bindEmailRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.bindEmail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 使用验证码绑定手机号到用户账户。
+         * @summary 绑定手机号
+         * @param {number} userId 用户 ID
+         * @param {BindPhoneRequest} bindPhoneRequest 绑定手机号请求
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async bindPhone(userId: number, bindPhoneRequest: BindPhoneRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.bindPhone(userId, bindPhoneRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.bindPhone']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15441,6 +15965,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 关闭用户的两步验证功能。
+         * @summary 关闭两步验证
+         * @param {number} userId 用户 ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async disableTwoFactor(userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.disableTwoFactor(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.disableTwoFactor']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 下载导出文件
          * @param {string} token 下载令牌
@@ -15464,6 +16001,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.downloadFile(materialId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.downloadFile']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 生成 TOTP 密钥和二维码 URL，用户需要使用 Google Authenticator 等应用扫描二维码。
+         * @summary 启用两步验证
+         * @param {number} userId 用户 ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async enableTwoFactor(userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.enableTwoFactor(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.enableTwoFactor']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16164,6 +16714,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getHotTopics1(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getHotTopics1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 查看用户的所有登录设备记录，包括设备类型、浏览器、IP 地址等信息。
+         * @summary 获取用户登录设备列表
+         * @param {number} userId 用户 ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLoginDevices(userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLoginDevices(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getLoginDevices']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16987,6 +17550,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 删除指定的登录设备记录，该设备将无法继续访问（需要重新登录）。
+         * @summary 踢出登录设备
+         * @param {number} userId 用户 ID
+         * @param {number} deviceId 设备 ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async kickDevice(userId: number, deviceId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.kickDevice(userId, deviceId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.kickDevice']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 点赞帖子
          * @param {number} postId 帖子ID
@@ -17112,6 +17689,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listAuditLogs(operatorId, actionType, startTime, endTime, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listAuditLogs']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 管理员查询用户封禁记录（支持分页和筛选）
+         * @summary 查询封禁记录列表
+         * @param {number} [userId] 用户ID（可选）
+         * @param {boolean} [isUnbanned] 是否已解封（可选）
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listBannedUsers(userId?: number, isUnbanned?: boolean, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageBanLogResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listBannedUsers(userId, isUnbanned, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listBannedUsers']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17340,6 +17933,24 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listNotifications(status, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listNotifications']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 管理员查询系统操作日志（支持分页和筛选）
+         * @summary 查询操作日志列表
+         * @param {number} [operatorId] 操作人ID
+         * @param {ListOperationLogsActionTypeEnum} [actionType] 操作类型
+         * @param {string} [startTime] 开始时间
+         * @param {string} [endTime] 结束时间
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listOperationLogs(operatorId?: number, actionType?: ListOperationLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listOperationLogs(operatorId, actionType, startTime, endTime, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listOperationLogs']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18244,6 +18855,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 向指定邮箱发送验证码，用于绑定邮箱。
+         * @summary 发送邮箱验证码
+         * @param {string} email 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sendEmailCode(email: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sendEmailCode(email, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.sendEmailCode']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 发送私信给指定用户，支持文本/图片/商品卡片
          * @summary 发送消息
          * @param {SendMessageRequest} sendMessageRequest 
@@ -18267,6 +18891,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.sendMessage1(sendNegotiationRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.sendMessage1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 向指定手机号发送验证码，用于绑定手机号。
+         * @summary 发送手机验证码
+         * @param {string} phone 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sendPhoneCode(phone: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sendPhoneCode(phone, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.sendPhoneCode']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18861,6 +19498,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 输入 Google Authenticator 中的 6 位验证码，验证成功后启用两步验证。
+         * @summary 验证并确认两步验证
+         * @param {number} userId 用户 ID
+         * @param {TwoFactorRequest} twoFactorRequest 两步验证请求
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verifyTwoFactor(userId: number, twoFactorRequest: TwoFactorRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verifyTwoFactor(userId, twoFactorRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.verifyTwoFactor']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 微信支付回调通知
          * @param {*} [options] Override http request option.
@@ -19177,6 +19828,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         batchVirusScan(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseString> {
             return localVarFp.batchVirusScan(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 使用验证码绑定邮箱到用户账户。
+         * @summary 绑定邮箱
+         * @param {DefaultApiBindEmailRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        bindEmail(requestParameters: DefaultApiBindEmailRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.bindEmail(requestParameters.userId, requestParameters.bindEmailRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 使用验证码绑定手机号到用户账户。
+         * @summary 绑定手机号
+         * @param {DefaultApiBindPhoneRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        bindPhone(requestParameters: DefaultApiBindPhoneRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.bindPhone(requestParameters.userId, requestParameters.bindPhoneRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -19747,6 +20418,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.detail(requestParameters.refundNo, options).then((request) => request(axios, basePath));
         },
         /**
+         * 关闭用户的两步验证功能。
+         * @summary 关闭两步验证
+         * @param {DefaultApiDisableTwoFactorRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        disableTwoFactor(requestParameters: DefaultApiDisableTwoFactorRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.disableTwoFactor(requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 下载导出文件
          * @param {DefaultApiDownloadRequest} requestParameters Request parameters.
@@ -19765,6 +20446,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         downloadFile(requestParameters: DefaultApiDownloadFileRequest, options?: RawAxiosRequestConfig): AxiosPromise<File> {
             return localVarFp.downloadFile(requestParameters.materialId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 生成 TOTP 密钥和二维码 URL，用户需要使用 Google Authenticator 等应用扫描二维码。
+         * @summary 启用两步验证
+         * @param {DefaultApiEnableTwoFactorRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enableTwoFactor(requestParameters: DefaultApiEnableTwoFactorRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse> {
+            return localVarFp.enableTwoFactor(requestParameters.userId, options).then((request) => request(axios, basePath));
         },
         /**
          * 将协商失败的纠纷升级为待仲裁状态
@@ -20292,6 +20983,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getHotTopics1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTopic> {
             return localVarFp.getHotTopics1(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 查看用户的所有登录设备记录，包括设备类型、浏览器、IP 地址等信息。
+         * @summary 获取用户登录设备列表
+         * @param {DefaultApiGetLoginDevicesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLoginDevices(requestParameters: DefaultApiGetLoginDevicesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse> {
+            return localVarFp.getLoginDevices(requestParameters.userId, options).then((request) => request(axios, basePath));
         },
         /**
          * 买家查看订单物流时调用
@@ -20909,6 +21610,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.isFavorited(requestParameters.goodsId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 删除指定的登录设备记录，该设备将无法继续访问（需要重新登录）。
+         * @summary 踢出登录设备
+         * @param {DefaultApiKickDeviceRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        kickDevice(requestParameters: DefaultApiKickDeviceRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.kickDevice(requestParameters.userId, requestParameters.deviceId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 点赞帖子
          * @param {DefaultApiLikePostRequest} requestParameters Request parameters.
@@ -20994,6 +21705,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listAuditLogs(requestParameters: DefaultApiListAuditLogsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageAuditLogResponse> {
             return localVarFp.listAuditLogs(requestParameters.operatorId, requestParameters.actionType, requestParameters.startTime, requestParameters.endTime, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 管理员查询用户封禁记录（支持分页和筛选）
+         * @summary 查询封禁记录列表
+         * @param {DefaultApiListBannedUsersRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listBannedUsers(requestParameters: DefaultApiListBannedUsersRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageBanLogResponse> {
+            return localVarFp.listBannedUsers(requestParameters.userId, requestParameters.isUnbanned, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 获取当前用户的黑名单列表
@@ -21149,6 +21870,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listNotifications(requestParameters: DefaultApiListNotificationsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageNotificationResponse> {
             return localVarFp.listNotifications(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 管理员查询系统操作日志（支持分页和筛选）
+         * @summary 查询操作日志列表
+         * @param {DefaultApiListOperationLogsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listOperationLogs(requestParameters: DefaultApiListOperationLogsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
+            return localVarFp.listOperationLogs(requestParameters.operatorId, requestParameters.actionType, requestParameters.startTime, requestParameters.endTime, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 查询待仲裁状态的纠纷列表
@@ -21810,6 +22541,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.searchPosts(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 向指定邮箱发送验证码，用于绑定邮箱。
+         * @summary 发送邮箱验证码
+         * @param {DefaultApiSendEmailCodeRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendEmailCode(requestParameters: DefaultApiSendEmailCodeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.sendEmailCode(requestParameters.email, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 发送私信给指定用户，支持文本/图片/商品卡片
          * @summary 发送消息
          * @param {DefaultApiSendMessageRequest} requestParameters Request parameters.
@@ -21828,6 +22569,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         sendMessage1(requestParameters: DefaultApiSendMessage1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong> {
             return localVarFp.sendMessage1(requestParameters.sendNegotiationRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 向指定手机号发送验证码，用于绑定手机号。
+         * @summary 发送手机验证码
+         * @param {DefaultApiSendPhoneCodeRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendPhoneCode(requestParameters: DefaultApiSendPhoneCodeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.sendPhoneCode(requestParameters.phone, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -22269,6 +23020,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.validateMigration(requestParameters.campusMigrationRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 输入 Google Authenticator 中的 6 位验证码，验证成功后启用两步验证。
+         * @summary 验证并确认两步验证
+         * @param {DefaultApiVerifyTwoFactorRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyTwoFactor(requestParameters: DefaultApiVerifyTwoFactorRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.verifyTwoFactor(requestParameters.userId, requestParameters.twoFactorRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 微信支付回调通知
          * @param {*} [options] Override http request option.
@@ -22592,6 +23353,28 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     batchVirusScan(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseString>;
+
+    /**
+     * 使用验证码绑定邮箱到用户账户。
+     * @summary 绑定邮箱
+     * @param {number} userId 用户 ID
+     * @param {BindEmailRequest} bindEmailRequest 绑定邮箱请求
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    bindEmail(userId: number, bindEmailRequest: BindEmailRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 使用验证码绑定手机号到用户账户。
+     * @summary 绑定手机号
+     * @param {number} userId 用户 ID
+     * @param {BindPhoneRequest} bindPhoneRequest 绑定手机号请求
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    bindPhone(userId: number, bindPhoneRequest: BindPhoneRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 
@@ -23169,6 +23952,16 @@ export interface DefaultApiInterface {
     detail(refundNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundRequest>;
 
     /**
+     * 关闭用户的两步验证功能。
+     * @summary 关闭两步验证
+     * @param {number} userId 用户 ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    disableTwoFactor(userId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 
      * @summary 下载导出文件
      * @param {string} token 下载令牌
@@ -23187,6 +23980,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     downloadFile(materialId: number, options?: RawAxiosRequestConfig): AxiosPromise<File>;
+
+    /**
+     * 生成 TOTP 密钥和二维码 URL，用户需要使用 Google Authenticator 等应用扫描二维码。
+     * @summary 启用两步验证
+     * @param {number} userId 用户 ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enableTwoFactor(userId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse>;
 
     /**
      * 将协商失败的纠纷升级为待仲裁状态
@@ -23725,6 +24528,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     getHotTopics1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTopic>;
+
+    /**
+     * 查看用户的所有登录设备记录，包括设备类型、浏览器、IP 地址等信息。
+     * @summary 获取用户登录设备列表
+     * @param {number} userId 用户 ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getLoginDevices(userId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse>;
 
     /**
      * 买家查看订单物流时调用
@@ -24358,6 +25171,17 @@ export interface DefaultApiInterface {
     isFavorited(goodsId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
 
     /**
+     * 删除指定的登录设备记录，该设备将无法继续访问（需要重新登录）。
+     * @summary 踢出登录设备
+     * @param {number} userId 用户 ID
+     * @param {number} deviceId 设备 ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    kickDevice(userId: number, deviceId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 
      * @summary 点赞帖子
      * @param {number} postId 帖子ID
@@ -24457,6 +25281,19 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     listAuditLogs(operatorId?: number, actionType?: ListAuditLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageAuditLogResponse>;
+
+    /**
+     * 管理员查询用户封禁记录（支持分页和筛选）
+     * @summary 查询封禁记录列表
+     * @param {number} [userId] 用户ID（可选）
+     * @param {boolean} [isUnbanned] 是否已解封（可选）
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页大小
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listBannedUsers(userId?: number, isUnbanned?: boolean, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageBanLogResponse>;
 
     /**
      * 获取当前用户的黑名单列表
@@ -24637,6 +25474,21 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     listNotifications(status?: ListNotificationsStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageNotificationResponse>;
+
+    /**
+     * 管理员查询系统操作日志（支持分页和筛选）
+     * @summary 查询操作日志列表
+     * @param {number} [operatorId] 操作人ID
+     * @param {ListOperationLogsActionTypeEnum} [actionType] 操作类型
+     * @param {string} [startTime] 开始时间
+     * @param {string} [endTime] 结束时间
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页大小
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listOperationLogs(operatorId?: number, actionType?: ListOperationLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
 
     /**
      * 查询待仲裁状态的纠纷列表
@@ -25339,6 +26191,16 @@ export interface DefaultApiInterface {
     searchPosts(keyword: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePagePostResponse>;
 
     /**
+     * 向指定邮箱发送验证码，用于绑定邮箱。
+     * @summary 发送邮箱验证码
+     * @param {string} email 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    sendEmailCode(email: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 发送私信给指定用户，支持文本/图片/商品卡片
      * @summary 发送消息
      * @param {SendMessageRequest} sendMessageRequest 
@@ -25357,6 +26219,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     sendMessage1(sendNegotiationRequest: SendNegotiationRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
+
+    /**
+     * 向指定手机号发送验证码，用于绑定手机号。
+     * @summary 发送手机验证码
+     * @param {string} phone 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    sendPhoneCode(phone: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 
@@ -25818,6 +26690,17 @@ export interface DefaultApiInterface {
     validateMigration(campusMigrationRequest: CampusMigrationRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampusMigrationValidationResponse>;
 
     /**
+     * 输入 Google Authenticator 中的 6 位验证码，验证成功后启用两步验证。
+     * @summary 验证并确认两步验证
+     * @param {number} userId 用户 ID
+     * @param {TwoFactorRequest} twoFactorRequest 两步验证请求
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    verifyTwoFactor(userId: number, twoFactorRequest: TwoFactorRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 
      * @summary 微信支付回调通知
      * @param {*} [options] Override http request option.
@@ -26267,6 +27150,48 @@ export interface DefaultApiBatchUpdateSortRequest {
      * @memberof DefaultApiBatchUpdateSort
      */
     readonly categoryBatchSortRequest: CategoryBatchSortRequest
+}
+
+/**
+ * Request parameters for bindEmail operation in DefaultApi.
+ * @export
+ * @interface DefaultApiBindEmailRequest
+ */
+export interface DefaultApiBindEmailRequest {
+    /**
+     * 用户 ID
+     * @type {number}
+     * @memberof DefaultApiBindEmail
+     */
+    readonly userId: number
+
+    /**
+     * 绑定邮箱请求
+     * @type {BindEmailRequest}
+     * @memberof DefaultApiBindEmail
+     */
+    readonly bindEmailRequest: BindEmailRequest
+}
+
+/**
+ * Request parameters for bindPhone operation in DefaultApi.
+ * @export
+ * @interface DefaultApiBindPhoneRequest
+ */
+export interface DefaultApiBindPhoneRequest {
+    /**
+     * 用户 ID
+     * @type {number}
+     * @memberof DefaultApiBindPhone
+     */
+    readonly userId: number
+
+    /**
+     * 绑定手机号请求
+     * @type {BindPhoneRequest}
+     * @memberof DefaultApiBindPhone
+     */
+    readonly bindPhoneRequest: BindPhoneRequest
 }
 
 /**
@@ -27075,6 +28000,20 @@ export interface DefaultApiDetailRequest {
 }
 
 /**
+ * Request parameters for disableTwoFactor operation in DefaultApi.
+ * @export
+ * @interface DefaultApiDisableTwoFactorRequest
+ */
+export interface DefaultApiDisableTwoFactorRequest {
+    /**
+     * 用户 ID
+     * @type {number}
+     * @memberof DefaultApiDisableTwoFactor
+     */
+    readonly userId: number
+}
+
+/**
  * Request parameters for download operation in DefaultApi.
  * @export
  * @interface DefaultApiDownloadRequest
@@ -27100,6 +28039,20 @@ export interface DefaultApiDownloadFileRequest {
      * @memberof DefaultApiDownloadFile
      */
     readonly materialId: number
+}
+
+/**
+ * Request parameters for enableTwoFactor operation in DefaultApi.
+ * @export
+ * @interface DefaultApiEnableTwoFactorRequest
+ */
+export interface DefaultApiEnableTwoFactorRequest {
+    /**
+     * 用户 ID
+     * @type {number}
+     * @memberof DefaultApiEnableTwoFactor
+     */
+    readonly userId: number
 }
 
 /**
@@ -27751,6 +28704,20 @@ export interface DefaultApiGetHotKeywordsRequest {
      * @memberof DefaultApiGetHotKeywords
      */
     readonly limit?: number
+}
+
+/**
+ * Request parameters for getLoginDevices operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetLoginDevicesRequest
+ */
+export interface DefaultApiGetLoginDevicesRequest {
+    /**
+     * 用户 ID
+     * @type {number}
+     * @memberof DefaultApiGetLoginDevices
+     */
+    readonly userId: number
 }
 
 /**
@@ -28538,6 +29505,27 @@ export interface DefaultApiIsFavoritedRequest {
 }
 
 /**
+ * Request parameters for kickDevice operation in DefaultApi.
+ * @export
+ * @interface DefaultApiKickDeviceRequest
+ */
+export interface DefaultApiKickDeviceRequest {
+    /**
+     * 用户 ID
+     * @type {number}
+     * @memberof DefaultApiKickDevice
+     */
+    readonly userId: number
+
+    /**
+     * 设备 ID
+     * @type {number}
+     * @memberof DefaultApiKickDevice
+     */
+    readonly deviceId: number
+}
+
+/**
  * Request parameters for likePost operation in DefaultApi.
  * @export
  * @interface DefaultApiLikePostRequest
@@ -28715,6 +29703,41 @@ export interface DefaultApiListAuditLogsRequest {
      * 每页数量
      * @type {number}
      * @memberof DefaultApiListAuditLogs
+     */
+    readonly size?: number
+}
+
+/**
+ * Request parameters for listBannedUsers operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListBannedUsersRequest
+ */
+export interface DefaultApiListBannedUsersRequest {
+    /**
+     * 用户ID（可选）
+     * @type {number}
+     * @memberof DefaultApiListBannedUsers
+     */
+    readonly userId?: number
+
+    /**
+     * 是否已解封（可选）
+     * @type {boolean}
+     * @memberof DefaultApiListBannedUsers
+     */
+    readonly isUnbanned?: boolean
+
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiListBannedUsers
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     * @type {number}
+     * @memberof DefaultApiListBannedUsers
      */
     readonly size?: number
 }
@@ -29044,6 +30067,55 @@ export interface DefaultApiListNotificationsRequest {
      * 每页大小
      * @type {number}
      * @memberof DefaultApiListNotifications
+     */
+    readonly size?: number
+}
+
+/**
+ * Request parameters for listOperationLogs operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListOperationLogsRequest
+ */
+export interface DefaultApiListOperationLogsRequest {
+    /**
+     * 操作人ID
+     * @type {number}
+     * @memberof DefaultApiListOperationLogs
+     */
+    readonly operatorId?: number
+
+    /**
+     * 操作类型
+     * @type {'USER_LOGIN' | 'USER_REGISTER' | 'USER_BAN' | 'USER_UNBAN' | 'GOODS_CREATE' | 'GOODS_APPROVE' | 'GOODS_DELETE' | 'POST_CREATE' | 'POST_APPROVE' | 'POST_DELETE' | 'REPLY_CREATE' | 'REPLY_DELETE' | 'ORDER_CREATE' | 'ORDER_PAY' | 'ORDER_CANCEL' | 'DISPUTE_CREATE' | 'DISPUTE_UPDATE' | 'DISPUTE_CLOSE' | 'REPORT_CREATE' | 'REPORT_HANDLE' | 'USER_APPEAL' | 'APPEAL_APPROVE' | 'APPEAL_REJECT' | 'APPEAL_CANCEL' | 'COMPLIANCE_CHECK' | 'NOTIFICATION_FAIL' | 'UPDATE' | 'DELETE'}
+     * @memberof DefaultApiListOperationLogs
+     */
+    readonly actionType?: ListOperationLogsActionTypeEnum
+
+    /**
+     * 开始时间
+     * @type {string}
+     * @memberof DefaultApiListOperationLogs
+     */
+    readonly startTime?: string
+
+    /**
+     * 结束时间
+     * @type {string}
+     * @memberof DefaultApiListOperationLogs
+     */
+    readonly endTime?: string
+
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiListOperationLogs
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     * @type {number}
+     * @memberof DefaultApiListOperationLogs
      */
     readonly size?: number
 }
@@ -30120,6 +31192,20 @@ export interface DefaultApiSearchPostsRequest {
 }
 
 /**
+ * Request parameters for sendEmailCode operation in DefaultApi.
+ * @export
+ * @interface DefaultApiSendEmailCodeRequest
+ */
+export interface DefaultApiSendEmailCodeRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof DefaultApiSendEmailCode
+     */
+    readonly email: string
+}
+
+/**
  * Request parameters for sendMessage operation in DefaultApi.
  * @export
  * @interface DefaultApiSendMessageRequest
@@ -30145,6 +31231,20 @@ export interface DefaultApiSendMessage1Request {
      * @memberof DefaultApiSendMessage1
      */
     readonly sendNegotiationRequest: SendNegotiationRequest
+}
+
+/**
+ * Request parameters for sendPhoneCode operation in DefaultApi.
+ * @export
+ * @interface DefaultApiSendPhoneCodeRequest
+ */
+export interface DefaultApiSendPhoneCodeRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof DefaultApiSendPhoneCode
+     */
+    readonly phone: string
 }
 
 /**
@@ -30890,6 +31990,27 @@ export interface DefaultApiValidateMigrationRequest {
 }
 
 /**
+ * Request parameters for verifyTwoFactor operation in DefaultApi.
+ * @export
+ * @interface DefaultApiVerifyTwoFactorRequest
+ */
+export interface DefaultApiVerifyTwoFactorRequest {
+    /**
+     * 用户 ID
+     * @type {number}
+     * @memberof DefaultApiVerifyTwoFactor
+     */
+    readonly userId: number
+
+    /**
+     * 两步验证请求
+     * @type {TwoFactorRequest}
+     * @memberof DefaultApiVerifyTwoFactor
+     */
+    readonly twoFactorRequest: TwoFactorRequest
+}
+
+/**
  * DefaultApi - object-oriented interface
  * @export
  * @class DefaultApi
@@ -31250,6 +32371,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public batchVirusScan(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).batchVirusScan(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 使用验证码绑定邮箱到用户账户。
+     * @summary 绑定邮箱
+     * @param {DefaultApiBindEmailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public bindEmail(requestParameters: DefaultApiBindEmailRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).bindEmail(requestParameters.userId, requestParameters.bindEmailRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 使用验证码绑定手机号到用户账户。
+     * @summary 绑定手机号
+     * @param {DefaultApiBindPhoneRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public bindPhone(requestParameters: DefaultApiBindPhoneRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).bindPhone(requestParameters.userId, requestParameters.bindPhoneRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -31935,6 +33080,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 关闭用户的两步验证功能。
+     * @summary 关闭两步验证
+     * @param {DefaultApiDisableTwoFactorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public disableTwoFactor(requestParameters: DefaultApiDisableTwoFactorRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).disableTwoFactor(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 下载导出文件
      * @param {DefaultApiDownloadRequest} requestParameters Request parameters.
@@ -31956,6 +33113,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public downloadFile(requestParameters: DefaultApiDownloadFileRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).downloadFile(requestParameters.materialId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 生成 TOTP 密钥和二维码 URL，用户需要使用 Google Authenticator 等应用扫描二维码。
+     * @summary 启用两步验证
+     * @param {DefaultApiEnableTwoFactorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public enableTwoFactor(requestParameters: DefaultApiEnableTwoFactorRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).enableTwoFactor(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -32591,6 +33760,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getHotTopics1(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getHotTopics1(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 查看用户的所有登录设备记录，包括设备类型、浏览器、IP 地址等信息。
+     * @summary 获取用户登录设备列表
+     * @param {DefaultApiGetLoginDevicesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getLoginDevices(requestParameters: DefaultApiGetLoginDevicesRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getLoginDevices(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -33335,6 +34516,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 删除指定的登录设备记录，该设备将无法继续访问（需要重新登录）。
+     * @summary 踢出登录设备
+     * @param {DefaultApiKickDeviceRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public kickDevice(requestParameters: DefaultApiKickDeviceRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).kickDevice(requestParameters.userId, requestParameters.deviceId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 点赞帖子
      * @param {DefaultApiLikePostRequest} requestParameters Request parameters.
@@ -33437,6 +34630,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listAuditLogs(requestParameters: DefaultApiListAuditLogsRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listAuditLogs(requestParameters.operatorId, requestParameters.actionType, requestParameters.startTime, requestParameters.endTime, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 管理员查询用户封禁记录（支持分页和筛选）
+     * @summary 查询封禁记录列表
+     * @param {DefaultApiListBannedUsersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listBannedUsers(requestParameters: DefaultApiListBannedUsersRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listBannedUsers(requestParameters.userId, requestParameters.isUnbanned, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -33624,6 +34829,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listNotifications(requestParameters: DefaultApiListNotificationsRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listNotifications(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 管理员查询系统操作日志（支持分页和筛选）
+     * @summary 查询操作日志列表
+     * @param {DefaultApiListOperationLogsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listOperationLogs(requestParameters: DefaultApiListOperationLogsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listOperationLogs(requestParameters.operatorId, requestParameters.actionType, requestParameters.startTime, requestParameters.endTime, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -34420,6 +35637,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 向指定邮箱发送验证码，用于绑定邮箱。
+     * @summary 发送邮箱验证码
+     * @param {DefaultApiSendEmailCodeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public sendEmailCode(requestParameters: DefaultApiSendEmailCodeRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).sendEmailCode(requestParameters.email, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 发送私信给指定用户，支持文本/图片/商品卡片
      * @summary 发送消息
      * @param {DefaultApiSendMessageRequest} requestParameters Request parameters.
@@ -34441,6 +35670,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public sendMessage1(requestParameters: DefaultApiSendMessage1Request, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).sendMessage1(requestParameters.sendNegotiationRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 向指定手机号发送验证码，用于绑定手机号。
+     * @summary 发送手机验证码
+     * @param {DefaultApiSendPhoneCodeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public sendPhoneCode(requestParameters: DefaultApiSendPhoneCodeRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).sendPhoneCode(requestParameters.phone, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -34971,6 +36212,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 输入 Google Authenticator 中的 6 位验证码，验证成功后启用两步验证。
+     * @summary 验证并确认两步验证
+     * @param {DefaultApiVerifyTwoFactorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public verifyTwoFactor(requestParameters: DefaultApiVerifyTwoFactorRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).verifyTwoFactor(requestParameters.userId, requestParameters.twoFactorRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 微信支付回调通知
      * @param {*} [options] Override http request option.
@@ -35162,6 +36415,40 @@ export const ListNotificationsStatusEnum = {
     Deleted: 'DELETED'
 } as const;
 export type ListNotificationsStatusEnum = typeof ListNotificationsStatusEnum[keyof typeof ListNotificationsStatusEnum];
+/**
+ * @export
+ */
+export const ListOperationLogsActionTypeEnum = {
+    UserLogin: 'USER_LOGIN',
+    UserRegister: 'USER_REGISTER',
+    UserBan: 'USER_BAN',
+    UserUnban: 'USER_UNBAN',
+    GoodsCreate: 'GOODS_CREATE',
+    GoodsApprove: 'GOODS_APPROVE',
+    GoodsDelete: 'GOODS_DELETE',
+    PostCreate: 'POST_CREATE',
+    PostApprove: 'POST_APPROVE',
+    PostDelete: 'POST_DELETE',
+    ReplyCreate: 'REPLY_CREATE',
+    ReplyDelete: 'REPLY_DELETE',
+    OrderCreate: 'ORDER_CREATE',
+    OrderPay: 'ORDER_PAY',
+    OrderCancel: 'ORDER_CANCEL',
+    DisputeCreate: 'DISPUTE_CREATE',
+    DisputeUpdate: 'DISPUTE_UPDATE',
+    DisputeClose: 'DISPUTE_CLOSE',
+    ReportCreate: 'REPORT_CREATE',
+    ReportHandle: 'REPORT_HANDLE',
+    UserAppeal: 'USER_APPEAL',
+    AppealApprove: 'APPEAL_APPROVE',
+    AppealReject: 'APPEAL_REJECT',
+    AppealCancel: 'APPEAL_CANCEL',
+    ComplianceCheck: 'COMPLIANCE_CHECK',
+    NotificationFail: 'NOTIFICATION_FAIL',
+    Update: 'UPDATE',
+    Delete: 'DELETE'
+} as const;
+export type ListOperationLogsActionTypeEnum = typeof ListOperationLogsActionTypeEnum[keyof typeof ListOperationLogsActionTypeEnum];
 /**
  * @export
  */

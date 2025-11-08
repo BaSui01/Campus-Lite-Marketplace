@@ -87,6 +87,7 @@ models/api-response-order.ts
 models/api-response-page-appeal-material.ts
 models/api-response-page-appeal.ts
 models/api-response-page-audit-log-response.ts
+models/api-response-page-ban-log-response.ts
 models/api-response-page-batch-task-response.ts
 models/api-response-page-blacklist.ts
 models/api-response-page-compliance-audit-log.ts
@@ -132,6 +133,7 @@ models/approve-goods-request.ts
 models/arbitrate-dispute-request.ts
 models/arbitration-dto.ts
 models/audit-log-response.ts
+models/ban-log-response.ts
 models/ban-user-request.ts
 models/banner.ts
 models/batch-error.ts
@@ -140,6 +142,8 @@ models/batch-review-result.ts
 models/batch-task-progress-response.ts
 models/batch-task-response.ts
 models/batch-unblock-request.ts
+models/bind-email-request.ts
+models/bind-phone-request.ts
 models/blacklist-stats-response.ts
 models/blacklist.ts
 models/campus-create-request.ts
@@ -220,6 +224,7 @@ models/order.ts
 models/page-appeal-material.ts
 models/page-appeal.ts
 models/page-audit-log-response.ts
+models/page-ban-log-response.ts
 models/page-batch-task-response.ts
 models/page-blacklist.ts
 models/page-compliance-audit-log.ts
@@ -280,6 +285,7 @@ models/tag-statistics-response.ts
 models/tag.ts
 models/text-highlight.ts
 models/topic.ts
+models/two-factor-request.ts
 models/update-category-request.ts
 models/update-password-request.ts
 models/update-post-request.ts

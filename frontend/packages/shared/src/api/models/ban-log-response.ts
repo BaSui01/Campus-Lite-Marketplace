@@ -13,84 +13,72 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
- * 业务数据载荷
+ * 封禁记录响应
  * @export
- * @interface PageObject
+ * @interface BanLogResponse
  */
-export interface PageObject {
+export interface BanLogResponse {
     /**
-     * 
+     * 封禁记录ID
      * @type {number}
-     * @memberof PageObject
+     * @memberof BanLogResponse
      */
-    'totalElements'?: number;
+    'id'?: number;
     /**
-     * 
+     * 被封禁用户ID
      * @type {number}
-     * @memberof PageObject
+     * @memberof BanLogResponse
      */
-    'totalPages'?: number;
+    'userId'?: number;
     /**
-     * 
+     * 被封禁用户名
+     * @type {string}
+     * @memberof BanLogResponse
+     */
+    'username'?: string;
+    /**
+     * 管理员ID
      * @type {number}
-     * @memberof PageObject
+     * @memberof BanLogResponse
      */
-    'size'?: number;
+    'adminId'?: number;
     /**
-     * 
-     * @type {Array<object>}
-     * @memberof PageObject
+     * 管理员用户名
+     * @type {string}
+     * @memberof BanLogResponse
      */
-    'content'?: Array<object>;
+    'adminUsername'?: string;
     /**
-     * 
+     * 封禁原因
+     * @type {string}
+     * @memberof BanLogResponse
+     */
+    'reason'?: string;
+    /**
+     * 封禁天数（0表示永久）
      * @type {number}
-     * @memberof PageObject
+     * @memberof BanLogResponse
      */
-    'number'?: number;
+    'days'?: number;
     /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageObject
+     * 解封时间（null表示永久封禁）
+     * @type {string}
+     * @memberof BanLogResponse
      */
-    'sort'?: Array<SortObject>;
+    'unbanTime'?: string;
     /**
-     * 
+     * 是否已解封
      * @type {boolean}
-     * @memberof PageObject
+     * @memberof BanLogResponse
      */
-    'first'?: boolean;
+    'isUnbanned'?: boolean;
     /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
+     * 创建时间
+     * @type {string}
+     * @memberof BanLogResponse
      */
-    'last'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageObject
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageObject
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'empty'?: boolean;
+    'createdAt'?: string;
 }
 

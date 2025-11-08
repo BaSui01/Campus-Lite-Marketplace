@@ -1,12 +1,15 @@
 /**
  * 🚀 BaSui 的 API 客户端（基于 OpenAPI 生成代码）
  * @description 统一的 API 客户端配置：Token、拦截器、错误处理
+ * @updated 2025-11-08 - 优化 Token 刷新和错误处理
  */
 
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { DefaultApi, Configuration } from '../api';
 import { BASE_PATH as DEFAULT_BASE_PATH } from '../api/base';
 import { TOKEN_KEY, REFRESH_TOKEN_KEY } from '../constants';
+import { installTokenRefreshInterceptor } from './tokenRefresh';
+import { installErrorHandler } from './errorHandler';
 
 // ==================== 常量配置 ====================
 
@@ -107,6 +110,7 @@ export const hasToken = (): boolean => {
 
 /**
  * 创建 Axios 实例（带拦截器）
+ * @updated 使用新的 Token 刷新和错误处理机制
  */
 const createAxiosInstance = (baseURL: string): AxiosInstance => {
   const instance = axios.create({
@@ -139,57 +143,44 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
     }
   );
 
-  // ==================== 响应拦截器 ====================
+  // ==================== 响应拦截器（简单日志） ====================
   instance.interceptors.response.use(
     (response) => {
       console.log(`[API Client] ✅ ${response.config.method?.toUpperCase()} ${response.config.url}`, response.data);
       return response;
     },
-    async (error: AxiosError) => {
-      const { response } = error;
+    (error) => {
+      // 错误会被后续的拦截器处理（Token 刷新和错误处理）
+      return Promise.reject(error);
+    }
+  );
 
-      console.error(`[API Client] ❌ ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-        status: response?.status,
-        data: response?.data,
+  // ==================== 安装 Token 自动刷新拦截器 ====================
+  installTokenRefreshInterceptor(instance, {
+    getAccessToken,
+    getRefreshToken,
+    setTokens,
+    clearTokens,
+    refreshEndpoint: joinWithBaseUrl(API_BASE_URL, '/api/auth/refresh'),
+    onRefreshFailed: () => {
+      // 保存当前路径，登录后跳转回来
+      const currentPath = window.location.pathname + window.location.search;
+      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+    },
+  });
+
+  // ==================== 安装全局错误处理拦截器 ====================
+  // 注意：错误处理器需要在 UI 层安装（因为需要 message.error）
+  // 这里只记录日志
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      console.error('[API Client] ❌ 请求失败:', {
+        method: error.config?.method?.toUpperCase(),
+        url: error.config?.url,
+        status: error.response?.status,
+        data: error.response?.data,
       });
-
-      // 🔄 401 Token 过期处理
-      if (response?.status === 401) {
-        const refreshToken = getRefreshToken();
-        if (refreshToken) {
-          try {
-            // 尝试刷新 Token
-            const refreshEndpoint = joinWithBaseUrl(API_BASE_URL, '/api/auth/refresh');
-            const { data } = await axios.post(refreshEndpoint, { refreshToken });
-            const newAccessToken = data.data?.accessToken;
-
-            if (newAccessToken) {
-              setTokens(newAccessToken);
-              // 重试原请求
-              if (error.config && error.config.headers) {
-                error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-              }
-              return instance.request(error.config!);
-            }
-          } catch (refreshError) {
-            console.error('[API Client] ❌ Token 刷新失败:', refreshError);
-            clearTokens();
-            // 保存当前路径，登录后跳转回来
-            const currentPath = window.location.pathname + window.location.search;
-            window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-          }
-        } else {
-          clearTokens();
-          // 保存当前路径，登录后跳转回来
-          const currentPath = window.location.pathname + window.location.search;
-          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-        }
-      }
-
-      // 📢 错误提示
-      const errorMessage = (response?.data as any)?.message || error.message || '系统内部错误';
-      console.log(`[API Client] 💬 ${errorMessage}`);
-
       return Promise.reject(error);
     }
   );

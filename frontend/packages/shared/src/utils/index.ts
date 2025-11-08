@@ -6,6 +6,9 @@
 
 // 🌐 API 客户端（基于 OpenAPI）
 export * from './apiClient';
+export * from './tokenRefresh';
+export * from './errorHandler';
+export * from './tabSync';
 
 // 🎨 格式化工具
 export * from './format';
