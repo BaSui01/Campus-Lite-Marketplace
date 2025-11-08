@@ -63,6 +63,30 @@ public class FileSecurityServiceImpl implements FileSecurityService {
         "..", "/", "\\", ":", "*", "?", "\"", "<", ">", "|", "\0"
     );
 
+    // 文件魔数（Magic Number）映射表 - 用于验证文件真实类型
+    private static final Map<String, String> MAGIC_NUMBER_MAP = new HashMap<>();
+    
+    static {
+        // JPEG: FF D8 FF (前3字节)
+        MAGIC_NUMBER_MAP.put("FFD8FF", "image/jpeg");
+        
+        // PNG: 89 50 4E 47 (前4字节)
+        MAGIC_NUMBER_MAP.put("89504E47", "image/png");
+        
+        // GIF: 47 49 46 38 (前4字节，GIF8)
+        MAGIC_NUMBER_MAP.put("47494638", "image/gif");
+        
+        // PDF: 25 50 44 46 (前4字节，%PDF)
+        MAGIC_NUMBER_MAP.put("25504446", "application/pdf");
+        
+        // WEBP: 52 49 46 46 (前4字节，RIFF)
+        // 注意：WEBP的完整魔数是 RIFF....WEBP，这里只检查RIFF
+        MAGIC_NUMBER_MAP.put("52494646", "image/webp");
+        
+        // BMP: 42 4D (前2字节，BM)
+        MAGIC_NUMBER_MAP.put("424D", "image/bmp");
+    }
+
     @Override
     public void validateFileType(MultipartFile file) {
         String contentType = file.getContentType();
@@ -270,6 +294,60 @@ public class FileSecurityServiceImpl implements FileSecurityService {
         }
     }
 
+    @Override
+    public void validateFileMagicNumber(MultipartFile file) {
+        try {
+            String fileName = file.getOriginalFilename();
+            String contentType = file.getContentType();
+            
+            if (fileName == null || contentType == null) {
+                log.warn("文件名或MIME类型为空");
+                throw new IllegalArgumentException("无效的文件信息");
+            }
+
+            // 读取文件的前8个字节（足够识别大多数文件类型）
+            byte[] fileHeader = new byte[8];
+            int bytesRead = file.getInputStream().read(fileHeader);
+            
+            if (bytesRead < 2) {
+                log.warn("文件太小，无法读取魔数: {}", fileName);
+                throw new IllegalArgumentException("文件太小，无法验证文件类型");
+            }
+
+            // 将字节数组转换为十六进制字符串
+            String magicNumber = bytesToHex(fileHeader, bytesRead);
+            log.debug("文件魔数: {} -> {}", fileName, magicNumber);
+
+            // 匹配魔数
+            String detectedMimeType = detectMimeTypeByMagicNumber(magicNumber);
+            
+            if (detectedMimeType == null) {
+                // 如果无法识别魔数，记录警告但不阻止（避免误拦）
+                log.warn("无法识别文件魔数: {} -> {}", fileName, magicNumber);
+                return;
+            }
+
+            // 验证魔数是否与声明的MIME类型匹配
+            if (!detectedMimeType.equalsIgnoreCase(contentType)) {
+                log.warn("文件魔数与声明的MIME类型不匹配: 文件={}, 魔数={}, 检测类型={}, 声明类型={}",
+                    fileName, magicNumber, detectedMimeType, contentType);
+                throw new IllegalArgumentException(
+                    String.format("文件内容与声明类型不匹配：检测为 %s，声明为 %s", 
+                        detectedMimeType, contentType)
+                );
+            }
+
+            log.debug("文件魔数验证通过: {} -> {}", fileName, detectedMimeType);
+            
+        } catch (IllegalArgumentException e) {
+            // 重新抛出业务异常
+            throw e;
+        } catch (Exception e) {
+            log.error("文件魔数验证失败: {}", file.getOriginalFilename(), e);
+            throw new RuntimeException("文件魔数验证失败", e);
+        }
+    }
+
     /**
      * 获取文件扩展名
      * 
@@ -287,5 +365,46 @@ public class FileSecurityServiceImpl implements FileSecurityService {
         }
         
         return "";
+    }
+
+    /**
+     * 将字节数组转换为十六进制字符串
+     * 
+     * @param bytes 字节数组
+     * @param length 有效字节长度
+     * @return 十六进制字符串（大写）
+     */
+    private String bytesToHex(byte[] bytes, int length) {
+        StringBuilder hexString = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            String hex = String.format("%02X", bytes[i]);
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    /**
+     * 根据魔数检测MIME类型
+     * 
+     * @param magicNumber 文件魔数（十六进制字符串）
+     * @return 检测到的MIME类型，如果无法识别则返回null
+     */
+    private String detectMimeTypeByMagicNumber(String magicNumber) {
+        if (magicNumber == null || magicNumber.isEmpty()) {
+            return null;
+        }
+
+        // 遍历魔数映射表，匹配前缀
+        for (Map.Entry<String, String> entry : MAGIC_NUMBER_MAP.entrySet()) {
+            String magic = entry.getKey();
+            String mimeType = entry.getValue();
+            
+            // 检查魔数是否以该特征开头
+            if (magicNumber.startsWith(magic)) {
+                return mimeType;
+            }
+        }
+
+        return null;
     }
 }

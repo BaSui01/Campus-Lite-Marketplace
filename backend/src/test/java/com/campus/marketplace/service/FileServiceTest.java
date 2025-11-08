@@ -2,6 +2,7 @@ package com.campus.marketplace.service;
 
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.service.impl.FileSecurityServiceImpl;
 import com.campus.marketplace.service.impl.FileServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,13 +29,19 @@ import static org.assertj.core.api.Assertions.*;
 class FileServiceTest {
 
     private FileServiceImpl fileService;
+    private FileSecurityService fileSecurityService;
 
     @TempDir
     Path tempDir; // 临时目录，测试完自动清理
 
     @BeforeEach
     void setUp() {
-        fileService = new FileServiceImpl();
+        // 🎯 创建真实的 FileSecurityService 实例
+        fileSecurityService = new FileSecurityServiceImpl();
+        
+        // 🎯 注入 FileSecurityService 到 FileServiceImpl
+        fileService = new FileServiceImpl(fileSecurityService);
+        
         // 设置上传目录为临时目录
         ReflectionTestUtils.setField(fileService, "uploadDir", tempDir.toString());
         ReflectionTestUtils.setField(fileService, "maxFileSize", 10 * 1024 * 1024L); // 10MB
@@ -44,8 +51,13 @@ class FileServiceTest {
     @Test
     @DisplayName("上传图片成功 - 返回文件访问路径")
     void uploadFile_Success() throws IOException {
-        // 🎯 准备测试数据
-        byte[] imageContent = "fake-image-content".getBytes();
+        // 🎯 准备测试数据（使用真实的JPEG魔数）
+        byte[] imageContent = {
+            (byte)0xFF, (byte)0xD8, (byte)0xFF, (byte)0xE0, // JPEG 魔数
+            0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, // JFIF header
+            0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00,
+            (byte)0xFF, (byte)0xD9 // JPEG 结束标记
+        };
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test-image.jpg",
@@ -56,14 +68,14 @@ class FileServiceTest {
         // 🚀 执行上传
         String fileUrl = fileService.uploadFile(file);
 
-        // ✅ 验证结果
+        // ✅ 验证结果（新的目录结构：/uploads/images/yyyy/MM/dd/文件.jpg）
         assertThat(fileUrl).isNotNull();
-        assertThat(fileUrl).startsWith("/uploads/");
+        assertThat(fileUrl).startsWith("/uploads/images/"); // 图片文件在 images/ 目录
         assertThat(fileUrl).endsWith(".jpg");
 
-        // 验证文件确实保存了
-        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-        Path uploadedFile = tempDir.resolve(fileName);
+        // 验证文件确实保存了（包含分类和日期子目录）
+        String relativePath = fileUrl.replace("/uploads/", "");
+        Path uploadedFile = tempDir.resolve(relativePath);
         assertThat(uploadedFile).exists();
         assertThat(Files.readAllBytes(uploadedFile)).isEqualTo(imageContent);
     }
@@ -89,16 +101,16 @@ class FileServiceTest {
     @Test
     @DisplayName("上传文件类型不合法 - 抛出异常")
     void uploadFile_InvalidFileType_ThrowsException() {
-        // 🎯 准备非图片文件
-        MockMultipartFile txtFile = new MockMultipartFile(
+        // 🎯 准备不支持的文件类型（使用exe文件）
+        MockMultipartFile exeFile = new MockMultipartFile(
                 "file",
-                "test.txt",
-                "text/plain",
-                "some content".getBytes()
+                "malware.exe",
+                "application/x-msdownload",
+                "MZ".getBytes() // EXE 文件魔数
         );
 
         // 🚀 执行上传并验证异常
-        assertThatThrownBy(() -> fileService.uploadFile(txtFile))
+        assertThatThrownBy(() -> fileService.uploadFile(exeFile))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_PARAM)
                 .hasMessageContaining("不支持的文件类型");

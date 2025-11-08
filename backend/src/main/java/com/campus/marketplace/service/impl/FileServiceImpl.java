@@ -2,7 +2,9 @@ package com.campus.marketplace.service.impl;
 
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.service.FileSecurityService;
 import com.campus.marketplace.service.FileService;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
@@ -14,10 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -30,7 +30,9 @@ import java.util.UUID;
 @Service
 public class FileServiceImpl implements FileService {
 
-    @Value("${file.upload.dir:uploads}")
+    private final FileSecurityService fileSecurityService;
+
+    @Value("${file.upload.dir:backend/uploads}")
     private String uploadDir;
 
     @Value("${file.upload.max-size:10485760}") // 默认 10MB
@@ -39,29 +41,85 @@ public class FileServiceImpl implements FileService {
     @Value("${file.upload.allowed-types:image/jpeg,image/png,image/gif,image/webp,video/mp4,video/mpeg,video/quicktime,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet}")
     private String[] allowedTypes;
 
+    // 🎯 构造函数注入 FileSecurityService
+    public FileServiceImpl(FileSecurityService fileSecurityService) {
+        this.fileSecurityService = fileSecurityService;
+    }
+
+    /**
+     * 初始化方法：确保上传目录存在
+     */
+    @PostConstruct
+    public void init() {
+        try {
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+                log.info("✅ 创建上传目录成功: {}", uploadPath.toAbsolutePath());
+            } else {
+                log.info("✅ 上传目录已存在: {}", uploadPath.toAbsolutePath());
+            }
+        } catch (IOException e) {
+            log.error("❌ 创建上传目录失败: {}", uploadDir, e);
+            throw new RuntimeException("无法创建上传目录: " + uploadDir, e);
+        }
+    }
+
     @Override
     public String uploadFile(MultipartFile file) throws IOException {
-        // 🎯 第一步：验证文件
-        validateFile(file);
+        // 🎯 第一步：执行完整的安全检查（集成 FileSecurityService）
+        try {
+            // 1. 执行基础安全检查（文件非空、文件名、类型、扩展名匹配）
+            fileSecurityService.performSecurityCheck(file);
 
-        // 🎯 第二步：生成唯一文件名
-        String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
+            // 2. 验证文件大小
+            fileSecurityService.validateFileSize(file, maxFileSize);
 
-        // 🎯 第三步：按日期分类创建子目录（格式：yyyy/MM/dd）
-        String dateDir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-        Path uploadPath = Paths.get(uploadDir, dateDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
+            // 3. 验证文件魔数（防止伪造Content-Type）
+            fileSecurityService.validateFileMagicNumber(file);
+
+            log.info("文件安全检查全部通过: {}", file.getOriginalFilename());
+        } catch (IllegalArgumentException e) {
+            // 将安全检查异常转换为业务异常
+            throw new BusinessException(ErrorCode.INVALID_PARAM, e.getMessage());
         }
 
-        // 🎯 第四步：保存文件
+        // 🎯 第二步：根据文件类型确定分类目录
+        String categoryDir = determineFileCategory(file.getContentType());
+
+        // 🎯 第三步：生成唯一文件名
+        String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
+
+        // 🎯 第四步：按日期分类创建子目录（格式：category/yyyy/MM/dd）
+        String dateDir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        Path uploadPath = Paths.get(uploadDir, categoryDir, dateDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+            log.debug("创建分类子目录: {}", uploadPath);
+        }
+
+        // 🎯 第五步：保存文件（使用重试机制防止文件名冲突）
         Path filePath = uploadPath.resolve(uniqueFileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        log.info("文件上传成功: {}/{}", dateDir, uniqueFileName);
+        // 🛑 安全检查：如果文件已存在，重新生成文件名
+        int retryCount = 0;
+        while (Files.exists(filePath) && retryCount < 3) {
+            log.warn("文件已存在，重新生成文件名: {}", uniqueFileName);
+            uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
+            filePath = uploadPath.resolve(uniqueFileName);
+            retryCount++;
+        }
 
-        // 🎯 返回访问URL（包含日期路径）
-        return "/uploads/" + dateDir + "/" + uniqueFileName;
+        if (Files.exists(filePath)) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "文件上传失败：文件名冲突");
+        }
+
+        Files.copy(file.getInputStream(), filePath);
+
+        log.info("文件上传成功: {}/{}/{}", categoryDir, dateDir, uniqueFileName);
+
+        // 🎯 返回访问URL（包含分类和日期路径）
+        return "/uploads/" + categoryDir + "/" + dateDir + "/" + uniqueFileName;
     }
 
     @Override
@@ -102,7 +160,23 @@ public class FileServiceImpl implements FileService {
         try {
             // 🎯 提取文件路径（去掉 /uploads/ 前缀）
             String relativePath = fileUrl.replace("/uploads/", "");
-            Path filePath = Paths.get(uploadDir, relativePath);
+
+            // 🛑 安全检查：防止路径遍历攻击
+            if (relativePath.contains("..") || relativePath.contains("//") || relativePath.startsWith("/")) {
+                log.error("检测到路径遍历攻击：{}", fileUrl);
+                throw new BusinessException(ErrorCode.INVALID_PARAM, "非法的文件路径");
+            }
+
+            // 🛑 路径规范化：解析并验证路径安全性
+            Path uploadBasePath = Paths.get(uploadDir).toAbsolutePath().normalize();
+            Path filePath = uploadBasePath.resolve(relativePath).normalize();
+
+            // 🛑 边界检查：确保文件路径在上传目录内
+            if (!filePath.startsWith(uploadBasePath)) {
+                log.error("路径超出边界：fileUrl={}, uploadDir={}, resolvedPath={}",
+                    fileUrl, uploadBasePath, filePath);
+                throw new BusinessException(ErrorCode.INVALID_PARAM, "非法的文件路径");
+            }
 
             // 🎯 删除文件
             if (Files.exists(filePath)) {
@@ -123,6 +197,9 @@ public class FileServiceImpl implements FileService {
                 return true;
             }
             return false;
+        } catch (BusinessException e) {
+            // 重新抛出业务异常
+            throw e;
         } catch (Exception e) {
             log.error("文件删除失败: {}", e.getMessage(), e);
             return false;
@@ -139,29 +216,36 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * 验证上传文件的合法性
+     * 根据文件MIME类型确定分类目录
+     *
+     * @param contentType 文件MIME类型
+     * @return 分类目录名称
      */
-    private void validateFile(MultipartFile file) {
-        // 🚫 验证：文件不能为空
-        if (file == null || file.isEmpty()) {
-            throw new BusinessException(ErrorCode.INVALID_PARAM, "文件不能为空");
+    private String determineFileCategory(String contentType) {
+        if (contentType == null) {
+            return "others";
         }
 
-        // 🚫 验证：文件大小
-        if (file.getSize() > maxFileSize) {
-            throw new BusinessException(
-                    ErrorCode.INVALID_PARAM,
-                    "文件大小超过限制（最大 " + (maxFileSize / 1024 / 1024) + "MB）"
-            );
+        // 🎨 图片文件 → images/
+        if (contentType.startsWith("image/")) {
+            return "images";
         }
 
-        // 🚫 验证：文件类型
-        String contentType = file.getContentType();
-        if (contentType == null || !Arrays.asList(allowedTypes).contains(contentType)) {
-            throw new BusinessException(
-                    ErrorCode.INVALID_PARAM,
-                    "不支持的文件类型，仅支持: " + String.join(", ", allowedTypes)
-            );
+        // 🎬 视频文件 → videos/
+        if (contentType.startsWith("video/")) {
+            return "videos";
         }
+
+        // 📄 文档文件 → documents/
+        if (contentType.startsWith("application/pdf") ||
+            contentType.startsWith("application/msword") ||
+            contentType.startsWith("application/vnd.openxmlformats") ||
+            contentType.startsWith("application/vnd.ms-excel") ||
+            contentType.startsWith("text/plain")) {
+            return "documents";
+        }
+
+        // 🗂️ 其他文件 → others/
+        return "others";
     }
 }
