@@ -52,10 +52,37 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
-      <Card className="login-card">
+      {/* 装饰性元素 */}
+      <div className="decoration-circle decoration-top-left"></div>
+      <div className="decoration-circle decoration-bottom-right"></div>
+      
+      <Card className="login-card" bordered={false}>
+        {/* 顶部装饰条 */}
+        <div className="card-decoration-bar"></div>
+        
+        {/* Logo区域 */}
+        <div className="login-logo">
+          <div className="logo-circle">
+            <svg viewBox="0 0 1024 1024" width="56" height="56">
+              <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z" fill="url(#gradient1)"/>
+              <path d="M512 140c-205.4 0-372 166.6-372 372s166.6 372 372 372 372-166.6 372-372-166.6-372-372-372z m0 684c-172.3 0-312-139.7-312-312s139.7-312 312-312 312 139.7 312 312-139.7 312-312 312z" fill="url(#gradient2)"/>
+              <defs>
+                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor: '#667eea', stopOpacity: 1}} />
+                  <stop offset="100%" style={{stopColor: '#764ba2', stopOpacity: 1}} />
+                </linearGradient>
+                <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor: '#f093fb', stopOpacity: 1}} />
+                  <stop offset="100%" style={{stopColor: '#f5576c', stopOpacity: 1}} />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
         <div className="login-header">
           <Title level={2}>校园轻享集市</Title>
-          <Text type="secondary">管理后台</Text>
+          <Text type="secondary">管理后台系统</Text>
         </div>
 
         <Form
@@ -71,11 +98,14 @@ const Login: React.FC = () => {
               { min: 3, message: '用户名至少 3 个字符！' },
             ]}
           >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="用户名"
-              autoComplete="username"
-            />
+            <div className="input-wrapper">
+              <Input
+                prefix={<UserOutlined className="input-icon" />}
+                placeholder="用户名"
+                autoComplete="username"
+                className="styled-input"
+              />
+            </div>
           </Form.Item>
 
           <Form.Item
@@ -85,11 +115,14 @@ const Login: React.FC = () => {
               { min: 6, message: '密码至少 6 个字符！' },
             ]}
           >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="密码"
-              autoComplete="current-password"
-            />
+            <div className="input-wrapper">
+              <Input.Password
+                prefix={<LockOutlined className="input-icon" />}
+                placeholder="密码"
+                autoComplete="current-password"
+                className="styled-input"
+              />
+            </div>
           </Form.Item>
 
           <Form.Item>
@@ -98,15 +131,18 @@ const Login: React.FC = () => {
               htmlType="submit"
               loading={loading}
               block
+              className="login-button"
             >
-              {loading ? '登录中...' : '登录'}
+              <span className="button-text">
+                {loading ? '登录中...' : '立即登录'}
+              </span>
             </Button>
           </Form.Item>
         </Form>
 
         <div className="login-footer">
           <Text type="secondary">
-            © 2025 校园轻享集市 | Powered by BaSui 😎
+            © 2025 校园轻享集市 · Powered by BaSui 😎
           </Text>
         </div>
       </Card>

@@ -35,7 +35,7 @@ import {
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { getApi } from '@campus/shared/utils/apiClient';
-import type { UserBehaviorLogDto } from '@campus/shared/api';
+import type { UserBehaviorLogDTO } from '@campus/shared/api';
 import ReactECharts from 'echarts-for-react';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -66,7 +66,7 @@ export const BehaviorDashboard: React.FC = () => {
     queryKey: ['behavior', 'logs', dateRange],
     queryFn: async () => {
       const api = getApi();
-      const response = await api.listUserBehaviorLogs(
+      const response = await api.getUserBehaviors(
         undefined, // userId
         undefined, // behaviorType
         dateRange[0].format('YYYY-MM-DD'),
@@ -79,13 +79,24 @@ export const BehaviorDashboard: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // 模拟统计数据
-  const statistics = {
-    totalUsers: 1234,
-    activeUsers: 567,
-    totalBehaviors: 8901,
-    avgBehaviorsPerUser: 7.2,
-  };
+  // 查询统计数据
+  const { data: statistics } = useQuery({
+    queryKey: ['behavior', 'statistics', dateRange],
+    queryFn: async () => {
+      const api = getApi();
+      const response = await api.getBehaviorStatistics(
+        dateRange[0].format('YYYY-MM-DD'),
+        dateRange[1].format('YYYY-MM-DD')
+      );
+      return response.data.data || {
+        totalUsers: 0,
+        activeUsers: 0,
+        totalBehaviors: 0,
+        avgBehaviorsPerUser: 0,
+      };
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   // 行为类型分布图表配置
   const behaviorTypeChartOption = {
@@ -225,20 +236,20 @@ export const BehaviorDashboard: React.FC = () => {
       {/* 统计卡片 */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={6}>
-          <Card>
+          <Card variant="outlined">
             <Statistic
               title="总用户数"
-              value={statistics.totalUsers}
+              value={statistics?.totalUsers ?? 0}
               prefix={<UserOutlined />}
               suffix="人"
             />
           </Card>
         </Col>
         <Col span={6}>
-          <Card>
+          <Card variant="outlined">
             <Statistic
               title="活跃用户"
-              value={statistics.activeUsers}
+              value={statistics?.activeUsers ?? 0}
               prefix={<UserOutlined />}
               suffix="人"
               valueStyle={{ color: '#3f8600' }}
@@ -246,20 +257,20 @@ export const BehaviorDashboard: React.FC = () => {
           </Card>
         </Col>
         <Col span={6}>
-          <Card>
+          <Card variant="outlined">
             <Statistic
               title="总行为数"
-              value={statistics.totalBehaviors}
+              value={statistics?.totalBehaviors ?? 0}
               prefix={<BarChartOutlined />}
               suffix="次"
             />
           </Card>
         </Col>
         <Col span={6}>
-          <Card>
+          <Card variant="outlined">
             <Statistic
               title="人均行为数"
-              value={statistics.avgBehaviorsPerUser}
+              value={statistics?.avgBehaviorsPerUser ?? 0}
               precision={1}
               prefix={<BarChartOutlined />}
               suffix="次"
@@ -271,19 +282,19 @@ export const BehaviorDashboard: React.FC = () => {
       {/* 图表区域 */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={12}>
-          <Card>
+          <Card variant="outlined">
             <ReactECharts option={behaviorTypeChartOption} style={{ height: 400 }} />
           </Card>
         </Col>
         <Col span={12}>
-          <Card>
+          <Card variant="outlined">
             <ReactECharts option={activeUserTrendOption} style={{ height: 400 }} />
           </Card>
         </Col>
       </Row>
 
       {/* 筛选区域 */}
-      <Card style={{ marginBottom: 24 }}>
+      <Card variant="outlined" style={{ marginBottom: 24 }}>
         <Space>
           <RangePicker
             value={dateRange}
@@ -298,7 +309,7 @@ export const BehaviorDashboard: React.FC = () => {
       </Card>
 
       {/* 行为日志列表 */}
-      <Card title="行为日志">
+      <Card variant="outlined" title="行为日志">
         <Table
           columns={columns}
           dataSource={data || []}

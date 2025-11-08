@@ -137,7 +137,17 @@ export const LogisticsList: React.FC = () => {
     }
   };
 
-  // 模拟数据（等待后端列表API）
+  // ⚠️ BaSui 注意：后端暂无物流列表API！
+  // 现有API：
+  //   - GET /api/logistics/order/{orderId} - 根据订单ID查询物流
+  //   - GET /api/logistics/tracking/{trackingNumber} - 根据快递单号查询物流
+  //   - GET /api/logistics/statistics - 物流统计（已使用✅）
+  //
+  // 🚧 需要后端提供：GET /api/admin/logistics（管理端物流列表）
+  //    参数：keyword, status, page, size
+  //    返回：{ content: Logistics[], totalElements: number }
+  //
+  // 临时方案：显示空列表，等待后端API
   const mockData = {
     content: [],
     totalElements: 0,

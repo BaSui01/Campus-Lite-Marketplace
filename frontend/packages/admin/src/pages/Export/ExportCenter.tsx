@@ -287,8 +287,8 @@ export const ExportCenter: React.FC = () => {
               type="link"
               size="small"
               icon={<DownloadOutlined />}
-              onClick={() => handleDownload(record.downloadToken!, record.fileName!)}
-              disabled={record.expiredAt ? dayjs(record.expiredAt).isBefore(dayjs()) : false}
+              onClick={() => handleDownload(record.downloadToken!, record.type || 'export')}
+              disabled={record.expireAt ? dayjs(record.expireAt).isBefore(dayjs()) : false}
             >
               下载
             </Button>
@@ -299,19 +299,19 @@ export const ExportCenter: React.FC = () => {
               size="small"
               danger
               icon={<CloseCircleOutlined />}
-              onClick={() => handleCancel(record.id)}
+              onClick={() => handleCancel(record.id!)}
             >
               取消
             </Button>
           )}
-          {record.status === 'FAILED' && record.errorMessage && (
+          {record.status === 'FAILED' && (
             <Button
               type="link"
               size="small"
               onClick={() => {
                 Modal.error({
                   title: '错误信息',
-                  content: record.errorMessage,
+                  content: record.message || '导出失败',
                 });
               }}
             >

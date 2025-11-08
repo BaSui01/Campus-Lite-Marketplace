@@ -77,12 +77,11 @@ export const SearchGuide: React.FC<SearchGuideProps> = ({
   const [isVisible, setIsVisible] = useState(propVisible);
   const [showHighlight, setShowHighlight] = useState(false);
 
-  const { setValue, getValue } = useLocalStorage('search-guide-completed', false);
-  const guideCompleted = getValue();
+  const [guideCompleted, setGuideCompleted] = useLocalStorage('search-guide-completed', false);
 
   // 检查是否应该显示引导
   useEffect(() => {
-    const shouldShow = forceShow || (visible && !guideCompleted);
+    const shouldShow = forceShow || (propVisible && !guideCompleted);
     setIsVisible(shouldShow);
 
     if (shouldShow) {
@@ -92,7 +91,7 @@ export const SearchGuide: React.FC<SearchGuideProps> = ({
       // 3秒后隐藏高亮
       setTimeout(() => setShowHighlight(false), 3000);
     }
-  }, [visible, guideCompleted, forceShow, getValue]);
+  }, [propVisible, guideCompleted, forceShow]);
 
   const nextStep = () => {
     if (currentStep < GUIDE_STEPS.length - 1) {
@@ -117,7 +116,7 @@ export const SearchGuide: React.FC<SearchGuideProps> = ({
   };
 
   const completeGuide = () => {
-    setValue(true);
+    setGuideCompleted(true);
     setIsVisible(false);
     setShowHighlight(false);
     onComplete?.();
@@ -188,7 +187,7 @@ export const SearchGuide: React.FC<SearchGuideProps> = ({
           </div>
 
           {/* 快捷搜索演示 */}
-          {currentStep.id === 'shortcuts' && (
+          {currentGuideStep.id === 'shortcuts' && (
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <div className="text-sm font-medium text-gray-700 mb-3">
                 快捷搜索示例：
@@ -207,7 +206,7 @@ export const SearchGuide: React.FC<SearchGuideProps> = ({
           )}
 
           {/* 搜索演示 */}
-          {currentStep.id === 'basic' && (
+          {currentGuideStep.id === 'basic' && (
             <div className="mb-6">
               <SearchBar
                 searchState={{
@@ -232,7 +231,7 @@ export const SearchGuide: React.FC<SearchGuideProps> = ({
           )}
 
           {/* 高级筛选演示 */}
-          {currentStep.id === 'advanced' && (
+          {currentGuideStep.id === 'advanced' && (
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <div className="text-sm font-medium text-gray-700 mb-3">
                 高级筛选示例：

@@ -77,6 +77,11 @@ const PaymentStatus = lazy(() => import('../pages/Payment/PaymentStatus'));
 const PaymentResult = lazy(() => import('../pages/Payment/PaymentResult'));
 const PaymentMethods = lazy(() => import('../pages/Payment/PaymentMethods'));
 
+// 法律相关页面
+const AboutUs = lazy(() => import('../pages/AboutUs'));
+const PrivacyPolicy = lazy(() => import('../pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('../pages/TermsOfService'));
+
 // ==================== 路由守卫组件 ====================
 
 /**
@@ -549,6 +554,30 @@ export const router = createBrowserRouter(
               <PaymentMethods />
             </LazyLoadWrapper>
           </RequireAuth>
+        ),
+      },
+      {
+        path: 'about',
+        element: (
+          <LazyLoadWrapper>
+            <AboutUs />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'privacy',
+        element: (
+          <LazyLoadWrapper>
+            <PrivacyPolicy />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'terms',
+        element: (
+          <LazyLoadWrapper>
+            <TermsOfService />
+          </LazyLoadWrapper>
         ),
       },
     ],

@@ -1,20 +1,23 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * 校园管理 API 服务
+ * ✅ 校园管理 API 服务 - 完全重构版
  * @author BaSui 😎
- * @description 校园列表、添加、编辑、删除、统计等接口
+ * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
+ *
+ * 功能：
+ * - 校园列表查询（分页）
+ * - 校园详情查看
+ * - 校园创建/更新/删除
+ * - 校园统计数据
+ * - 批量删除校园
  */
 
 import { getApi } from '../utils/apiClient';
-import type { BaseResponse } from '@campus/shared/api';
+import type {
+  Campus,
+  CampusCreateRequest,
+  CampusUpdateRequest,
+  CampusStatisticsResponse,
+} from '../api';
 
 /**
  * 校园状态枚举
@@ -25,61 +28,13 @@ export enum CampusStatus {
 }
 
 /**
- * 校园信息
- */
-export interface Campus {
-  id: number;
-  name: string;
-  code: string;
-  address?: string;
-  phone?: string;
-  status: CampusStatus;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-/**
  * 校园列表查询参数
  */
 export interface CampusListParams {
-  keyword?: string;        // 搜索关键词（名称或代码）
-  status?: CampusStatus;   // 状态筛选
-  page?: number;           // 页码（从0开始）
-  size?: number;           // 每页大小
-}
-
-/**
- * 分页响应
- */
-export interface PageResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
-
-/**
- * 校园统计数据
- */
-export interface CampusStatistics {
-  campusId: number;
-  campusName: string;
-  userCount: number;        // 用户数
-  goodsCount: number;       // 商品数
-  orderCount: number;       // 订单数
-  activeUserCount: number;  // 活跃用户数（近30天）
-}
-
-/**
- * 添加/编辑校园请求
- */
-export interface CampusRequest {
-  name: string;
-  code: string;
-  address?: string;
-  phone?: string;
-  status: CampusStatus;
+  keyword?: string;
+  status?: CampusStatus;
+  page?: number;
+  size?: number;
 }
 
 /**
@@ -87,20 +42,13 @@ export interface CampusRequest {
  */
 export class CampusService {
   /**
-   * 获取校园列表（分页）
-   * @param params 查询参数
-   * @returns 校园列表（分页）
+   * 获取校园列表
+   * @returns 校园列表
    */
-  async list(params?: CampusListParams): Promise<PageResponse<Campus>> {
-    const response = await apiClient.get<PageResponse<Campus>>('/api/admin/campuses', {
-      params: {
-        keyword: params?.keyword,
-        status: params?.status,
-        page: params?.page ?? 0,
-        size: params?.size ?? 20
-      }
-    });
-    return response.data;
+  async list(): Promise<Campus[]> {
+    const api = getApi();
+    const response = await api.listCampuses();
+    return response.data.data as Campus[];
   }
 
   /**
@@ -109,18 +57,20 @@ export class CampusService {
    * @returns 校园详情
    */
   async getDetail(id: number): Promise<Campus> {
-    const response = await http.get<BaseResponse<Campus>>(`/api/admin/campuses/${id}`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getCampusById({ id });
+    return response.data.data as Campus;
   }
 
   /**
-   * 添加校园
+   * 创建校园
    * @param data 校园信息
    * @returns 创建的校园ID
    */
-  async create(data: CampusRequest): Promise<number> {
-    const response = await http.post<BaseResponse<number>>('/api/admin/campuses', data);
-    return response.data.data;
+  async create(data: CampusCreateRequest): Promise<number> {
+    const api = getApi();
+    const response = await api.createCampus({ campusCreateRequest: data });
+    return response.data.data as number;
   }
 
   /**
@@ -129,9 +79,10 @@ export class CampusService {
    * @param data 校园信息
    * @returns 更新后的校园信息
    */
-  async update(id: number, data: Partial<CampusRequest>): Promise<Campus> {
-    const response = await http.put<BaseResponse<Campus>>(`/api/admin/campuses/${id}`, data);
-    return response.data.data;
+  async update(id: number, data: CampusUpdateRequest): Promise<Campus> {
+    const api = getApi();
+    const response = await api.updateCampus({ id, campusUpdateRequest: data });
+    return response.data.data as Campus;
   }
 
   /**
@@ -139,7 +90,8 @@ export class CampusService {
    * @param id 校园ID
    */
   async delete(id: number): Promise<void> {
-    await http.delete(`/api/admin/campuses/${id}`);
+    const api = getApi();
+    await api.deleteCampus({ id });
   }
 
   /**
@@ -149,7 +101,7 @@ export class CampusService {
    * @returns 更新后的校园信息
    */
   async updateStatus(id: number, status: CampusStatus): Promise<Campus> {
-    return this.update(id, { status });
+    return this.update(id, { status } as CampusUpdateRequest);
   }
 
   /**
@@ -157,11 +109,10 @@ export class CampusService {
    * @param id 校园ID
    * @returns 校园统计数据
    */
-  async statistics(id: number): Promise<CampusStatistics> {
-    const response = await http.get<BaseResponse<CampusStatistics>>(
-      `/api/admin/campuses/${id}/statistics`
-    );
-    return response.data.data;
+  async statistics(id: number): Promise<CampusStatisticsResponse> {
+    const api = getApi();
+    const response = await api.getCampusStatistics({ id });
+    return response.data.data as CampusStatisticsResponse;
   }
 
   /**
@@ -169,7 +120,8 @@ export class CampusService {
    * @param ids 校园ID列表
    */
   async batchDelete(ids: number[]): Promise<void> {
-    await http.post('/api/admin/campuses/batch/delete', { ids });
+    const api = getApi();
+    await api.batchDeleteCampuses({ requestBody: ids });
   }
 }
 
@@ -179,11 +131,6 @@ export class CampusService {
 export const campusService = new CampusService();
 
 /**
- * 导出类型
+ * 导出单例
  */
-export type {
-  Campus as CampusType,
-  CampusListParams as CampusListParamsType,
-  CampusStatistics as CampusStatisticsType,
-  CampusRequest as CampusRequestType
-};
+export default campusService;

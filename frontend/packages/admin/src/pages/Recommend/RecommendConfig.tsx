@@ -74,8 +74,22 @@ export const RecommendConfig: React.FC = () => {
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
 
-  // 模拟推荐配置数据
-  const mockConfig = {
+  // ⚠️ BaSui 注意：后端暂无推荐配置管理API！
+  // 现有API：
+  //   - GET /api/recommend/hot - 热门榜单
+  //   - GET /api/recommend/personal - 个性化推荐
+  //   - POST /api/recommend/admin/hot/refresh - 刷新热门榜单（已实现）
+  //
+  // 🚧 需要后端提供以下API：
+  //   1. GET /api/admin/recommend/config - 获取推荐配置
+  //      返回：{ algorithm, enabled, weights, params }
+  //   2. PUT /api/admin/recommend/config - 更新推荐配置
+  //      参数：{ algorithm, enabled, weights, params }
+  //   3. GET /api/admin/recommend/statistics - 获取推荐统计
+  //      返回：{ totalRecommendations, clickRate, conversionRate, avgScore }
+  //
+  // 临时方案：前端显示固定配置，保存操作提示需要后端API
+  const defaultConfig = {
     algorithm: 'HYBRID',
     enabled: true,
     weights: {
@@ -91,33 +105,37 @@ export const RecommendConfig: React.FC = () => {
     },
   };
 
-  // 模拟推荐效果统计
-  const mockStatistics = {
-    totalRecommendations: 12345,
-    clickRate: 0.23,
-    conversionRate: 0.056,
-    avgScore: 0.78,
+  const defaultStatistics = {
+    totalRecommendations: 0,
+    clickRate: 0,
+    conversionRate: 0,
+    avgScore: 0,
   };
 
-  // 保存配置
+  // ⚠️ BaSui 修复：保存配置 - 需要后端API支持
   const saveMutation = useMutation({
     mutationFn: async (values: any) => {
-      // TODO: 调用保存配置 API
-      console.log('保存推荐配置', values);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // TODO: 等待后端提供配置保存API
+      // const api = getApi();
+      // await api.updateRecommendConfig(values);
+
+      // 临时提示：告知用户需要后端API
+      console.warn('⚠️ 保存推荐配置失败：后端暂未提供配置管理API');
+      console.log('📋 配置内容:', values);
+      throw new Error('后端暂未提供配置管理API，请联系后端开发人员');
     },
     onSuccess: () => {
       message.success('推荐配置已保存');
       queryClient.invalidateQueries({ queryKey: ['recommend', 'config'] });
     },
-    onError: () => {
-      message.error('保存推荐配置失败');
+    onError: (error: any) => {
+      message.error(error?.message || '保存推荐配置失败');
     },
   });
 
   // 重置配置
   const handleReset = () => {
-    form.setFieldsValue(mockConfig);
+    form.setFieldsValue(defaultConfig);
     message.info('配置已重置');
   };
 
@@ -172,7 +190,7 @@ export const RecommendConfig: React.FC = () => {
 
   // 初始化表单值
   useState(() => {
-    form.setFieldsValue(mockConfig);
+    form.setFieldsValue(defaultConfig);
   });
 
   return (
@@ -183,7 +201,7 @@ export const RecommendConfig: React.FC = () => {
           <Card>
             <Statistic
               title="推荐总数"
-              value={mockStatistics.totalRecommendations}
+              value={defaultStatistics.totalRecommendations}
               prefix={<ThunderboltOutlined />}
               suffix="次"
             />
@@ -193,7 +211,7 @@ export const RecommendConfig: React.FC = () => {
           <Card>
             <Statistic
               title="点击率"
-              value={mockStatistics.clickRate * 100}
+              value={defaultStatistics.clickRate * 100}
               precision={2}
               suffix="%"
               valueStyle={{ color: '#1890ff' }}
@@ -204,7 +222,7 @@ export const RecommendConfig: React.FC = () => {
           <Card>
             <Statistic
               title="转化率"
-              value={mockStatistics.conversionRate * 100}
+              value={defaultStatistics.conversionRate * 100}
               precision={2}
               suffix="%"
               valueStyle={{ color: '#3f8600' }}
@@ -215,7 +233,7 @@ export const RecommendConfig: React.FC = () => {
           <Card>
             <Statistic
               title="平均评分"
-              value={mockStatistics.avgScore}
+              value={defaultStatistics.avgScore}
               precision={2}
               suffix="/ 1.0"
             />
@@ -250,7 +268,7 @@ export const RecommendConfig: React.FC = () => {
         <Form
           form={form}
           layout="vertical"
-          initialValues={mockConfig}
+          initialValues={defaultConfig}
         >
           <Row gutter={16}>
             <Col span={12}>

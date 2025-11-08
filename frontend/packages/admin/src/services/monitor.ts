@@ -1,19 +1,16 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
+ * ✅ 重构完成：已使用 OpenAPI 生成的 API 客户端
+ * 📋 使用方法：healthCheck, getMetrics, getHealthHistory, getSlowQueries, getEndpointStatistics,
+ *             getErrorRequests, getQpsStatistics, getUnresolvedErrors, getErrorsBySeverity,
+ *             getErrorStatistics, markErrorAsResolved, generatePerformanceReport, getHealthScore, cleanupAllHistory
  */
 /**
  * 系统监控服务
  * @author BaSui 😎
- * @description 系统健康检查、性能监控、错误日志
+ * @description 系统健康检查、性能监控、错误日志（基于 OpenAPI 生成代码）
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
+import { getApi } from '@campus/shared/utils/apiClient';
 import type { PageResponse, BaseResponse } from '@campus/shared/api';
 
 // ==================== 类型定义 ====================
@@ -198,105 +195,155 @@ export interface MonitorService {
 // ==================== 服务实现 ====================
 
 class MonitorServiceImpl implements MonitorService {
-  private readonly BASE_PATH = '/api/admin/monitor';
-
+  /**
+   * 健康检查
+   * @returns 健康检查结果
+   */
   async healthCheck(): Promise<HealthCheckResponse> {
-    const response = await http.get<BaseResponse<HealthCheckResponse>>(`${this.BASE_PATH}/health`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.healthCheck();
+    return response.data.data as HealthCheckResponse;
   }
 
+  /**
+   * 获取系统指标
+   * @returns 系统指标
+   */
   async getMetrics(): Promise<SystemMetrics> {
-    const response = await http.get<BaseResponse<SystemMetrics>>(`${this.BASE_PATH}/metrics`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getMetrics();
+    return response.data.data as SystemMetrics;
   }
 
+  /**
+   * 获取健康检查历史
+   * @param hours 时间范围（小时）
+   * @returns 健康检查历史记录
+   */
   async getHealthHistory(hours: number = 24): Promise<HealthCheckRecord[]> {
-    const response = await http.get<BaseResponse<HealthCheckRecord[]>>(
-      `${this.BASE_PATH}/health/history`,
-      { params: { hours } }
-    );
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getHealthHistory({ hours });
+    return response.data.data as HealthCheckRecord[];
   }
 
+  /**
+   * 获取慢查询日志
+   * @param hours 时间范围（小时）
+   * @returns 慢查询日志
+   */
   async getSlowQueries(hours: number = 24): Promise<ApiPerformanceLog[]> {
-    const response = await http.get<BaseResponse<ApiPerformanceLog[]>>(
-      `${this.BASE_PATH}/api/slow-queries`,
-      { params: { hours } }
-    );
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getSlowQueries({ hours });
+    return response.data.data as ApiPerformanceLog[];
   }
 
+  /**
+   * 获取端点性能统计
+   * @param hours 时间范围（小时）
+   * @returns 端点统计数据
+   */
   async getEndpointStatistics(hours: number = 24): Promise<EndpointStats[]> {
-    const response = await http.get<BaseResponse<EndpointStats[]>>(
-      `${this.BASE_PATH}/api/statistics`,
-      { params: { hours } }
-    );
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getEndpointStatistics({ hours });
+    return response.data.data as EndpointStats[];
   }
 
+  /**
+   * 获取错误请求日志
+   * @param hours 时间范围（小时）
+   * @returns 错误请求日志
+   */
   async getErrorRequests(hours: number = 24): Promise<ApiPerformanceLog[]> {
-    const response = await http.get<BaseResponse<ApiPerformanceLog[]>>(
-      `${this.BASE_PATH}/api/errors`,
-      { params: { hours } }
-    );
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getErrorRequests({ hours });
+    return response.data.data as ApiPerformanceLog[];
   }
 
+  /**
+   * 获取QPS统计
+   * @param hours 时间范围（小时）
+   * @returns QPS统计数据
+   */
   async getQpsStatistics(hours: number = 1): Promise<QpsData[]> {
-    const response = await http.get<BaseResponse<QpsData[]>>(
-      `${this.BASE_PATH}/api/qps`,
-      { params: { hours } }
-    );
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getQpsStatistics({ hours });
+    return response.data.data as QpsData[];
   }
 
+  /**
+   * 获取未解决的错误
+   * @returns 未解决的错误列表
+   */
   async getUnresolvedErrors(): Promise<ErrorLog[]> {
-    const response = await http.get<BaseResponse<ErrorLog[]>>(
-      `${this.BASE_PATH}/errors/unresolved`
-    );
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getUnresolvedErrors();
+    return response.data.data as ErrorLog[];
   }
 
+  /**
+   * 获取指定严重程度的错误
+   * @param severity 错误严重程度
+   * @param hours 时间范围（小时）
+   * @returns 错误列表
+   */
   async getErrorsBySeverity(severity: ErrorSeverity, hours: number = 24): Promise<ErrorLog[]> {
-    const response = await http.get<BaseResponse<ErrorLog[]>>(
-      `${this.BASE_PATH}/errors/by-severity`,
-      { params: { severity, hours } }
-    );
-    return response.data.data;
-  }
-
-  async getErrorStatistics(hours: number = 24): Promise<Record<ErrorSeverity, number>> {
-    const response = await http.get<BaseResponse<Record<ErrorSeverity, number>>>(
-      `${this.BASE_PATH}/errors/statistics`,
-      { params: { hours } }
-    );
-    return response.data.data;
-  }
-
-  async markErrorAsResolved(errorId: number): Promise<void> {
-    await http.post(`${this.BASE_PATH}/errors/${errorId}/resolve`);
-  }
-
-  async generatePerformanceReport(hours: number = 24): Promise<PerformanceReport> {
-    const response = await http.get<BaseResponse<PerformanceReport>>(
-      `${this.BASE_PATH}/report`,
-      { params: { hours } }
-    );
-    return response.data.data;
-  }
-
-  async getHealthScore(hours: number = 24): Promise<number> {
-    const response = await http.get<BaseResponse<number>>(
-      `${this.BASE_PATH}/health-score`,
-      { params: { hours } }
-    );
-    return response.data.data;
-  }
-
-  async cleanupHistory(daysToKeep: number = 30): Promise<void> {
-    await http.delete(`${this.BASE_PATH}/cleanup`, {
-      params: { daysToKeep },
+    const api = getApi();
+    const response = await api.getErrorsBySeverity({
+      severity,
+      hours,
     });
+    return response.data.data as ErrorLog[];
+  }
+
+  /**
+   * 获取错误统计
+   * @param hours 时间范围（小时）
+   * @returns 错误统计数据
+   */
+  async getErrorStatistics(hours: number = 24): Promise<Record<ErrorSeverity, number>> {
+    const api = getApi();
+    const response = await api.getErrorStatistics({ hours });
+    return response.data.data as Record<ErrorSeverity, number>;
+  }
+
+  /**
+   * 标记错误为已解决
+   * @param errorId 错误ID
+   */
+  async markErrorAsResolved(errorId: number): Promise<void> {
+    const api = getApi();
+    await api.markErrorAsResolved({ errorId });
+  }
+
+  /**
+   * 生成性能报表
+   * @param hours 时间范围（小时）
+   * @returns 性能报表
+   */
+  async generatePerformanceReport(hours: number = 24): Promise<PerformanceReport> {
+    const api = getApi();
+    const response = await api.generatePerformanceReport({ hours });
+    return response.data.data as PerformanceReport;
+  }
+
+  /**
+   * 获取系统健康度评分
+   * @param hours 时间范围（小时）
+   * @returns 健康度评分（0-100）
+   */
+  async getHealthScore(hours: number = 24): Promise<number> {
+    const api = getApi();
+    const response = await api.getHealthScore({ hours });
+    return response.data.data as number;
+  }
+
+  /**
+   * 清理历史数据
+   * @param daysToKeep 保留天数
+   */
+  async cleanupHistory(daysToKeep: number = 30): Promise<void> {
+    const api = getApi();
+    await api.cleanupAllHistory({ daysToKeep });
   }
 }
 

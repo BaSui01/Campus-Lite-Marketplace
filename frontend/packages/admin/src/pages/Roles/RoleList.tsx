@@ -52,28 +52,36 @@ const RoleList: React.FC = () => {
   // ===== 权限树数据 =====
   const permissionTreeData = React.useMemo(() => {
     const groupByModule = (permissions: string[]) => {
-      const grouped: Record<string, string[]> = {};
-      
+      const grouped: Record<string, Set<string>> = {};
+
+      // 使用 Set 去重，避免重复的 action
       permissions.forEach(permission => {
-        const [module, action] = permission.split(':');
+        const parts = permission.split(':');
+        if (parts.length < 2) return; // 跳过格式不正确的权限
+
+        const module = parts[0];
+        const action = parts.slice(1).join(':'); // 支持多层级权限
+
         if (!grouped[module]) {
-          grouped[module] = [];
+          grouped[module] = new Set<string>();
         }
-        grouped[module].push(action);
+        grouped[module].add(action);
       });
-      
+
+      // 转换为 Tree 结构，使用唯一 key
       return Object.entries(grouped).map(([module, actions]) => ({
         title: module,
-        key: module,
-        children: actions.map(action => ({
+        key: `module-${module}`, // ✅ 修复：模块使用唯一key
+        children: Array.from(actions).map(action => ({
           title: `${module}:${action}`,
-          key: `${module}:${action}`,
+          key: `${module}:${action}`, // ✅ 完整权限代码作为key
           isLeaf: true,
         })),
       }));
     };
 
-    const allPermissions = Object.values(PERMISSION_CODES);
+    // ✅ 去重：使用 Set 确保权限代码唯一
+    const allPermissions = Array.from(new Set(Object.values(PERMISSION_CODES)));
     return groupByModule(allPermissions);
   }, []);
 

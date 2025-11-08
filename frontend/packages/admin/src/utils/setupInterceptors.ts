@@ -44,29 +44,24 @@ export const setupInterceptors = (): void => {
   // ==================== 初始化 Tab 同步 ====================
   initTabSync({
     channelName: 'admin-auth-sync',
-    onLogin: (user, token) => {
-      console.log('[Tab Sync] 收到登录事件', { user, token });
-      useAuthStore.getState().setUser(user);
-      useAuthStore.getState().setToken(token);
-      antdMessage.success('其他标签页已登录，当前页面已同步', 2);
+    onLogin: () => {
+      // Tab 同步登录：刷新页面以重新加载状态
+      antdMessage.success('其他标签页已登录，正在同步...', 1);
+      setTimeout(() => window.location.reload(), 1000);
     },
     onLogout: () => {
-      console.log('[Tab Sync] 收到登出事件');
       useAuthStore.getState().logout();
-      antdMessage.warning('其他标签页已登出，当前页面即将跳转', 2);
-      setTimeout(() => {
-        window.location.href = '/admin/login';
-      }, 2000);
+      antdMessage.warning('其他标签页已登出，即将跳转...', 1);
+      setTimeout(() => window.location.href = '/admin/login', 1500);
     },
-    onTokenRefresh: (token) => {
-      console.log('[Tab Sync] 收到 Token 刷新事件');
-      useAuthStore.getState().setToken(token);
+    onTokenRefresh: () => {
+      // Token 刷新由 apiClient 自动处理
     },
-    onPermissionUpdate: (permissions) => {
-      console.log('[Tab Sync] 收到权限更新事件', permissions);
-      // TODO: 更新权限状态
+    onPermissionUpdate: () => {
+      // 权限更新：刷新页面
+      setTimeout(() => window.location.reload(), 500);
     },
-    debug: import.meta.env.DEV, // 开发环境启用调试日志
+    debug: false, // 关闭调试日志
   });
 
   console.log('[Setup] ✅ Tab 同步已初始化');

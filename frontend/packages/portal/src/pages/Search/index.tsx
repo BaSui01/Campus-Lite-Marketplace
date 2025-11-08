@@ -64,7 +64,7 @@ const Search: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
 
   // 🎯 搜索引导状态
-  const { getValue: getGuideCompleted, setValue: setGuideCompleted } = useLocalStorage('search-guide-completed', false);
+  const [guideCompleted, setGuideCompleted] = useLocalStorage('search-guide-completed', false);
   const [showSearchGuide, setShowSearchGuide] = useState(false);
 
   // 商品搜索结果
@@ -92,7 +92,7 @@ const Search: React.FC = () => {
    * 检查是否需要显示搜索引导
    */
   useEffect(() => {
-    const shouldShowGuide = !getGuideCompleted() &&
+    const shouldShowGuide = !guideCompleted &&
                            !searchParams.get('q') &&
                            !keyword.trim() &&
                            searchHistory.length === 0;
@@ -105,7 +105,7 @@ const Search: React.FC = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [getGuideCompleted, searchParams, keyword, searchHistory]);
+  }, [guideCompleted, searchParams, keyword, searchHistory]);
 
   /**
    * 搜索商品
@@ -747,7 +747,7 @@ const Search: React.FC = () => {
               <div className="empty-icon">🔍</div>
               <p className="empty-text">输入关键词开始搜索</p>
               <p className="empty-tip">试试搜索"自行车"、"书籍"等关键词</p>
-              {!getGuideCompleted() && (
+              {!guideCompleted && (
                 <Button
                   type="primary"
                   onClick={handleShowGuide}

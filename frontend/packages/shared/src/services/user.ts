@@ -1,27 +1,24 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * 用户 API 服务
+ * ✅ 用户 API 服务 - 完全重构版
  * @author BaSui 😎
- * @description 用户资料、密码修改、用户列表等接口
+ * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
+ *
+ * 功能：
+ * - 获取当前用户资料
+ * - 获取指定用户资料
+ * - 更新用户资料
+ * - 修改密码
+ * - 积分记录查询
+ * - 签到功能
  */
 
-import { apiClient } from '../utils/apiClient';
+import { getApi } from '../utils/apiClient';
 import type {
-  ApiResponse,
-  PageInfo,
   User,
   UpdateProfileRequest,
   ChangePasswordRequest,
-  UserListQuery,
-} from '../types';
+  PageInfo,
+} from '../api/models';
 
 /**
  * 用户 API 服务类
@@ -31,9 +28,18 @@ export class UserService {
    * 获取当前用户资料
    * @returns 当前用户信息
    */
-  async getProfile(): Promise<ApiResponse<User>> {
-    const response = await apiClient.get('/users/profile');
-    return response.data;
+  async getProfile(): Promise<User> {
+    const api = getApi();
+    // 注意：后端可能需要传userId，这里先尝试getCurrentUser
+    const response = await api.getCurrentUser();
+    return response.data.data as User;
+  }
+
+  /**
+   * 获取当前登录用户信息（别名方法）
+   */
+  async getCurrentUser(): Promise<User> {
+    return this.getProfile();
   }
 
   /**
@@ -41,9 +47,10 @@ export class UserService {
    * @param userId 用户ID
    * @returns 用户信息
    */
-  async getUserById(userId: number): Promise<ApiResponse<User>> {
-    const response = await apiClient.get(`/users/${userId}`);
-    return response.data;
+  async getUserById(userId: number): Promise<User> {
+    const api = getApi();
+    const response = await api.getUserProfile({ userId });
+    return response.data.data as User;
   }
 
   /**
@@ -51,19 +58,19 @@ export class UserService {
    * @param data 更新资料请求参数
    * @returns 更新后的用户信息
    */
-  async updateProfile(data: UpdateProfileRequest): Promise<ApiResponse<User>> {
-    const response = await apiClient.put('/users/profile', data);
-    return response.data;
+  async updateProfile(data: UpdateProfileRequest): Promise<User> {
+    const api = getApi();
+    const response = await api.updateUserProfile({ updateProfileRequest: data });
+    return response.data.data as User;
   }
 
   /**
    * 修改密码
    * @param data 修改密码请求参数
-   * @returns 修改结果
    */
-  async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<void>> {
-    const response = await apiClient.put('/users/password', data);
-    return response.data;
+  async changePassword(data: ChangePasswordRequest): Promise<void> {
+    const api = getApi();
+    await api.changePassword({ changePasswordRequest: data });
   }
 
   /**
@@ -71,18 +78,23 @@ export class UserService {
    * @param params 查询参数
    * @returns 积分记录列表
    */
-  async getPointsLogs(params?: { page?: number; pageSize?: number }): Promise<ApiResponse<PageInfo<any>>> {
-    const response = await apiClient.get('/users/points/logs', { params });
-    return response.data;
+  async getPointsLogs(params?: { page?: number; pageSize?: number }): Promise<PageInfo<any>> {
+    const api = getApi();
+    const response = await api.getUserPointsLogs({
+      page: params?.page,
+      size: params?.pageSize,
+    });
+    return response.data.data as PageInfo<any>;
   }
 
   /**
    * 签到
    * @returns 签到结果（包含获得的积分）
    */
-  async signIn(): Promise<ApiResponse<{ points: number }>> {
-    const response = await apiClient.post('/users/sign-in');
-    return response.data;
+  async signIn(): Promise<{ points: number }> {
+    const api = getApi();
+    const response = await api.userSignIn();
+    return response.data.data as { points: number };
   }
 }
 

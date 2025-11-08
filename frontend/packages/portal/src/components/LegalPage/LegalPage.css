@@ -1,0 +1,334 @@
+/**
+ * 法律页面样式
+ * @author BaSui 😎
+ * @description 法律相关页面的统一样式
+ */
+
+.legal-page {
+  min-height: calc(100vh - 200px);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 顶部导航 ==================== */
+
+.legal-page__header {
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.legal-page__back-btn {
+  padding: 8px 16px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.legal-page__back-btn:hover {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: #667eea;
+  transform: translateX(-2px);
+}
+
+.legal-page__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.legal-page__breadcrumb-item {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.legal-page__breadcrumb-item:hover {
+  color: #667eea;
+}
+
+.legal-page__breadcrumb-item--active {
+  color: #334155;
+  font-weight: 600;
+  cursor: default;
+}
+
+.legal-page__breadcrumb-divider {
+  color: #cbd5e1;
+}
+
+/* ==================== 主内容区 ==================== */
+
+.legal-page__container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.legal-page__content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  padding: 48px;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 标题区域 ==================== */
+
+.legal-page__title-section {
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.legal-page__title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.legal-page__last-updated {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ==================== 内容区域 ==================== */
+
+.legal-page__body {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #334155;
+}
+
+/* 标题样式 */
+.legal-page__body h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 48px 0 24px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.legal-page__body h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #334155;
+  margin: 32px 0 16px 0;
+}
+
+.legal-page__body h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #475569;
+  margin: 24px 0 12px 0;
+}
+
+/* 段落样式 */
+.legal-page__body p {
+  margin: 16px 0;
+  text-align: justify;
+}
+
+/* 列表样式 */
+.legal-page__body ul,
+.legal-page__body ol {
+  margin: 16px 0;
+  padding-left: 32px;
+}
+
+.legal-page__body li {
+  margin: 8px 0;
+}
+
+.legal-page__body ul li::marker {
+  color: #667eea;
+}
+
+.legal-page__body ol li::marker {
+  font-weight: 600;
+  color: #667eea;
+}
+
+/* 强调文本 */
+.legal-page__body strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* 链接样式 */
+.legal-page__body a {
+  color: #667eea;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+  transition: all 0.2s ease;
+}
+
+.legal-page__body a:hover {
+  border-bottom-color: #667eea;
+  color: #5568d3;
+}
+
+/* 引用块 */
+.legal-page__body blockquote {
+  margin: 24px 0;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+}
+
+/* 代码块 */
+.legal-page__body code {
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 14px;
+  color: #e11d48;
+}
+
+/* 表格样式 */
+.legal-page__body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+}
+
+.legal-page__body th,
+.legal-page__body td {
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.legal-page__body th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.legal-page__body tr:hover {
+  background: #f8fafc;
+}
+
+/* ==================== 侧边目录 ==================== */
+
+.legal-page__toc {
+  position: sticky;
+  top: 120px;
+  height: fit-content;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.legal-page__toc-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .legal-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .legal-page__content {
+    padding: 24px;
+    border-radius: 12px;
+  }
+
+  .legal-page__title {
+    font-size: 28px;
+  }
+
+  .legal-page__body {
+    font-size: 15px;
+  }
+
+  .legal-page__body h2 {
+    font-size: 22px;
+    margin: 32px 0 16px 0;
+  }
+
+  .legal-page__body h3 {
+    font-size: 18px;
+    margin: 24px 0 12px 0;
+  }
+
+  .legal-page__body h4 {
+    font-size: 16px;
+  }
+
+  .legal-page__toc {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .legal-page__content {
+    padding: 20px;
+  }
+
+  .legal-page__title {
+    font-size: 24px;
+  }
+
+  .legal-page__body {
+    font-size: 14px;
+  }
+
+  .legal-page__body h2 {
+    font-size: 20px;
+  }
+
+  .legal-page__body h3 {
+    font-size: 17px;
+  }
+}

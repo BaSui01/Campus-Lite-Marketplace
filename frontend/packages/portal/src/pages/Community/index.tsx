@@ -1,13 +1,15 @@
 /**
  * 社区页面 - 发现校园精彩生活！🌐
  * @author BaSui 😎
- * @description 社区动态、帖子发布、点赞评论
+ * @description 社区动态、帖子发布、点赞评论、标签筛选
+ * @updated 2025-11-08 - 集成标签功能、美化UI
  */
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Skeleton, Modal, Tabs } from '@campus/shared/components';
-import { postService } from '@campus/shared/services';;
+import { postService, tagService } from '@campus/shared/services';
+import type { Tag } from '@campus/shared/services/tag';
 import { useAuthStore, useNotificationStore } from '../../store';
 import './Community.css';
 
@@ -56,6 +58,7 @@ const Community: React.FC = () => {
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishContent, setPublishContent] = useState('');
   const [publishImages, setPublishImages] = useState<string[]>([]);
+  const [publishTagIds, setPublishTagIds] = useState<number[]>([]);
   const [publishing, setPublishing] = useState(false);
 
   // 评论弹窗
@@ -67,8 +70,34 @@ const Community: React.FC = () => {
 
   // 标签筛选
   const [activeTab, setActiveTab] = useState('all');
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loadingTags, setLoadingTags] = useState(false);
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
 
   // ==================== 数据加载 ====================
+
+  /**
+   * 加载标签列表
+   */
+  const loadTags = async () => {
+    try {
+      setLoadingTags(true);
+      // 🚀 调用真实后端 API 获取标签列表
+      const response = await tagService.list({
+        status: 'ENABLED' as any,
+        size: 20,
+      });
+
+      if (response && response.content) {
+        setTags(response.content);
+      }
+    } catch (err: any) {
+      console.error('加载标签失败：', err);
+      // 静默失败，不影响主要功能
+    } finally {
+      setLoadingTags(false);
+    }
+  };
 
   /**
    * 加载帖子列表
@@ -124,6 +153,10 @@ const Community: React.FC = () => {
     loadPosts();
   }, [activeTab]);
 
+  useEffect(() => {
+    loadTags(); // 初始化加载标签
+  }, []);
+
   // ==================== 事件处理 ====================
 
   /**
@@ -138,6 +171,7 @@ const Community: React.FC = () => {
     setShowPublishModal(true);
     setPublishContent('');
     setPublishImages([]);
+    setPublishTagIds([]);
   };
 
   /**
@@ -147,6 +181,7 @@ const Community: React.FC = () => {
     setShowPublishModal(false);
     setPublishContent('');
     setPublishImages([]);
+    setPublishTagIds([]);
   };
 
   /**
@@ -161,10 +196,12 @@ const Community: React.FC = () => {
     setPublishing(true);
 
     try {
-      // 🚀 调用真实后端 API 发布动态
+      // 🚀 调用真实后端 API 发布动态（带标签）
       await postService.createPost({
+        title: publishContent.substring(0, 50), // 标题取前50字符
         content: publishContent,
         images: publishImages,
+        tagIds: publishTagIds, // 🎯 新增：传递标签ID列表
       });
 
       toast.success('发布成功！🎉');
@@ -320,6 +357,36 @@ const Community: React.FC = () => {
   };
 
   /**
+   * 选择标签筛选
+   */
+  const handleSelectTag = (tagId: number | null) => {
+    setSelectedTagId(tagId);
+    setPage(1);
+    setHasMore(true);
+    setPosts([]);
+    loadPosts(false, tagId); // 立即加载该标签的帖子
+  };
+
+  /**
+   * 切换发布帖子的标签
+   */
+  const handleTogglePublishTag = (tagId: number) => {
+    setPublishTagIds((prev) => {
+      if (prev.includes(tagId)) {
+        // 已选中，取消选择
+        return prev.filter((id) => id !== tagId);
+      } else {
+        // 未选中，添加选择（最多10个）
+        if (prev.length >= 10) {
+          toast.warning('最多只能选择 10 个标签！😰');
+          return prev;
+        }
+        return [...prev, tagId];
+      }
+    });
+  };
+
+  /**
    * 格式化时间
    */
   const formatTime = (time?: string) => {
@@ -367,6 +434,39 @@ const Community: React.FC = () => {
             ✍️ 发布动态
           </Button>
         </div>
+
+        {/* ==================== 热门标签 ==================== */}
+        {tags.length > 0 && (
+          <div className="community-tags-section">
+            <div className="tags-header">
+              <span className="tags-title">🏷️ 热门标签</span>
+              <span className="tags-subtitle">点击筛选相关内容</span>
+            </div>
+            <div className="tags-list">
+              {/* "全部"标签 */}
+              <button
+                className={`tag-item ${selectedTagId === null ? 'tag-item--active' : ''}`}
+                onClick={() => handleSelectTag(null)}
+              >
+                <span className="tag-name">全部</span>
+              </button>
+
+              {/* 热门标签列表 */}
+              {tags.slice(0, 10).map((tag) => (
+                <button
+                  key={tag.id}
+                  className={`tag-item ${selectedTagId === tag.id ? 'tag-item--active' : ''}`}
+                  onClick={() => handleSelectTag(tag.id)}
+                >
+                  <span className="tag-name">{tag.name}</span>
+                  {tag.hotCount > 0 && (
+                    <span className="tag-count">{tag.hotCount}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ==================== 标签筛选 ==================== */}
         <div className="community-tabs">
@@ -474,6 +574,29 @@ const Community: React.FC = () => {
               maxLength={500}
               rows={6}
             />
+
+            {/* 标签选择区域 */}
+            {tags.length > 0 && (
+              <div className="publish-modal__tags">
+                <div className="publish-modal__tags-header">
+                  <span className="publish-modal__tags-title">🏷️ 选择标签</span>
+                  <span className="publish-modal__tags-hint">（最多选择10个，已选{publishTagIds.length}个）</span>
+                </div>
+                <div className="publish-modal__tags-list">
+                  {tags.slice(0, 20).map((tag) => (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      className={`publish-tag-item ${publishTagIds.includes(tag.id) ? 'publish-tag-item--active' : ''}`}
+                      onClick={() => handleTogglePublishTag(tag.id)}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="publish-modal__footer">
               <Button onClick={handleClosePublishModal}>取消</Button>
               <Button

@@ -206,11 +206,25 @@ export const Register: React.FC = () => {
   return (
     <div className="register-page">
       <div className="register-container">
+        {/* 左侧欢迎区域 */}
+        <div className="register-welcome">
+          <h1 className="register-welcome__title">加入我们</h1>
+          <p className="register-welcome__subtitle">Join Campus Marketplace</p>
+          <p className="register-welcome__desc">
+            🎓 学生专属的二手交易平台
+            <br />
+            💡 买卖闲置 | 交友互动 | 绿色环保
+            <br />
+            🔥 注册即刻开启你的轻享之旅
+          </p>
+        </div>
+
+        {/* 右侧注册表单 */}
         <div className="register-card">
           {/* Logo和标题 */}
           <div className="register-header">
-            <h1 className="register-title">校园轻享集市</h1>
-            <p className="register-subtitle">注册新账号</p>
+            <h1 className="register-title">创建新账号 🎉</h1>
+            <p className="register-subtitle">快速注册，开启轻享生活</p>
           </div>
 
           {/* 注册方式切换 */}
@@ -233,12 +247,14 @@ export const Register: React.FC = () => {
           <form className="register-form" onSubmit={handleSubmit}>
             {/* 用户名 */}
             <div className="form-field">
+              <label>用户名</label>
               <Input
                 size="large"
                 placeholder="请输入用户名（2-20个字符）"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 prefix={<span>👤</span>}
+                allowClear
               />
               {errors.username && (
                 <div className="form-field-error">{errors.username}</div>
@@ -248,12 +264,14 @@ export const Register: React.FC = () => {
             {/* 手机号/邮箱 */}
             {registerType === 'phone' ? (
               <div className="form-field">
+                <label>手机号</label>
                 <Input
                   size="large"
                   placeholder="请输入手机号"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   prefix={<span>📱</span>}
+                  allowClear
                 />
                 {errors.phone && (
                   <div className="form-field-error">{errors.phone}</div>
@@ -261,6 +279,7 @@ export const Register: React.FC = () => {
               </div>
             ) : (
               <div className="form-field">
+                <label>邮箱</label>
                 <Input
                   size="large"
                   type="email"
@@ -268,6 +287,7 @@ export const Register: React.FC = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   prefix={<span>📧</span>}
+                  allowClear
                 />
                 {errors.email && (
                   <div className="form-field-error">{errors.email}</div>
@@ -277,6 +297,7 @@ export const Register: React.FC = () => {
 
             {/* 验证码 */}
             <div className="form-field">
+              <label>验证码</label>
               <div className="verification-code-field">
                 <Input
                   size="large"
@@ -310,6 +331,7 @@ export const Register: React.FC = () => {
 
             {/* 密码 */}
             <div className="form-field">
+              <label>密码</label>
               <Input
                 size="large"
                 type="password"
@@ -325,6 +347,7 @@ export const Register: React.FC = () => {
 
             {/* 确认密码 */}
             <div className="form-field">
+              <label>确认密码</label>
               <Input
                 size="large"
                 type="password"
@@ -340,7 +363,7 @@ export const Register: React.FC = () => {
 
             {/* 提交错误 */}
             {errors.submit && (
-              <div className="form-submit-error">{errors.submit}</div>
+              <div className="form-submit-error">⚠️ {errors.submit}</div>
             )}
 
             {/* 注册按钮 */}

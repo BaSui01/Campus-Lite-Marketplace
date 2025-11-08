@@ -35,6 +35,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getApi } from '@campus/shared/utils/apiClient';
 
 const { Option } = Select;
 const { TextArea } = Form.Item;
@@ -60,26 +61,22 @@ export const PostAuditList: React.FC = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['posts', 'audit', { status, page, size }],
     queryFn: async () => {
-      // 模拟数据
-      return {
-        content: Array.from({ length: 15 }, (_, i) => ({
-          id: page * 20 + i + 1,
-          title: `帖子标题${i + 1}`,
-          content: `这是帖子内容...`.repeat(3),
-          authorName: `用户${(i % 10) + 1}`,
-          images: i % 2 === 0 ? ['https://via.placeholder.com/150'] : [],
-          status: ['PENDING', 'PUBLISHED', 'REJECTED'][i % 3],
-          createdAt: new Date(Date.now() - i * 3600000).toISOString(),
-        })),
-        totalElements: 45,
-      };
+      const api = getApi();
+      const response = await api.listPosts(
+        undefined, // keyword
+        status as any,
+        page,
+        size
+      );
+      return response.data.data;
     },
     staleTime: 2 * 60 * 1000,
   });
 
   const auditMutation = useMutation({
     mutationFn: async ({ postId, approved, reason }: { postId: number; approved: boolean; reason?: string }) => {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const api = getApi();
+      await api.auditPost(postId, { approved, reason });
     },
     onSuccess: () => {
       message.success('审核成功');

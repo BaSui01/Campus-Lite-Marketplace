@@ -37,6 +37,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
+import { getApi } from '@campus/shared/utils/apiClient';
 
 const { Text } = Typography;
 const { confirm } = Modal;
@@ -68,56 +69,29 @@ export const BlacklistManagement: React.FC = () => {
   const [searchBlockedUserId, setSearchBlockedUserId] = useState<string>('');
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
 
-  // 查询黑名单列表（模拟数据）
+  // 查询黑名单列表（调用真实API）
   const { data, isLoading } = useQuery({
     queryKey: ['blacklistRecords', page, size, searchUserId, searchBlockedUserId],
     queryFn: async () => {
-      // TODO: 实际调用API
-      // const response = await blacklistService.listAllBlacklist({
-      //   page,
-      //   size,
-      //   userId: searchUserId ? parseInt(searchUserId) : undefined,
-      //   blockedUserId: searchBlockedUserId ? parseInt(searchBlockedUserId) : undefined,
-      // });
-      // return response.data;
-
-      // 模拟数据
-      const mockData: BlacklistRecord[] = Array.from({ length: size }, (_, i) => ({
-        id: page * size + i + 1,
-        userId: ((i % 10) + 1) * 100,
-        userName: `用户${((i % 10) + 1) * 100}`,
-        blockedUserId: ((i % 20) + 1) * 200,
-        blockedUserName: `用户${((i % 20) + 1) * 200}`,
-        createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-      }));
-
-      return {
-        content: mockData,
-        totalElements: 300,
-        totalPages: Math.ceil(300 / size),
-      };
+      const api = getApi();
+      const response = await api.listAllBlacklist(
+        searchUserId ? parseInt(searchUserId) : undefined,
+        searchBlockedUserId ? parseInt(searchBlockedUserId) : undefined,
+        page,
+        size
+      );
+      return response.data.data;
     },
     staleTime: 2 * 60 * 1000,
   });
 
-  // 查询黑名单统计（模拟数据）
+  // 查询黑名单统计（调用真实API）
   const { data: statistics } = useQuery({
     queryKey: ['blacklistStatistics'],
     queryFn: async (): Promise<BlacklistStatistics> => {
-      // TODO: 实际调用API
-      // const response = await blacklistService.getStatistics();
-      // return response.data;
-
-      // 模拟数据
-      return {
-        totalCount: 300,
-        activeUsers: 85,
-        mostBlockedUser: {
-          userId: 2001,
-          userName: '用户2001',
-          blockCount: 25,
-        },
-      };
+      const api = getApi();
+      const response = await api.getBlacklistStatistics();
+      return response.data.data as BlacklistStatistics;
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -125,9 +99,8 @@ export const BlacklistManagement: React.FC = () => {
   // 批量解除黑名单 Mutation
   const batchUnblockMutation = useMutation({
     mutationFn: async (ids: number[]) => {
-      // TODO: 实际调用API
-      // await blacklistService.batchUnblock(ids);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 模拟请求
+      const api = getApi();
+      await api.batchRemoveBlacklist({ ids });
     },
     onSuccess: () => {
       message.success('批量解除黑名单成功！🎉');

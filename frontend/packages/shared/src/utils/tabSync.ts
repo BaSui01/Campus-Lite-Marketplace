@@ -217,8 +217,9 @@ let tabSyncInstance: TabSyncManager | null = null;
  */
 export const initTabSync = (config: TabSyncConfig): TabSyncManager => {
   if (tabSyncInstance) {
-    console.warn('[Tab Sync] 已初始化，销毁旧实例');
-    tabSyncInstance.destroy();
+    // React 严格模式会导致双重调用，直接返回现有实例
+    console.log('[Tab Sync] 已初始化，复用现有实例');
+    return tabSyncInstance;
   }
 
   tabSyncInstance = new TabSyncManager(config);

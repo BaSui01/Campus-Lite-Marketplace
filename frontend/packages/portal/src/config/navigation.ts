@@ -14,9 +14,11 @@ export interface NavItem {
 }
 
 /**
- * 主导航菜单配置
+ * 主导航菜单配置（优化版 - 调整分组、优化icon、增强体验）🎨
+ * @updated 2025-11-08 - BaSui 优化：重新设计菜单结构，提升用户体验
  */
 export const MAIN_NAV_ITEMS: NavItem[] = [
+  // ==================== 核心功能 ====================
   {
     key: 'home',
     label: '首页',
@@ -30,18 +32,18 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
     children: [
       {
         key: 'goods-all',
-        label: '全部商品',
+        label: '🔍 全部商品',
         path: '/goods',
       },
       {
         key: 'goods-publish',
-        label: '我要卖',
+        label: '📝 我要卖',
         path: '/publish',
         auth: true,
       },
       {
         key: 'favorites',
-        label: '我的收藏',
+        label: '⭐ 我的收藏',
         path: '/favorites',
         auth: true,
       },
@@ -53,24 +55,33 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
     path: '/community',
     icon: '👥',
   },
+
+  // ==================== 活动&话题 ====================
   {
     key: 'activities',
-    label: '活动中心',
+    label: '活动&话题',
     icon: '🎉',
     children: [
       {
         key: 'activities-list',
-        label: '活动列表',
+        label: '🎊 活动列表',
         path: '/seller/activities',
       },
       {
+        key: 'topics',
+        label: '💬 热门话题',
+        path: '/topics',
+      },
+      {
         key: 'activities-create',
-        label: '发起活动',
+        label: '✨ 发起活动',
         path: '/seller/activities/create',
         auth: true,
       },
     ],
   },
+
+  // ==================== 卖家中心（登录后显示）====================
   {
     key: 'seller',
     label: '卖家中心',
@@ -79,26 +90,28 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
     children: [
       {
         key: 'seller-dashboard',
-        label: '数据看板',
+        label: '📈 数据看板',
         path: '/seller/dashboard',
       },
       {
         key: 'seller-goods',
-        label: '我的商品',
+        label: '📦 我的商品',
         path: '/profile?tab=goods',
       },
       {
         key: 'seller-reviews',
-        label: '我的评价',
+        label: '⭐ 我的评价',
         path: '/reviews/my',
       },
       {
         key: 'seller-credit',
-        label: '信用分',
+        label: '💯 信用分',
         path: '/credit',
       },
     ],
   },
+
+  // ==================== 订单管理（登录后显示）====================
   {
     key: 'orders',
     label: '订单管理',
@@ -107,17 +120,17 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
     children: [
       {
         key: 'orders-all',
-        label: '全部订单',
+        label: '📋 全部订单',
         path: '/orders',
       },
       {
         key: 'orders-refunds',
-        label: '退款/售后',
+        label: '💰 退款/售后',
         path: '/refunds',
       },
       {
         key: 'orders-subscriptions',
-        label: '订阅管理',
+        label: '📬 订阅管理',
         path: '/subscriptions',
       },
     ],
@@ -125,42 +138,16 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * 用户下拉菜单配置
+ * 用户下拉菜单配置（优化版 - 精简重复、优化分组）🎨
+ * @updated 2025-11-08 - BaSui 优化：去除重复菜单项，优化分组结构
  */
 export const USER_MENU_ITEMS: NavItem[] = [
+  // ==================== 个人信息组 ====================
   {
     key: 'profile',
     label: '个人中心',
     path: '/profile',
     icon: '👤',
-  },
-  {
-    key: 'following',
-    label: '我的关注',
-    path: '/following',
-    icon: '❤️',
-  },
-  {
-    key: 'subscriptions',
-    label: '我的订阅',
-    path: '/subscriptions',
-    icon: '📬',
-  },
-  {
-    key: 'divider1',
-    label: '',
-  },
-  {
-    key: 'orders',
-    label: '我的订单',
-    path: '/orders',
-    icon: '📦',
-  },
-  {
-    key: 'favorites',
-    label: '我的收藏',
-    path: '/favorites',
-    icon: '⭐',
   },
   {
     key: 'credit',
@@ -169,9 +156,29 @@ export const USER_MENU_ITEMS: NavItem[] = [
     icon: '💯',
   },
   {
+    key: 'divider1',
+    label: '',
+  },
+
+  // ==================== 订单管理组 ====================
+  {
+    key: 'orders',
+    label: '我的订单',
+    path: '/orders',
+    icon: '📦',
+  },
+  {
+    key: 'refunds',
+    label: '退款/售后',
+    path: '/refunds',
+    icon: '💰',
+  },
+  {
     key: 'divider2',
     label: '',
   },
+
+  // ==================== 设置组 ====================
   {
     key: 'settings',
     label: '账号设置',
@@ -185,15 +192,11 @@ export const USER_MENU_ITEMS: NavItem[] = [
     icon: '🔔',
   },
   {
-    key: 'blacklist',
-    label: '黑名单',
-    path: '/settings/blacklist',
-    icon: '🚫',
-  },
-  {
     key: 'divider3',
     label: '',
   },
+
+  // ==================== 数据操作组 ====================
   {
     key: 'revert',
     label: '数据撤销',

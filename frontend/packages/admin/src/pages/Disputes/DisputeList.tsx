@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Select, Space, Tag, Card, Row, Col, Statistic } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
+import { getApi } from '@campus/shared/utils/apiClient';
 
 const { Option } = Select;
 
@@ -27,20 +28,16 @@ export const DisputeList: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['disputes', { keyword, status, page, size }],
-    queryFn: async () => ({
-      content: Array.from({ length: 12 }, (_, i) => ({
-        id: page * 20 + i + 1,
-        disputeNo: `DSP${Date.now() + i}`,
-        orderNo: `ORD${1000 + i}`,
-        title: `纠纷标题${i + 1}`,
-        plaintiffName: `用户A${i + 1}`,
-        defendantName: `用户B${i + 1}`,
-        status: Object.keys(STATUS_MAP)[i % 4],
-        amount: (Math.random() * 1000).toFixed(2),
-        createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-      })),
-      totalElements: 40,
-    }),
+    queryFn: async () => {
+      const api = getApi();
+      const response = await api.listAllDisputes(
+        keyword || undefined,
+        status as any,
+        page,
+        size
+      );
+      return response.data.data;
+    },
   });
 
   const columns = [

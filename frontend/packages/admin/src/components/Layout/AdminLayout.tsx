@@ -25,6 +25,15 @@ import {
   StarOutlined,
   ThunderboltOutlined,
   TeamOutlined,
+  BarChartOutlined,
+  MessageOutlined,
+  PayCircleOutlined,
+  CarOutlined,
+  ExportOutlined,
+  FundOutlined,
+  RocketOutlined,
+  SearchOutlined,
+  BellOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth, usePermission, useBreakpoint } from '@/hooks';
@@ -50,6 +59,15 @@ const getIcon = (iconName: string) => {
     StarOutlined: <StarOutlined />,
     ThunderboltOutlined: <ThunderboltOutlined />,
     TeamOutlined: <TeamOutlined />,
+    BarChartOutlined: <BarChartOutlined />,
+    MessageOutlined: <MessageOutlined />,
+    PayCircleOutlined: <PayCircleOutlined />,
+    CarOutlined: <CarOutlined />,
+    ExportOutlined: <ExportOutlined />,
+    FundOutlined: <FundOutlined />,
+    RocketOutlined: <RocketOutlined />,
+    SearchOutlined: <SearchOutlined />,
+    BellOutlined: <BellOutlined />,
   };
   return icons[iconName];
 };
@@ -210,11 +228,65 @@ export const AdminLayout: React.FC = () => {
   // 菜单内容组件（Sider和Drawer共用）
   const MenuContent = () => (
     <>
-      <div style={{ padding: '16px', textAlign: 'center' }}>
-        <Title level={4} style={{ color: 'white', margin: 0 }}>
-          {collapsed && !isMobile ? '管理' : '校园集市管理系统'}
-        </Title>
+      {/* 🎨 优化后的Logo区域 - 现代化设计 */}
+      <div
+        style={{
+          padding: collapsed && !isMobile ? '20px 12px' : '20px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        {/* Logo Icon */}
+        <span
+          style={{
+            fontSize: collapsed && !isMobile ? '28px' : '36px',
+            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          🎓
+        </span>
+
+        {/* Logo Text */}
+        {(!collapsed || isMobile) && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2px',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <span
+              style={{
+                fontSize: '18px',
+                fontWeight: 700,
+                color: '#ffffff',
+                letterSpacing: '0.5px',
+                lineHeight: '1.2',
+              }}
+            >
+              校园轻享集市
+            </span>
+            <span
+              style={{
+                fontSize: '12px',
+                fontWeight: 500,
+                color: 'rgba(255, 255, 255, 0.65)',
+                letterSpacing: '1px',
+              }}
+            >
+              管理后台
+            </span>
+          </div>
+        )}
       </div>
+
       <Menu
         theme="dark"
         mode="inline"
@@ -258,7 +330,7 @@ export const AdminLayout: React.FC = () => {
         </Sider>
       )}
       
-      <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 80 : 200) }}>
+      <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 80 : 200), height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <Header
           style={{
             padding: '0 16px',
@@ -266,6 +338,10 @@ export const AdminLayout: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            position: 'sticky',
+            top: 0,
+            zIndex: 998,
+            borderBottom: '1px solid #f0f0f0',
           }}
         >
           <Button
@@ -299,8 +375,9 @@ export const AdminLayout: React.FC = () => {
           style={{
             margin: '16px',
             padding: '16px',
-            minHeight: 280,
             background: '#fff',
+            overflow: 'auto',
+            flex: 1,
           }}
         >
           <Outlet />

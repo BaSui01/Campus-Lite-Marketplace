@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Table, Button, Input, Select, Space, Tag, Card, Row, Col, Statistic, Rate, Modal, Image } from 'antd';
 import { SearchOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getApi } from '@campus/shared/utils/apiClient';
 
 const { Option } = Select;
 
@@ -21,23 +22,23 @@ export const ReviewList: React.FC = () => {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['reviews', { keyword, rating, page, size }],
-    queryFn: async () => ({
-      content: Array.from({ length: 15 }, (_, i) => ({
-        id: page * 20 + i + 1,
-        orderId: 1000 + i,
-        goodsTitle: `商品${i + 1}`,
-        buyerName: `用户${i + 1}`,
-        rating: [1, 2, 3, 4, 5][i % 5],
-        content: `评价内容...`.repeat(2),
-        images: i % 2 === 0 ? ['https://via.placeholder.com/100'] : [],
-        createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-      })),
-      totalElements: 50,
-    }),
+    queryFn: async () => {
+      const api = getApi();
+      const response = await api.listReviews(
+        keyword || undefined,
+        rating,
+        page,
+        size
+      );
+      return response.data.data;
+    },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => { await new Promise(r => setTimeout(r, 500)); },
+    mutationFn: async (id: number) => {
+      const api = getApi();
+      await api.deleteReview(id);
+    },
     onSuccess: () => { refetch(); queryClient.invalidateQueries({ queryKey: ['reviews'] }); },
   });
 

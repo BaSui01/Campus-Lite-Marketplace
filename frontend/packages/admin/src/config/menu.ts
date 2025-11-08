@@ -26,6 +26,30 @@ export const MENU_ITEMS: MenuItem[] = [
     permission: PERMISSION_CODES.SYSTEM_STATISTICS_VIEW,
   },
   {
+    key: 'statistics',
+    label: '统计分析',
+    icon: 'BarChartOutlined',
+    permission: PERMISSION_CODES.SYSTEM_STATISTICS_VIEW,
+    children: [
+      {
+        key: 'statistics-dashboard',
+        label: '数据统计',
+        path: '/admin/statistics',
+      },
+      {
+        key: 'behavior-dashboard',
+        label: '行为分析',
+        path: '/admin/behavior/dashboard',
+        permission: PERMISSION_CODES.SYSTEM_USER_VIEW,
+      },
+      {
+        key: 'search-statistics',
+        label: '搜索统计',
+        path: '/admin/search/statistics',
+      },
+    ],
+  },
+  {
     key: 'goods',
     label: '商品管理',
     icon: 'ShoppingOutlined',
@@ -60,6 +84,16 @@ export const MENU_ITEMS: MenuItem[] = [
         label: '退款管理',
         path: '/admin/orders/refunds',
         permission: PERMISSION_CODES.SYSTEM_ORDER_MANAGE,
+      },
+      {
+        key: 'payments-list',
+        label: '支付管理',
+        path: '/admin/payments/list',
+      },
+      {
+        key: 'logistics-list',
+        label: '物流管理',
+        path: '/admin/logistics/list',
       },
     ],
   },
@@ -143,6 +177,19 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
   },
   {
+    key: 'messages',
+    label: '消息管理',
+    icon: 'MessageOutlined',
+    permission: PERMISSION_CODES.SYSTEM_USER_VIEW,
+    children: [
+      {
+        key: 'messages-list',
+        label: '消息列表',
+        path: '/admin/messages/list',
+      },
+    ],
+  },
+  {
     key: 'content',
     label: '内容管理',
     icon: 'FileTextOutlined',
@@ -222,9 +269,22 @@ export const MENU_ITEMS: MenuItem[] = [
         permission: PERMISSION_CODES.SYSTEM_RATE_LIMIT_MANAGE,
       },
       {
-        key: 'system-notifications',
+        key: 'system-notification-templates',
         label: '通知模板',
-        path: '/admin/system/notifications',
+        path: '/admin/system/notification-templates',
+        permission: PERMISSION_CODES.SYSTEM_RATE_LIMIT_MANAGE,
+      },
+      {
+        key: 'recommend-config',
+        label: '推荐管理',
+        path: '/admin/recommend/config',
+        permission: PERMISSION_CODES.SYSTEM_CONFIG_UPDATE,
+      },
+      {
+        key: 'export-center',
+        label: '导出中心',
+        path: '/admin/export/center',
+        permission: PERMISSION_CODES.SYSTEM_USER_VIEW,
       },
       {
         key: 'system-compliance',

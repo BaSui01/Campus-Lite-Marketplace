@@ -1,29 +1,41 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * 消息 API 服务
+ * ✅ 消息 API 服务 - 已重构为 OpenAPI
  * @author BaSui 😎
- * @description 即时消息、会话管理等接口
+ * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
+ *
+ * 功能：
+ * - 会话管理（查询、创建、删除）
+ * - 消息发送与查询
+ * - 消息已读标记
+ * - 消息撤回
+ * - 未读消息数查询
+ *
+ * 📋 API 路径：/api/messages/*
  */
 
 import { getApi } from '../utils/apiClient';
 import type {
-  ApiResponse,
-  PageInfo,
-  Message,
-  Conversation,
   SendMessageRequest,
-  ConversationListQuery,
-  MessageListQuery,
-  MarkMessageReadRequest,
-} from '../types';
+  ConversationResponse,
+  MessageResponse,
+} from '../api/models';
+
+/**
+ * 会话列表查询参数
+ */
+export interface ConversationListParams {
+  page?: number;
+  size?: number;
+}
+
+/**
+ * 消息列表查询参数
+ */
+export interface MessageListParams {
+  conversationId: number;
+  page?: number;
+  size?: number;
+}
 
 /**
  * 消息 API 服务类
@@ -33,93 +45,114 @@ export class MessageService {
 
   /**
    * 获取会话列表
+   * GET /api/messages/conversations
    * @param params 查询参数
-   * @returns 会话列表
+   * @returns 会话列表（分页）
    */
-  async getConversations(params?: ConversationListQuery): Promise<ApiResponse<PageInfo<Conversation>>> {
-    return http.get('/conversations', { params });
+  async getConversations(params?: ConversationListParams) {
+    const api = getApi();
+    const response = await api.listConversations({
+      page: params?.page,
+      size: params?.size,
+    });
+    return response.data.data;
   }
 
   /**
    * 获取会话详情
+   * GET /api/messages/conversations/{conversationId}
    * @param conversationId 会话ID
    * @returns 会话详情
    */
-  async getConversationById(conversationId: number): Promise<ApiResponse<Conversation>> {
-    return http.get(`/conversations/${conversationId}`);
+  async getConversationById(conversationId: number): Promise<ConversationResponse> {
+    const api = getApi();
+    const response = await api.getConversation({ conversationId });
+    return response.data.data as ConversationResponse;
   }
 
   /**
    * 创建或获取会话
+   * POST /api/messages/conversations
    * @param userId 对方用户ID
    * @returns 会话信息
    */
-  async getOrCreateConversation(userId: number): Promise<ApiResponse<Conversation>> {
-    return http.post('/conversations', { userId });
+  async getOrCreateConversation(userId: number): Promise<ConversationResponse> {
+    const api = getApi();
+    const response = await api.createConversation({ createConversationRequest: { userId } });
+    return response.data.data as ConversationResponse;
   }
 
   /**
    * 删除会话
+   * DELETE /api/messages/conversations/{conversationId}
    * @param conversationId 会话ID
-   * @returns 删除结果
    */
-  async deleteConversation(conversationId: number): Promise<ApiResponse<void>> {
-    return http.delete(`/conversations/${conversationId}`);
+  async deleteConversation(conversationId: number): Promise<void> {
+    const api = getApi();
+    await api.deleteConversation({ conversationId });
   }
 
   // ==================== 消息相关接口 ====================
 
   /**
    * 发送消息
+   * POST /api/messages/send
    * @param data 发送消息请求参数
-   * @returns 消息信息
+   * @returns 消息ID
    */
-  async sendMessage(data: SendMessageRequest): Promise<ApiResponse<Message>> {
-    return http.post('/messages', data);
+  async sendMessage(data: SendMessageRequest): Promise<number> {
+    const api = getApi();
+    const response = await api.sendMessage({ sendMessageRequest: data });
+    return response.data.data as number;
   }
 
   /**
    * 获取消息列表
+   * GET /api/messages/conversations/{conversationId}/messages
    * @param params 查询参数
-   * @returns 消息列表
+   * @returns 消息列表（分页）
    */
-  async getMessages(params: MessageListQuery): Promise<ApiResponse<PageInfo<Message>>> {
-    return http.get('/messages', { params });
-  }
-
-  /**
-   * 标记消息已读
-   * @param data 标记消息已读请求参数
-   * @returns 标记结果
-   */
-  async markMessagesAsRead(data: MarkMessageReadRequest): Promise<ApiResponse<void>> {
-    return http.post('/messages/mark-read', data);
+  async getMessages(params: MessageListParams) {
+    const api = getApi();
+    const response = await api.listMessages({
+      conversationId: params.conversationId,
+      page: params.page,
+      size: params.size,
+    });
+    return response.data.data;
   }
 
   /**
    * 标记会话所有消息已读
+   * POST /api/messages/conversations/{conversationId}/mark-read
    * @param conversationId 会话ID
-   * @returns 标记结果
+   * @returns 标记的消息数量
    */
-  async markConversationAsRead(conversationId: number): Promise<ApiResponse<void>> {
-    return http.post(`/messages/mark-read/conversation/${conversationId}`);
+  async markConversationAsRead(conversationId: number): Promise<number> {
+    const api = getApi();
+    const response = await api.markConversationAsRead({ conversationId });
+    return response.data.data as number;
   }
 
   /**
    * 撤回消息
+   * POST /api/messages/{messageId}/recall
    * @param messageId 消息ID
-   * @returns 撤回结果
    */
-  async recallMessage(messageId: number): Promise<ApiResponse<void>> {
-    return http.post(`/messages/${messageId}/recall`);
+  async recallMessage(messageId: number): Promise<void> {
+    const api = getApi();
+    await api.recallMessage({ messageId });
   }
 
   /**
    * 获取未读消息数
+   * GET /api/messages/unread-count
    * @returns 未读消息数
    */
-  async getUnreadCount(): Promise<ApiResponse<number>> {
-    return http.get('/messages/unread-count');
+  async getUnreadCount(): Promise<number> {
+    const api = getApi();
+    const response = await api.getUnreadCount();
+    return response.data.data as number;
   }
 }
 

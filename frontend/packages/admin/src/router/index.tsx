@@ -3,41 +3,128 @@
  *
  * @author BaSui 😎
  * @date 2025-11-01
+ * @updated 2025-11-08 - 添加路由懒加载和代码分割
  */
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { Spin } from 'antd';
 import { AdminLayout } from '@/components/Layout';
-import Login from '@/pages/Login';
-import Dashboard from '@/pages/Dashboard';
-import ProfilePage from '@/pages/Profile';
-// import DashboardTest from '@/pages/Dashboard/Dashboard.test'; // 临时测试用
-import UserList from '@/pages/Users/UserList';
-import UserDetail from '@/pages/Users/UserDetail';
-// import { ReportList } from '@/pages/Content'; // TODO: 实现 ReportList 组件
-import { RoleList } from '@/pages/Roles';
-import { RateLimit, RecycleBin, Notifications, Compliance, RevertManagement, CampusList, CategoryList, TagList, FeatureFlagList, SystemMonitor, TaskList } from '@/pages/System';
-import { GoodsList, GoodsDetail, GoodsAudit } from '@/pages/Goods';
-import { OrderList, OrderDetail, RefundManagement } from '@/pages/Orders';
-import { PaymentList, PaymentDetail } from '@/pages/Payment';
-import { MessageList, MessageDetail } from '@/pages/Messages';
-import { ExportCenter } from '@/pages/Export';
-import { LogisticsList } from '@/pages/Logistics';
-import { BehaviorDashboard } from '@/pages/Behavior';
-import { RecommendConfig } from '@/pages/Recommend';
-import { SearchStatistics } from '@/pages/Search';
-import { AppealList, AppealDetail } from '@/pages/Appeals';
-import { ReviewList } from '@/pages/Reviews';
-import { BatchTaskList } from '@/pages/Batch';
-import { DisputeList, DisputeDetail, DisputeStatistics } from '@/pages/Disputes';
-import { AuditLogList, OperationLogList } from '@/pages/Logs';
-import { BannedUserList, BlacklistManagement } from '@/pages/Users';
-import { PostAuditList, ReportList } from '@/pages/Content';
-import { TopicList, CommunityList } from '@/pages/Community';
-import { StatisticsDashboard } from '@/pages/Statistics';
-import { NotificationTemplateList } from '@/pages/NotificationTemplates';
 import { PermissionGuard } from '@/components';
 import { PERMISSION_CODES } from '@campus/shared';
+
+// ===== 页面加载组件 =====
+const PageLoading: React.FC = () => (
+  <div style={{ padding: '24px' }}>
+    <Spin size="large" tip="加载中...">
+      <div style={{ minHeight: '400px' }} />
+    </Spin>
+  </div>
+);
+
+// ===== 核心页面（不懒加载，保证首屏速度）=====
+import Login from '@/pages/Login';
+import Dashboard from '@/pages/Dashboard';
+
+// ===== 懒加载页面（按需加载）=====
+
+// 用户管理
+const UserList = lazy(() => import('@/pages/Users/UserList'));
+const UserDetail = lazy(() => import('@/pages/Users/UserDetail'));
+const BannedUserList = lazy(() => import('@/pages/Users/BannedUserList'));
+const BlacklistManagement = lazy(() => import('@/pages/Users/BlacklistManagement'));
+
+// 个人中心
+const ProfilePage = lazy(() => import('@/pages/Profile'));
+
+// 角色权限
+const RoleList = lazy(() => import('@/pages/Roles').then(m => ({ default: m.RoleList })));
+
+// 系统管理
+const RateLimit = lazy(() => import('@/pages/System').then(m => ({ default: m.RateLimit })));
+const RecycleBin = lazy(() => import('@/pages/System').then(m => ({ default: m.RecycleBin })));
+const Notifications = lazy(() => import('@/pages/System').then(m => ({ default: m.Notifications })));
+const Compliance = lazy(() => import('@/pages/System').then(m => ({ default: m.Compliance })));
+const RevertManagement = lazy(() => import('@/pages/System').then(m => ({ default: m.RevertManagement })));
+const CampusList = lazy(() => import('@/pages/System').then(m => ({ default: m.CampusList })));
+const CategoryList = lazy(() => import('@/pages/System').then(m => ({ default: m.CategoryList })));
+const TagList = lazy(() => import('@/pages/System').then(m => ({ default: m.TagList })));
+const FeatureFlagList = lazy(() => import('@/pages/System').then(m => ({ default: m.FeatureFlagList })));
+const SystemMonitor = lazy(() => import('@/pages/System').then(m => ({ default: m.SystemMonitor })));
+const TaskList = lazy(() => import('@/pages/System').then(m => ({ default: m.TaskList })));
+
+// 商品管理
+const GoodsList = lazy(() => import('@/pages/Goods').then(m => ({ default: m.GoodsList })));
+const GoodsDetail = lazy(() => import('@/pages/Goods').then(m => ({ default: m.GoodsDetail })));
+const GoodsAudit = lazy(() => import('@/pages/Goods').then(m => ({ default: m.GoodsAudit })));
+
+// 订单管理
+const OrderList = lazy(() => import('@/pages/Orders').then(m => ({ default: m.OrderList })));
+const OrderDetail = lazy(() => import('@/pages/Orders').then(m => ({ default: m.OrderDetail })));
+const RefundManagement = lazy(() => import('@/pages/Orders').then(m => ({ default: m.RefundManagement })));
+
+// 支付管理
+const PaymentList = lazy(() => import('@/pages/Payment').then(m => ({ default: m.PaymentList })));
+const PaymentDetail = lazy(() => import('@/pages/Payment').then(m => ({ default: m.PaymentDetail })));
+
+// 消息管理
+const MessageList = lazy(() => import('@/pages/Messages').then(m => ({ default: m.MessageList })));
+const MessageDetail = lazy(() => import('@/pages/Messages').then(m => ({ default: m.MessageDetail })));
+
+// 导出中心
+const ExportCenter = lazy(() => import('@/pages/Export').then(m => ({ default: m.ExportCenter })));
+
+// 物流管理
+const LogisticsList = lazy(() => import('@/pages/Logistics').then(m => ({ default: m.LogisticsList })));
+
+// 行为分析
+const BehaviorDashboard = lazy(() => import('@/pages/Behavior').then(m => ({ default: m.BehaviorDashboard })));
+
+// 推荐管理
+const RecommendConfig = lazy(() => import('@/pages/Recommend').then(m => ({ default: m.RecommendConfig })));
+
+// 搜索管理
+const SearchStatistics = lazy(() => import('@/pages/Search').then(m => ({ default: m.SearchStatistics })));
+
+// 申诉管理
+const AppealList = lazy(() => import('@/pages/Appeals').then(m => ({ default: m.AppealList })));
+const AppealDetail = lazy(() => import('@/pages/Appeals').then(m => ({ default: m.AppealDetail })));
+
+// 评价管理
+const ReviewList = lazy(() => import('@/pages/Reviews').then(m => ({ default: m.ReviewList })));
+
+// 批量任务
+const BatchTaskList = lazy(() => import('@/pages/Batch').then(m => ({ default: m.BatchTaskList })));
+
+// 纠纷管理
+const DisputeList = lazy(() => import('@/pages/Disputes').then(m => ({ default: m.DisputeList })));
+const DisputeDetail = lazy(() => import('@/pages/Disputes').then(m => ({ default: m.DisputeDetail })));
+const DisputeStatistics = lazy(() => import('@/pages/Disputes').then(m => ({ default: m.DisputeStatistics })));
+
+// 日志管理
+const AuditLogList = lazy(() => import('@/pages/Logs').then(m => ({ default: m.AuditLogList })));
+const OperationLogList = lazy(() => import('@/pages/Logs').then(m => ({ default: m.OperationLogList })));
+
+// 内容管理
+const PostAuditList = lazy(() => import('@/pages/Content').then(m => ({ default: m.PostAuditList })));
+const ReportList = lazy(() => import('@/pages/Content').then(m => ({ default: m.ReportList })));
+
+// 社区管理
+const TopicList = lazy(() => import('@/pages/Community').then(m => ({ default: m.TopicList })));
+const CommunityList = lazy(() => import('@/pages/Community').then(m => ({ default: m.CommunityList })));
+
+// 统计分析
+const StatisticsDashboard = lazy(() => import('@/pages/Statistics').then(m => ({ default: m.StatisticsDashboard })));
+
+// 通知模板
+const NotificationTemplateList = lazy(() => import('@/pages/NotificationTemplates').then(m => ({ default: m.NotificationTemplateList })));
+
+// ===== 辅助函数：包裹 Suspense =====
+const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType<any>>) => (
+  <Suspense fallback={<PageLoading />}>
+    <Component />
+  </Suspense>
+);
 
 // ===== 路由配置 =====
 export const router = createBrowserRouter([
@@ -63,13 +150,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'profile',
-        element: <ProfilePage />,
+        element: withSuspense(ProfilePage),
       },
       {
         path: 'statistics',
         element: (
           <PermissionGuard permission={PERMISSION_CODES.SYSTEM_STATISTICS_VIEW}>
-            <StatisticsDashboard />
+            <Suspense fallback={<PageLoading />}>
+              <StatisticsDashboard />
+            </Suspense>
           </PermissionGuard>
         ),
       },

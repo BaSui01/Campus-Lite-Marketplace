@@ -18,91 +18,102 @@ import type { ApiResponse, UploadResponse } from '../types';
 import { IMAGE_UPLOAD_URL, FILE_UPLOAD_URL } from '../constants';
 
 /**
+ * 上传选项
+ */
+export interface UploadOptions {
+  category?: 'avatar' | 'goods' | 'post' | 'message' | 'general';
+  onProgress?: (percent: number) => void;
+}
+
+/**
  * 文件上传 API 服务类
  */
 export class UploadService {
   /**
    * 上传图片
    * @param file 图片文件或FormData
-   * @param onProgress 上传进度回调
+   * @param options 上传选项（category、onProgress）
    * @returns 上传结果（包含图片URL）
    */
   async uploadImage(
     file: File | FormData,
-    onProgress?: (percent: number) => void
+    options?: UploadOptions
   ): Promise<ApiResponse<UploadResponse>> {
+    const { category = 'general', onProgress } = options || {};
+
     const formData = file instanceof FormData ? file : new FormData();
     if (file instanceof File) {
       formData.append('file', file);
     }
 
-    const response = await apiClient.post(IMAGE_UPLOAD_URL, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      onUploadProgress: (progressEvent) => {
-        if (onProgress && progressEvent.total) {
-          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          onProgress(percent);
-        }
-      },
-    });
+    const response = await apiClient.post(
+      `${IMAGE_UPLOAD_URL}?category=${category}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && progressEvent.total) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            onProgress(percent);
+          }
+        },
+      }
+    );
     return response.data;
   }
 
   /**
    * 批量上传图片
    * @param files 图片文件数组
-   * @param onProgress 上传进度回调
+   * @param options 上传选项（category、onProgress）
    * @returns 上传结果数组
    */
   async uploadImages(
     files: File[],
-    onProgress?: (percent: number) => void
+    options?: UploadOptions
   ): Promise<ApiResponse<UploadResponse[]>> {
-    const formData = new FormData();
-    files.forEach((file) => {
-      formData.append('files', file);
-    });
-
-    const response = await apiClient.post(`${IMAGE_UPLOAD_URL}/batch`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      onUploadProgress: (progressEvent) => {
-        if (onProgress && progressEvent.total) {
-          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          onProgress(percent);
-        }
-      },
-    });
-    return response.data;
+    const results = await Promise.all(
+      files.map((file) => this.uploadImage(file, options))
+    );
+    return {
+      code: 200,
+      message: 'success',
+      data: results.map((r) => r.data),
+    } as ApiResponse<UploadResponse[]>;
   }
 
   /**
    * 上传文件
    * @param file 文件
-   * @param onProgress 上传进度回调
+   * @param options 上传选项（category、onProgress）
    * @returns 上传结果（包含文件URL）
    */
   async uploadFile(
     file: File,
-    onProgress?: (percent: number) => void
+    options?: UploadOptions
   ): Promise<ApiResponse<UploadResponse>> {
+    const { category = 'general', onProgress } = options || {};
+
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await apiClient.post(FILE_UPLOAD_URL, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      onUploadProgress: (progressEvent) => {
-        if (onProgress && progressEvent.total) {
-          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          onProgress(percent);
-        }
-      },
-    });
+    const response = await apiClient.post(
+      `${FILE_UPLOAD_URL}?category=${category}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && progressEvent.total) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            onProgress(percent);
+          }
+        },
+      }
+    );
     return response.data;
   }
 

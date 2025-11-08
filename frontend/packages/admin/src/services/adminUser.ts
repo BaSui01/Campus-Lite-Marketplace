@@ -1,64 +1,66 @@
 /**
- * 管理端用户服务
+ * ✅ 管理端用户服务 - 管理端专属版本
  * @author BaSui 😎
- * @description 用户列表、封禁/解封、自动解封等管理员专属功能
+ * @description 使用 OpenAPI 生成的 DefaultApi
+ *
+ * 功能：
+ * - 封禁用户（支持指定天数）
+ * - 解封用户
+ * - 自动解封过期用户
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
-import type { ApiResponse, PageInfo, User, UserListQuery } from '@campus/shared/types';
-
-export interface BanUserPayload {
-  userId: number;
-  reason: string;
-  days: number;
-}
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { BanUserRequest } from '@campus/shared/api';
 
 /**
- * 管理员用户服务类
+ * 管理端用户治理服务类
  */
 export class AdminUserService {
   /**
-   * 获取用户列表（管理员）
-   * @param params 查询参数
-   * @returns 用户列表
+   * 封禁用户
+   * @param payload - 封禁请求参数
+   * @returns Promise<void>
    */
-  async getUserList(params: UserListQuery): Promise<ApiResponse<PageInfo<User>>> {
+  async banUser(payload: BanUserRequest): Promise<void> {
     const api = getApi();
-    // TODO: 使用 OpenAPI 生成的方法替换手写路径
-    const response = await api.axiosInstance.get<ApiResponse<PageInfo<User>>>('/users', { params });
-    return response.data;
+    const response = await api.banUser({ banUserRequest: payload });
+
+    if (response.data.code !== 200) {
+      throw new Error(response.data.message || '封禁用户失败');
+    }
   }
 
   /**
-   * 封禁用户（管理员）
-   * @param payload 封禁参数
-   * @returns 封禁结果
-   */
-  async banUser(payload: BanUserPayload): Promise<void> {
-    const api = getApi();
-    await api.axiosInstance.post<ApiResponse<void>>('/admin/users/ban', payload);
-  }
-
-  /**
-   * 解封用户（管理员）
-   * @param userId 用户ID
-   * @returns 解封结果
+   * 解封用户
+   * @param userId - 用户ID
+   * @returns Promise<void>
    */
   async unbanUser(userId: number): Promise<void> {
     const api = getApi();
-    await api.axiosInstance.post<ApiResponse<void>>(`/admin/users/${userId}/unban`);
+    const response = await api.unbanUser({ userId });
+
+    if (response.data.code !== 200) {
+      throw new Error(response.data.message || '解封用户失败');
+    }
   }
 
   /**
-   * 自动解封过期用户（管理员）
-   * @returns 解封的用户数
+   * 自动解封过期用户（定时任务）
+   * @returns Promise<number> - 解封的用户数量
    */
   async autoUnbanExpired(): Promise<number> {
     const api = getApi();
-    const response = await api.axiosInstance.post<ApiResponse<number>>('/admin/users/auto-unban');
+    const response = await api.autoUnbanExpiredUsers();
+
+    if (response.data.code !== 200) {
+      throw new Error(response.data.message || '自动解封失败');
+    }
+
     return response.data.data ?? 0;
   }
 }
 
+// 导出单例实例
 export const adminUserService = new AdminUserService();
 export default adminUserService;
+

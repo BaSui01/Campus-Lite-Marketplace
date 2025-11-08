@@ -183,14 +183,7 @@ export const SearchStatistics: React.FC = () => {
     },
   ];
 
-  // 模拟热门关键词数据
-  const mockKeywords = [
-    { keyword: 'iPhone 15', count: 1234, resultCount: 89, clickRate: 0.65, conversionRate: 0.12, trend: 1 },
-    { keyword: '笔记本电脑', count: 987, resultCount: 156, clickRate: 0.58, conversionRate: 0.09, trend: 1 },
-    { keyword: '运动鞋', count: 856, resultCount: 234, clickRate: 0.52, conversionRate: 0.08, trend: -1 },
-    { keyword: '连衣裙', count: 745, resultCount: 178, clickRate: 0.48, conversionRate: 0.07, trend: 0 },
-    { keyword: '二手教材', count: 623, resultCount: 98, clickRate: 0.45, conversionRate: 0.15, trend: 1 },
-  ];
+  // ✅ BaSui 修复：已删除模拟数据，使用真实API返回的热门关键词
 
   return (
     <div style={{ padding: '24px' }}>
@@ -300,7 +293,7 @@ export const SearchStatistics: React.FC = () => {
       <Card title={<><FireOutlined /> 热门搜索词</>}>
         <Table
           columns={keywordColumns}
-          dataSource={mockKeywords}
+          dataSource={popularKeywords || []} {/* ✅ BaSui 修复：使用真实API数据 */}
           loading={isLoading}
           rowKey="keyword"
           pagination={{

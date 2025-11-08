@@ -79,12 +79,12 @@ export const REMEMBER_ME_DAYS = 7;
 /**
  * 图片上传地址
  */
-export const IMAGE_UPLOAD_URL = `${API_BASE_URL}/upload/image`;
+export const IMAGE_UPLOAD_URL = `${API_BASE_URL}/file/upload`;
 
 /**
  * 文件上传地址
  */
-export const FILE_UPLOAD_URL = `${API_BASE_URL}/upload/file`;
+export const FILE_UPLOAD_URL = `${API_BASE_URL}/file/upload`;
 
 /**
  * 图片上传最大大小（字节，默认 5MB）

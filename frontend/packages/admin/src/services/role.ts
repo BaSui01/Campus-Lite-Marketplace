@@ -1,81 +1,79 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * 角色与权限管理服务（管理端）
+ * ✅ 角色与权限管理服务 - 完全重构版
+ * @author BaSui 😎
+ * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
-import type { ApiResponse } from '@campus/shared/types';
-
-export interface RoleSummary {
-  id: number;
-  name: string;
-  description?: string;
-  permissionCount: number;
-  userCount: number;
-  builtIn: boolean;
-}
-
-export interface RoleDetail {
-  id: number;
-  name: string;
-  description?: string;
-  permissions: string[];
-  userCount: number;
-  createdAt: string;
-}
-
-export interface CreateRolePayload {
-  name: string;
-  description?: string;
-  permissions: string[];
-}
-
-export interface UpdateRolePayload {
-  description?: string;
-  permissions: string[];
-}
-
-export interface UpdateUserRolesPayload {
-  roles: string[];
-}
+import { getApi } from '@campus/shared/utils/apiClient';
+import type {
+  RoleSummaryResponse,
+  RoleDetailResponse,
+  CreateRoleRequest,
+  UpdateRoleRequest,
+  UpdateUserRolesRequest,
+} from '@campus/shared/api';
 
 export class RoleService {
-  async listRoles(): Promise<RoleSummary[]> {
-    const res = await http.get<ApiResponse<RoleSummary[]>>('/api/admin/roles');
-    return res.data;
+  /**
+   * 获取角色列表
+   */
+  async listRoles(): Promise<RoleSummaryResponse[]> {
+    const api = getApi();
+    const response = await api.listRoles();
+    return response.data.data as RoleSummaryResponse[];
   }
 
-  async getRole(roleId: number): Promise<RoleDetail> {
-    const res = await http.get<ApiResponse<RoleDetail>>(`/api/admin/roles/${roleId}`);
-    return res.data;
+  /**
+   * 获取角色详情
+   * @param roleId 角色ID
+   */
+  async getRole(roleId: number): Promise<RoleDetailResponse> {
+    const api = getApi();
+    const response = await api.getRole({ roleId });
+    return response.data.data as RoleDetailResponse;
   }
 
-  async createRole(payload: CreateRolePayload): Promise<RoleDetail> {
-    const res = await http.post<ApiResponse<RoleDetail>>('/api/admin/roles', payload);
-    return res.data;
+  /**
+   * 创建角色
+   * @param payload 创建角色请求参数
+   */
+  async createRole(payload: CreateRoleRequest): Promise<RoleDetailResponse> {
+    const api = getApi();
+    const response = await api.createRole({ createRoleRequest: payload });
+    return response.data.data as RoleDetailResponse;
   }
 
-  async updateRole(roleId: number, payload: UpdateRolePayload): Promise<RoleDetail> {
-    const res = await http.put<ApiResponse<RoleDetail>>(`/api/admin/roles/${roleId}`, payload);
-    return res.data;
+  /**
+   * 更新角色
+   * @param roleId 角色ID
+   * @param payload 更新角色请求参数
+   */
+  async updateRole(roleId: number, payload: UpdateRoleRequest): Promise<RoleDetailResponse> {
+    const api = getApi();
+    const response = await api.updateRole({ roleId, updateRoleRequest: payload });
+    return response.data.data as RoleDetailResponse;
   }
 
+  /**
+   * 删除角色
+   * @param roleId 角色ID
+   */
   async deleteRole(roleId: number): Promise<void> {
-    await http.delete<ApiResponse<void>>(`/api/admin/roles/${roleId}`);
+    const api = getApi();
+    await api.deleteRole({ roleId });
   }
 
-  async updateUserRoles(userId: number, payload: UpdateUserRolesPayload): Promise<void> {
-    await http.put<ApiResponse<void>>(`/api/admin/users/${userId}/roles`, payload);
+  /**
+   * 更新用户角色
+   * @param userId 用户ID
+   * @param payload 用户角色列表
+   */
+  async updateUserRoles(userId: number, payload: UpdateUserRolesRequest): Promise<void> {
+    const api = getApi();
+    await api.updateUserRoles({ userId, updateUserRolesRequest: payload });
   }
 }
 
+// 导出单例
 export const roleService = new RoleService();
 export default roleService;

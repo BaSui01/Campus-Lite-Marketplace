@@ -22,6 +22,7 @@ import {
   type RevertExecutionResult
 } from '@campus/shared';
 import { revertService } from '@campus/shared';
+import { getApi } from '@campus/shared/utils/apiClient';
 import './index.css';
 
 /**
@@ -68,38 +69,6 @@ const RevertManagement: React.FC = () => {
   const [approvalComment, setApprovalComment] = useState('');
   const [approving, setApproving] = useState(false);
 
-  // 模拟待审批数据
-  const mockPendingData: PendingRequest[] = [
-    {
-      id: 2001,
-      auditLogId: 1002,
-      requesterId: 100,
-      requesterName: '张三',
-      reason: '误操作点击了确认收货，实际商品还未收到',
-      status: 'PENDING' as RevertRequestStatus,
-      createdAt: '2025-11-03T09:00:00',
-      updatedAt: '2025-11-03T09:00:00',
-      entityType: 'Order',
-      entityName: '订单号: ORD20251101001',
-      actionType: 'UPDATE',
-      originalActionTime: '2025-11-02T14:20:00'
-    },
-    {
-      id: 2002,
-      auditLogId: 1005,
-      requesterId: 101,
-      requesterName: '李四',
-      reason: '误删除商品，需要恢复',
-      status: 'PENDING' as RevertRequestStatus,
-      createdAt: '2025-11-03T10:30:00',
-      updatedAt: '2025-11-03T10:30:00',
-      entityType: 'Goods',
-      entityName: 'MacBook Air M2',
-      actionType: 'DELETE',
-      originalActionTime: '2025-11-03T09:45:00'
-    }
-  ];
-
   // 加载数据
   React.useEffect(() => {
     loadData();
@@ -108,18 +77,26 @@ const RevertManagement: React.FC = () => {
 
   const loadData = async () => {
     setLoading(true);
-    
+
     try {
-      // TODO: 接入真实API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      const api = getApi();
+
       if (activeTab === 'pending') {
-        setPendingData(mockPendingData);
-        setTotal(mockPendingData.length);
+        const response = await api.listRevertRequests(
+          'PENDING' as any,
+          currentPage - 1,
+          pageSize
+        );
+        setPendingData(response.data.data?.content || []);
+        setTotal(response.data.data?.totalElements || 0);
       } else {
-        // 历史记录（这里用空数组模拟）
-        setHistoryData([]);
-        setTotal(0);
+        const response = await api.listRevertRequests(
+          undefined,
+          currentPage - 1,
+          pageSize
+        );
+        setHistoryData(response.data.data?.content || []);
+        setTotal(response.data.data?.totalElements || 0);
       }
     } catch (error: any) {
       toast.error(error.message || '加载数据失败');
@@ -130,13 +107,14 @@ const RevertManagement: React.FC = () => {
 
   const loadStatistics = async () => {
     try {
-      // TODO: 接入真实API
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      const api = getApi();
+      const response = await api.getRevertStatistics();
+      const stats = response.data.data;
+
       setStatistics({
-        pendingCount: mockPendingData.length,
-        todayRevertCount: 5,
-        successRate: 92.5
+        pendingCount: stats?.pendingCount || 0,
+        todayRevertCount: stats?.todayRevertCount || 0,
+        successRate: stats?.successRate || 0
       });
     } catch (error: any) {
       console.error('加载统计数据失败', error);
@@ -155,13 +133,11 @@ const RevertManagement: React.FC = () => {
     if (!selectedRequest) return;
 
     setApproving(true);
-    
+
     try {
-      // TODO: 调用批准API
-      // await revertService.executeRevert(selectedRequest.id);
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const api = getApi();
+      await api.approveRevert(selectedRequest.id, { comment: approvalComment });
+
       toast.success('撤销申请已批准并执行');
       setApprovalModalVisible(false);
       setSelectedRequest(null);
@@ -172,7 +148,7 @@ const RevertManagement: React.FC = () => {
     } finally {
       setApproving(false);
     }
-  }, [selectedRequest, loadData, loadStatistics]);
+  }, [selectedRequest, approvalComment, loadData, loadStatistics]);
 
   // 拒绝撤销
   const handleReject = useCallback(async () => {
@@ -183,13 +159,11 @@ const RevertManagement: React.FC = () => {
     }
 
     setApproving(true);
-    
+
     try {
-      // TODO: 调用拒绝API
-      // await revertService.rejectRevert(selectedRequest.id, { reason: approvalComment });
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const api = getApi();
+      await api.rejectRevert(selectedRequest.id, { reason: approvalComment });
+
       toast.success('撤销申请已拒绝');
       setApprovalModalVisible(false);
       setSelectedRequest(null);

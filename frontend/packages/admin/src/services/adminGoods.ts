@@ -1,10 +1,10 @@
 /**
- * 管理员商品服务
+ * ✅ 管理员商品服务
  * @author BaSui 😎
- * @description 商品审核、状态管理、批量操作等管理员专属功能
+ * @description 商品审核、状态管理、批量操作等管理员专属功能（基于 OpenAPI）
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
+import { getApi } from '@campus/shared/utils/apiClient';
 import type { PageGoodsResponse } from '@campus/shared/api/models';
 
 /**
