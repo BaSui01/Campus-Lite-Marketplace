@@ -56,6 +56,8 @@ class PostServiceImplTest {
     @Mock private PostTagRepository postTagRepository;
     @Mock private TagRepository tagRepository;
     @Mock private UserRepository userRepository;
+    @Mock private com.campus.marketplace.repository.PostLikeRepository postLikeRepository;
+    @Mock private com.campus.marketplace.repository.PostCollectRepository postCollectRepository;
     @Mock private RedisTemplate<String, Object> redisTemplate;
     @Mock private ValueOperations<String, Object> valueOperations;
     @Mock private MessageService messageService;
@@ -66,7 +68,7 @@ class PostServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        postService = new PostServiceImpl(postRepository, postTagRepository, tagRepository, userRepository, sensitiveWordFilter, complianceService, redisTemplate, messageService);
+        postService = new PostServiceImpl(postRepository, postTagRepository, tagRepository, userRepository, postLikeRepository, postCollectRepository, sensitiveWordFilter, complianceService, redisTemplate, messageService);
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 

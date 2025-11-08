@@ -156,6 +156,10 @@ class CommunityServiceTest {
         Long postId = 1L;
         Long userId = 100L;
 
+        Post post = new Post();
+        post.setId(postId);
+        post.setLikeCount(5); // 初始点赞数
+
         PostLike postLike = PostLike.builder()
             .postId(postId)
             .userId(userId)
@@ -164,12 +168,15 @@ class CommunityServiceTest {
 
         when(postLikeRepository.findByPostIdAndUserId(postId, userId))
             .thenReturn(Optional.of(postLike));
+        when(postRepository.findById(postId))
+            .thenReturn(Optional.of(post)); // 🔥 修复：添加帖子Mock
 
         // Act
         communityService.unlikePost(postId, userId);
 
         // Assert
         verify(postLikeRepository, times(1)).delete(postLike);
+        verify(postRepository, times(1)).save(post); // 验证帖子被保存
     }
 
     @Test
@@ -182,8 +189,8 @@ class CommunityServiceTest {
         Post post = new Post();
         post.setId(postId);
 
-        // Mock existsById instead of findById
-        when(postRepository.existsById(postId)).thenReturn(true);
+        // 🔥 修复：使用 findById 而不是 existsById
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(postCollectRepository.existsByPostIdAndUserId(postId, userId))
             .thenReturn(false);
 

@@ -10,6 +10,7 @@ import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.common.utils.SensitiveWordFilter;
 import com.campus.marketplace.repository.PostRepository;
+import com.campus.marketplace.repository.PostTagRepository;
 import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.impl.PostServiceImpl;
 import com.campus.marketplace.testutil.PostRequestTestDataBuilder;
@@ -37,6 +38,9 @@ class PostServiceTest {
 
     @Mock
     private PostRepository postRepository;
+
+    @Mock
+    private PostTagRepository postTagRepository;
 
     @Mock
     private UserRepository userRepository;
