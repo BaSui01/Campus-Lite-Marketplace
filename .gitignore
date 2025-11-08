@@ -115,6 +115,10 @@ uploads/*
 !uploads/*/.gitkeep
 !uploads/README.md
 
+# 后端上传文件目录
+backend/uploads/**/*
+!backend/uploads/.gitkeep
+
 # ============ 配置文件（敏感信息）============
 # 生产环境配置
 application-prod.yml
@@ -158,4 +162,6 @@ gatling-results/
 # ============ AI 助手 ============
 .claude/
 null
+nul
+**/nul
 .factory/
