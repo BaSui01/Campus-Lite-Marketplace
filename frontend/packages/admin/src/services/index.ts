@@ -18,3 +18,5 @@ export * from './blacklist';
 export * from './report';
 export * from './featureFlag';
 export * from './role';
+export * from './bannedUser';
+export * from './operationLog';

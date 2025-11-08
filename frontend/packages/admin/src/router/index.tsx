@@ -19,6 +19,13 @@ import { RoleList } from '@/pages/Roles';
 import { RateLimit, RecycleBin, Notifications, Compliance, RevertManagement, CampusList, CategoryList, TagList, FeatureFlagList, SystemMonitor, TaskList } from '@/pages/System';
 import { GoodsList, GoodsDetail, GoodsAudit } from '@/pages/Goods';
 import { OrderList, OrderDetail, RefundManagement } from '@/pages/Orders';
+import { PaymentList, PaymentDetail } from '@/pages/Payment';
+import { MessageList, MessageDetail } from '@/pages/Messages';
+import { ExportCenter } from '@/pages/Export';
+import { LogisticsList } from '@/pages/Logistics';
+import { BehaviorDashboard } from '@/pages/Behavior';
+import { RecommendConfig } from '@/pages/Recommend';
+import { SearchStatistics } from '@/pages/Search';
 import { AppealList, AppealDetail } from '@/pages/Appeals';
 import { ReviewList } from '@/pages/Reviews';
 import { BatchTaskList } from '@/pages/Batch';
@@ -111,6 +118,78 @@ export const router = createBrowserRouter([
         element: (
           <PermissionGuard permission={PERMISSION_CODES.SYSTEM_ORDER_MANAGE}>
             <RefundManagement />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'payments/list',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_ORDER_VIEW}>
+            <PaymentList />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'payments/:orderNo',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_ORDER_VIEW}>
+            <PaymentDetail />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'messages/list',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_USER_VIEW}>
+            <MessageList />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'messages/:conversationId',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_USER_VIEW}>
+            <MessageDetail />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'export/center',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_USER_VIEW}>
+            <ExportCenter />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'logistics/list',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_ORDER_VIEW}>
+            <LogisticsList />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'behavior/dashboard',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_USER_VIEW}>
+            <BehaviorDashboard />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'recommend/config',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_CONFIG_UPDATE}>
+            <RecommendConfig />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'search/statistics',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_STATISTICS_VIEW}>
+            <SearchStatistics />
           </PermissionGuard>
         ),
       },

@@ -35,6 +35,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { bannedUserService } from '@/services';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -59,27 +60,15 @@ export const BannedUserList: React.FC = () => {
   const [unbanModalVisible, setUnbanModalVisible] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
-  // 查询封禁记录（使用模拟数据）
+  // 查询封禁记录（调用真实API）
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['bannedUsers', { keyword, status, page, size }],
-    queryFn: async () => {
-      // 模拟数据
-      return {
-        content: Array.from({ length: 15 }, (_, i) => ({
-          id: page * 20 + i + 1,
-          userId: 1000 + i,
-          userName: `用户${i + 1}`,
-          userAvatar: null,
-          banReason: `违规行为${i + 1}：发布违规内容`,
-          banDuration: [7, 15, 30, 60, 365][i % 5],
-          bannedAt: new Date(Date.now() - i * 86400000).toISOString(),
-          unbannedAt: i % 3 === 0 ? new Date(Date.now() - i * 43200000).toISOString() : null,
-          operatorName: `管理员${(i % 3) + 1}`,
-          status: i % 3 === 0 ? 'UNBANNED' : 'ACTIVE',
-        })),
-        totalElements: 50,
-      };
-    },
+    queryFn: () => bannedUserService.list({
+      userId: keyword ? parseInt(keyword) : undefined,
+      isUnbanned: status === 'UNBANNED' ? true : status === 'ACTIVE' ? false : undefined,
+      page,
+      size,
+    }),
     staleTime: 2 * 60 * 1000,
   });
 

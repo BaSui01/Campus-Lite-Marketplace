@@ -1,0 +1,363 @@
+/**
+ * 物流管理列表页
+ * 
+ * 功能：
+ * - 分页查询物流信息
+ * - 搜索物流（订单号、快递单号）
+ * - 物流状态筛选
+ * - 物流统计卡片
+ * - 查看物流轨迹
+ * - 物流异常标记
+ * 
+ * @author BaSui 😎
+ * @date 2025-11-08
+ */
+
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Table,
+  Button,
+  Input,
+  Select,
+  Space,
+  Tag,
+  Card,
+  Row,
+  Col,
+  Statistic,
+  message,
+  Modal,
+  Timeline,
+} from 'antd';
+import {
+  SearchOutlined,
+  EyeOutlined,
+  CarOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  SyncOutlined,
+  EnvironmentOutlined,
+} from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { logisticsService } from '@campus/shared';
+import type { Logistics, LogisticsTrack } from '@campus/shared';
+import dayjs from 'dayjs';
+
+const { Option } = Select;
+
+/**
+ * 物流状态映射
+ */
+const STATUS_MAP: Record<string, { text: string; color: string; icon: React.ReactNode }> = {
+  PENDING: { 
+    text: '待揽件', 
+    color: 'default',
+    icon: <SyncOutlined />
+  },
+  IN_TRANSIT: { 
+    text: '运输中', 
+    color: 'blue',
+    icon: <CarOutlined />
+  },
+  OUT_FOR_DELIVERY: { 
+    text: '派送中', 
+    color: 'cyan',
+    icon: <EnvironmentOutlined />
+  },
+  DELIVERED: { 
+    text: '已签收', 
+    color: 'green',
+    icon: <CheckCircleOutlined />
+  },
+  EXCEPTION: { 
+    text: '异常', 
+    color: 'red',
+    icon: <CloseCircleOutlined />
+  },
+};
+
+export const LogisticsList: React.FC = () => {
+  const navigate = useNavigate();
+
+  // 查询参数
+  const [keyword, setKeyword] = useState<string>('');
+  const [status, setStatus] = useState<string | undefined>();
+
+  // 查询物流统计
+  const { data: statistics } = useQuery({
+    queryKey: ['logistics', 'statistics'],
+    queryFn: () => logisticsService.getLogisticsStatistics(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // 搜索处理
+  const handleSearch = () => {
+    message.info('搜索功能开发中...');
+  };
+
+  // 重置筛选
+  const handleReset = () => {
+    setKeyword('');
+    setStatus(undefined);
+  };
+
+  // 查看物流轨迹
+  const handleViewTrack = async (orderId: number) => {
+    try {
+      const logistics = await logisticsService.getOrderLogistics(orderId);
+      
+      Modal.info({
+        title: `物流轨迹 - ${logistics.expressName} (${logistics.trackingNumber})`,
+        width: 600,
+        content: (
+          <Timeline
+            style={{ marginTop: 16 }}
+            items={logistics.tracks.map((track: LogisticsTrack) => ({
+              color: track.status === 'DELIVERED' ? 'green' : 'blue',
+              children: (
+                <>
+                  <p style={{ margin: 0 }}>{track.description}</p>
+                  {track.location && (
+                    <p style={{ margin: 0, color: '#8c8c8c', fontSize: 12 }}>
+                      <EnvironmentOutlined /> {track.location}
+                    </p>
+                  )}
+                  <p style={{ margin: 0, color: '#8c8c8c', fontSize: 12 }}>
+                    {dayjs(track.time).format('YYYY-MM-DD HH:mm:ss')}
+                  </p>
+                </>
+              ),
+            }))}
+          />
+        ),
+      });
+    } catch (error) {
+      message.error('获取物流轨迹失败');
+    }
+  };
+
+  // 模拟数据（等待后端列表API）
+  const mockData = {
+    content: [],
+    totalElements: 0,
+  };
+
+  // 表格列定义
+  const columns = [
+    {
+      title: '订单ID',
+      dataIndex: 'orderId',
+      key: 'orderId',
+      width: 100,
+    },
+    {
+      title: '快递公司',
+      dataIndex: 'expressName',
+      key: 'expressName',
+      width: 120,
+    },
+    {
+      title: '快递单号',
+      dataIndex: 'trackingNumber',
+      key: 'trackingNumber',
+      width: 200,
+      render: (trackingNumber: string) => (
+        <span style={{ fontFamily: 'monospace' }}>{trackingNumber}</span>
+      ),
+    },
+    {
+      title: '物流状态',
+      dataIndex: 'status',
+      key: 'status',
+      width: 120,
+      render: (statusValue: string) => {
+        const config = STATUS_MAP[statusValue] || { text: statusValue, color: 'default', icon: null };
+        return (
+          <Tag color={config.color} icon={config.icon}>
+            {config.text}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: '发货时间',
+      dataIndex: 'shippedAt',
+      key: 'shippedAt',
+      width: 180,
+      render: (shippedAt: string) => shippedAt ? dayjs(shippedAt).format('YYYY-MM-DD HH:mm:ss') : '-',
+    },
+    {
+      title: '签收时间',
+      dataIndex: 'deliveredAt',
+      key: 'deliveredAt',
+      width: 180,
+      render: (deliveredAt: string) => deliveredAt ? dayjs(deliveredAt).format('YYYY-MM-DD HH:mm:ss') : '-',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      width: 180,
+      render: (updatedAt: string) => dayjs(updatedAt).format('YYYY-MM-DD HH:mm:ss'),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      fixed: 'right' as const,
+      width: 150,
+      render: (_: unknown, record: Logistics) => (
+        <Space size="small">
+          <Button
+            type="link"
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => handleViewTrack(record.orderId)}
+          >
+            查看轨迹
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <div style={{ padding: '24px' }}>
+      {/* 统计卡片 */}
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="总订单数"
+              value={statistics?.totalOrders || 0}
+              prefix={<CarOutlined />}
+              suffix="单"
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="待发货"
+              value={statistics?.pendingShipment || 0}
+              prefix={<SyncOutlined />}
+              suffix="单"
+              valueStyle={{ color: '#faad14' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="运输中"
+              value={statistics?.inTransit || 0}
+              prefix={<CarOutlined />}
+              suffix="单"
+              valueStyle={{ color: '#1890ff' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="已送达"
+              value={statistics?.delivered || 0}
+              prefix={<CheckCircleOutlined />}
+              suffix="单"
+              valueStyle={{ color: '#3f8600' }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col span={8}>
+          <Card>
+            <Statistic
+              title="异常订单"
+              value={statistics?.exception || 0}
+              prefix={<CloseCircleOutlined />}
+              suffix="单"
+              valueStyle={{ color: '#cf1322' }}
+            />
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card>
+            <Statistic
+              title="平均配送时长"
+              value={statistics?.avgDeliveryTime || 0}
+              precision={1}
+              suffix="小时"
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* 搜索筛选区域 */}
+      <Card style={{ marginBottom: 24 }}>
+        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+          <Space wrap>
+            <Input
+              placeholder="搜索订单ID/快递单号"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              onPressEnter={handleSearch}
+              style={{ width: 250 }}
+              prefix={<SearchOutlined />}
+            />
+
+            <Select
+              placeholder="物流状态"
+              value={status}
+              onChange={setStatus}
+              allowClear
+              style={{ width: 150 }}
+            >
+              <Option value="PENDING">待揽件</Option>
+              <Option value="IN_TRANSIT">运输中</Option>
+              <Option value="OUT_FOR_DELIVERY">派送中</Option>
+              <Option value="DELIVERED">已签收</Option>
+              <Option value="EXCEPTION">异常</Option>
+            </Select>
+
+            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+              搜索
+            </Button>
+
+            <Button onClick={handleReset}>重置</Button>
+          </Space>
+        </Space>
+      </Card>
+
+      {/* 数据表格 */}
+      <Card>
+        <Table
+          columns={columns}
+          dataSource={mockData.content}
+          loading={false}
+          rowKey="orderId"
+          scroll={{ x: 1300 }}
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `共 ${total} 条记录`,
+          }}
+          locale={{
+            emptyText: (
+              <div style={{ padding: '40px', color: '#8c8c8c' }}>
+                <CarOutlined style={{ fontSize: 48, marginBottom: 16 }} />
+                <div>暂无物流数据</div>
+                <div style={{ fontSize: 12, marginTop: 8 }}>
+                  💡 提示：物流信息需要订单发货后才会显示
+                </div>
+              </div>
+            ),
+          }}
+        />
+      </Card>
+    </div>
+  );
+};
+
+export default LogisticsList;

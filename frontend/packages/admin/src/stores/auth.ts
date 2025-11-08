@@ -7,6 +7,7 @@
 import {
   createAuthStore,
   authService,
+  getTabSync,
   type LoginRequest,
   type LoginResponse,
   type ApiResponse,
@@ -98,10 +99,18 @@ export const useAuthStore = createAuthStore<AdminUser, LoginRequest>({
       throw new Error('登录失败：未获取到用户信息');
     }
 
+    const normalizedUser = normalizeUser(userInfo as RawUser);
+
+    // 广播登录事件到其他 Tab
+    const tabSync = getTabSync();
+    if (tabSync) {
+      tabSync.broadcastLogin(normalizedUser, token);
+    }
+
     return {
       accessToken: token,
       refreshToken: undefined, // 后端暂未提供 refreshToken
-      user: normalizeUser(userInfo as RawUser),
+      user: normalizedUser,
     };
   },
 
@@ -110,6 +119,12 @@ export const useAuthStore = createAuthStore<AdminUser, LoginRequest>({
       await authService.logout();
     } catch (error) {
       console.warn('登出接口调用失败，忽略错误继续清理本地状态', error);
+    }
+
+    // 广播登出事件到其他 Tab
+    const tabSync = getTabSync();
+    if (tabSync) {
+      tabSync.broadcastLogout();
     }
   },
 

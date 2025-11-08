@@ -119,42 +119,16 @@ export const ProfilePage: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // 查询登录设备（模拟数据）
-  const { data: loginDevices = [] } = useQuery<LoginDevice[]>({
-    queryKey: ['loginDevices'],
-    queryFn: async () => {
-      // TODO: 调用真实API
-      // const response = await userService.getLoginDevices();
-      // return response.data;
-
-      // 模拟数据
-      return [
-        {
-          id: '1',
-          deviceName: 'Windows 11 - Chrome',
-          deviceType: 'desktop',
-          os: 'Windows 11',
-          browser: 'Chrome 120',
-          ip: '192.168.1.100',
-          location: '中国 北京',
-          lastActiveAt: new Date().toISOString(),
-          isCurrent: true,
-        },
-        {
-          id: '2',
-          deviceName: 'iPhone 15 Pro - Safari',
-          deviceType: 'mobile',
-          os: 'iOS 17.2',
-          browser: 'Safari',
-          ip: '192.168.1.101',
-          location: '中国 上海',
-          lastActiveAt: new Date(Date.now() - 86400000).toISOString(),
-          isCurrent: false,
-        },
-      ];
-    },
-    staleTime: 2 * 60 * 1000,
-  });
+  // ⚠️ 登录设备功能暂未实现后端 API，暂时禁用
+  // TODO: 等待后端实现 GET /api/users/devices 接口
+  // const { data: loginDevices = [] } = useQuery<LoginDevice[]>({
+  //   queryKey: ['loginDevices'],
+  //   queryFn: async () => {
+  //     const response = await userService.getLoginDevices();
+  //     return response.data;
+  //   },
+  //   staleTime: 2 * 60 * 1000,
+  // });
 
   // 更新个人资料 Mutation
   const updateProfileMutation = useMutation({
@@ -210,18 +184,18 @@ export const ProfilePage: React.FC = () => {
 
   // 发送邮箱验证码
   const sendEmailCode = () => {
-    // TODO: 调用真实API
-    message.success('验证码已发送到您的邮箱！');
-    setEmailCodeSent(true);
-    startCountdown();
+    // ⚠️ TODO: 等待后端实现 POST /api/users/email/send-code 接口
+    message.warning('此功能暂未开放，敬请期待！🚧');
+    // setEmailCodeSent(true);
+    // startCountdown();
   };
 
   // 发送手机验证码
   const sendPhoneCode = () => {
-    // TODO: 调用真实API
-    message.success('验证码已发送到您的手机！');
-    setPhoneCodeSent(true);
-    startCountdown();
+    // ⚠️ TODO: 等待后端实现 POST /api/users/phone/send-code 接口
+    message.warning('此功能暂未开放，敬请期待！🚧');
+    // setPhoneCodeSent(true);
+    // startCountdown();
   };
 
   // 倒计时
@@ -241,74 +215,77 @@ export const ProfilePage: React.FC = () => {
   // 绑定邮箱
   const handleBindEmail = () => {
     emailForm.validateFields().then((values) => {
-      // TODO: 调用真实API
-      message.success('邮箱绑定成功！🎉');
-      setEmailVerified(true);
-      setEmailBindModalVisible(false);
-      emailForm.resetFields();
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      // ⚠️ TODO: 等待后端实现 POST /api/users/email/bind 接口
+      message.warning('此功能暂未开放，敬请期待！🚧');
+      // setEmailVerified(true);
+      // setEmailBindModalVisible(false);
+      // emailForm.resetFields();
+      // queryClient.invalidateQueries({ queryKey: ['userProfile'] });
     });
   };
 
   // 绑定手机号
   const handleBindPhone = () => {
     phoneForm.validateFields().then((values) => {
-      // TODO: 调用真实API
-      message.success('手机号绑定成功！🎉');
-      setPhoneVerified(true);
-      setPhoneBindModalVisible(false);
-      phoneForm.resetFields();
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      // ⚠️ TODO: 等待后端实现 POST /api/users/phone/bind 接口
+      message.warning('此功能暂未开放，敬请期待！🚧');
+      // setPhoneVerified(true);
+      // setPhoneBindModalVisible(false);
+      // phoneForm.resetFields();
+      // queryClient.invalidateQueries({ queryKey: ['userProfile'] });
     });
   };
 
   // 启用两步验证
   const handleEnableTwoFactor = () => {
-    // 生成模拟密钥
-    setTwoFactorSecret('JBSWY3DPEHPK3PXP');
-    setTwoFactorModalVisible(true);
-    setTwoFactorStep(0);
+    // ⚠️ TODO: 等待后端实现 POST /api/users/2fa/enable 接口
+    message.warning('此功能暂未开放，敬请期待！🚧');
+    // setTwoFactorSecret('JBSWY3DPEHPK3PXP');
+    // setTwoFactorModalVisible(true);
+    // setTwoFactorStep(0);
   };
 
   // 确认两步验证
   const handleConfirmTwoFactor = () => {
-    // TODO: 验证 TOTP 码
-    message.success('两步验证启用成功！🎉');
-    setTwoFactorEnabled(true);
-    setTwoFactorModalVisible(false);
-    setTwoFactorStep(0);
+    // ⚠️ TODO: 等待后端实现 POST /api/users/2fa/verify 接口
+    message.warning('此功能暂未开放，敬请期待！🚧');
+    // setTwoFactorEnabled(true);
+    // setTwoFactorModalVisible(false);
+    // setTwoFactorStep(0);
   };
 
   // 关闭两步验证
   const handleDisableTwoFactor = () => {
-    Modal.confirm({
-      title: '关闭两步验证',
-      content: '关闭后您的账号安全性会降低，确定要关闭吗？',
-      okText: '确认关闭',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: () => {
-        // TODO: 调用真实API
-        message.success('两步验证已关闭');
-        setTwoFactorEnabled(false);
-      },
-    });
+    // ⚠️ TODO: 等待后端实现 POST /api/users/2fa/disable 接口
+    message.warning('此功能暂未开放，敬请期待！🚧');
+    // Modal.confirm({
+    //   title: '关闭两步验证',
+    //   content: '关闭后您的账号安全性会降低，确定要关闭吗？',
+    //   okText: '确认关闭',
+    //   okType: 'danger',
+    //   cancelText: '取消',
+    //   onOk: () => {
+    //     message.success('两步验证已关闭');
+    //     setTwoFactorEnabled(false);
+    //   },
+    // });
   };
 
   // 踢出设备
   const handleKickDevice = (deviceId: string) => {
-    Modal.confirm({
-      title: '踢出设备',
-      content: '确定要踢出这个设备吗？该设备需要重新登录。',
-      okText: '确认踢出',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk: () => {
-        // TODO: 调用真实API
-        message.success('设备已踢出');
-        queryClient.invalidateQueries({ queryKey: ['loginDevices'] });
-      },
-    });
+    // ⚠️ TODO: 等待后端实现 DELETE /api/users/devices/{deviceId} 接口
+    message.warning('此功能暂未开放，敬请期待！🚧');
+    // Modal.confirm({
+    //   title: '踢出设备',
+    //   content: '确定要踢出这个设备吗？该设备需要重新登录。',
+    //   okText: '确认踢出',
+    //   okType: 'danger',
+    //   cancelText: '取消',
+    //   onOk: () => {
+    //     message.success('设备已踢出');
+    //     queryClient.invalidateQueries({ queryKey: ['loginDevices'] });
+    //   },
+    // });
   };
 
   // 提交个人资料
@@ -709,31 +686,33 @@ export const ProfilePage: React.FC = () => {
         </Card>
       ),
     },
-    {
-      key: 'devices',
-      label: (
-        <span>
-          <DesktopOutlined /> 登录设备
-        </span>
-      ),
-      children: (
-        <Card>
-          <Alert
-            message="安全提示"
-            description="如果发现陌生设备，请立即踢出并修改密码。"
-            type="warning"
-            showIcon
-            style={{ marginBottom: 16 }}
-          />
-          <Table
-            columns={deviceColumns}
-            dataSource={loginDevices}
-            rowKey="id"
-            pagination={false}
-          />
-        </Card>
-      ),
-    },
+    // ⚠️ 登录设备功能暂未实现后端 API，暂时隐藏
+    // TODO: 等待后端实现 GET /api/users/devices 接口后再启用
+    // {
+    //   key: 'devices',
+    //   label: (
+    //     <span>
+    //       <DesktopOutlined /> 登录设备
+    //     </span>
+    //   ),
+    //   children: (
+    //     <Card>
+    //       <Alert
+    //         message="安全提示"
+    //         description="如果发现陌生设备，请立即踢出并修改密码。"
+    //         type="warning"
+    //         showIcon
+    //         style={{ marginBottom: 16 }}
+    //       />
+    //       <Table
+    //         columns={deviceColumns}
+    //         dataSource={loginDevices}
+    //         rowKey="id"
+    //         pagination={false}
+    //       />
+    //     </Card>
+    //   ),
+    // },
     {
       key: 'info',
       label: (
