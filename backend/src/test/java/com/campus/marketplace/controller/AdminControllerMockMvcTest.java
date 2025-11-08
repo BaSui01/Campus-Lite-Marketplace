@@ -49,7 +49,7 @@ class AdminControllerMockMvcTest {
     void banUser_withAuthority_returnsSuccess() throws Exception {
         BanUserRequest request = new BanUserRequest(100L, "spam", 7);
 
-        mockMvc.perform(post("/api/admin/users/ban")
+        mockMvc.perform(post("/admin/users/ban")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -71,7 +71,7 @@ class AdminControllerMockMvcTest {
     void autoUnbanExpiredUsers_returnsCount() throws Exception {
         when(userService.autoUnbanExpiredUsers()).thenReturn(3);
 
-        mockMvc.perform(post("/api/admin/users/auto-unban"))
+        mockMvc.perform(post("/admin/users/auto-unban"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(3));

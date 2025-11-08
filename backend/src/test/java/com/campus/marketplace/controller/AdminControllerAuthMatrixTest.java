@@ -75,7 +75,7 @@ class AdminControllerAuthMatrixTest {
     @Test
     @DisplayName("未登录访问管理员统计接口 -> 401")
     void admin_stats_unauth_401() throws Exception {
-        mockMvc.perform(get("/api/admin/statistics/overview")
+        mockMvc.perform(get("/admin/statistics/overview")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -84,7 +84,7 @@ class AdminControllerAuthMatrixTest {
     @DisplayName("已登录但无权限访问管理员统计接口 -> 403")
     @WithMockUser(username = "u1", roles = "USER")
     void admin_stats_forbidden_403() throws Exception {
-        mockMvc.perform(get("/api/admin/statistics/overview")
+        mockMvc.perform(get("/admin/statistics/overview")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -103,7 +103,7 @@ class AdminControllerAuthMatrixTest {
                     .anonymous(anon -> anon.disable())
                     .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/api/admin/**").hasAuthority("system:statistics:view")
+                            .requestMatchers("/admin/**").hasAuthority("system:statistics:view")
                             .anyRequest().authenticated())
                     .exceptionHandling(ex -> ex
                             .authenticationEntryPoint(entryPoint)

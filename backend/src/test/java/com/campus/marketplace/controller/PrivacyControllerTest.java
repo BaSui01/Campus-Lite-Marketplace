@@ -56,7 +56,7 @@ class PrivacyControllerTest {
         CreatePrivacyRequest request = new CreatePrivacyRequest(PrivacyRequestType.EXPORT, "导出数据");
         when(privacyService.createRequest(any(CreatePrivacyRequest.class))).thenReturn(123L);
 
-        mockMvc.perform(post("/api/privacy")
+        mockMvc.perform(post("/privacy")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -72,7 +72,7 @@ class PrivacyControllerTest {
     void createPrivacyRequest_forbidden() throws Exception {
         CreatePrivacyRequest request = new CreatePrivacyRequest(PrivacyRequestType.DELETE, "删除数据");
 
-        mockMvc.perform(post("/api/privacy")
+        mockMvc.perform(post("/privacy")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
@@ -92,7 +92,7 @@ class PrivacyControllerTest {
                 .build();
         when(privacyService.listMyRequests()).thenReturn(List.of(response));
 
-        mockMvc.perform(get("/api/privacy"))
+        mockMvc.perform(get("/privacy"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0].type").value("EXPORT"));
@@ -104,7 +104,7 @@ class PrivacyControllerTest {
     @DisplayName("管理员审核队列需要合规权限")
     @WithMockUser(roles = "ADMIN")
     void listPendingRequests_withoutAuthority_forbidden() throws Exception {
-        mockMvc.perform(get("/api/admin/privacy/requests"))
+        mockMvc.perform(get("/admin/privacy/requests"))
                 .andExpect(status().isForbidden());
 
         verify(privacyService, never()).listPendingRequests();
@@ -121,7 +121,7 @@ class PrivacyControllerTest {
                 .build();
         when(privacyService.listPendingRequests()).thenReturn(List.of(response));
 
-        mockMvc.perform(get("/api/admin/privacy/requests"))
+        mockMvc.perform(get("/admin/privacy/requests"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0].status").value("PENDING"));
@@ -135,7 +135,7 @@ class PrivacyControllerTest {
     void completeRequest_success() throws Exception {
         CompletePrivacyRequest request = new CompletePrivacyRequest("s3://exports/file.zip");
 
-        mockMvc.perform(post("/api/admin/privacy/requests/{id}/complete", 900L)
+        mockMvc.perform(post("/admin/privacy/requests/{id}/complete", 900L)
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())

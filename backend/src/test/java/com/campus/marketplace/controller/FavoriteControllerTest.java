@@ -48,7 +48,7 @@ class FavoriteControllerTest {
     @DisplayName("添加收藏成功返回统一响应")
     @WithMockUser(roles = "STUDENT")
     void addFavorite_success() throws Exception {
-        mockMvc.perform(post("/api/favorites/{goodsId}", 1001L))
+        mockMvc.perform(post("/favorites/{goodsId}", 1001L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -59,7 +59,7 @@ class FavoriteControllerTest {
     @DisplayName("非学生角色调用添加收藏返回403")
     @WithMockUser(roles = "TEACHER")
     void addFavorite_forbidden() throws Exception {
-        mockMvc.perform(post("/api/favorites/{goodsId}", 2002L))
+        mockMvc.perform(post("/favorites/{goodsId}", 2002L))
                 .andExpect(status().isForbidden());
 
         verify(favoriteService, never()).addFavorite(any());
@@ -69,7 +69,7 @@ class FavoriteControllerTest {
     @DisplayName("取消收藏成功")
     @WithMockUser(roles = "STUDENT")
     void removeFavorite_success() throws Exception {
-        mockMvc.perform(delete("/api/favorites/{goodsId}", 3003L))
+        mockMvc.perform(delete("/favorites/{goodsId}", 3003L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -89,7 +89,7 @@ class FavoriteControllerTest {
         when(favoriteService.listFavorites(0, 20))
                 .thenReturn(new PageImpl<>(List.of(response)));
 
-        mockMvc.perform(get("/api/favorites"))
+        mockMvc.perform(get("/favorites"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.content[0].id").value(9009))
@@ -101,7 +101,7 @@ class FavoriteControllerTest {
     void isFavorited_success() throws Exception {
         when(favoriteService.isFavorited(8080L)).thenReturn(true);
 
-        mockMvc.perform(get("/api/favorites/{goodsId}/check", 8080L))
+        mockMvc.perform(get("/favorites/{goodsId}/check", 8080L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(true));

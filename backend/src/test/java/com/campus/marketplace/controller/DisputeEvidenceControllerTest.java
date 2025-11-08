@@ -51,7 +51,7 @@ class DisputeEvidenceControllerTest {
     void getDisputeEvidence_ShouldReturnList() throws Exception {
         when(evidenceService.getDisputeEvidence(anyLong())).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/disputes/evidence/1"))
+        mockMvc.perform(get("/disputes/evidence/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
     }
@@ -62,7 +62,7 @@ class DisputeEvidenceControllerTest {
     void getBuyerEvidence_ShouldReturnList() throws Exception {
         when(evidenceService.getBuyerEvidence(anyLong())).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/disputes/evidence/1/buyer"))
+        mockMvc.perform(get("/disputes/evidence/1/buyer"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
     }
@@ -73,7 +73,7 @@ class DisputeEvidenceControllerTest {
     void getSellerEvidence_ShouldReturnList() throws Exception {
         when(evidenceService.getSellerEvidence(anyLong())).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/disputes/evidence/1/seller"))
+        mockMvc.perform(get("/disputes/evidence/1/seller"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
     }

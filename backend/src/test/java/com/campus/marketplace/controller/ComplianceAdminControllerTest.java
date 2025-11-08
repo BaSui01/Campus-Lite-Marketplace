@@ -64,7 +64,7 @@ class ComplianceAdminControllerTest {
                 .build();
         when(whitelistRepository.save(any(ComplianceWhitelist.class))).thenReturn(saved);
 
-        mockMvc.perform(post("/api/admin/compliance/whitelist")
+        mockMvc.perform(post("/admin/compliance/whitelist")
                         .param("type", "USER")
                         .param("targetId", "500")
                         .accept(MediaType.APPLICATION_JSON))
@@ -84,7 +84,7 @@ class ComplianceAdminControllerTest {
     @DisplayName("无权限无法新增白名单")
     @WithMockUser(roles = "USER")
     void addWhitelist_forbidden() throws Exception {
-        mockMvc.perform(post("/api/admin/compliance/whitelist")
+        mockMvc.perform(post("/admin/compliance/whitelist")
                         .param("type", "USER")
                         .param("targetId", "1"))
                 .andExpect(status().isForbidden());
@@ -96,7 +96,7 @@ class ComplianceAdminControllerTest {
     @DisplayName("移除白名单成功")
     @WithMockUser(authorities = "system:compliance:review")
     void removeWhitelist_success() throws Exception {
-        mockMvc.perform(delete("/api/admin/compliance/whitelist/{id}", 20L))
+        mockMvc.perform(delete("/admin/compliance/whitelist/{id}", 20L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -119,7 +119,7 @@ class ComplianceAdminControllerTest {
                 eq("POST"), eq(10L), any(PageRequest.class)))
                 .thenReturn(new PageImpl<>(List.of(log)));
 
-        mockMvc.perform(get("/api/admin/compliance/audit")
+        mockMvc.perform(get("/admin/compliance/audit")
                         .param("targetType", "POST")
                         .param("targetId", "10")
                         .param("page", "1")

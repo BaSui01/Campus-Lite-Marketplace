@@ -10,6 +10,8 @@ import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.repository.PostRepository;
+import com.campus.marketplace.repository.PostTagRepository;
+import com.campus.marketplace.repository.TagRepository;
 import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.impl.PostServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -51,6 +53,8 @@ import static org.mockito.Mockito.*;
 class PostServiceImplTest {
 
     @Mock private PostRepository postRepository;
+    @Mock private PostTagRepository postTagRepository;
+    @Mock private TagRepository tagRepository;
     @Mock private UserRepository userRepository;
     @Mock private RedisTemplate<String, Object> redisTemplate;
     @Mock private ValueOperations<String, Object> valueOperations;
@@ -62,7 +66,7 @@ class PostServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        postService = new PostServiceImpl(postRepository, userRepository, sensitiveWordFilter, complianceService, redisTemplate, messageService);
+        postService = new PostServiceImpl(postRepository, postTagRepository, tagRepository, userRepository, sensitiveWordFilter, complianceService, redisTemplate, messageService);
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
@@ -125,7 +129,7 @@ class PostServiceImplTest {
             return saved;
         });
 
-        Long postId = postService.createPost(new CreatePostRequest("原始标题", "原始内容", List.of("img1")));
+        Long postId = postService.createPost(new CreatePostRequest("原始标题", "原始内容", List.of("img1"), null));
 
         assertThat(postId).isEqualTo(99L);
         ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
@@ -148,7 +152,7 @@ class PostServiceImplTest {
         when(userRepository.findByUsername("user1")).thenReturn(java.util.Optional.of(user));
         when(valueOperations.increment("post:limit:" + user.getId(), 0L)).thenReturn(10L);
 
-        assertThatThrownBy(() -> postService.createPost(new CreatePostRequest("标题", "内容", List.of())))
+        assertThatThrownBy(() -> postService.createPost(new CreatePostRequest("标题", "内容", List.of(), null)))
                 .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("code", ErrorCode.POST_LIMIT_EXCEEDED.getCode());
 
@@ -193,7 +197,7 @@ class PostServiceImplTest {
         when(complianceService.moderateText("新内容", "POST_CONTENT"))
                 .thenReturn(new com.campus.marketplace.service.ComplianceService.TextResult(false, ComplianceAction.PASS, "新内容", Set.of()));
 
-        postService.updatePost(12L, new UpdatePostRequest("新标题", "新内容", List.of("img")));
+        postService.updatePost(12L, new UpdatePostRequest("新标题", "新内容", List.of("img"), null));
 
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         verify(postRepository, atLeastOnce()).save(captor.capture());

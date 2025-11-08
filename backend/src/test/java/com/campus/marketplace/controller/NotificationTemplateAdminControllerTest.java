@@ -66,7 +66,7 @@ class NotificationTemplateAdminControllerTest {
                 .build();
         when(repository.findAll()).thenReturn(List.of(tpl));
 
-        mockMvc.perform(get("/api/admin/notification-templates"))
+        mockMvc.perform(get("/admin/notification-templates"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].code").value("ORDER_PAID"));
 
@@ -85,7 +85,7 @@ class NotificationTemplateAdminControllerTest {
                 .build();
         when(repository.save(any(NotificationTemplate.class))).thenReturn(body);
 
-        mockMvc.perform(post("/api/admin/notification-templates")
+        mockMvc.perform(post("/admin/notification-templates")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(body)))
                 .andExpect(status().isOk())
@@ -100,7 +100,7 @@ class NotificationTemplateAdminControllerTest {
     @DisplayName("删除模板成功")
     @WithMockUser(authorities = "system:rate-limit:manage")
     void delete_success() throws Exception {
-        mockMvc.perform(delete("/api/admin/notification-templates/{id}", 9L))
+        mockMvc.perform(delete("/admin/notification-templates/{id}", 9L))
                 .andExpect(status().isOk());
 
         verify(repository).deleteById(9L);
@@ -115,7 +115,7 @@ class NotificationTemplateAdminControllerTest {
         when(templateService.render(eq("ORDER_PAID"), any(Locale.class), eq(Map.of("orderNo", "1001"))))
                 .thenReturn(rendered);
 
-        mockMvc.perform(post("/api/admin/notification-templates/render/{code}", "ORDER_PAID")
+        mockMvc.perform(post("/admin/notification-templates/render/{code}", "ORDER_PAID")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(Map.of("orderNo", "1001"))))
                 .andExpect(status().isOk())

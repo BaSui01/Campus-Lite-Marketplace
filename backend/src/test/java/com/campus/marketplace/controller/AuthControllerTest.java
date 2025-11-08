@@ -55,7 +55,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("发送注册邮箱验证码")
     void sendRegisterEmailCode_success() throws Exception {
-        mockMvc.perform(post("/api/auth/register/code")
+        mockMvc.perform(post("/auth/register/code")
                         .param("email", "user@example.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
@@ -73,7 +73,7 @@ class AuthControllerTest {
                 "Passw0rd!"
         );
 
-        mockMvc.perform(post("/api/auth/register/by-email")
+        mockMvc.perform(post("/auth/register/by-email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -88,7 +88,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("发送重置密码邮箱验证码")
     void sendResetEmailCode_success() throws Exception {
-        mockMvc.perform(post("/api/auth/password/reset/code/email")
+        mockMvc.perform(post("/auth/password/reset/code/email")
                         .param("email", "reset@example.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
@@ -105,7 +105,7 @@ class AuthControllerTest {
                 "NewPassw0rd!"
         );
 
-        mockMvc.perform(post("/api/auth/password/reset/email")
+        mockMvc.perform(post("/auth/password/reset/email")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -119,7 +119,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("发送重置密码短信验证码")
     void sendResetSmsCode_success() throws Exception {
-        mockMvc.perform(post("/api/auth/password/reset/code/sms")
+        mockMvc.perform(post("/auth/password/reset/code/sms")
                         .param("phone", "+8613012345678"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
@@ -137,7 +137,7 @@ class AuthControllerTest {
                 "SmsPassw0rd!"
         );
 
-        mockMvc.perform(post("/api/auth/password/reset/sms")
+        mockMvc.perform(post("/auth/password/reset/sms")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -151,7 +151,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("用户登出时剥离Bearer前缀")
     void logout_success() throws Exception {
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(post("/auth/logout")
                         .header("Authorization", "Bearer token-123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
@@ -175,7 +175,7 @@ class AuthControllerTest {
                 .build();
         when(authService.refreshToken("old-token")).thenReturn(response);
 
-        mockMvc.perform(post("/api/auth/refresh")
+        mockMvc.perform(post("/auth/refresh")
                         .header("Authorization", "Bearer old-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))

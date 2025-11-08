@@ -65,7 +65,7 @@ class GoodsControllerMockMvcTest {
         );
         when(goodsService.createGoods(request)).thenReturn(42L);
 
-        mockMvc.perform(post("/api/goods")
+        mockMvc.perform(post("/goods")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -96,7 +96,7 @@ class GoodsControllerMockMvcTest {
                 eq("createdAt"), eq("DESC"), eq(List.of(1L, 2L))))
                 .thenReturn(new PageImpl<>(List.of(response)));
 
-        mockMvc.perform(get("/api/goods")
+        mockMvc.perform(get("/goods")
                         .param("keyword", "耳机")
                         .param("categoryId", "12")
                         .param("page", "0")
@@ -123,7 +123,7 @@ class GoodsControllerMockMvcTest {
                 .build();
         when(goodsService.getGoodsDetail(7L)).thenReturn(response);
 
-        mockMvc.perform(get("/api/goods/{id}", 7))
+        mockMvc.perform(get("/goods/{id}", 7))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.title").value("Switch OLED"))
@@ -137,7 +137,7 @@ class GoodsControllerMockMvcTest {
         when(goodsService.listPendingGoods(1, 5))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/goods/pending").param("page", "1").param("size", "5"))
+        mockMvc.perform(get("/goods/pending").param("page", "1").param("size", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -150,7 +150,7 @@ class GoodsControllerMockMvcTest {
     void approveGoods_updatesStatus() throws Exception {
         ApproveGoodsRequest request = new ApproveGoodsRequest(true, null);
 
-        mockMvc.perform(post("/api/goods/{id}/approve", 55)
+        mockMvc.perform(post("/goods/{id}/approve", 55)
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())

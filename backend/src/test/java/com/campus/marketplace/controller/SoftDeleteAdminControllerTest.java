@@ -46,7 +46,7 @@ class SoftDeleteAdminControllerTest {
     void listTargets_adminSuccess() throws Exception {
         when(softDeleteAdminService.listTargets()).thenReturn(List.of("post", "reply"));
 
-        mockMvc.perform(get("/api/admin/soft-delete/targets"))
+        mockMvc.perform(get("/admin/soft-delete/targets"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0]").value("post"));
@@ -58,7 +58,7 @@ class SoftDeleteAdminControllerTest {
     @DisplayName("非管理员查询实体列表被拒绝")
     @WithMockUser(roles = "STUDENT")
     void listTargets_forbidden() throws Exception {
-        mockMvc.perform(get("/api/admin/soft-delete/targets"))
+        mockMvc.perform(get("/admin/soft-delete/targets"))
                 .andExpect(status().isForbidden());
 
         verify(softDeleteAdminService, never()).listTargets();
@@ -68,7 +68,7 @@ class SoftDeleteAdminControllerTest {
     @DisplayName("管理员恢复软删除记录成功")
     @WithMockUser(roles = "ADMIN")
     void restore_adminSuccess() throws Exception {
-        mockMvc.perform(post("/api/admin/soft-delete/{entity}/{id}/restore", "post", 100L))
+        mockMvc.perform(post("/admin/soft-delete/{entity}/{id}/restore", "post", 100L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -79,7 +79,7 @@ class SoftDeleteAdminControllerTest {
     @DisplayName("非管理员恢复软删除记录被拒绝")
     @WithMockUser(roles = "STUDENT")
     void restore_forbidden() throws Exception {
-        mockMvc.perform(post("/api/admin/soft-delete/{entity}/{id}/restore", "post", 100L))
+        mockMvc.perform(post("/admin/soft-delete/{entity}/{id}/restore", "post", 100L))
                 .andExpect(status().isForbidden());
 
         verify(softDeleteAdminService, never()).restore(anyString(), anyLong());
@@ -89,7 +89,7 @@ class SoftDeleteAdminControllerTest {
     @DisplayName("管理员彻底删除软删除记录成功")
     @WithMockUser(roles = "ADMIN")
     void purge_adminSuccess() throws Exception {
-        mockMvc.perform(delete("/api/admin/soft-delete/{entity}/{id}/purge", "post", 200L))
+        mockMvc.perform(delete("/admin/soft-delete/{entity}/{id}/purge", "post", 200L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -100,7 +100,7 @@ class SoftDeleteAdminControllerTest {
     @DisplayName("非管理员彻底删除记录被拒绝")
     @WithMockUser(roles = "STUDENT")
     void purge_forbidden() throws Exception {
-        mockMvc.perform(delete("/api/admin/soft-delete/{entity}/{id}/purge", "post", 200L))
+        mockMvc.perform(delete("/admin/soft-delete/{entity}/{id}/purge", "post", 200L))
                 .andExpect(status().isForbidden());
 
         verify(softDeleteAdminService, never()).purge(anyString(), anyLong());

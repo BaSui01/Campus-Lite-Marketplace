@@ -54,7 +54,7 @@ class RefundControllerTest {
     void applyRefund_success() throws Exception {
         when(refundService.applyRefund(eq("ORDER-1"), eq("质量问题"), anyMap())).thenReturn("REF-100");
 
-        mockMvc.perform(post("/api/orders/{orderNo}/refunds", "ORDER-1")
+        mockMvc.perform(post("/orders/{orderNo}/refunds", "ORDER-1")
                         .param("reason", "质量问题")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -77,7 +77,7 @@ class RefundControllerTest {
     @Test
     @DisplayName("管理员审批通过退款")
     void approveRefund_success() throws Exception {
-        mockMvc.perform(put("/api/admin/refunds/{refundNo}/approve", "REF-1"))
+        mockMvc.perform(put("/admin/refunds/{refundNo}/approve", "REF-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -87,7 +87,7 @@ class RefundControllerTest {
     @Test
     @DisplayName("管理员驳回退款时传递原因")
     void rejectRefund_success() throws Exception {
-        mockMvc.perform(put("/api/admin/refunds/{refundNo}/reject", "REF-2")
+        mockMvc.perform(put("/admin/refunds/{refundNo}/reject", "REF-2")
                         .param("reason", "材料不足"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
@@ -108,7 +108,7 @@ class RefundControllerTest {
                 .build();
         when(refundService.getByRefundNo("REF-3")).thenReturn(request);
 
-        mockMvc.perform(get("/api/admin/refunds/{refundNo}", "REF-3"))
+        mockMvc.perform(get("/admin/refunds/{refundNo}", "REF-3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.refundNo").value("REF-3"))

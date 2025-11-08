@@ -4,6 +4,7 @@ import com.campus.marketplace.common.support.SpringContextHolder;
 import com.campus.marketplace.common.utils.JwtUtil;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -50,6 +51,18 @@ public class TestSecurityConfig {
     }
 
     /**
+     * Mock StringRedisTemplate Bean
+     *
+     * 🔧 解决问题：RateLimitAspect 需要 StringRedisTemplate
+     * 在测试环境中，我们不需要真正的 Redis 连接
+     * 使用 @Bean + Mockito.mock() 创建一个 Mock 对象
+     */
+    @Bean
+    public org.springframework.data.redis.core.StringRedisTemplate stringRedisTemplate() {
+        return org.mockito.Mockito.mock(org.springframework.data.redis.core.StringRedisTemplate.class);
+    }
+
+    /**
      * SpringContextHolder Bean
      *
      * 🔧 解决问题：SecurityUtil.getCurrentUserId() 内部调用 SpringContextHolder.getBean()
@@ -61,7 +74,15 @@ public class TestSecurityConfig {
         return new SpringContextHolder();
     }
 
+    /**
+     * Security Filter Chain (测试专用配置，优先级高于生产配置)
+     *
+     * 🔧 解决问题：避免与 SecurityConfig.filterChain 冲突
+     * 使用 @Primary 注解，让测试配置优先生效
+     * 测试环境下，所有请求都允许访问（permitAll）
+     */
     @Bean
+    @Primary  // 💡 关键：测试配置优先！
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)

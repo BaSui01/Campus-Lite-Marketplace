@@ -76,7 +76,7 @@ class DisputeControllerTest {
 
         when(disputeService.submitDispute(any(), anyLong())).thenReturn(1L);
 
-        mockMvc.perform(post("/api/disputes")
+        mockMvc.perform(post("/disputes")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -98,7 +98,7 @@ class DisputeControllerTest {
         Page<DisputeDTO> page = new PageImpl<>(List.of(dispute), PageRequest.of(0, 20), 1);
         when(disputeService.getUserDisputes(anyLong(), any(), any())).thenReturn(page);
 
-        mockMvc.perform(get("/api/disputes")
+        mockMvc.perform(get("/disputes")
                         .param("page", "0")
                         .param("size", "20"))
                 .andExpect(status().isOk())
@@ -118,7 +118,7 @@ class DisputeControllerTest {
 
         when(disputeService.getDisputeDetail(anyLong())).thenReturn(detail);
 
-        mockMvc.perform(get("/api/disputes/1"))
+        mockMvc.perform(get("/disputes/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.id").value(1L));
@@ -130,7 +130,7 @@ class DisputeControllerTest {
     void escalateToArbitration_ShouldReturnSuccess() throws Exception {
         when(disputeService.escalateToArbitration(anyLong())).thenReturn(true);
 
-        mockMvc.perform(post("/api/disputes/1/escalate")
+        mockMvc.perform(post("/disputes/1/escalate")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
@@ -143,7 +143,7 @@ class DisputeControllerTest {
     void closeDispute_ShouldReturnSuccess() throws Exception {
         when(disputeService.closeDispute(anyLong(), anyString())).thenReturn(true);
 
-        mockMvc.perform(post("/api/disputes/1/close")
+        mockMvc.perform(post("/disputes/1/close")
                         .with(csrf())
                         .param("closeReason", "Test reason"))
                 .andExpect(status().isOk())
@@ -163,7 +163,7 @@ class DisputeControllerTest {
         Page<DisputeDTO> page = new PageImpl<>(List.of(dispute), PageRequest.of(0, 20), 1);
         when(disputeService.getUserDisputes(isNull(), any(), any())).thenReturn(page);
 
-        mockMvc.perform(get("/api/disputes/admin/all")
+        mockMvc.perform(get("/disputes/admin/all")
                         .param("page", "0")
                         .param("size", "20"))
                 .andExpect(status().isOk())

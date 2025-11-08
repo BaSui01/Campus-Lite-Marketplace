@@ -47,7 +47,7 @@ class BlacklistControllerTest {
     @DisplayName("用户成功拉黑目标")
     @WithMockUser(roles = "USER")
     void addToBlacklist_success() throws Exception {
-        mockMvc.perform(post("/api/blacklist/block/{blockedUserId}", 88L)
+        mockMvc.perform(post("/blacklist/block/{blockedUserId}", 88L)
                         .param("reason", "spam")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -60,7 +60,7 @@ class BlacklistControllerTest {
     @DisplayName("无 USER 角色无法拉黑")
     @WithMockUser(roles = "TEACHER")
     void addToBlacklist_forbidden() throws Exception {
-        mockMvc.perform(post("/api/blacklist/block/{blockedUserId}", 99L))
+        mockMvc.perform(post("/blacklist/block/{blockedUserId}", 99L))
                 .andExpect(status().isForbidden());
 
         verify(blacklistService, never()).addToBlacklist(any(), any());
@@ -70,7 +70,7 @@ class BlacklistControllerTest {
     @DisplayName("从黑名单移除成功")
     @WithMockUser(roles = "USER")
     void removeFromBlacklist_success() throws Exception {
-        mockMvc.perform(delete("/api/blacklist/unblock/{blockedUserId}", 66L))
+        mockMvc.perform(delete("/blacklist/unblock/{blockedUserId}", 66L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -88,7 +88,7 @@ class BlacklistControllerTest {
         when(blacklistService.listBlacklist(2, 5))
                 .thenReturn(new PageImpl<>(List.of(profile)));
 
-        mockMvc.perform(get("/api/blacklist/list")
+        mockMvc.perform(get("/blacklist/list")
                         .param("page", "2")
                         .param("size", "5"))
                 .andExpect(status().isOk())
@@ -102,7 +102,7 @@ class BlacklistControllerTest {
     void isBlocked_success() throws Exception {
         when(blacklistService.isBlocked(77L)).thenReturn(true);
 
-        mockMvc.perform(get("/api/blacklist/check/{blockedUserId}", 77L))
+        mockMvc.perform(get("/blacklist/check/{blockedUserId}", 77L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(true));

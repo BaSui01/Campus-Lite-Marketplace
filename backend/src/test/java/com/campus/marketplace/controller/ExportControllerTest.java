@@ -45,7 +45,7 @@ class ExportControllerTest {
     void requestExport_success() throws Exception {
         when(exportService.requestExport("orders", "{\"dateFrom\":\"2025-01-01\"}")).thenReturn(321L);
 
-        mockMvc.perform(post("/api/exports")
+        mockMvc.perform(post("/exports")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("type", "orders")
                         .param("params", "{\"dateFrom\":\"2025-01-01\"}"))
@@ -71,7 +71,7 @@ class ExportControllerTest {
                 .build();
         when(exportService.listMyJobs()).thenReturn(List.of(job));
 
-        mockMvc.perform(get("/api/exports"))
+        mockMvc.perform(get("/exports"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0].type").value("goods"))
@@ -83,7 +83,7 @@ class ExportControllerTest {
     @Test
     @DisplayName("取消导出任务成功")
     void cancelJob_success() throws Exception {
-        mockMvc.perform(post("/api/exports/{id}/cancel", 55L))
+        mockMvc.perform(post("/exports/{id}/cancel", 55L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").value("操作成功"));
@@ -97,7 +97,7 @@ class ExportControllerTest {
         byte[] bytes = "csv-data".getBytes();
         when(exportService.download("token-abc")).thenReturn(bytes);
 
-        mockMvc.perform(get("/api/exports/download/{token}", "token-abc"))
+        mockMvc.perform(get("/exports/download/{token}", "token-abc"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=export.csv"))
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))

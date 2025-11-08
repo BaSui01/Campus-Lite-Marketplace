@@ -58,7 +58,7 @@ class ReportControllerTest {
         CreateReportRequest request = new CreateReportRequest(ReportType.POST, 888L, "涉嫌广告");
         when(reportService.createReport(request)).thenReturn(1001L);
 
-        mockMvc.perform(post("/api/reports")
+        mockMvc.perform(post("/reports")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(status().isOk())
@@ -74,7 +74,7 @@ class ReportControllerTest {
     void createReport_forbidden() throws Exception {
         CreateReportRequest request = new CreateReportRequest(ReportType.USER, 123L, "恶意骚扰");
 
-        mockMvc.perform(post("/api/reports")
+        mockMvc.perform(post("/reports")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(status().isForbidden());
@@ -99,7 +99,7 @@ class ReportControllerTest {
         when(reportService.listPendingReports(0, 20))
                 .thenReturn(new PageImpl<>(List.of(pending)));
 
-        mockMvc.perform(get("/api/reports/pending")
+        mockMvc.perform(get("/reports/pending")
                         .param("page", "0")
                         .param("size", "20"))
                 .andExpect(status().isOk())
@@ -126,7 +126,7 @@ class ReportControllerTest {
         when(reportService.listMyReports(1, 10))
                 .thenReturn(new PageImpl<>(List.of(myReport)));
 
-        mockMvc.perform(get("/api/reports/my")
+        mockMvc.perform(get("/reports/my")
                         .param("page", "1")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -140,7 +140,7 @@ class ReportControllerTest {
     @DisplayName("管理员处理举报成功")
     @WithMockUser(authorities = "system:report:handle")
     void handleReport_success() throws Exception {
-        mockMvc.perform(post("/api/reports/{id}/handle", 456L)
+        mockMvc.perform(post("/reports/{id}/handle", 456L)
                         .param("approved", "true")
                         .param("handleResult", "删除帖子并警告用户"))
                 .andExpect(status().isOk())
@@ -154,7 +154,7 @@ class ReportControllerTest {
     @DisplayName("无权限处理举报被拒绝")
     @WithMockUser(roles = "STUDENT")
     void handleReport_forbidden() throws Exception {
-        mockMvc.perform(post("/api/reports/{id}/handle", 789L)
+        mockMvc.perform(post("/reports/{id}/handle", 789L)
                         .param("approved", "false")
                         .param("handleResult", "无违规"))
                 .andExpect(status().isForbidden());

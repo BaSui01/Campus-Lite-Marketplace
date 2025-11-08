@@ -68,9 +68,9 @@ class FileServiceTest {
         // 🚀 执行上传
         String fileUrl = fileService.uploadFile(file);
 
-        // ✅ 验证结果（新的目录结构：/uploads/images/yyyy/MM/dd/文件.jpg）
+        // ✅ 验证结果（新的目录结构：/uploads/general/yyyy/MM/dd/文件.jpg）
         assertThat(fileUrl).isNotNull();
-        assertThat(fileUrl).startsWith("/uploads/images/"); // 图片文件在 images/ 目录
+        assertThat(fileUrl).startsWith("/uploads/general/"); // 默认使用 general/ 目录
         assertThat(fileUrl).endsWith(".jpg");
 
         // 验证文件确实保存了（包含分类和日期子目录）
@@ -165,15 +165,16 @@ class FileServiceTest {
         assertThat(fileUrl).isNotNull();
         assertThat(fileUrl).startsWith("/uploads/");
 
-        // 验证缩略图也生成了
+        // 验证缩略图命名规则正确
         String thumbnailUrl = fileUrl.replace(".png", "_thumb.png");
         String thumbnailFileName = thumbnailUrl.substring(thumbnailUrl.lastIndexOf("/") + 1);
         Path thumbnailFile = tempDir.resolve(thumbnailFileName);
-        // 使用缩略图路径变量以避免未使用告警，同时校验命名规则
         assertThat(thumbnailFile.getFileName().toString()).contains("_thumb");
 
-        // 缩略图可能不存在（因为这是 mock 数据），所以我们主要验证原图
-        assertThat(tempDir.resolve(fileUrl.substring(fileUrl.lastIndexOf("/") + 1))).exists();
+        // 验证原图已保存（提取完整相对路径，包含分类/日期/文件名）
+        String relativePath = fileUrl.replace("/uploads/", "");
+        Path uploadedFile = tempDir.resolve(relativePath);
+        assertThat(uploadedFile).exists();
     }
 
     @Test

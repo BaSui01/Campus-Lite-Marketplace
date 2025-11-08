@@ -53,7 +53,7 @@ class SubscriptionControllerTest {
         CreateSubscriptionRequest request = new CreateSubscriptionRequest("Mac", 1L);
         when(subscriptionService.subscribe(any(CreateSubscriptionRequest.class))).thenReturn(88L);
 
-        mockMvc.perform(post("/api/subscribe")
+        mockMvc.perform(post("/subscribe")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -69,7 +69,7 @@ class SubscriptionControllerTest {
     void subscribe_forbidden() throws Exception {
         CreateSubscriptionRequest request = new CreateSubscriptionRequest("耳机", null);
 
-        mockMvc.perform(post("/api/subscribe")
+        mockMvc.perform(post("/subscribe")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
@@ -81,7 +81,7 @@ class SubscriptionControllerTest {
     @DisplayName("学生取消订阅成功")
     @WithMockUser(roles = "STUDENT")
     void unsubscribe_success() throws Exception {
-        mockMvc.perform(delete("/api/subscribe/{id}", 55L))
+        mockMvc.perform(delete("/subscribe/{id}", 55L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -101,7 +101,7 @@ class SubscriptionControllerTest {
                 .build();
         when(subscriptionService.listMySubscriptions()).thenReturn(List.of(response));
 
-        mockMvc.perform(get("/api/subscribe"))
+        mockMvc.perform(get("/subscribe"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0].keyword").value("ipad"));
@@ -113,7 +113,7 @@ class SubscriptionControllerTest {
     @DisplayName("非学生角色无法查看订阅列表")
     @WithMockUser(roles = "TEACHER")
     void listSubscriptions_forbidden() throws Exception {
-        mockMvc.perform(get("/api/subscribe"))
+        mockMvc.perform(get("/subscribe"))
                 .andExpect(status().isForbidden());
 
         verify(subscriptionService, never()).listMySubscriptions();

@@ -77,7 +77,7 @@ class CommunityControllerTest {
             .thenReturn(Arrays.asList(topic1, topic2));
 
         // Act & Assert
-        mockMvc.perform(get("/api/community/topics/hot"))
+        mockMvc.perform(get("/community/topics/hot"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.data").isArray())
@@ -98,7 +98,7 @@ class CommunityControllerTest {
         doNothing().when(communityService).addTopicTagsToPost(eq(postId), anyList());
 
         // Act & Assert
-        mockMvc.perform(post("/api/community/posts/{postId}/topics", postId)
+        mockMvc.perform(post("/community/posts/{postId}/topics", postId)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
@@ -119,7 +119,7 @@ class CommunityControllerTest {
         doNothing().when(communityService).likePost(eq(postId), anyLong());
 
         // Act & Assert
-        mockMvc.perform(post("/api/community/posts/{postId}/like", postId)
+        mockMvc.perform(post("/community/posts/{postId}/like", postId)
                 .with(csrf()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
@@ -138,7 +138,7 @@ class CommunityControllerTest {
         doNothing().when(communityService).unlikePost(eq(postId), anyLong());
 
         // Act & Assert
-        mockMvc.perform(delete("/api/community/posts/{postId}/like", postId)
+        mockMvc.perform(delete("/community/posts/{postId}/like", postId)
                 .with(csrf()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
@@ -157,7 +157,7 @@ class CommunityControllerTest {
         doNothing().when(communityService).collectPost(eq(postId), anyLong());
 
         // Act & Assert
-        mockMvc.perform(post("/api/community/posts/{postId}/collect", postId)
+        mockMvc.perform(post("/community/posts/{postId}/collect", postId)
                 .with(csrf()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
@@ -191,7 +191,7 @@ class CommunityControllerTest {
             .thenReturn(Arrays.asList(feed1, feed2));
 
         // Act & Assert
-        mockMvc.perform(get("/api/community/feed"))
+        mockMvc.perform(get("/community/feed"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.data").isArray())
@@ -213,7 +213,7 @@ class CommunityControllerTest {
             .thenReturn(postIds);
 
         // Act & Assert
-        mockMvc.perform(get("/api/community/topics/{topicId}/posts", topicId))
+        mockMvc.perform(get("/community/topics/{topicId}/posts", topicId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.data").isArray())
@@ -233,7 +233,7 @@ class CommunityControllerTest {
         when(communityService.getPostLikeCount(postId)).thenReturn(100L);
 
         // Act & Assert
-        mockMvc.perform(get("/api/community/posts/{postId}/likes/count", postId))
+        mockMvc.perform(get("/community/posts/{postId}/likes/count", postId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.data").value(100));
@@ -250,7 +250,7 @@ class CommunityControllerTest {
         when(communityService.isPostLikedByUser(eq(postId), anyLong())).thenReturn(true);
 
         // Act & Assert
-        mockMvc.perform(get("/api/community/posts/{postId}/liked", postId))
+        mockMvc.perform(get("/community/posts/{postId}/liked", postId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.data").value(true));

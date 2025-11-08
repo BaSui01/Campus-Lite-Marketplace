@@ -39,7 +39,7 @@ class FileControllerTest {
     void deleteFile_success() throws Exception {
         when(fileService.deleteFile("https://cdn/file.png")).thenReturn(true);
 
-        mockMvc.perform(delete("/api/files").param("url", "https://cdn/file.png"))
+        mockMvc.perform(delete("/files").param("url", "https://cdn/file.png"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(true));
 
@@ -52,7 +52,7 @@ class FileControllerTest {
     void deleteFile_fail() throws Exception {
         when(fileService.deleteFile("https://cdn/missing.png")).thenReturn(false);
 
-        mockMvc.perform(delete("/api/files").param("url", "https://cdn/missing.png"))
+        mockMvc.perform(delete("/files").param("url", "https://cdn/missing.png"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(500))
                 .andExpect(jsonPath("$.message").value("文件删除失败"));

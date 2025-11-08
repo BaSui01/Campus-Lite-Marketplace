@@ -64,7 +64,7 @@ class AuditLogControllerTest {
                 LocalDateTime.parse("2025-10-31T23:59:59"), 1, 10))
                 .thenReturn(new PageImpl<>(List.of(log)));
 
-        mockMvc.perform(get("/api/audit-logs")
+        mockMvc.perform(get("/audit-logs")
                         .param("operatorId", "100")
                         .param("actionType", "POST_DELETE")
                         .param("startTime", "2025-10-01T00:00:00")
@@ -86,7 +86,7 @@ class AuditLogControllerTest {
     @DisplayName("无审计权限的用户查询日志被拒绝")
     @WithMockUser(roles = "USER")
     void listAuditLogs_forbidden() throws Exception {
-        mockMvc.perform(get("/api/audit-logs"))
+        mockMvc.perform(get("/audit-logs"))
                 .andExpect(status().isForbidden());
 
         verify(auditLogService, never()).listAuditLogs(any(), any(), any(), any(), anyInt(), anyInt());
