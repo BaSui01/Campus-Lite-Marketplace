@@ -87,7 +87,7 @@ public interface AuditLogService {
 
     /**
      * 记录可撤销操作
-     * 
+     *
      * @param operatorId 操作人ID
      * @param operatorName 操作人用户名
      * @param actionType 操作类型
@@ -96,6 +96,18 @@ public interface AuditLogService {
      * @param oldValue 变更前数据
      * @param newValue 变更后数据
      */
-    void logReversibleAction(Long operatorId, String operatorName, AuditActionType actionType, 
+    void logReversibleAction(Long operatorId, String operatorName, AuditActionType actionType,
                             String entityName, Long entityId, Object oldValue, Object newValue);
+
+    /**
+     * 获取操作日志统计数据
+     *
+     * @param operatorId 操作人ID（可选）
+     * @param actionType 操作类型（可选）
+     * @param startTime 开始时间（可选）
+     * @param endTime 结束时间（可选）
+     * @return 统计数据（总操作数、成功数、失败数、今日操作数）
+     */
+    java.util.Map<String, Object> getStatistics(Long operatorId, AuditActionType actionType,
+                                                LocalDateTime startTime, LocalDateTime endTime);
 }

@@ -125,6 +125,33 @@ public class User {
     private UserStatus status = UserStatus.ACTIVE;
 
     /**
+     * 邮箱是否已验证
+     */
+    @Builder.Default
+    @Column(name = "email_verified", nullable = false, columnDefinition = "boolean default false")
+    private Boolean emailVerified = false;
+
+    /**
+     * 手机号是否已验证
+     */
+    @Builder.Default
+    @Column(name = "phone_verified", nullable = false, columnDefinition = "boolean default false")
+    private Boolean phoneVerified = false;
+
+    /**
+     * 两步验证是否启用
+     */
+    @Builder.Default
+    @Column(name = "two_factor_enabled", nullable = false, columnDefinition = "boolean default false")
+    private Boolean twoFactorEnabled = false;
+
+    /**
+     * 两步验证密钥（TOTP Secret）
+     */
+    @Column(name = "two_factor_secret", length = 32)
+    private String twoFactorSecret;
+
+    /**
      * 用户角色（任务 4 遗漏关联 - 已补充！）
      * Many-to-Many 关联
      */

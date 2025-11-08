@@ -59,4 +59,18 @@ public class AdminController {
         int count = userService.autoUnbanExpiredUsers();
         return ApiResponse.success(count);
     }
+
+    @GetMapping("/users/banned")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_USER_VIEW)")
+    @Operation(summary = "查询封禁记录列表", description = "管理员查询用户封禁记录（支持分页和筛选）")
+    public ApiResponse<org.springframework.data.domain.Page<com.campus.marketplace.common.dto.response.BanLogResponse>> listBannedUsers(
+            @Parameter(description = "用户ID（可选）", example = "10002") @RequestParam(required = false) Long userId,
+            @Parameter(description = "是否已解封（可选）", example = "false") @RequestParam(required = false) Boolean isUnbanned,
+            @Parameter(description = "页码", example = "0") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "每页大小", example = "20") @RequestParam(defaultValue = "20") int size
+    ) {
+        org.springframework.data.domain.Page<com.campus.marketplace.common.dto.response.BanLogResponse> result =
+                userService.listBannedUsers(userId, isUnbanned, page, size);
+        return ApiResponse.success(result);
+    }
 }
