@@ -24,6 +24,11 @@ spring:
       port: 35729
     add-properties: true
 
+  # 🔥 禁用 Spring Boot 默认静态资源自动配置（关键修复！）
+  web:
+    resources:
+      add-mappings: false  # 禁用默认静态资源映射，避免与 API 路由冲突
+
   # JPA 配置（开发环境）
   jpa:
     hibernate:

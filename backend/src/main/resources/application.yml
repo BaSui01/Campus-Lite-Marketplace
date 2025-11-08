@@ -88,8 +88,13 @@ spring:
       enabled: ${FILE_UPLOAD_ENABLED:true}
 
   # MVC 配置 - 静态资源路径模式
-  mvc:
-    static-path-pattern: /uploads/**  # 只匹配 /uploads/** 路径，避免覆盖 API 路径
+  # ✅ BaSui: 已删除 static-path-pattern 配置，使用默认值 /**
+  # 静态资源映射由 WebMvcConfig.addResourceHandlers() 统一管理
+
+  # 🔥 禁用 Spring Boot 默认静态资源自动配置（关键修复！）
+  web:
+    resources:
+      add-mappings: false  # 禁用默认静态资源映射，避免与 API 路由冲突
 
   # 邮件配置（使用真实 SMTP）
   mail:
@@ -373,6 +378,10 @@ spring:
       enabled: DETECT
   flyway:
     enabled: true
+  # 🔥 禁用 Spring Boot 默认静态资源自动配置（关键修复！）
+  web:
+    resources:
+      add-mappings: false  # 禁用默认静态资源映射，避免与 API 路由冲突
 app:
   cache:
     prewarm:
@@ -387,8 +396,7 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: false
-  mvc:
-    static-path-pattern: /uploads/**  # 只匹配 /uploads/** 路径，避免覆盖 API 路径
+  # ✅ BaSui: 已删除 mvc.static-path-pattern 配置，使用默认值 /**
 server:
   port: ${TEST_SERVER_PORT:${SERVER_PORT:8200}}  # 测试环境也使用 8200
   # 测试环境不设置 context-path，因为测试代码中已经包含了 /api 前缀
@@ -433,6 +441,10 @@ spring:
           min-idle: ${REDIS_POOL_MIN_IDLE:20}
           max-wait: 3000ms
       timeout: 3000ms
+  # 🔥 禁用 Spring Boot 默认静态资源自动配置（关键修复！）
+  web:
+    resources:
+      add-mappings: false  # 禁用默认静态资源映射，避免与 API 路由冲突
 logging:
   level:
     root: ${LOG_LEVEL_ROOT:WARN}

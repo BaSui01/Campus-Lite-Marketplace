@@ -71,13 +71,13 @@ public class OpenApiConfig {
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
                 
-                // 服务器配置（⚠️ 不包含 /api 后缀，因为生成的接口路径已包含）
+                // 服务器配置（✅ BaSui: 包含 /api 前缀，与 context-path 保持一致）
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8200")
+                                .url("http://localhost:8200/api")
                                 .description("本地开发环境"),
                         new Server()
-                                .url("https://api.campus-marketplace.com")
+                                .url("https://api.campus-marketplace.com/api")
                                 .description("生产环境")
                 ))
                 

@@ -32,7 +32,7 @@ public class FileServiceImpl implements FileService {
 
     private final FileSecurityService fileSecurityService;
 
-    @Value("${file.upload.dir:backend/uploads}")
+    @Value("${file.upload.dir:./uploads}")
     private String uploadDir;
 
     @Value("${file.upload.max-size:10485760}") // 默认 10MB
