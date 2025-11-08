@@ -34,13 +34,13 @@ export interface PageReportResponse {
      * @type {number}
      * @memberof PageReportResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageReportResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}

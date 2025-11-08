@@ -13,36 +13,33 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { PageLogisticsDTO } from './page-logistics-dto';
 
 /**
- * 
+ * 统一响应包装结构
  * @export
- * @interface UpdatePostRequest
+ * @interface ApiResponsePageLogisticsDTO
  */
-export interface UpdatePostRequest {
+export interface ApiResponsePageLogisticsDTO {
     /**
-     * 
+     * 业务状态码，0 表示成功
+     * @type {number}
+     * @memberof ApiResponsePageLogisticsDTO
+     */
+    'code'?: number;
+    /**
+     * 人类可读的响应消息
      * @type {string}
-     * @memberof UpdatePostRequest
+     * @memberof ApiResponsePageLogisticsDTO
      */
-    'title'?: string;
+    'message'?: string;
     /**
      * 
-     * @type {string}
-     * @memberof UpdatePostRequest
+     * @type {PageLogisticsDTO}
+     * @memberof ApiResponsePageLogisticsDTO
      */
-    'content'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof UpdatePostRequest
-     */
-    'images'?: Array<string>;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof UpdatePostRequest
-     */
-    'tagIds'?: Array<number>;
+    'data'?: PageLogisticsDTO | null;
 }
 

@@ -17,32 +17,32 @@
 /**
  * 
  * @export
- * @interface UpdatePostRequest
+ * @interface RecommendConfigDTO
  */
-export interface UpdatePostRequest {
+export interface RecommendConfigDTO {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RecommendConfigDTO
+     */
+    'enabled'?: boolean;
     /**
      * 
      * @type {string}
-     * @memberof UpdatePostRequest
+     * @memberof RecommendConfigDTO
      */
-    'title'?: string;
+    'algorithm'?: string;
     /**
      * 
-     * @type {string}
-     * @memberof UpdatePostRequest
+     * @type {{ [key: string]: number; }}
+     * @memberof RecommendConfigDTO
      */
-    'content'?: string;
+    'weights'?: { [key: string]: number; };
     /**
      * 
-     * @type {Array<string>}
-     * @memberof UpdatePostRequest
+     * @type {{ [key: string]: object; }}
+     * @memberof RecommendConfigDTO
      */
-    'images'?: Array<string>;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof UpdatePostRequest
-     */
-    'tagIds'?: Array<number>;
+    'params'?: { [key: string]: object; };
 }
 

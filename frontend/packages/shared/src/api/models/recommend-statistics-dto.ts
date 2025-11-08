@@ -15,34 +15,34 @@
 
 
 /**
- * 
+ * 业务数据载荷
  * @export
- * @interface UpdatePostRequest
+ * @interface RecommendStatisticsDTO
  */
-export interface UpdatePostRequest {
+export interface RecommendStatisticsDTO {
     /**
      * 
-     * @type {string}
-     * @memberof UpdatePostRequest
+     * @type {number}
+     * @memberof RecommendStatisticsDTO
      */
-    'title'?: string;
+    'totalRecommendations'?: number;
     /**
      * 
-     * @type {string}
-     * @memberof UpdatePostRequest
+     * @type {number}
+     * @memberof RecommendStatisticsDTO
      */
-    'content'?: string;
+    'clickRate'?: number;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof UpdatePostRequest
+     * @type {number}
+     * @memberof RecommendStatisticsDTO
      */
-    'images'?: Array<string>;
+    'conversionRate'?: number;
     /**
      * 
-     * @type {Array<number>}
-     * @memberof UpdatePostRequest
+     * @type {number}
+     * @memberof RecommendStatisticsDTO
      */
-    'tagIds'?: Array<number>;
+    'avgScore'?: number;
 }
 

@@ -34,13 +34,13 @@ export interface PageSearchResultItem {
      * @type {number}
      * @memberof PageSearchResultItem
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageSearchResultItem
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}

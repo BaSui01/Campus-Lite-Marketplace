@@ -34,13 +34,13 @@ export interface PageUserProfileResponse {
      * @type {number}
      * @memberof PageUserProfileResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageUserProfileResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}

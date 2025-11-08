@@ -94,6 +94,7 @@ models/api-response-page-compliance-audit-log.ts
 models/api-response-page-conversation-response.ts
 models/api-response-page-dispute-dto.ts
 models/api-response-page-goods-response.ts
+models/api-response-page-logistics-dto.ts
 models/api-response-page-message-response.ts
 models/api-response-page-message-search-response.ts
 models/api-response-page-notification-response.ts
@@ -107,6 +108,8 @@ models/api-response-page-search-result-item.ts
 models/api-response-page-user-profile-response.ts
 models/api-response-performance-report-response.ts
 models/api-response-post-response.ts
+models/api-response-recommend-config-dto.ts
+models/api-response-recommend-statistics-dto.ts
 models/api-response-refund-request.ts
 models/api-response-revert-execution-result.ts
 models/api-response-review-media-dto.ts
@@ -231,6 +234,7 @@ models/page-compliance-audit-log.ts
 models/page-conversation-response.ts
 models/page-dispute-dto.ts
 models/page-goods-response.ts
+models/page-logistics-dto.ts
 models/page-message-response.ts
 models/page-message-search-response.ts
 models/page-notification-response.ts
@@ -253,6 +257,8 @@ models/price-batch-request.ts
 models/privacy-request-response.ts
 models/propose-dispute-request.ts
 models/qps-data.ts
+models/recommend-config-dto.ts
+models/recommend-statistics-dto.ts
 models/refund-request.ts
 models/register-request.ts
 models/reply-response.ts

@@ -190,6 +190,8 @@ import type { ApiResponsePageDisputeDTO } from '../models';
 // @ts-ignore
 import type { ApiResponsePageGoodsResponse } from '../models';
 // @ts-ignore
+import type { ApiResponsePageLogisticsDTO } from '../models';
+// @ts-ignore
 import type { ApiResponsePageMessageResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageMessageSearchResponse } from '../models';
@@ -215,6 +217,10 @@ import type { ApiResponsePageUserProfileResponse } from '../models';
 import type { ApiResponsePerformanceReportResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePostResponse } from '../models';
+// @ts-ignore
+import type { ApiResponseRecommendConfigDTO } from '../models';
+// @ts-ignore
+import type { ApiResponseRecommendStatisticsDTO } from '../models';
 // @ts-ignore
 import type { ApiResponseRefundRequest } from '../models';
 // @ts-ignore
@@ -325,6 +331,8 @@ import type { PayOrderRequest } from '../models';
 import type { PriceBatchRequest } from '../models';
 // @ts-ignore
 import type { ProposeDisputeRequest } from '../models';
+// @ts-ignore
+import type { RecommendConfigDTO } from '../models';
 // @ts-ignore
 import type { RegisterRequest } from '../models';
 // @ts-ignore
@@ -6890,6 +6898,74 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 管理员查看当前推荐算法配置
+         * @summary 获取推荐配置
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecommendConfig: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/recommend/config`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理员查看推荐效果统计数据
+         * @summary 获取推荐统计
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecommendStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/recommend/statistics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 获取按月统计的收入趋势（仅管理员）
          * @summary 获取收入趋势
          * @param {number} [months] 统计月数
@@ -9579,6 +9655,70 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (tags) {
                 localVarQueryParameter['tags'] = tags;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+         * @summary 分页查询物流列表
+         * @param {string} [keyword] 关键词（订单ID/快递单号）
+         * @param {ListLogisticsStatusEnum} [status] 物流状态
+         * @param {number} [page] 页码（从0开始）
+         * @param {number} [size] 每页大小
+         * @param {string} [sortBy] 排序字段
+         * @param {string} [sortDirection] 排序方向
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listLogistics: async (keyword?: string, status?: ListLogisticsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/logistics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sortBy'] = sortBy;
+            }
+
+            if (sortDirection !== undefined) {
+                localVarQueryParameter['sortDirection'] = sortDirection;
             }
 
 
@@ -13102,11 +13242,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             if (start !== undefined) {
-                localVarQueryParameter['start'] = start;
+                localVarQueryParameter['start'] = (start as any instanceof Date) ?
+                    (start as any).toISOString() :
+                    start;
             }
 
             if (end !== undefined) {
-                localVarQueryParameter['end'] = end;
+                localVarQueryParameter['end'] = (end as any instanceof Date) ?
+                    (end as any).toISOString() :
+                    end;
             }
 
 
@@ -14156,6 +14300,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 管理员更新推荐算法配置（实时生效）
+         * @summary 更新推荐配置
+         * @param {RecommendConfigDTO} recommendConfigDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRecommendConfig: async (recommendConfigDTO: RecommendConfigDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'recommendConfigDTO' is not null or undefined
+            assertParamExists('updateRecommendConfig', 'recommendConfigDTO', recommendConfigDTO)
+            const localVarPath = `/admin/recommend/config`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(recommendConfigDTO, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 更新角色描述和权限集合
          * @summary 更新角色
          * @param {number} roleId 角色 ID
@@ -14372,13 +14556,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 上传单个图片文件，返回访问URL
-         * @summary 上传图片
-         * @param {File} file 
+         * 上传文件，支持按业务场景分类存储
+         * @summary 上传文件
+         * @param {File} file 文件
+         * @param {string} [category] 业务场景（avatar/goods/post/message/general）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        uploadFile: async (file: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        uploadFile: async (file: File, category?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'file' is not null or undefined
             assertParamExists('uploadFile', 'file', file)
             const localVarPath = `/files/upload`;
@@ -14397,6 +14582,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (category !== undefined) {
+                localVarQueryParameter['category'] = category;
+            }
 
 
             if (file !== undefined) { 
@@ -16966,6 +17155,30 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 管理员查看当前推荐算法配置
+         * @summary 获取推荐配置
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRecommendConfig(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseRecommendConfigDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecommendConfig(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getRecommendConfig']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 管理员查看推荐效果统计数据
+         * @summary 获取推荐统计
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRecommendStatistics(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseRecommendStatisticsDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRecommendStatistics(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getRecommendStatistics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 获取按月统计的收入趋势（仅管理员）
          * @summary 获取收入趋势
          * @param {number} [months] 统计月数
@@ -17847,6 +18060,24 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listGoods(keyword, categoryId, minPrice, maxPrice, page, size, sortBy, sortDirection, tags, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listGoods']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+         * @summary 分页查询物流列表
+         * @param {string} [keyword] 关键词（订单ID/快递单号）
+         * @param {ListLogisticsStatusEnum} [status] 物流状态
+         * @param {number} [page] 页码（从0开始）
+         * @param {number} [size] 每页大小
+         * @param {string} [sortBy] 排序字段
+         * @param {string} [sortDirection] 排序方向
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listLogistics(keyword?: string, status?: ListLogisticsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageLogisticsDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listLogistics(keyword, status, page, size, sortBy, sortDirection, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listLogistics']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -19332,6 +19563,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 管理员更新推荐算法配置（实时生效）
+         * @summary 更新推荐配置
+         * @param {RecommendConfigDTO} recommendConfigDTO 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateRecommendConfig(recommendConfigDTO: RecommendConfigDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateRecommendConfig(recommendConfigDTO, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateRecommendConfig']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 更新角色描述和权限集合
          * @summary 更新角色
          * @param {number} roleId 角色 ID
@@ -19401,14 +19645,15 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 上传单个图片文件，返回访问URL
-         * @summary 上传图片
-         * @param {File} file 
+         * 上传文件，支持按业务场景分类存储
+         * @summary 上传文件
+         * @param {File} file 文件
+         * @param {string} [category] 业务场景（avatar/goods/post/message/general）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async uploadFile(file: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringString>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadFile(file, options);
+        async uploadFile(file: File, category?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadFile(file, category, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.uploadFile']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -21173,6 +21418,24 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getQpsStatistics(requestParameters.hours, options).then((request) => request(axios, basePath));
         },
         /**
+         * 管理员查看当前推荐算法配置
+         * @summary 获取推荐配置
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecommendConfig(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRecommendConfigDTO> {
+            return localVarFp.getRecommendConfig(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 管理员查看推荐效果统计数据
+         * @summary 获取推荐统计
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecommendStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRecommendStatisticsDTO> {
+            return localVarFp.getRecommendStatistics(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 获取按月统计的收入趋势（仅管理员）
          * @summary 获取收入趋势
          * @param {DefaultApiGetRevenueTrendRequest} requestParameters Request parameters.
@@ -21811,6 +22074,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listGoods(requestParameters: DefaultApiListGoodsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse> {
             return localVarFp.listGoods(requestParameters.keyword, requestParameters.categoryId, requestParameters.minPrice, requestParameters.maxPrice, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.tags, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+         * @summary 分页查询物流列表
+         * @param {DefaultApiListLogisticsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listLogistics(requestParameters: DefaultApiListLogisticsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageLogisticsDTO> {
+            return localVarFp.listLogistics(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, options).then((request) => request(axios, basePath));
         },
         /**
          * 获取指定会话的消息历史，按时间倒序
@@ -22900,6 +23173,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.updateProfile(requestParameters.updateProfileRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 管理员更新推荐算法配置（实时生效）
+         * @summary 更新推荐配置
+         * @param {DefaultApiUpdateRecommendConfigRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateRecommendConfig(requestParameters: DefaultApiUpdateRecommendConfigRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.updateRecommendConfig(requestParameters.recommendConfigDTO, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 更新角色描述和权限集合
          * @summary 更新角色
          * @param {DefaultApiUpdateRoleRequest} requestParameters Request parameters.
@@ -22950,14 +23233,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.uploadEvidence(requestParameters.uploadEvidenceRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 上传单个图片文件，返回访问URL
-         * @summary 上传图片
+         * 上传文件，支持按业务场景分类存储
+         * @summary 上传文件
          * @param {DefaultApiUploadFileRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         uploadFile(requestParameters: DefaultApiUploadFileRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringString> {
-            return localVarFp.uploadFile(requestParameters.file, options).then((request) => request(axios, basePath));
+            return localVarFp.uploadFile(requestParameters.file, requestParameters.category, options).then((request) => request(axios, basePath));
         },
         /**
          * 上传图片并自动生成缩略图
@@ -24722,6 +25005,24 @@ export interface DefaultApiInterface {
     getQpsStatistics(hours?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListQpsData>;
 
     /**
+     * 管理员查看当前推荐算法配置
+     * @summary 获取推荐配置
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getRecommendConfig(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRecommendConfigDTO>;
+
+    /**
+     * 管理员查看推荐效果统计数据
+     * @summary 获取推荐统计
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getRecommendStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRecommendStatisticsDTO>;
+
+    /**
      * 获取按月统计的收入趋势（仅管理员）
      * @summary 获取收入趋势
      * @param {number} [months] 统计月数
@@ -25406,6 +25707,21 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     listGoods(keyword?: string, categoryId?: number, minPrice?: number, maxPrice?: number, page?: number, size?: number, sortBy?: string, sortDirection?: string, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse>;
+
+    /**
+     * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+     * @summary 分页查询物流列表
+     * @param {string} [keyword] 关键词（订单ID/快递单号）
+     * @param {ListLogisticsStatusEnum} [status] 物流状态
+     * @param {number} [page] 页码（从0开始）
+     * @param {number} [size] 每页大小
+     * @param {string} [sortBy] 排序字段
+     * @param {string} [sortDirection] 排序方向
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listLogistics(keyword?: string, status?: ListLogisticsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageLogisticsDTO>;
 
     /**
      * 获取指定会话的消息历史，按时间倒序
@@ -26560,6 +26876,16 @@ export interface DefaultApiInterface {
     updateProfile(updateProfileRequest: UpdateProfileRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 管理员更新推荐算法配置（实时生效）
+     * @summary 更新推荐配置
+     * @param {RecommendConfigDTO} recommendConfigDTO 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    updateRecommendConfig(recommendConfigDTO: RecommendConfigDTO, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 更新角色描述和权限集合
      * @summary 更新角色
      * @param {number} roleId 角色 ID
@@ -26614,14 +26940,15 @@ export interface DefaultApiInterface {
     uploadEvidence(uploadEvidenceRequest: UploadEvidenceRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
 
     /**
-     * 上传单个图片文件，返回访问URL
-     * @summary 上传图片
-     * @param {File} file 
+     * 上传文件，支持按业务场景分类存储
+     * @summary 上传文件
+     * @param {File} file 文件
+     * @param {string} [category] 业务场景（avatar/goods/post/message/general）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    uploadFile(file: File, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringString>;
+    uploadFile(file: File, category?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringString>;
 
     /**
      * 上传图片并自动生成缩略图
@@ -29939,6 +30266,55 @@ export interface DefaultApiListGoodsRequest {
 }
 
 /**
+ * Request parameters for listLogistics operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListLogisticsRequest
+ */
+export interface DefaultApiListLogisticsRequest {
+    /**
+     * 关键词（订单ID/快递单号）
+     * @type {string}
+     * @memberof DefaultApiListLogistics
+     */
+    readonly keyword?: string
+
+    /**
+     * 物流状态
+     * @type {'PENDING' | 'PICKED_UP' | 'IN_TRANSIT' | 'DELIVERING' | 'DELIVERED' | 'REJECTED' | 'LOST'}
+     * @memberof DefaultApiListLogistics
+     */
+    readonly status?: ListLogisticsStatusEnum
+
+    /**
+     * 页码（从0开始）
+     * @type {number}
+     * @memberof DefaultApiListLogistics
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     * @type {number}
+     * @memberof DefaultApiListLogistics
+     */
+    readonly size?: number
+
+    /**
+     * 排序字段
+     * @type {string}
+     * @memberof DefaultApiListLogistics
+     */
+    readonly sortBy?: string
+
+    /**
+     * 排序方向
+     * @type {string}
+     * @memberof DefaultApiListLogistics
+     */
+    readonly sortDirection?: string
+}
+
+/**
  * Request parameters for listMessages operation in DefaultApi.
  * @export
  * @interface DefaultApiListMessagesRequest
@@ -31752,6 +32128,20 @@ export interface DefaultApiUpdateProfileRequest {
 }
 
 /**
+ * Request parameters for updateRecommendConfig operation in DefaultApi.
+ * @export
+ * @interface DefaultApiUpdateRecommendConfigRequest
+ */
+export interface DefaultApiUpdateRecommendConfigRequest {
+    /**
+     * 
+     * @type {RecommendConfigDTO}
+     * @memberof DefaultApiUpdateRecommendConfig
+     */
+    readonly recommendConfigDTO: RecommendConfigDTO
+}
+
+/**
  * Request parameters for updateRole operation in DefaultApi.
  * @export
  * @interface DefaultApiUpdateRoleRequest
@@ -31856,11 +32246,18 @@ export interface DefaultApiUploadEvidenceRequest {
  */
 export interface DefaultApiUploadFileRequest {
     /**
-     * 
+     * 文件
      * @type {File}
      * @memberof DefaultApiUploadFile
      */
     readonly file: File
+
+    /**
+     * 业务场景（avatar/goods/post/message/general）
+     * @type {string}
+     * @memberof DefaultApiUploadFile
+     */
+    readonly category?: string
 }
 
 /**
@@ -33989,6 +34386,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 管理员查看当前推荐算法配置
+     * @summary 获取推荐配置
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getRecommendConfig(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getRecommendConfig(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 管理员查看推荐效果统计数据
+     * @summary 获取推荐统计
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getRecommendStatistics(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getRecommendStatistics(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 获取按月统计的收入趋势（仅管理员）
      * @summary 获取收入趋势
      * @param {DefaultApiGetRevenueTrendRequest} requestParameters Request parameters.
@@ -34758,6 +35177,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listGoods(requestParameters: DefaultApiListGoodsRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listGoods(requestParameters.keyword, requestParameters.categoryId, requestParameters.minPrice, requestParameters.maxPrice, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.tags, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+     * @summary 分页查询物流列表
+     * @param {DefaultApiListLogisticsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listLogistics(requestParameters: DefaultApiListLogisticsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listLogistics(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -36068,6 +36499,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 管理员更新推荐算法配置（实时生效）
+     * @summary 更新推荐配置
+     * @param {DefaultApiUpdateRecommendConfigRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public updateRecommendConfig(requestParameters: DefaultApiUpdateRecommendConfigRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateRecommendConfig(requestParameters.recommendConfigDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 更新角色描述和权限集合
      * @summary 更新角色
      * @param {DefaultApiUpdateRoleRequest} requestParameters Request parameters.
@@ -36128,15 +36571,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 上传单个图片文件，返回访问URL
-     * @summary 上传图片
+     * 上传文件，支持按业务场景分类存储
+     * @summary 上传文件
      * @param {DefaultApiUploadFileRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
     public uploadFile(requestParameters: DefaultApiUploadFileRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).uploadFile(requestParameters.file, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).uploadFile(requestParameters.file, requestParameters.category, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -36382,6 +36825,19 @@ export const ListDisputesStatusEnum = {
     Closed: 'CLOSED'
 } as const;
 export type ListDisputesStatusEnum = typeof ListDisputesStatusEnum[keyof typeof ListDisputesStatusEnum];
+/**
+ * @export
+ */
+export const ListLogisticsStatusEnum = {
+    Pending: 'PENDING',
+    PickedUp: 'PICKED_UP',
+    InTransit: 'IN_TRANSIT',
+    Delivering: 'DELIVERING',
+    Delivered: 'DELIVERED',
+    Rejected: 'REJECTED',
+    Lost: 'LOST'
+} as const;
+export type ListLogisticsStatusEnum = typeof ListLogisticsStatusEnum[keyof typeof ListLogisticsStatusEnum];
 /**
  * @export
  */

@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { DisputeDTO } from './dispute-dto';
+import type { LogisticsDTO } from './logistics-dto';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { PageableObject } from './pageable-object';
@@ -26,73 +26,73 @@ import type { SortObject } from './sort-object';
 /**
  * 业务数据载荷
  * @export
- * @interface PageDisputeDTO
+ * @interface PageLogisticsDTO
  */
-export interface PageDisputeDTO {
+export interface PageLogisticsDTO {
     /**
      * 
      * @type {number}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'totalPages'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'totalElements'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'size'?: number;
     /**
      * 
-     * @type {Array<DisputeDTO>}
-     * @memberof PageDisputeDTO
+     * @type {Array<LogisticsDTO>}
+     * @memberof PageLogisticsDTO
      */
-    'content'?: Array<DisputeDTO>;
+    'content'?: Array<LogisticsDTO>;
     /**
      * 
      * @type {number}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'number'?: number;
     /**
      * 
      * @type {Array<SortObject>}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'sort'?: Array<SortObject>;
     /**
      * 
      * @type {boolean}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'first'?: boolean;
     /**
      * 
      * @type {boolean}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'last'?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'numberOfElements'?: number;
     /**
      * 
      * @type {PageableObject}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageDisputeDTO
+     * @memberof PageLogisticsDTO
      */
     'empty'?: boolean;
 }

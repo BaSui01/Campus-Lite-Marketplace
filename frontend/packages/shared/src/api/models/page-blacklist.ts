@@ -34,13 +34,13 @@ export interface PageBlacklist {
      * @type {number}
      * @memberof PageBlacklist
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageBlacklist
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}

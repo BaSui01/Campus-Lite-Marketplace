@@ -31,13 +31,13 @@ export interface PageObject {
      * @type {number}
      * @memberof PageObject
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageObject
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}

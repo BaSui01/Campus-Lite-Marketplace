@@ -1,17 +1,16 @@
 /**
- * ✅ 限流管理服务 - 已重构为 OpenAPI（部分）
+ * ✅ 限流管理服务 - 已重构为 OpenAPI
  * @author BaSui 😎
  * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
  *
  * 功能：
+ * - 限流规则查询
+ * - 限流开关管理
  * - 用户白名单管理
  * - IP 白名单管理
  * - IP 黑名单管理
  *
- * ⚠️ 注意：
- * - 所有接口需要管理员权限（ADMIN角色）
- * - getRules() 和 setEnabled() 方法暂未实现（后端接口缺失）
- *
+ * ⚠️ 注意：所有接口需要管理员权限（ADMIN角色）
  * 📋 API 路径：/api/admin/rate-limit/*
  */
 
@@ -32,19 +31,31 @@ export interface RateLimitRules {
  */
 export class RateLimitService {
   /**
-   * ⚠️ 获取限流规则（暂未实现）
-   * TODO: 等待后端实现 GET /api/admin/rate-limit/rules
+   * 获取限流规则
+   * GET /api/admin/rate-limit/rules
+   * @returns 限流规则（开关状态、白名单、黑名单）
    */
   async getRules(): Promise<RateLimitRules> {
-    throw new Error('getRules() 方法暂未实现，等待后端接口');
+    const api = getApi();
+    const response = await api.getRules();
+    const data = response.data.data as Record<string, any>;
+
+    return {
+      enabled: Boolean(data.enabled),
+      userWhitelist: (data.userWhitelist || []) as number[],
+      ipWhitelist: (data.ipWhitelist || []) as string[],
+      ipBlacklist: (data.ipBlacklist || []) as string[],
+    };
   }
 
   /**
-   * ⚠️ 设置限流开关（暂未实现）
-   * TODO: 等待后端实现 POST /api/admin/rate-limit/enabled/{enabled}
+   * 设置限流开关
+   * POST /api/admin/rate-limit/enabled/{enabled}
+   * @param enabled 是否启用限流
    */
   async setEnabled(enabled: boolean): Promise<void> {
-    throw new Error('setEnabled() 方法暂未实现，等待后端接口');
+    const api = getApi();
+    await api.setEnabled({ enabled });
   }
 
   /**
