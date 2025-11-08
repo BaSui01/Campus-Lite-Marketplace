@@ -19,9 +19,9 @@ import type { Configuration } from './configuration';
 import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 
-// ⚠️ 临时修改：应该通过重新生成 OpenAPI 代码来修复
-// 正确的 BASE_PATH 应该是 http://localhost:8200（不含 /api 后缀）
-export const BASE_PATH = "http://localhost:8200".replace(/\/+$/, "");
+// ✅ BaSui修复：BASE_PATH 必须包含 /api 后缀，与后端 context-path 一致
+// 后端配置：server.servlet.context-path=/api (application.yml:171)
+export const BASE_PATH = "http://localhost:8200/api".replace(/\/+$/, "");
 
 /**
  *

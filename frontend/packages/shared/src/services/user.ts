@@ -13,7 +13,7 @@
  * @description 用户资料、密码修改、用户列表等接口
  */
 
-import { getApi } from '../utils/apiClient';
+import { apiClient } from '../utils/apiClient';
 import type {
   ApiResponse,
   PageInfo,
@@ -32,7 +32,8 @@ export class UserService {
    * @returns 当前用户信息
    */
   async getProfile(): Promise<ApiResponse<User>> {
-    return http.get('/users/profile');
+    const response = await apiClient.get('/users/profile');
+    return response.data;
   }
 
   /**
@@ -41,7 +42,8 @@ export class UserService {
    * @returns 用户信息
    */
   async getUserById(userId: number): Promise<ApiResponse<User>> {
-    return http.get(`/users/${userId}`);
+    const response = await apiClient.get(`/users/${userId}`);
+    return response.data;
   }
 
   /**
@@ -50,7 +52,8 @@ export class UserService {
    * @returns 更新后的用户信息
    */
   async updateProfile(data: UpdateProfileRequest): Promise<ApiResponse<User>> {
-    return http.put('/users/profile', data);
+    const response = await apiClient.put('/users/profile', data);
+    return response.data;
   }
 
   /**
@@ -59,7 +62,8 @@ export class UserService {
    * @returns 修改结果
    */
   async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<void>> {
-    return http.put('/users/password', data);
+    const response = await apiClient.put('/users/password', data);
+    return response.data;
   }
 
   /**
@@ -68,7 +72,8 @@ export class UserService {
    * @returns 积分记录列表
    */
   async getPointsLogs(params?: { page?: number; pageSize?: number }): Promise<ApiResponse<PageInfo<any>>> {
-    return http.get('/users/points/logs', { params });
+    const response = await apiClient.get('/users/points/logs', { params });
+    return response.data;
   }
 
   /**
@@ -76,7 +81,8 @@ export class UserService {
    * @returns 签到结果（包含获得的积分）
    */
   async signIn(): Promise<ApiResponse<{ points: number }>> {
-    return http.post('/users/sign-in');
+    const response = await apiClient.post('/users/sign-in');
+    return response.data;
   }
 }
 

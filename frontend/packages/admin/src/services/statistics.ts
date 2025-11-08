@@ -52,9 +52,9 @@ export interface TodayStatistics {
 }
 
 export class StatisticsService {
-  // 🔥 修复：改为 getter 方法，延迟初始化（避免 import.meta.env 还没加载完）
+  // ✅ 使用 apiClient（axios实例）调用管理端自定义API
   private get api() {
-    return getApi();
+    return apiClient;
   }
 
   /**

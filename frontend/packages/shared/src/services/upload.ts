@@ -13,7 +13,7 @@
  * @description 图片、文件上传等接口
  */
 
-import { getApi } from '../utils/apiClient';
+import { apiClient } from '../utils/apiClient';
 import type { ApiResponse, UploadResponse } from '../types';
 import { IMAGE_UPLOAD_URL, FILE_UPLOAD_URL } from '../constants';
 
@@ -23,18 +23,20 @@ import { IMAGE_UPLOAD_URL, FILE_UPLOAD_URL } from '../constants';
 export class UploadService {
   /**
    * 上传图片
-   * @param file 图片文件
+   * @param file 图片文件或FormData
    * @param onProgress 上传进度回调
    * @returns 上传结果（包含图片URL）
    */
   async uploadImage(
-    file: File,
+    file: File | FormData,
     onProgress?: (percent: number) => void
   ): Promise<ApiResponse<UploadResponse>> {
-    const formData = new FormData();
-    formData.append('file', file);
+    const formData = file instanceof FormData ? file : new FormData();
+    if (file instanceof File) {
+      formData.append('file', file);
+    }
 
-    return http.post(IMAGE_UPLOAD_URL, formData, {
+    const response = await apiClient.post(IMAGE_UPLOAD_URL, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -45,6 +47,7 @@ export class UploadService {
         }
       },
     });
+    return response.data;
   }
 
   /**
@@ -62,7 +65,7 @@ export class UploadService {
       formData.append('files', file);
     });
 
-    return http.post(`${IMAGE_UPLOAD_URL}/batch`, formData, {
+    const response = await apiClient.post(`${IMAGE_UPLOAD_URL}/batch`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -73,6 +76,7 @@ export class UploadService {
         }
       },
     });
+    return response.data;
   }
 
   /**
@@ -88,7 +92,7 @@ export class UploadService {
     const formData = new FormData();
     formData.append('file', file);
 
-    return http.post(FILE_UPLOAD_URL, formData, {
+    const response = await apiClient.post(FILE_UPLOAD_URL, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -99,6 +103,7 @@ export class UploadService {
         }
       },
     });
+    return response.data;
   }
 
   /**
@@ -107,7 +112,8 @@ export class UploadService {
    * @returns 上传结果（包含图片URL）
    */
   async uploadBase64Image(base64: string): Promise<ApiResponse<UploadResponse>> {
-    return http.post(`${IMAGE_UPLOAD_URL}/base64`, { base64 });
+    const response = await apiClient.post(`${IMAGE_UPLOAD_URL}/base64`, { base64 });
+    return response.data;
   }
 
   /**
@@ -116,7 +122,8 @@ export class UploadService {
    * @returns 删除结果
    */
   async deleteFile(url: string): Promise<ApiResponse<void>> {
-    return http.delete('/upload/delete', { data: { url } });
+    const response = await apiClient.delete('/upload/delete', { data: { url } });
+    return response.data;
   }
 }
 
