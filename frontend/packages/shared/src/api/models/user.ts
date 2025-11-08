@@ -127,6 +127,12 @@ export interface User {
      * @type {string}
      * @memberof User
      */
+    'lastLoginTime'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
     'deletedAt'?: string;
     /**
      * 

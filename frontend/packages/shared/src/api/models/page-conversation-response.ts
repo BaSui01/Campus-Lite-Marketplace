@@ -73,12 +73,6 @@ export interface PageConversationResponse {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageConversationResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageConversationResponse
      */
@@ -89,6 +83,12 @@ export interface PageConversationResponse {
      * @memberof PageConversationResponse
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageConversationResponse
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

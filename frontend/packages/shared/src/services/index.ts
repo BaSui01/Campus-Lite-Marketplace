@@ -40,6 +40,23 @@ export type { OrderService } from './order';
 export { messageService } from './message';
 export type { MessageService } from './message';
 
+// ==================== 支付服务（两端共享）====================
+export { paymentService } from './payment';
+export type {
+  PaymentService,
+  PaymentRecord,
+  PaymentStatistics,
+  PaymentListParams
+} from './payment';
+
+// ==================== 导出服务（两端共享）====================
+export { exportService, ExportType } from './export';
+export type {
+  ExportService,
+  ExportJob,
+  ExportRequest
+} from './export';
+
 // ==================== 分类服务（两端共享）====================
 export { categoryService, CategoryStatus } from './category';
 export type {

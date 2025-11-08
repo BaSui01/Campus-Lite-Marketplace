@@ -73,12 +73,6 @@ export interface PageAppealMaterial {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageAppealMaterial
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageAppealMaterial
      */
@@ -89,6 +83,12 @@ export interface PageAppealMaterial {
      * @memberof PageAppealMaterial
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageAppealMaterial
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

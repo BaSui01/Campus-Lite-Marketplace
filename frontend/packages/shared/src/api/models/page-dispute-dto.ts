@@ -73,12 +73,6 @@ export interface PageDisputeDTO {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageDisputeDTO
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageDisputeDTO
      */
@@ -89,6 +83,12 @@ export interface PageDisputeDTO {
      * @memberof PageDisputeDTO
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageDisputeDTO
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

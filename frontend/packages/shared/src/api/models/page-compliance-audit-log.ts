@@ -73,12 +73,6 @@ export interface PageComplianceAuditLog {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageComplianceAuditLog
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageComplianceAuditLog
      */
@@ -89,6 +83,12 @@ export interface PageComplianceAuditLog {
      * @memberof PageComplianceAuditLog
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageComplianceAuditLog
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

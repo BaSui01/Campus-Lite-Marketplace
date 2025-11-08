@@ -36,11 +36,21 @@ import type { ApiResponseBatchTaskProgressResponse } from '../models';
 // @ts-ignore
 import type { ApiResponseBatchTaskResponse } from '../models';
 // @ts-ignore
+import type { ApiResponseBlacklistStatsResponse } from '../models';
+// @ts-ignore
 import type { ApiResponseBoolean } from '../models';
 // @ts-ignore
 import type { ApiResponseCampus } from '../models';
 // @ts-ignore
 import type { ApiResponseCampusMigrationValidationResponse } from '../models';
+// @ts-ignore
+import type { ApiResponseCampusStatisticsResponse } from '../models';
+// @ts-ignore
+import type { ApiResponseCategory } from '../models';
+// @ts-ignore
+import type { ApiResponseCategoryStatisticsResponse } from '../models';
+// @ts-ignore
+import type { ApiResponseCheckBlacklistRelationResponse } from '../models';
 // @ts-ignore
 import type { ApiResponseComplianceWhitelist } from '../models';
 // @ts-ignore
@@ -66,7 +76,11 @@ import type { ApiResponseListAppealMaterial } from '../models';
 // @ts-ignore
 import type { ApiResponseListArbitrationDTO } from '../models';
 // @ts-ignore
+import type { ApiResponseListBanner } from '../models';
+// @ts-ignore
 import type { ApiResponseListCampus } from '../models';
+// @ts-ignore
+import type { ApiResponseListCategory } from '../models';
 // @ts-ignore
 import type { ApiResponseListCategoryNodeResponse } from '../models';
 // @ts-ignore
@@ -89,6 +103,10 @@ import type { ApiResponseListHealthCheckRecord } from '../models';
 import type { ApiResponseListLong } from '../models';
 // @ts-ignore
 import type { ApiResponseListMapStringObject } from '../models';
+// @ts-ignore
+import type { ApiResponseListMessageSearchHistory } from '../models';
+// @ts-ignore
+import type { ApiResponseListMessageSearchSuggestion } from '../models';
 // @ts-ignore
 import type { ApiResponseListNegotiationMessageDTO } from '../models';
 // @ts-ignore
@@ -140,6 +158,8 @@ import type { ApiResponseMapStringString } from '../models';
 // @ts-ignore
 import type { ApiResponseMaterialUploadResponse } from '../models';
 // @ts-ignore
+import type { ApiResponseMessageSearchStatistics } from '../models';
+// @ts-ignore
 import type { ApiResponseNotificationTemplate } from '../models';
 // @ts-ignore
 import type { ApiResponseObject } from '../models';
@@ -158,6 +178,8 @@ import type { ApiResponsePageAuditLogResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageBatchTaskResponse } from '../models';
 // @ts-ignore
+import type { ApiResponsePageBlacklist } from '../models';
+// @ts-ignore
 import type { ApiResponsePageComplianceAuditLog } from '../models';
 // @ts-ignore
 import type { ApiResponsePageConversationResponse } from '../models';
@@ -167,6 +189,8 @@ import type { ApiResponsePageDisputeDTO } from '../models';
 import type { ApiResponsePageGoodsResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageMessageResponse } from '../models';
+// @ts-ignore
+import type { ApiResponsePageMessageSearchResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageNotificationResponse } from '../models';
 // @ts-ignore
@@ -206,6 +230,10 @@ import type { ApiResponseString } from '../models';
 // @ts-ignore
 import type { ApiResponseSystemMetricsResponse } from '../models';
 // @ts-ignore
+import type { ApiResponseTag } from '../models';
+// @ts-ignore
+import type { ApiResponseTagStatisticsResponse } from '../models';
+// @ts-ignore
 import type { ApiResponseTopic } from '../models';
 // @ts-ignore
 import type { ApiResponseUserBehaviorLogDTO } from '../models';
@@ -224,7 +252,15 @@ import type { BanUserRequest } from '../models';
 // @ts-ignore
 import type { BatchReviewRequest } from '../models';
 // @ts-ignore
+import type { BatchUnblockRequest } from '../models';
+// @ts-ignore
+import type { CampusCreateRequest } from '../models';
+// @ts-ignore
 import type { CampusMigrationRequest } from '../models';
+// @ts-ignore
+import type { CampusUpdateRequest } from '../models';
+// @ts-ignore
+import type { CategoryBatchSortRequest } from '../models';
 // @ts-ignore
 import type { CompletePrivacyRequest } from '../models';
 // @ts-ignore
@@ -233,8 +269,6 @@ import type { ConfirmRegisterByEmailRequest } from '../models';
 import type { CreateAppealRequest } from '../models';
 // @ts-ignore
 import type { CreateBatchTaskRequest } from '../models';
-// @ts-ignore
-import type { CreateCampusRequest } from '../models';
 // @ts-ignore
 import type { CreateCategoryRequest } from '../models';
 // @ts-ignore
@@ -262,7 +296,9 @@ import type { CreateSubscriptionRequest } from '../models';
 // @ts-ignore
 import type { CreateTagRequest } from '../models';
 // @ts-ignore
-import type { FeatureFlag } from '../models';
+import type { FeatureFlagCreateRequest } from '../models';
+// @ts-ignore
+import type { FeatureFlagUpdateRequest } from '../models';
 // @ts-ignore
 import type { GoodsBatchRequest } from '../models';
 // @ts-ignore
@@ -271,6 +307,8 @@ import type { InventoryBatchRequest } from '../models';
 import type { LoginRequest } from '../models';
 // @ts-ignore
 import type { MergeTagRequest } from '../models';
+// @ts-ignore
+import type { MessageSearchRequest } from '../models';
 // @ts-ignore
 import type { NotificationTemplate } from '../models';
 // @ts-ignore
@@ -296,8 +334,6 @@ import type { SendMessageRequest } from '../models';
 // @ts-ignore
 import type { SendNegotiationRequest } from '../models';
 // @ts-ignore
-import type { UpdateCampusRequest } from '../models';
-// @ts-ignore
 import type { UpdateCategoryRequest } from '../models';
 // @ts-ignore
 import type { UpdatePasswordRequest } from '../models';
@@ -321,16 +357,16 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @summary 删除开关
-         * @param {string} key 
+         * @summary 删除
+         * @param {number} id 模板ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        _delete: async (key: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'key' is not null or undefined
-            assertParamExists('_delete', 'key', key)
-            const localVarPath = `/api/feature-flags/{key}`
-                .replace(`{${"key"}}`, encodeURIComponent(String(key)));
+        _delete: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('_delete', 'id', id)
+            const localVarPath = `/admin/notification-templates/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -367,7 +403,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         addFavorite: async (goodsId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsId' is not null or undefined
             assertParamExists('addFavorite', 'goodsId', goodsId)
-            const localVarPath = `/api/favorites/{goodsId}`
+            const localVarPath = `/favorites/{goodsId}`
                 .replace(`{${"goodsId"}}`, encodeURIComponent(String(goodsId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -405,7 +441,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         addIpBlacklist: async (ip: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'ip' is not null or undefined
             assertParamExists('addIpBlacklist', 'ip', ip)
-            const localVarPath = `/api/admin/rate-limit/blacklist/ips/{ip}`
+            const localVarPath = `/admin/rate-limit/blacklist/ips/{ip}`
                 .replace(`{${"ip"}}`, encodeURIComponent(String(ip)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -443,7 +479,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         addIpWhitelist: async (ip: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'ip' is not null or undefined
             assertParamExists('addIpWhitelist', 'ip', ip)
-            const localVarPath = `/api/admin/rate-limit/whitelist/ips/{ip}`
+            const localVarPath = `/admin/rate-limit/whitelist/ips/{ip}`
                 .replace(`{${"ip"}}`, encodeURIComponent(String(ip)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -482,7 +518,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         addToBlacklist: async (blockedUserId: number, reason?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'blockedUserId' is not null or undefined
             assertParamExists('addToBlacklist', 'blockedUserId', blockedUserId)
-            const localVarPath = `/api/blacklist/block/{blockedUserId}`
+            const localVarPath = `/blacklist/block/{blockedUserId}`
                 .replace(`{${"blockedUserId"}}`, encodeURIComponent(String(blockedUserId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -527,7 +563,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('addTopicsToPost', 'postId', postId)
             // verify required parameter 'requestBody' is not null or undefined
             assertParamExists('addTopicsToPost', 'requestBody', requestBody)
-            const localVarPath = `/api/community/posts/{postId}/topics`
+            const localVarPath = `/community/posts/{postId}/topics`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -568,7 +604,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         addUserWhitelist: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('addUserWhitelist', 'userId', userId)
-            const localVarPath = `/api/admin/rate-limit/whitelist/users/{userId}`
+            const localVarPath = `/admin/rate-limit/whitelist/users/{userId}`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -609,7 +645,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('addWhitelist', 'type', type)
             // verify required parameter 'targetId' is not null or undefined
             assertParamExists('addWhitelist', 'targetId', targetId)
-            const localVarPath = `/api/admin/compliance/whitelist`;
+            const localVarPath = `/admin/compliance/whitelist`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -651,7 +687,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         alipayRefundNotify: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/payment/alipay/refund/notify`;
+            const localVarPath = `/payment/alipay/refund/notify`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -692,7 +728,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('apply', 'orderNo', orderNo)
             // verify required parameter 'reason' is not null or undefined
             assertParamExists('apply', 'reason', reason)
-            const localVarPath = `/api/orders/{orderNo}/refunds`
+            const localVarPath = `/orders/{orderNo}/refunds`
                 .replace(`{${"orderNo"}}`, encodeURIComponent(String(orderNo)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -737,7 +773,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         approve: async (refundNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'refundNo' is not null or undefined
             assertParamExists('approve', 'refundNo', refundNo)
-            const localVarPath = `/api/admin/refunds/{refundNo}/approve`
+            const localVarPath = `/admin/refunds/{refundNo}/approve`
                 .replace(`{${"refundNo"}}`, encodeURIComponent(String(refundNo)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -778,7 +814,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('approveGoods', 'id', id)
             // verify required parameter 'approveGoodsRequest' is not null or undefined
             assertParamExists('approveGoods', 'approveGoodsRequest', approveGoodsRequest)
-            const localVarPath = `/api/goods/{id}/approve`
+            const localVarPath = `/goods/{id}/approve`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -823,7 +859,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('approvePost', 'id', id)
             // verify required parameter 'approved' is not null or undefined
             assertParamExists('approvePost', 'approved', approved)
-            const localVarPath = `/api/posts/{id}/approve`
+            const localVarPath = `/posts/{id}/approve`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -860,6 +896,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 仲裁员提交仲裁决定
+         * @summary 仲裁纠纷
+         * @param {number} id 纠纷ID
+         * @param {ArbitrateDisputeRequest} arbitrateDisputeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        arbitrateDispute: async (id: number, arbitrateDisputeRequest: ArbitrateDisputeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('arbitrateDispute', 'id', id)
+            // verify required parameter 'arbitrateDisputeRequest' is not null or undefined
+            assertParamExists('arbitrateDispute', 'arbitrateDisputeRequest', arbitrateDisputeRequest)
+            const localVarPath = `/admin/disputes/{id}/arbitrate`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(arbitrateDisputeRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 管理员为纠纷分配仲裁员
          * @summary 分配仲裁员
          * @param {number} disputeId 纠纷ID
@@ -872,7 +952,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('assignArbitrator', 'disputeId', disputeId)
             // verify required parameter 'arbitratorId' is not null or undefined
             assertParamExists('assignArbitrator', 'arbitratorId', arbitratorId)
-            const localVarPath = `/api/disputes/arbitrations/{disputeId}/assign`
+            const localVarPath = `/disputes/arbitrations/{disputeId}/assign`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -911,7 +991,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         autoUnbanExpiredUsers: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/users/auto-unban`;
+            const localVarPath = `/admin/users/auto-unban`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -948,7 +1028,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         banUser: async (banUserRequest: BanUserRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'banUserRequest' is not null or undefined
             assertParamExists('banUser', 'banUserRequest', banUserRequest)
-            const localVarPath = `/api/admin/users/ban`;
+            const localVarPath = `/admin/users/ban`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -979,6 +1059,54 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 管理员批量分配仲裁员
+         * @summary 批量分配仲裁员
+         * @param {Array<number>} disputeIds 纠纷ID列表
+         * @param {number} arbitratorId 仲裁员ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchAssignArbitrator: async (disputeIds: Array<number>, arbitratorId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'disputeIds' is not null or undefined
+            assertParamExists('batchAssignArbitrator', 'disputeIds', disputeIds)
+            // verify required parameter 'arbitratorId' is not null or undefined
+            assertParamExists('batchAssignArbitrator', 'arbitratorId', arbitratorId)
+            const localVarPath = `/admin/disputes/batch-assign`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (disputeIds) {
+                localVarQueryParameter['disputeIds'] = disputeIds;
+            }
+
+            if (arbitratorId !== undefined) {
+                localVarQueryParameter['arbitratorId'] = arbitratorId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 批量删除商品
          * @param {GoodsBatchRequest} goodsBatchRequest 
@@ -988,7 +1116,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         batchDelete: async (goodsBatchRequest: GoodsBatchRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsBatchRequest' is not null or undefined
             assertParamExists('batchDelete', 'goodsBatchRequest', goodsBatchRequest)
-            const localVarPath = `/api/goods/batch/delete`;
+            const localVarPath = `/goods/batch/delete`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1019,6 +1147,86 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 批量删除多个校园（软删除）
+         * @summary 批量删除校园
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchDeleteCampuses: async (requestBody: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('batchDeleteCampuses', 'requestBody', requestBody)
+            const localVarPath = `/admin/campuses/batch/delete`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 批量删除多个标签（跳过有关联商品的标签）
+         * @summary 批量删除标签
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchDeleteTags: async (requestBody: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('batchDeleteTags', 'requestBody', requestBody)
+            const localVarPath = `/admin/tags/batch/delete`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 批量下架商品
          * @param {GoodsBatchRequest} goodsBatchRequest 
@@ -1028,7 +1236,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         batchOffline: async (goodsBatchRequest: GoodsBatchRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsBatchRequest' is not null or undefined
             assertParamExists('batchOffline', 'goodsBatchRequest', goodsBatchRequest)
-            const localVarPath = `/api/goods/batch/offline`;
+            const localVarPath = `/goods/batch/offline`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1068,7 +1276,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         batchOnline: async (goodsBatchRequest: GoodsBatchRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsBatchRequest' is not null or undefined
             assertParamExists('batchOnline', 'goodsBatchRequest', goodsBatchRequest)
-            const localVarPath = `/api/goods/batch/online`;
+            const localVarPath = `/goods/batch/online`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1108,7 +1316,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         batchReviewAppeals: async (batchReviewRequest: BatchReviewRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'batchReviewRequest' is not null or undefined
             assertParamExists('batchReviewAppeals', 'batchReviewRequest', batchReviewRequest)
-            const localVarPath = `/api/admin/appeals/batch-review`;
+            const localVarPath = `/admin/appeals/batch-review`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1145,7 +1353,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         batchSyncLogistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/logistics/batch-sync`;
+            const localVarPath = `/logistics/batch-sync`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1173,6 +1381,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 管理员批量解除黑名单关系
+         * @summary 批量解除黑名单
+         * @param {BatchUnblockRequest} batchUnblockRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchUnblock: async (batchUnblockRequest: BatchUnblockRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'batchUnblockRequest' is not null or undefined
+            assertParamExists('batchUnblock', 'batchUnblockRequest', batchUnblockRequest)
+            const localVarPath = `/admin/blacklist/batch-unblock`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(batchUnblockRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 批量更新库存
          * @param {InventoryBatchRequest} inventoryBatchRequest 
@@ -1182,7 +1430,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         batchUpdateInventory: async (inventoryBatchRequest: InventoryBatchRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'inventoryBatchRequest' is not null or undefined
             assertParamExists('batchUpdateInventory', 'inventoryBatchRequest', inventoryBatchRequest)
-            const localVarPath = `/api/goods/batch/inventory`;
+            const localVarPath = `/goods/batch/inventory`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1222,7 +1470,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         batchUpdatePrice: async (priceBatchRequest: PriceBatchRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'priceBatchRequest' is not null or undefined
             assertParamExists('batchUpdatePrice', 'priceBatchRequest', priceBatchRequest)
-            const localVarPath = `/api/goods/batch/price`;
+            const localVarPath = `/goods/batch/price`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1253,13 +1501,53 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 批量更新分类排序
+         * @summary 批量排序
+         * @param {CategoryBatchSortRequest} categoryBatchSortRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchUpdateSort: async (categoryBatchSortRequest: CategoryBatchSortRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'categoryBatchSortRequest' is not null or undefined
+            assertParamExists('batchUpdateSort', 'categoryBatchSortRequest', categoryBatchSortRequest)
+            const localVarPath = `/admin/categories/sort`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(categoryBatchSortRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 批量病毒扫描
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         batchVirusScan: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/appeals/materials/batch-scan`;
+            const localVarPath = `/appeals/materials/batch-scan`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1296,7 +1584,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         buildUserPersona: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('buildUserPersona', 'userId', userId)
-            const localVarPath = `/api/behavior-analysis/persona/{userId}/build`
+            const localVarPath = `/behavior-analysis/persona/{userId}/build`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1334,7 +1622,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         cancel: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('cancel', 'id', id)
-            const localVarPath = `/api/exports/{id}/cancel`
+            const localVarPath = `/exports/{id}/cancel`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1372,7 +1660,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         cancelAppeal: async (appealId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'appealId' is not null or undefined
             assertParamExists('cancelAppeal', 'appealId', appealId)
-            const localVarPath = `/api/appeals/{appealId}/cancel`
+            const localVarPath = `/appeals/{appealId}/cancel`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1410,7 +1698,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         cancelBatchTask: async (taskId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskId' is not null or undefined
             assertParamExists('cancelBatchTask', 'taskId', taskId)
-            const localVarPath = `/api/batch/tasks/{taskId}/cancel`
+            const localVarPath = `/batch/tasks/{taskId}/cancel`
                 .replace(`{${"taskId"}}`, encodeURIComponent(String(taskId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1448,7 +1736,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         cancelOrder: async (orderNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'orderNo' is not null or undefined
             assertParamExists('cancelOrder', 'orderNo', orderNo)
-            const localVarPath = `/api/orders/{orderNo}/cancel`
+            const localVarPath = `/orders/{orderNo}/cancel`
                 .replace(`{${"orderNo"}}`, encodeURIComponent(String(orderNo)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1486,7 +1774,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         checkEmail: async (email: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'email' is not null or undefined
             assertParamExists('checkEmail', 'email', email)
-            const localVarPath = `/api/auth/check-email`;
+            const localVarPath = `/auth/check-email`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1527,7 +1815,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         checkFileExists: async (materialId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'materialId' is not null or undefined
             assertParamExists('checkFileExists', 'materialId', materialId)
-            const localVarPath = `/api/appeals/materials/{materialId}/exists`
+            const localVarPath = `/appeals/materials/{materialId}/exists`
                 .replace(`{${"materialId"}}`, encodeURIComponent(String(materialId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1565,7 +1853,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         checkFollowing: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('checkFollowing', 'userId', userId)
-            const localVarPath = `/api/users/{userId}/following`
+            const localVarPath = `/users/{userId}/following`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1603,7 +1891,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         checkLikeStatus: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reviewId' is not null or undefined
             assertParamExists('checkLikeStatus', 'reviewId', reviewId)
-            const localVarPath = `/api/reviews/{reviewId}/like/status`
+            const localVarPath = `/reviews/{reviewId}/like/status`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1641,7 +1929,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         checkPostCollected: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('checkPostCollected', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/collected`
+            const localVarPath = `/community/posts/{postId}/collected`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1679,7 +1967,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         checkPostLiked: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('checkPostLiked', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/liked`
+            const localVarPath = `/community/posts/{postId}/liked`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1708,6 +1996,54 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 检查两个用户之间的黑名单关系（双向）
+         * @summary 检查用户黑名单关系
+         * @param {number} userId 用户ID
+         * @param {number} targetUserId 目标用户ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        checkRelation: async (userId: number, targetUserId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('checkRelation', 'userId', userId)
+            // verify required parameter 'targetUserId' is not null or undefined
+            assertParamExists('checkRelation', 'targetUserId', targetUserId)
+            const localVarPath = `/admin/blacklist/check-relation`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (targetUserId !== undefined) {
+                localVarQueryParameter['targetUserId'] = targetUserId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 检查是否已关注
          * @param {number} topicId 话题ID
@@ -1717,7 +2053,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         checkTopicFollowed: async (topicId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'topicId' is not null or undefined
             assertParamExists('checkTopicFollowed', 'topicId', topicId)
-            const localVarPath = `/api/topics/{topicId}/followed`
+            const localVarPath = `/topics/{topicId}/followed`
                 .replace(`{${"topicId"}}`, encodeURIComponent(String(topicId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1755,7 +2091,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         checkUsername: async (username: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'username' is not null or undefined
             assertParamExists('checkUsername', 'username', username)
-            const localVarPath = `/api/auth/check-username`;
+            const localVarPath = `/auth/check-username`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1787,6 +2123,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 仲裁员认领待处理的纠纷
+         * @summary 认领纠纷
+         * @param {number} id 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        claimDispute: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('claimDispute', 'id', id)
+            const localVarPath = `/admin/disputes/{id}/claim`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 清理所有历史数据
          * @param {number} [daysToKeep] 
@@ -1794,7 +2168,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         cleanupAllHistory: async (daysToKeep?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/cleanup`;
+            const localVarPath = `/admin/monitor/cleanup`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1832,7 +2206,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         clearSearchHistory: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/search/history`;
+            const localVarPath = `/search/history`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1860,13 +2234,54 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 清空用户在指定纠纷的消息搜索历史记录
+         * @summary 清空消息搜索历史
+         * @param {number} disputeId 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        clearSearchHistory1: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'disputeId' is not null or undefined
+            assertParamExists('clearSearchHistory1', 'disputeId', disputeId)
+            const localVarPath = `/messages/search/history`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (disputeId !== undefined) {
+                localVarQueryParameter['disputeId'] = disputeId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 清空浏览历史
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         clearViewHistory: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/goods/view-history`;
+            const localVarPath = `/goods/view-history`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1906,7 +2321,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('closeDispute', 'disputeId', disputeId)
             // verify required parameter 'closeReason' is not null or undefined
             assertParamExists('closeDispute', 'closeReason', closeReason)
-            const localVarPath = `/api/disputes/{disputeId}/close`
+            const localVarPath = `/disputes/{disputeId}/close`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1939,6 +2354,51 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 管理员手动关闭纠纷
+         * @summary 关闭纠纷
+         * @param {number} id 纠纷ID
+         * @param {string} reason 关闭原因
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        closeDispute1: async (id: number, reason: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('closeDispute1', 'id', id)
+            // verify required parameter 'reason' is not null or undefined
+            assertParamExists('closeDispute1', 'reason', reason)
+            const localVarPath = `/admin/disputes/{id}/close`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (reason !== undefined) {
+                localVarQueryParameter['reason'] = reason;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 收藏帖子
          * @param {number} postId 帖子ID
@@ -1948,7 +2408,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         collectPost: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('collectPost', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/collect`
+            const localVarPath = `/community/posts/{postId}/collect`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1989,7 +2449,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('completeRequest', 'id', id)
             // verify required parameter 'completePrivacyRequest' is not null or undefined
             assertParamExists('completeRequest', 'completePrivacyRequest', completePrivacyRequest)
-            const localVarPath = `/api/admin/privacy/requests/{id}/complete`
+            const localVarPath = `/admin/privacy/requests/{id}/complete`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2030,7 +2490,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         countReviewLikes: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reviewId' is not null or undefined
             assertParamExists('countReviewLikes', 'reviewId', reviewId)
-            const localVarPath = `/api/reviews/{reviewId}/likes/count`
+            const localVarPath = `/reviews/{reviewId}/likes/count`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2065,7 +2525,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         countUnreadReplies: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/reviews/replies/unread/count`;
+            const localVarPath = `/reviews/replies/unread/count`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2094,46 +2554,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary 创建校区
-         * @param {CreateCampusRequest} createCampusRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        create: async (createCampusRequest: CreateCampusRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createCampusRequest' is not null or undefined
-            assertParamExists('create', 'createCampusRequest', createCampusRequest)
-            const localVarPath = `/api/admin/campuses`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createCampusRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary 创建批量任务
          * @param {CreateBatchTaskRequest} createBatchTaskRequest 
          * @param {*} [options] Override http request option.
@@ -2142,7 +2562,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createBatchTask: async (createBatchTaskRequest: CreateBatchTaskRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createBatchTaskRequest' is not null or undefined
             assertParamExists('createBatchTask', 'createBatchTaskRequest', createBatchTaskRequest)
-            const localVarPath = `/api/batch/tasks`;
+            const localVarPath = `/batch/tasks`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2173,7 +2593,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员创建新的分类节点
+         * 创建新的校园
+         * @summary 创建校园
+         * @param {CampusCreateRequest} campusCreateRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createCampus: async (campusCreateRequest: CampusCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'campusCreateRequest' is not null or undefined
+            assertParamExists('createCampus', 'campusCreateRequest', campusCreateRequest)
+            const localVarPath = `/admin/campuses`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(campusCreateRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 创建新的商品分类
          * @summary 创建分类
          * @param {CreateCategoryRequest} createCategoryRequest 
          * @param {*} [options] Override http request option.
@@ -2182,7 +2642,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createCategory: async (createCategoryRequest: CreateCategoryRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createCategoryRequest' is not null or undefined
             assertParamExists('createCategory', 'createCategoryRequest', createCategoryRequest)
-            const localVarPath = `/api/admin/categories`;
+            const localVarPath = `/admin/categories`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2213,6 +2673,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 创建新的功能开关
+         * @summary 创建功能开关
+         * @param {FeatureFlagCreateRequest} featureFlagCreateRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFeatureFlag: async (featureFlagCreateRequest: FeatureFlagCreateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'featureFlagCreateRequest' is not null or undefined
+            assertParamExists('createFeatureFlag', 'featureFlagCreateRequest', featureFlagCreateRequest)
+            const localVarPath = `/admin/feature-flags`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(featureFlagCreateRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 用户发布二手物品信息
          * @summary 发布物品
          * @param {CreateGoodsRequest} createGoodsRequest 创建物品请求体
@@ -2222,7 +2722,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createGoods: async (createGoodsRequest: CreateGoodsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createGoodsRequest' is not null or undefined
             assertParamExists('createGoods', 'createGoodsRequest', createGoodsRequest)
-            const localVarPath = `/api/goods`;
+            const localVarPath = `/goods`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2268,7 +2768,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('createLogistics', 'trackingNumber', trackingNumber)
             // verify required parameter 'company' is not null or undefined
             assertParamExists('createLogistics', 'company', company)
-            const localVarPath = `/api/logistics/create`;
+            const localVarPath = `/logistics/create`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2317,7 +2817,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createOrder: async (createOrderRequest: CreateOrderRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createOrderRequest' is not null or undefined
             assertParamExists('createOrder', 'createOrderRequest', createOrderRequest)
-            const localVarPath = `/api/orders`;
+            const localVarPath = `/orders`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2358,7 +2858,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createPayment: async (payOrderRequest: PayOrderRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'payOrderRequest' is not null or undefined
             assertParamExists('createPayment', 'payOrderRequest', payOrderRequest)
-            const localVarPath = `/api/payment/create`;
+            const localVarPath = `/payment/create`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2398,7 +2898,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createPost: async (createPostRequest: CreatePostRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createPostRequest' is not null or undefined
             assertParamExists('createPost', 'createPostRequest', createPostRequest)
-            const localVarPath = `/api/posts`;
+            const localVarPath = `/posts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2438,7 +2938,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createPrivacyRequest: async (createPrivacyRequest: CreatePrivacyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createPrivacyRequest' is not null or undefined
             assertParamExists('createPrivacyRequest', 'createPrivacyRequest', createPrivacyRequest)
-            const localVarPath = `/api/privacy`;
+            const localVarPath = `/privacy`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2481,7 +2981,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('createReply', 'reviewId', reviewId)
             // verify required parameter 'createReviewReplyRequest' is not null or undefined
             assertParamExists('createReply', 'createReviewReplyRequest', createReviewReplyRequest)
-            const localVarPath = `/api/reviews/{reviewId}/replies`
+            const localVarPath = `/reviews/{reviewId}/replies`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2522,7 +3022,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createReply1: async (createPostReplyRequest: CreatePostReplyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createPostReplyRequest' is not null or undefined
             assertParamExists('createReply1', 'createPostReplyRequest', createPostReplyRequest)
-            const localVarPath = `/api/replies`;
+            const localVarPath = `/replies`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2562,7 +3062,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createReport: async (createReportRequest: CreateReportRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createReportRequest' is not null or undefined
             assertParamExists('createReport', 'createReportRequest', createReportRequest)
-            const localVarPath = `/api/reports`;
+            const localVarPath = `/reports`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2602,7 +3102,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createRole: async (createRoleRequest: CreateRoleRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createRoleRequest' is not null or undefined
             assertParamExists('createRole', 'createRoleRequest', createRoleRequest)
-            const localVarPath = `/api/admin/roles`;
+            const localVarPath = `/admin/roles`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2633,7 +3133,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员新增标签
+         * 创建新的商品标签
          * @summary 创建标签
          * @param {CreateTagRequest} createTagRequest 
          * @param {*} [options] Override http request option.
@@ -2642,7 +3142,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createTag: async (createTagRequest: CreateTagRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createTagRequest' is not null or undefined
             assertParamExists('createTag', 'createTagRequest', createTagRequest)
-            const localVarPath = `/api/admin/tags`;
+            const localVarPath = `/admin/tags`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2682,7 +3182,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createTopic: async (requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'requestBody' is not null or undefined
             assertParamExists('createTopic', 'requestBody', requestBody)
-            const localVarPath = `/api/topics`;
+            const localVarPath = `/topics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2713,82 +3213,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
-         * @summary 删除
-         * @param {number} id 模板ID
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        delete1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('delete1', 'id', id)
-            const localVarPath = `/api/admin/notification-templates/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary 删除校区
-         * @param {number} id 校区ID
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        delete2: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('delete2', 'id', id)
-            const localVarPath = `/api/admin/campuses/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * 批量删除评价的所有图片和视频
          * @summary 删除评价的所有媒体
          * @param {number} reviewId 评价ID
@@ -2798,7 +3222,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteAllMediaByReviewId: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reviewId' is not null or undefined
             assertParamExists('deleteAllMediaByReviewId', 'reviewId', reviewId)
-            const localVarPath = `/api/reviews/{reviewId}/media`
+            const localVarPath = `/reviews/{reviewId}/media`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2827,7 +3251,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员删除分类节点，删除前需确保无子节点及关联商品
+         * 删除指定校园（软删除）
+         * @summary 删除校园
+         * @param {number} id 校园ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteCampus: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteCampus', 'id', id)
+            const localVarPath = `/admin/campuses/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 删除指定分类（需确保无子分类和关联商品）
          * @summary 删除分类
          * @param {number} id 分类ID
          * @param {*} [options] Override http request option.
@@ -2836,7 +3298,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteCategory: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteCategory', 'id', id)
-            const localVarPath = `/api/admin/categories/{id}`
+            const localVarPath = `/admin/categories/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2874,8 +3336,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteEvidence: async (evidenceId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'evidenceId' is not null or undefined
             assertParamExists('deleteEvidence', 'evidenceId', evidenceId)
-            const localVarPath = `/api/disputes/evidence/{evidenceId}`
+            const localVarPath = `/disputes/evidence/{evidenceId}`
                 .replace(`{${"evidenceId"}}`, encodeURIComponent(String(evidenceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 删除指定功能开关（自动刷新缓存）
+         * @summary 删除功能开关
+         * @param {number} id 功能开关ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteFeatureFlag: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteFeatureFlag', 'id', id)
+            const localVarPath = `/admin/feature-flags/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2912,7 +3412,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteFile: async (url: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'url' is not null or undefined
             assertParamExists('deleteFile', 'url', url)
-            const localVarPath = `/api/files`;
+            const localVarPath = `/files`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2953,7 +3453,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteMaterial: async (materialId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'materialId' is not null or undefined
             assertParamExists('deleteMaterial', 'materialId', materialId)
-            const localVarPath = `/api/appeals/materials/{materialId}`
+            const localVarPath = `/appeals/materials/{materialId}`
                 .replace(`{${"materialId"}}`, encodeURIComponent(String(materialId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2991,7 +3491,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteMedia: async (mediaId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'mediaId' is not null or undefined
             assertParamExists('deleteMedia', 'mediaId', mediaId)
-            const localVarPath = `/api/reviews/media/{mediaId}`
+            const localVarPath = `/reviews/media/{mediaId}`
                 .replace(`{${"mediaId"}}`, encodeURIComponent(String(mediaId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3029,7 +3529,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteNotifications: async (body: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             assertParamExists('deleteNotifications', 'body', body)
-            const localVarPath = `/api/notifications`;
+            const localVarPath = `/notifications`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3069,7 +3569,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deletePost: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deletePost', 'id', id)
-            const localVarPath = `/api/posts/{id}`
+            const localVarPath = `/posts/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3107,7 +3607,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteReply: async (replyId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'replyId' is not null or undefined
             assertParamExists('deleteReply', 'replyId', replyId)
-            const localVarPath = `/api/reviews/replies/{replyId}`
+            const localVarPath = `/reviews/replies/{replyId}`
                 .replace(`{${"replyId"}}`, encodeURIComponent(String(replyId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3145,7 +3645,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteReply1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteReply1', 'id', id)
-            const localVarPath = `/api/replies/{id}`
+            const localVarPath = `/replies/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3183,7 +3683,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteRole: async (roleId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roleId' is not null or undefined
             assertParamExists('deleteRole', 'roleId', roleId)
-            const localVarPath = `/api/admin/roles/{roleId}`
+            const localVarPath = `/admin/roles/{roleId}`
                 .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3212,7 +3712,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员删除标签，删除前需确保无绑定
+         * 删除指定标签（需确保无关联商品）
          * @summary 删除标签
          * @param {number} id 标签ID
          * @param {*} [options] Override http request option.
@@ -3221,7 +3721,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteTag: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteTag', 'id', id)
-            const localVarPath = `/api/admin/tags/{id}`
+            const localVarPath = `/admin/tags/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3259,7 +3759,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         deleteTopic: async (topicId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'topicId' is not null or undefined
             assertParamExists('deleteTopic', 'topicId', topicId)
-            const localVarPath = `/api/topics/{topicId}`
+            const localVarPath = `/topics/{topicId}`
                 .replace(`{${"topicId"}}`, encodeURIComponent(String(topicId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3297,7 +3797,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         detail: async (refundNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'refundNo' is not null or undefined
             assertParamExists('detail', 'refundNo', refundNo)
-            const localVarPath = `/api/admin/refunds/{refundNo}`
+            const localVarPath = `/admin/refunds/{refundNo}`
                 .replace(`{${"refundNo"}}`, encodeURIComponent(String(refundNo)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3335,7 +3835,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         download: async (token: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'token' is not null or undefined
             assertParamExists('download', 'token', token)
-            const localVarPath = `/api/exports/download/{token}`
+            const localVarPath = `/exports/download/{token}`
                 .replace(`{${"token"}}`, encodeURIComponent(String(token)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3373,7 +3873,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         downloadFile: async (materialId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'materialId' is not null or undefined
             assertParamExists('downloadFile', 'materialId', materialId)
-            const localVarPath = `/api/appeals/materials/{materialId}/download`
+            const localVarPath = `/appeals/materials/{materialId}/download`
                 .replace(`{${"materialId"}}`, encodeURIComponent(String(materialId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3411,7 +3911,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         escalateToArbitration: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('escalateToArbitration', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/{disputeId}/escalate`
+            const localVarPath = `/disputes/{disputeId}/escalate`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3455,7 +3955,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('evaluateEvidence', 'validity', validity)
             // verify required parameter 'reason' is not null or undefined
             assertParamExists('evaluateEvidence', 'reason', reason)
-            const localVarPath = `/api/disputes/evidence/{evidenceId}/evaluate`
+            const localVarPath = `/disputes/evidence/{evidenceId}/evaluate`
                 .replace(`{${"evidenceId"}}`, encodeURIComponent(String(evidenceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3501,7 +4001,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         executeRevert: async (revertRequestId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'revertRequestId' is not null or undefined
             assertParamExists('executeRevert', 'revertRequestId', revertRequestId)
-            const localVarPath = `/api/revert/execute/{revertRequestId}`
+            const localVarPath = `/revert/execute/{revertRequestId}`
                 .replace(`{${"revertRequestId"}}`, encodeURIComponent(String(revertRequestId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3539,7 +4039,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         follow: async (sellerId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sellerId' is not null or undefined
             assertParamExists('follow', 'sellerId', sellerId)
-            const localVarPath = `/api/follow/{sellerId}`
+            const localVarPath = `/follow/{sellerId}`
                 .replace(`{${"sellerId"}}`, encodeURIComponent(String(sellerId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3577,7 +4077,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         followTopic: async (topicId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'topicId' is not null or undefined
             assertParamExists('followTopic', 'topicId', topicId)
-            const localVarPath = `/api/topics/{topicId}/follow`
+            const localVarPath = `/topics/{topicId}/follow`
                 .replace(`{${"topicId"}}`, encodeURIComponent(String(topicId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3615,7 +4115,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         followUser: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('followUser', 'userId', userId)
-            const localVarPath = `/api/users/{userId}/follow`
+            const localVarPath = `/users/{userId}/follow`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3651,7 +4151,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         generatePerformanceReport: async (hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/report`;
+            const localVarPath = `/admin/monitor/report`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3692,7 +4192,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         generateThumbnail: async (materialId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'materialId' is not null or undefined
             assertParamExists('generateThumbnail', 'materialId', materialId)
-            const localVarPath = `/api/appeals/materials/{materialId}/thumbnail`
+            const localVarPath = `/appeals/materials/{materialId}/thumbnail`
                 .replace(`{${"materialId"}}`, encodeURIComponent(String(materialId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3730,8 +4230,42 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getAcceptedProposal: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getAcceptedProposal', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/negotiations/{disputeId}/accepted-proposal`
+            const localVarPath = `/disputes/negotiations/{disputeId}/accepted-proposal`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取当前启用且在有效期内的轮播图列表，按排序顺序返回
+         * @summary 获取启用的轮播图
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getActiveBanners: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/banners/active`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3768,7 +4302,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getAllDisputes: async (status?: GetAllDisputesStatusEnum, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/disputes/admin/all`;
+            const localVarPath = `/disputes/admin/all`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3814,7 +4348,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getAllTopics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/topics`;
+            const localVarPath = `/topics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -3851,7 +4385,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getAppealDetail: async (appealId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'appealId' is not null or undefined
             assertParamExists('getAppealDetail', 'appealId', appealId)
-            const localVarPath = `/api/appeals/{appealId}`
+            const localVarPath = `/appeals/{appealId}`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3889,7 +4423,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getAppealDetail1: async (appealId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'appealId' is not null or undefined
             assertParamExists('getAppealDetail1', 'appealId', appealId)
-            const localVarPath = `/api/admin/appeals/{appealId}`
+            const localVarPath = `/admin/appeals/{appealId}`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3927,7 +4461,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getAppealMaterials: async (appealId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'appealId' is not null or undefined
             assertParamExists('getAppealMaterials', 'appealId', appealId)
-            const localVarPath = `/api/appeals/materials/{appealId}`
+            const localVarPath = `/appeals/materials/{appealId}`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3967,7 +4501,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getAppealMaterialsPage: async (appealId: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'appealId' is not null or undefined
             assertParamExists('getAppealMaterialsPage', 'appealId', appealId)
-            const localVarPath = `/api/appeals/materials/{appealId}/page`
+            const localVarPath = `/appeals/materials/{appealId}/page`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4010,7 +4544,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getAppealStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/appeals/statistics`;
+            const localVarPath = `/admin/appeals/statistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4049,7 +4583,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getAppealsByStatus: async (status: GetAppealsByStatusStatusEnum, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'status' is not null or undefined
             assertParamExists('getAppealsByStatus', 'status', status)
-            const localVarPath = `/api/admin/appeals/status/{status}`
+            const localVarPath = `/admin/appeals/status/{status}`
                 .replace(`{${"status"}}`, encodeURIComponent(String(status)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4095,7 +4629,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getArbitrationDetail: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getArbitrationDetail', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/arbitrations/{disputeId}`
+            const localVarPath = `/disputes/arbitrations/{disputeId}`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4130,7 +4664,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getArbitratorCases: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/disputes/arbitrations/my-cases`;
+            const localVarPath = `/disputes/arbitrations/my-cases`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4167,7 +4701,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getBatchTaskDetail: async (taskId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskId' is not null or undefined
             assertParamExists('getBatchTaskDetail', 'taskId', taskId)
-            const localVarPath = `/api/batch/tasks/{taskId}`
+            const localVarPath = `/batch/tasks/{taskId}`
                 .replace(`{${"taskId"}}`, encodeURIComponent(String(taskId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4205,7 +4739,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getBatchTasks: async (status?: GetBatchTasksStatusEnum, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/batch/tasks`;
+            const localVarPath = `/batch/tasks`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4251,7 +4785,83 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getBehaviorHeatmap: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/behavior-analysis/heatmap`;
+            const localVarPath = `/behavior-analysis/heatmap`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 查询指定用户拉黑了哪些人
+         * @summary 查询指定用户的黑名单
+         * @param {number} userId 用户ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBlacklistByUser: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getBlacklistByUser', 'userId', userId)
+            const localVarPath = `/admin/blacklist/by-user/{userId}`
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 查询哪些用户拉黑了指定用户
+         * @summary 查询拉黑了指定用户的人
+         * @param {number} blockedUserId 被拉黑的用户ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBlockedByUsers: async (blockedUserId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'blockedUserId' is not null or undefined
+            assertParamExists('getBlockedByUsers', 'blockedUserId', blockedUserId)
+            const localVarPath = `/admin/blacklist/blocked-by/{blockedUserId}`
+                .replace(`{${"blockedUserId"}}`, encodeURIComponent(String(blockedUserId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4288,7 +4898,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getBuyerEvidence: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getBuyerEvidence', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/evidence/{disputeId}/buyer`
+            const localVarPath = `/disputes/evidence/{disputeId}/buyer`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4317,13 +4927,17 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 物品分类分布统计
-         * @summary 获取分类统计数据
+         * 根据ID获取校园详细信息
+         * @summary 获取校园详情
+         * @param {number} id 校园ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCategoryStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/categories`;
+        getCampusById: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getCampusById', 'id', id)
+            const localVarPath = `/admin/campuses/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4351,13 +4965,195 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 按层级返回完整的分类树结构
+         * 获取校园用户/商品/订单统计数据
+         * @summary 校园统计
+         * @param {number} id 校园ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCampusStatistics: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getCampusStatistics', 'id', id)
+            const localVarPath = `/admin/campuses/{id}/statistics`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 根据ID获取分类详细信息
+         * @summary 获取分类详情
+         * @param {number} id 分类ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCategoryById: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getCategoryById', 'id', id)
+            const localVarPath = `/admin/categories/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取各分类下的物品数量统计（仅管理员）
+         * @summary 获取分类统计
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCategoryStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/statistics/categories`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取分类商品统计数据（在售、已售、子分类数）
+         * @summary 分类统计
+         * @param {number} id 分类ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCategoryStatistics1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getCategoryStatistics1', 'id', id)
+            const localVarPath = `/admin/categories/{id}/statistics`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 按层级返回完整的分类树结构（公开接口）
          * @summary 获取分类树
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getCategoryTree: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/categories/tree`;
+            const localVarPath = `/categories/tree`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取完整的分类树形结构（含子分类）
+         * @summary 获取分类树
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCategoryTree1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/categories/tree`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4391,7 +5187,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getCurrentUserProfile: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/users/profile`;
+            const localVarPath = `/users/profile`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4428,8 +5224,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getDisputeDetail: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getDisputeDetail', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/{disputeId}`
+            const localVarPath = `/disputes/{disputeId}`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 查询指定纠纷的完整信息（含证据、协商记录、仲裁结果）
+         * @summary 查询纠纷详情
+         * @param {number} id 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDisputeDetail1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getDisputeDetail1', 'id', id)
+            const localVarPath = `/admin/disputes/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4466,7 +5300,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getDisputeEvidence: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getDisputeEvidence', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/evidence/{disputeId}`
+            const localVarPath = `/disputes/evidence/{disputeId}`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4502,7 +5336,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getEndpointStatistics: async (hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/api/statistics`;
+            const localVarPath = `/admin/monitor/api/statistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4541,7 +5375,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getErrorRequests: async (hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/api/errors`;
+            const localVarPath = `/admin/monitor/api/errors`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4580,7 +5414,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getErrorStatistics: async (hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/errors/statistics`;
+            const localVarPath = `/admin/monitor/errors/statistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4622,7 +5456,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getErrorsBySeverity: async (severity: GetErrorsBySeveritySeverityEnum, hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'severity' is not null or undefined
             assertParamExists('getErrorsBySeverity', 'severity', severity)
-            const localVarPath = `/api/monitor/errors/by-severity`;
+            const localVarPath = `/admin/monitor/errors/by-severity`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4667,8 +5501,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getEvidenceSummary: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getEvidenceSummary', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/evidence/{disputeId}/summary`
+            const localVarPath = `/disputes/evidence/{disputeId}/summary`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 根据ID获取功能开关详细信息
+         * @summary 获取功能开关详情
+         * @param {number} id 功能开关ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFeatureFlagById: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getFeatureFlagById', 'id', id)
+            const localVarPath = `/admin/feature-flags/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4705,7 +5577,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getFollowerCount: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('getFollowerCount', 'userId', userId)
-            const localVarPath = `/api/users/{userId}/followers/count`
+            const localVarPath = `/users/{userId}/followers/count`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4740,7 +5612,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getFollowerList: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/users/followers`;
+            const localVarPath = `/users/followers`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4777,7 +5649,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getFollowingCount: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('getFollowingCount', 'userId', userId)
-            const localVarPath = `/api/users/{userId}/following/count`
+            const localVarPath = `/users/{userId}/following/count`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4812,7 +5684,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getFollowingList: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/users/following`;
+            const localVarPath = `/users/following`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4849,7 +5721,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getGoodsDetail: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getGoodsDetail', 'id', id)
-            const localVarPath = `/api/goods/{id}`
+            const localVarPath = `/goods/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4887,42 +5759,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getGoodsDetail1: async (goodsId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsId' is not null or undefined
             assertParamExists('getGoodsDetail1', 'goodsId', goodsId)
-            const localVarPath = `/api/goods/{goodsId}/detail`
+            const localVarPath = `/goods/{goodsId}/detail`
                 .replace(`{${"goodsId"}}`, encodeURIComponent(String(goodsId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 物品相关统计
-         * @summary 获取物品统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getGoodsStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/goods`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4957,7 +5795,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getHealthHistory: async (hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/health/history`;
+            const localVarPath = `/admin/monitor/health/history`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4996,7 +5834,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getHealthScore: async (hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/health-score`;
+            const localVarPath = `/admin/monitor/health-score`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5035,7 +5873,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getHotKeywords: async (limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/search/hot-keywords`;
+            const localVarPath = `/search/hot-keywords`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5073,7 +5911,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getHotTopics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/topics/hot`;
+            const localVarPath = `/topics/hot`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5107,7 +5945,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getHotTopics1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/community/topics/hot`;
+            const localVarPath = `/community/topics/hot`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5144,7 +5982,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getLogisticsByOrderId: async (orderId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'orderId' is not null or undefined
             assertParamExists('getLogisticsByOrderId', 'orderId', orderId)
-            const localVarPath = `/api/logistics/order/{orderId}`
+            const localVarPath = `/logistics/order/{orderId}`
                 .replace(`{${"orderId"}}`, encodeURIComponent(String(orderId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5182,7 +6020,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getLogisticsByTrackingNumber: async (trackingNumber: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'trackingNumber' is not null or undefined
             assertParamExists('getLogisticsByTrackingNumber', 'trackingNumber', trackingNumber)
-            const localVarPath = `/api/logistics/tracking/{trackingNumber}`
+            const localVarPath = `/logistics/tracking/{trackingNumber}`
                 .replace(`{${"trackingNumber"}}`, encodeURIComponent(String(trackingNumber)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5223,7 +6061,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getLogisticsStatistics', 'startDate', startDate)
             // verify required parameter 'endDate' is not null or undefined
             assertParamExists('getLogisticsStatistics', 'endDate', endDate)
-            const localVarPath = `/api/logistics/statistics`;
+            const localVarPath = `/logistics/statistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5272,7 +6110,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getMaterialStatistics: async (appealId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'appealId' is not null or undefined
             assertParamExists('getMaterialStatistics', 'appealId', appealId)
-            const localVarPath = `/api/appeals/materials/{appealId}/statistics`
+            const localVarPath = `/appeals/materials/{appealId}/statistics`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5313,7 +6151,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getMaterialsByType', 'appealId', appealId)
             // verify required parameter 'fileType' is not null or undefined
             assertParamExists('getMaterialsByType', 'fileType', fileType)
-            const localVarPath = `/api/appeals/materials/{appealId}/type/{fileType}`
+            const localVarPath = `/appeals/materials/{appealId}/type/{fileType}`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)))
                 .replace(`{${"fileType"}}`, encodeURIComponent(String(fileType)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -5349,7 +6187,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getMetrics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/metrics`;
+            const localVarPath = `/admin/monitor/metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5385,7 +6223,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getMyAppeals: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/appeals/my`;
+            const localVarPath = `/appeals/my`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5430,7 +6268,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getMyRefund: async (refundNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'refundNo' is not null or undefined
             assertParamExists('getMyRefund', 'refundNo', refundNo)
-            const localVarPath = `/api/refunds/{refundNo}`
+            const localVarPath = `/refunds/{refundNo}`
                 .replace(`{${"refundNo"}}`, encodeURIComponent(String(refundNo)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5468,7 +6306,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getNegotiationHistory: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getNegotiationHistory', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/negotiations/{disputeId}/history`
+            const localVarPath = `/disputes/negotiations/{disputeId}/history`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5506,42 +6344,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getOrderDetail: async (orderNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'orderNo' is not null or undefined
             assertParamExists('getOrderDetail', 'orderNo', orderNo)
-            const localVarPath = `/api/orders/{orderNo}`
+            const localVarPath = `/orders/{orderNo}`
                 .replace(`{${"orderNo"}}`, encodeURIComponent(String(orderNo)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 订单相关统计
-         * @summary 获取订单统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getOrderStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/orders`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5577,7 +6381,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getPendingAppeals: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/appeals/pending`;
+            const localVarPath = `/admin/appeals/pending`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5619,7 +6423,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getPendingExecutions: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/disputes/arbitrations/pending-execution`;
+            const localVarPath = `/disputes/arbitrations/pending-execution`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5656,7 +6460,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPendingProposal: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getPendingProposal', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/negotiations/{disputeId}/pending-proposal`
+            const localVarPath = `/disputes/negotiations/{disputeId}/pending-proposal`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5694,7 +6498,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPostCollectCount: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('getPostCollectCount', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/collects/count`
+            const localVarPath = `/community/posts/{postId}/collects/count`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5732,7 +6536,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPostDetail: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('getPostDetail', 'id', id)
-            const localVarPath = `/api/posts/{id}`
+            const localVarPath = `/posts/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5770,7 +6574,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPostLikeCount: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('getPostLikeCount', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/likes/count`
+            const localVarPath = `/community/posts/{postId}/likes/count`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5808,7 +6612,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getPostsByTopic: async (topicId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'topicId' is not null or undefined
             assertParamExists('getPostsByTopic', 'topicId', topicId)
-            const localVarPath = `/api/community/topics/{topicId}/posts`
+            const localVarPath = `/community/topics/{topicId}/posts`
                 .replace(`{${"topicId"}}`, encodeURIComponent(String(topicId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5844,7 +6648,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getQpsStatistics: async (hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/api/qps`;
+            const localVarPath = `/admin/monitor/api/qps`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5876,14 +6680,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 最近 N 个月的平台收入统计
-         * @summary 获取收入统计（按月）
-         * @param {number} [months] 月数
+         * 获取按月统计的收入趋势（仅管理员）
+         * @summary 获取收入趋势
+         * @param {number} [months] 统计月数
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRevenueByMonth: async (months?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/revenue`;
+        getRevenueTrend: async (months?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/statistics/revenue`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5924,7 +6728,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getReviewMedia: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reviewId' is not null or undefined
             assertParamExists('getReviewMedia', 'reviewId', reviewId)
-            const localVarPath = `/api/reviews/{reviewId}/media`
+            const localVarPath = `/reviews/{reviewId}/media`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5965,7 +6769,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('getReviewMediaByType', 'reviewId', reviewId)
             // verify required parameter 'mediaType' is not null or undefined
             assertParamExists('getReviewMediaByType', 'mediaType', mediaType)
-            const localVarPath = `/api/reviews/{reviewId}/media/{mediaType}`
+            const localVarPath = `/reviews/{reviewId}/media/{mediaType}`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)))
                 .replace(`{${"mediaType"}}`, encodeURIComponent(String(mediaType)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -6004,7 +6808,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getReviewReplies: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reviewId' is not null or undefined
             assertParamExists('getReviewReplies', 'reviewId', reviewId)
-            const localVarPath = `/api/reviews/{reviewId}/replies`
+            const localVarPath = `/reviews/{reviewId}/replies`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6042,7 +6846,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getRole: async (roleId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'roleId' is not null or undefined
             assertParamExists('getRole', 'roleId', roleId)
-            const localVarPath = `/api/admin/roles/{roleId}`
+            const localVarPath = `/admin/roles/{roleId}`
                 .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6077,7 +6881,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getRules: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/rate-limit/rules`;
+            const localVarPath = `/admin/rate-limit/rules`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6105,6 +6909,93 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 获取用户的消息搜索历史记录
+         * @summary 获取消息搜索历史
+         * @param {number} disputeId 纠纷ID
+         * @param {number} [limit] 返回数量限制
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSearchHistory: async (disputeId: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'disputeId' is not null or undefined
+            assertParamExists('getSearchHistory', 'disputeId', disputeId)
+            const localVarPath = `/messages/search/history`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (disputeId !== undefined) {
+                localVarQueryParameter['disputeId'] = disputeId;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取搜索相关的统计信息
+         * @summary 获取消息搜索统计
+         * @param {number} disputeId 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSearchStatistics: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'disputeId' is not null or undefined
+            assertParamExists('getSearchStatistics', 'disputeId', disputeId)
+            const localVarPath = `/messages/search/statistics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (disputeId !== undefined) {
+                localVarQueryParameter['disputeId'] = disputeId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取搜索建议
          * @param {string} [keyword] 关键词前缀
@@ -6112,7 +7003,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getSearchSuggestions: async (keyword?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/search/suggestions`;
+            const localVarPath = `/search/suggestions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6144,6 +7035,62 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 根据输入提供智能搜索建议
+         * @summary 获取消息搜索建议
+         * @param {number} disputeId 纠纷ID
+         * @param {string} [keyword] 关键词前缀
+         * @param {string} [suggestionType] 建议类型 (keyword/user/date)
+         * @param {number} [limit] 返回数量限制
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSearchSuggestions1: async (disputeId: number, keyword?: string, suggestionType?: string, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'disputeId' is not null or undefined
+            assertParamExists('getSearchSuggestions1', 'disputeId', disputeId)
+            const localVarPath = `/messages/search/suggestions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (disputeId !== undefined) {
+                localVarQueryParameter['disputeId'] = disputeId;
+            }
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (suggestionType !== undefined) {
+                localVarQueryParameter['suggestionType'] = suggestionType;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 查询卖家上传的所有证据
          * @summary 查询卖家证据
          * @param {number} disputeId 纠纷ID
@@ -6153,7 +7100,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getSellerEvidence: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getSellerEvidence', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/evidence/{disputeId}/seller`
+            const localVarPath = `/disputes/evidence/{disputeId}/seller`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6192,7 +7139,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getSimilarGoods: async (goodsId: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsId' is not null or undefined
             assertParamExists('getSimilarGoods', 'goodsId', goodsId)
-            const localVarPath = `/api/goods/{goodsId}/similar`
+            const localVarPath = `/goods/{goodsId}/similar`
                 .replace(`{${"goodsId"}}`, encodeURIComponent(String(goodsId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6232,7 +7179,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getSlowQueries: async (hours?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/api/slow-queries`;
+            const localVarPath = `/admin/monitor/api/slow-queries`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6264,13 +7211,123 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 系统整体数据概览
+         * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
+         * @summary 统计黑名单数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStatistics1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/blacklist/statistics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取系统核心数据概览（仅管理员）
          * @summary 获取系统概览统计
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getSystemOverview: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/overview`;
+            const localVarPath = `/admin/statistics/overview`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 根据ID获取标签详细信息
+         * @summary 获取标签详情
+         * @param {number} id 标签ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTagById: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getTagById', 'id', id)
+            const localVarPath = `/admin/tags/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取标签关联商品统计数据
+         * @summary 标签统计
+         * @param {number} id 标签ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTagStatistics: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getTagStatistics', 'id', id)
+            const localVarPath = `/admin/tags/{id}/statistics`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6307,7 +7364,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getTaskProgress: async (taskId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskId' is not null or undefined
             assertParamExists('getTaskProgress', 'taskId', taskId)
-            const localVarPath = `/api/batch/tasks/{taskId}/progress`
+            const localVarPath = `/batch/tasks/{taskId}/progress`
                 .replace(`{${"taskId"}}`, encodeURIComponent(String(taskId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6336,13 +7393,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 今日数据概览
-         * @summary 获取今日统计数据
+         * 获取今日核心数据统计（仅管理员）
+         * @summary 获取今日统计
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getTodayStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/today`;
+            const localVarPath = `/admin/statistics/today`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6370,14 +7427,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 浏览量最高的物品 Top N
-         * @summary 获取热门物品排行榜
-         * @param {number} [limit] 数量限制
+         * 获取浏览量最高的商品排行榜（仅管理员）
+         * @summary 获取热门商品排行
+         * @param {number} [limit] 返回数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getTopGoods: async (limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/top-goods`;
+            const localVarPath = `/admin/statistics/top-goods`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6409,14 +7466,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 积分最高的用户 Top N
-         * @summary 获取活跃用户排行榜
-         * @param {number} [limit] 数量限制
+         * 获取发布物品最多的用户排行榜（仅管理员）
+         * @summary 获取活跃用户排行
+         * @param {number} [limit] 返回数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getTopUsers: async (limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/top-users`;
+            const localVarPath = `/admin/statistics/top-users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6457,7 +7514,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getTopicById: async (topicId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'topicId' is not null or undefined
             assertParamExists('getTopicById', 'topicId', topicId)
-            const localVarPath = `/api/topics/{topicId}`
+            const localVarPath = `/topics/{topicId}`
                 .replace(`{${"topicId"}}`, encodeURIComponent(String(topicId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6495,7 +7552,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getTopicFollowerCount: async (topicId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'topicId' is not null or undefined
             assertParamExists('getTopicFollowerCount', 'topicId', topicId)
-            const localVarPath = `/api/topics/{topicId}/followers/count`
+            const localVarPath = `/topics/{topicId}/followers/count`
                 .replace(`{${"topicId"}}`, encodeURIComponent(String(topicId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6524,14 +7581,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 最近 N 天的数据趋势分析
-         * @summary 获取趋势数据
-         * @param {number} [days] 天数
+         * 获取用户、物品、订单的趋势数据（仅管理员）
+         * @summary 获取趋势统计
+         * @param {number} [days] 统计天数
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTrendData: async (days?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/trend`;
+        getTrend: async (days?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/statistics/trend`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6572,7 +7629,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getUnevaluatedEvidence: async (disputeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'disputeId' is not null or undefined
             assertParamExists('getUnevaluatedEvidence', 'disputeId', disputeId)
-            const localVarPath = `/api/disputes/evidence/{disputeId}/unevaluated`
+            const localVarPath = `/disputes/evidence/{disputeId}/unevaluated`
                 .replace(`{${"disputeId"}}`, encodeURIComponent(String(disputeId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6607,7 +7664,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUnreadCount: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/notifications/unread-count`;
+            const localVarPath = `/notifications/unread-count`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6641,7 +7698,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUnreadCount1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/messages/unread-count`;
+            const localVarPath = `/messages/unread-count`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6675,7 +7732,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUnreadReplies: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/reviews/replies/unread`;
+            const localVarPath = `/reviews/replies/unread`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6709,7 +7766,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUnresolvedErrors: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/errors/unresolved`;
+            const localVarPath = `/admin/monitor/errors/unresolved`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6747,7 +7804,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getUserBehaviors: async (userId: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('getUserBehaviors', 'userId', userId)
-            const localVarPath = `/api/behavior-analysis/behaviors/{userId}`
+            const localVarPath = `/behavior-analysis/behaviors/{userId}`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6789,7 +7846,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUserDisputes: async (status?: GetUserDisputesStatusEnum, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/disputes`;
+            const localVarPath = `/disputes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6835,7 +7892,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUserFeed: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/community/feed`;
+            const localVarPath = `/community/feed`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6869,7 +7926,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUserFollowedTopics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/topics/followed`;
+            const localVarPath = `/topics/followed`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6906,7 +7963,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getUserPersona: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('getUserPersona', 'userId', userId)
-            const localVarPath = `/api/behavior-analysis/persona/{userId}`
+            const localVarPath = `/behavior-analysis/persona/{userId}`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6944,7 +8001,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getUserProfile: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('getUserProfile', 'userId', userId)
-            const localVarPath = `/api/users/{userId}`
+            const localVarPath = `/users/{userId}`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6982,7 +8039,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getUserRevertRequests: async (pageable: Pageable, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'pageable' is not null or undefined
             assertParamExists('getUserRevertRequests', 'pageable', pageable)
-            const localVarPath = `/api/revert/requests`;
+            const localVarPath = `/revert/requests`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7023,7 +8080,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUserSearchHistory: async (limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/search/history`;
+            const localVarPath = `/search/history`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7061,41 +8118,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUserSegmentStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/behavior-analysis/persona/statistics`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 用户相关统计
-         * @summary 获取用户统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getUserStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/statistics/users`;
+            const localVarPath = `/behavior-analysis/persona/statistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7130,7 +8153,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getUserViewHistory: async (limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/goods/view-history`;
+            const localVarPath = `/goods/view-history`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7177,7 +8200,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('handleReport', 'approved', approved)
             // verify required parameter 'handleResult' is not null or undefined
             assertParamExists('handleReport', 'handleResult', handleResult)
-            const localVarPath = `/api/reports/{id}/handle`
+            const localVarPath = `/reports/{id}/handle`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7220,7 +8243,41 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         healthCheck: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/monitor/health`;
+            const localVarPath = `/admin/monitor/health`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 测试热重载 - 版本 1
+         * @summary Hello World
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        hello: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/test/hello`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7256,7 +8313,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         hot: async (campusId?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/recommend/hot`;
+            const localVarPath = `/recommend/hot`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7301,7 +8358,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         isBlocked: async (blockedUserId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'blockedUserId' is not null or undefined
             assertParamExists('isBlocked', 'blockedUserId', blockedUserId)
-            const localVarPath = `/api/blacklist/check/{blockedUserId}`
+            const localVarPath = `/blacklist/check/{blockedUserId}`
                 .replace(`{${"blockedUserId"}}`, encodeURIComponent(String(blockedUserId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7339,7 +8396,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         isFavorited: async (goodsId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsId' is not null or undefined
             assertParamExists('isFavorited', 'goodsId', goodsId)
-            const localVarPath = `/api/favorites/{goodsId}/check`
+            const localVarPath = `/favorites/{goodsId}/check`
                 .replace(`{${"goodsId"}}`, encodeURIComponent(String(goodsId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7377,7 +8434,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         likePost: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('likePost', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/like`
+            const localVarPath = `/community/posts/{postId}/like`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7415,7 +8472,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         likeReview: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reviewId' is not null or undefined
             assertParamExists('likeReview', 'reviewId', reviewId)
-            const localVarPath = `/api/reviews/{reviewId}/like`
+            const localVarPath = `/reviews/{reviewId}/like`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7450,41 +8507,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         list: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/tasks`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 查询所有功能开关
-         * @summary 开关列表
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        list1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/feature-flags`;
+            const localVarPath = `/tasks`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7517,8 +8540,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        list2: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/exports`;
+        list1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/exports`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7551,8 +8574,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        list3: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/notification-templates`;
+        list2: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/notification-templates`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7580,13 +8603,17 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 查询全部校区
-         * @summary 校区列表
+         * 管理员查询系统中的所有黑名单记录
+         * @summary 查询所有黑名单记录（分页）
+         * @param {number} [userId] 筛选用户ID（拉黑者）
+         * @param {number} [blockedUserId] 筛选被拉黑用户ID
+         * @param {number} [page] 页码（从0开始）
+         * @param {number} [size] 每页大小
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        list4: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/campuses`;
+        listAllBlacklist: async (userId?: number, blockedUserId?: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/blacklist`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7601,6 +8628,22 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (blockedUserId !== undefined) {
+                localVarQueryParameter['blockedUserId'] = blockedUserId;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
 
 
     
@@ -7624,7 +8667,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listAllRefunds: async (page?: number, size?: number, status?: ListAllRefundsStatusEnum, keyword?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/refunds`;
+            const localVarPath = `/admin/refunds`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7682,7 +8725,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('listAudit', 'targetType', targetType)
             // verify required parameter 'targetId' is not null or undefined
             assertParamExists('listAudit', 'targetId', targetId)
-            const localVarPath = `/api/admin/compliance/audit`;
+            const localVarPath = `/admin/compliance/audit`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7738,7 +8781,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listAuditLogs: async (operatorId?: number, actionType?: ListAuditLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/audit-logs`;
+            const localVarPath = `/audit-logs`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7802,7 +8845,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listBlacklist: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/blacklist/list`;
+            const localVarPath = `/blacklist/list`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7847,7 +8890,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listBuyerOrders: async (status?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/orders/buyer`;
+            const localVarPath = `/orders/buyer`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7887,15 +8930,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 获取当前用户的所有私信会话，按最后消息时间倒序
-         * @summary 查询会话列表
-         * @param {number} [page] 页码（从0开始）
-         * @param {number} [size] 每页大小
+         * 获取所有校园列表
+         * @summary 查询校园列表
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listConversations: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/messages/conversations`;
+        listCampuses: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/campuses`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7910,6 +8951,130 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取所有分类列表（平铺）
+         * @summary 查询分类列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCategories: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/categories`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取当前用户的所有私信会话，按最后消息时间倒序
+         * @summary 查询会话列表
+         * @param {number} [page] 页码（从0开始）
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listConversations: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/messages/conversations`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理员查询所有纠纷（支持筛选）
+         * @summary 查询纠纷列表
+         * @param {string} [keyword] 搜索关键字
+         * @param {ListDisputesStatusEnum} [status] 纠纷状态
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listDisputes: async (keyword?: string, status?: ListDisputesStatusEnum, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/disputes`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
 
             if (page !== undefined) {
                 localVarQueryParameter['page'] = page;
@@ -7939,7 +9104,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listFavorites: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/favorites`;
+            const localVarPath = `/favorites`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7975,13 +9140,47 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 获取所有功能开关列表
+         * @summary 查询功能开关列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listFeatureFlags: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/feature-flags`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 查看我关注的卖家列表
          * @summary 关注列表
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         listFollowings: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/following`;
+            const localVarPath = `/following`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8024,7 +9223,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listGoods: async (keyword?: string, categoryId?: number, minPrice?: number, maxPrice?: number, page?: number, size?: number, sortBy?: string, sortDirection?: string, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/goods`;
+            const localVarPath = `/goods`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8099,7 +9298,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         listMessages: async (conversationId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'conversationId' is not null or undefined
             assertParamExists('listMessages', 'conversationId', conversationId)
-            const localVarPath = `/api/messages/conversations/{conversationId}/messages`
+            const localVarPath = `/messages/conversations/{conversationId}/messages`
                 .replace(`{${"conversationId"}}`, encodeURIComponent(String(conversationId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8136,6 +9335,55 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 查询当前仲裁员处理的纠纷列表
+         * @summary 查询我的仲裁纠纷
+         * @param {ListMyDisputesStatusEnum} [status] 纠纷状态
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listMyDisputes: async (status?: ListMyDisputesStatusEnum, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/disputes/my`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 用户查询自己的退款列表，支持分页和状态筛选
          * @summary 查询我的退款列表
          * @param {number} [page] 页码
@@ -8145,7 +9393,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listMyRefunds: async (page?: number, size?: number, status?: ListMyRefundsStatusEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/refunds`;
+            const localVarPath = `/refunds`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8193,7 +9441,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listMyReports: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/reports/my`;
+            const localVarPath = `/reports/my`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8235,7 +9483,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listMyRequests: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/privacy`;
+            const localVarPath = `/privacy`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8272,7 +9520,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listNotifications: async (status?: ListNotificationsStatusEnum, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/notifications`;
+            const localVarPath = `/notifications`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8312,6 +9560,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 查询待仲裁状态的纠纷列表
+         * @summary 查询待处理纠纷
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPendingDisputes: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/disputes/pending`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 管理员查询所有待审核的物品
          * @summary 查询待审核物品列表
          * @param {number} [page] 页码（从 0 开始）
@@ -8320,7 +9612,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listPendingGoods: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/goods/pending`;
+            const localVarPath = `/goods/pending`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8364,7 +9656,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listPendingReports: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/reports/pending`;
+            const localVarPath = `/reports/pending`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8406,7 +9698,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listPendingRequests: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/privacy/requests`;
+            const localVarPath = `/admin/privacy/requests`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8444,7 +9736,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listPosts: async (page?: number, size?: number, sortBy?: string, sortDirection?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/posts`;
+            const localVarPath = `/posts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8499,7 +9791,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         listPostsByAuthor: async (authorId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'authorId' is not null or undefined
             assertParamExists('listPostsByAuthor', 'authorId', authorId)
-            const localVarPath = `/api/posts/user/{authorId}`
+            const localVarPath = `/posts/user/{authorId}`
                 .replace(`{${"authorId"}}`, encodeURIComponent(String(authorId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8547,7 +9839,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         listReplies: async (postId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('listReplies', 'postId', postId)
-            const localVarPath = `/api/replies/post/{postId}`
+            const localVarPath = `/replies/post/{postId}`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8590,7 +9882,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listRoles: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/roles`;
+            const localVarPath = `/admin/roles`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8627,7 +9919,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listSellerOrders: async (status?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/orders/seller`;
+            const localVarPath = `/orders/seller`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8676,7 +9968,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         listSubReplies: async (parentId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'parentId' is not null or undefined
             assertParamExists('listSubReplies', 'parentId', parentId)
-            const localVarPath = `/api/replies/{parentId}/sub`
+            const localVarPath = `/replies/{parentId}/sub`
                 .replace(`{${"parentId"}}`, encodeURIComponent(String(parentId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8711,7 +10003,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listSubscriptions: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/subscribe`;
+            const localVarPath = `/subscribe`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8745,7 +10037,41 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listTags: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/tags`;
+            const localVarPath = `/tags`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取所有标签列表
+         * @summary 查询标签列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listTags1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/tags`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8779,7 +10105,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listTargets: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/soft-delete/targets`;
+            const localVarPath = `/admin/soft-delete/targets`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8816,7 +10142,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         login: async (loginRequest: LoginRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'loginRequest' is not null or undefined
             assertParamExists('login', 'loginRequest', loginRequest)
-            const localVarPath = `/api/auth/login`;
+            const localVarPath = `/auth/login`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8856,7 +10182,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         logout: async (authorization: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'authorization' is not null or undefined
             assertParamExists('logout', 'authorization', authorization)
-            const localVarPath = `/api/auth/logout`;
+            const localVarPath = `/auth/logout`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8894,7 +10220,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         markAllAsRead: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/notifications/mark-all-read`;
+            const localVarPath = `/notifications/mark-all-read`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8928,7 +10254,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         markAllRepliesAsRead: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/reviews/replies/read/all`;
+            const localVarPath = `/reviews/replies/read/all`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -8965,7 +10291,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         markAsRead: async (body: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             assertParamExists('markAsRead', 'body', body)
-            const localVarPath = `/api/notifications/mark-read`;
+            const localVarPath = `/notifications/mark-read`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9005,7 +10331,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         markConversationAsRead: async (conversationId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'conversationId' is not null or undefined
             assertParamExists('markConversationAsRead', 'conversationId', conversationId)
-            const localVarPath = `/api/messages/conversations/{conversationId}/mark-read`
+            const localVarPath = `/messages/conversations/{conversationId}/mark-read`
                 .replace(`{${"conversationId"}}`, encodeURIComponent(String(conversationId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9043,7 +10369,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         markErrorAsResolved: async (errorId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'errorId' is not null or undefined
             assertParamExists('markErrorAsResolved', 'errorId', errorId)
-            const localVarPath = `/api/monitor/errors/{errorId}/resolve`
+            const localVarPath = `/admin/monitor/errors/{errorId}/resolve`
                 .replace(`{${"errorId"}}`, encodeURIComponent(String(errorId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9084,7 +10410,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('markExecuted', 'arbitrationId', arbitrationId)
             // verify required parameter 'executionNote' is not null or undefined
             assertParamExists('markExecuted', 'executionNote', executionNote)
-            const localVarPath = `/api/disputes/arbitrations/{arbitrationId}/mark-executed`
+            const localVarPath = `/disputes/arbitrations/{arbitrationId}/mark-executed`
                 .replace(`{${"arbitrationId"}}`, encodeURIComponent(String(arbitrationId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9123,7 +10449,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         markExpiredAppeals: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/appeals/mark-expired`;
+            const localVarPath = `/admin/appeals/mark-expired`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9157,7 +10483,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         markOvertimeLogistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/logistics/mark-overtime`;
+            const localVarPath = `/logistics/mark-overtime`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9194,7 +10520,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         markReplyAsRead: async (replyId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'replyId' is not null or undefined
             assertParamExists('markReplyAsRead', 'replyId', replyId)
-            const localVarPath = `/api/reviews/replies/{replyId}/read`
+            const localVarPath = `/reviews/replies/{replyId}/read`
                 .replace(`{${"replyId"}}`, encodeURIComponent(String(replyId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9223,16 +10549,16 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 将来源标签合并至目标标签
+         * 将源标签合并到目标标签（自动处理重复绑定）
          * @summary 合并标签
          * @param {MergeTagRequest} mergeTagRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        mergeTag: async (mergeTagRequest: MergeTagRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        mergeTags: async (mergeTagRequest: MergeTagRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'mergeTagRequest' is not null or undefined
-            assertParamExists('mergeTag', 'mergeTagRequest', mergeTagRequest)
-            const localVarPath = `/api/admin/tags/merge`;
+            assertParamExists('mergeTags', 'mergeTagRequest', mergeTagRequest)
+            const localVarPath = `/admin/tags/merge`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9272,7 +10598,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         migrateUsers: async (campusMigrationRequest: CampusMigrationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'campusMigrationRequest' is not null or undefined
             assertParamExists('migrateUsers', 'campusMigrationRequest', campusMigrationRequest)
-            const localVarPath = `/api/admin/campuses/migrate-users`;
+            const localVarPath = `/admin/campuses/migrate-users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9312,7 +10638,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         pause: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('pause', 'name', name)
-            const localVarPath = `/api/tasks/{name}/pause`
+            const localVarPath = `/tasks/{name}/pause`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9348,7 +10674,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         personal: async (size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/recommend/personal`;
+            const localVarPath = `/recommend/personal`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9389,7 +10715,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         proposeResolution: async (proposeDisputeRequest: ProposeDisputeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'proposeDisputeRequest' is not null or undefined
             assertParamExists('proposeResolution', 'proposeDisputeRequest', proposeDisputeRequest)
-            const localVarPath = `/api/disputes/negotiations/proposals`;
+            const localVarPath = `/disputes/negotiations/proposals`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9432,7 +10758,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('purge', 'entity', entity)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('purge', 'id', id)
-            const localVarPath = `/api/admin/soft-delete/{entity}/{id}/purge`
+            const localVarPath = `/admin/soft-delete/{entity}/{id}/purge`
                 .replace(`{${"entity"}}`, encodeURIComponent(String(entity)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -9471,7 +10797,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         queryPaymentStatus: async (orderNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'orderNo' is not null or undefined
             assertParamExists('queryPaymentStatus', 'orderNo', orderNo)
-            const localVarPath = `/api/payment/status/{orderNo}`
+            const localVarPath = `/payment/status/{orderNo}`
                 .replace(`{${"orderNo"}}`, encodeURIComponent(String(orderNo)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9509,7 +10835,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         recallMessage: async (messageId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'messageId' is not null or undefined
             assertParamExists('recallMessage', 'messageId', messageId)
-            const localVarPath = `/api/messages/messages/{messageId}/recall`
+            const localVarPath = `/messages/messages/{messageId}/recall`
                 .replace(`{${"messageId"}}`, encodeURIComponent(String(messageId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9558,7 +10884,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('recordBehavior', 'targetType', targetType)
             // verify required parameter 'targetId' is not null or undefined
             assertParamExists('recordBehavior', 'targetId', targetId)
-            const localVarPath = `/api/behavior-analysis/record`;
+            const localVarPath = `/behavior-analysis/record`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9610,6 +10936,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 用户点击轮播图时调用，用于统计点击次数
+         * @summary 记录轮播图点击
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        recordClick: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('recordClick', 'id', id)
+            const localVarPath = `/banners/{id}/click`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 记录商品浏览
          * @param {number} goodsId 商品ID
@@ -9620,7 +10984,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         recordView: async (goodsId: number, sourcePage?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsId' is not null or undefined
             assertParamExists('recordView', 'goodsId', goodsId)
-            const localVarPath = `/api/goods/{goodsId}/view`
+            const localVarPath = `/goods/{goodsId}/view`
                 .replace(`{${"goodsId"}}`, encodeURIComponent(String(goodsId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9653,6 +11017,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 轮播图展示时调用，用于统计展示次数
+         * @summary 记录轮播图展示
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        recordView1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('recordView1', 'id', id)
+            const localVarPath = `/banners/{id}/view`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 刷新Token
          * @param {string} authorization 
@@ -9662,7 +11064,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         refresh: async (authorization: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'authorization' is not null or undefined
             assertParamExists('refresh', 'authorization', authorization)
-            const localVarPath = `/api/auth/refresh`;
+            const localVarPath = `/auth/refresh`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9694,13 +11096,51 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
-         * @summary 刷新全部开关缓存
+         * 刷新所有功能开关的本地缓存
+         * @summary 刷新全部缓存
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        refreshAll: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/feature-flags/refresh`;
+        refreshAllCache: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/feature-flags/refresh`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 刷新指定功能开关的本地缓存
+         * @summary 刷新单个缓存
+         * @param {number} id 功能开关ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        refreshCache: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('refreshCache', 'id', id)
+            const localVarPath = `/admin/feature-flags/{id}/refresh`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9736,7 +11176,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         refreshHot: async (campusId?: number, topN?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/recommend/admin/hot/refresh`;
+            const localVarPath = `/recommend/admin/hot/refresh`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9781,7 +11221,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         register: async (registerRequest: RegisterRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'registerRequest' is not null or undefined
             assertParamExists('register', 'registerRequest', registerRequest)
-            const localVarPath = `/api/auth/register`;
+            const localVarPath = `/auth/register`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9821,7 +11261,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         registerByEmail: async (confirmRegisterByEmailRequest: ConfirmRegisterByEmailRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'confirmRegisterByEmailRequest' is not null or undefined
             assertParamExists('registerByEmail', 'confirmRegisterByEmailRequest', confirmRegisterByEmailRequest)
-            const localVarPath = `/api/auth/register/by-email`;
+            const localVarPath = `/auth/register/by-email`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9864,7 +11304,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('reject', 'refundNo', refundNo)
             // verify required parameter 'reason' is not null or undefined
             assertParamExists('reject', 'reason', reason)
-            const localVarPath = `/api/admin/refunds/{refundNo}/reject`
+            const localVarPath = `/admin/refunds/{refundNo}/reject`
                 .replace(`{${"refundNo"}}`, encodeURIComponent(String(refundNo)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9906,7 +11346,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         removeFavorite: async (goodsId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsId' is not null or undefined
             assertParamExists('removeFavorite', 'goodsId', goodsId)
-            const localVarPath = `/api/favorites/{goodsId}`
+            const localVarPath = `/favorites/{goodsId}`
                 .replace(`{${"goodsId"}}`, encodeURIComponent(String(goodsId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9944,7 +11384,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         removeFromBlacklist: async (blockedUserId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'blockedUserId' is not null or undefined
             assertParamExists('removeFromBlacklist', 'blockedUserId', blockedUserId)
-            const localVarPath = `/api/blacklist/unblock/{blockedUserId}`
+            const localVarPath = `/blacklist/unblock/{blockedUserId}`
                 .replace(`{${"blockedUserId"}}`, encodeURIComponent(String(blockedUserId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9982,7 +11422,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         removeIpBlacklist: async (ip: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'ip' is not null or undefined
             assertParamExists('removeIpBlacklist', 'ip', ip)
-            const localVarPath = `/api/admin/rate-limit/blacklist/ips/{ip}`
+            const localVarPath = `/admin/rate-limit/blacklist/ips/{ip}`
                 .replace(`{${"ip"}}`, encodeURIComponent(String(ip)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10020,7 +11460,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         removeIpWhitelist: async (ip: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'ip' is not null or undefined
             assertParamExists('removeIpWhitelist', 'ip', ip)
-            const localVarPath = `/api/admin/rate-limit/whitelist/ips/{ip}`
+            const localVarPath = `/admin/rate-limit/whitelist/ips/{ip}`
                 .replace(`{${"ip"}}`, encodeURIComponent(String(ip)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10058,7 +11498,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         removeTopicsFromPost: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('removeTopicsFromPost', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/topics`
+            const localVarPath = `/community/posts/{postId}/topics`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10096,7 +11536,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         removeUserWhitelist: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('removeUserWhitelist', 'userId', userId)
-            const localVarPath = `/api/admin/rate-limit/whitelist/users/{userId}`
+            const localVarPath = `/admin/rate-limit/whitelist/users/{userId}`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10134,7 +11574,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         removeWhitelist: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('removeWhitelist', 'id', id)
-            const localVarPath = `/api/admin/compliance/whitelist/{id}`
+            const localVarPath = `/admin/compliance/whitelist/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10172,7 +11612,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         render: async (code: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('render', 'code', code)
-            const localVarPath = `/api/admin/notification-templates/render/{code}`
+            const localVarPath = `/admin/notification-templates/render/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10211,7 +11651,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         request: async (type: string, params?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'type' is not null or undefined
             assertParamExists('request', 'type', type)
-            const localVarPath = `/api/exports`;
+            const localVarPath = `/exports`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10259,7 +11699,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('requestRevert', 'auditLogId', auditLogId)
             // verify required parameter 'createRevertRequestDto' is not null or undefined
             assertParamExists('requestRevert', 'createRevertRequestDto', createRevertRequestDto)
-            const localVarPath = `/api/revert/request`;
+            const localVarPath = `/revert/request`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10303,7 +11743,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         resetPasswordByEmail: async (resetPasswordByEmailRequest: ResetPasswordByEmailRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'resetPasswordByEmailRequest' is not null or undefined
             assertParamExists('resetPasswordByEmail', 'resetPasswordByEmailRequest', resetPasswordByEmailRequest)
-            const localVarPath = `/api/auth/password/reset/email`;
+            const localVarPath = `/auth/password/reset/email`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10343,7 +11783,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         resetPasswordBySms: async (resetPasswordBySmsRequest: ResetPasswordBySmsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'resetPasswordBySmsRequest' is not null or undefined
             assertParamExists('resetPasswordBySms', 'resetPasswordBySmsRequest', resetPasswordBySmsRequest)
-            const localVarPath = `/api/auth/password/reset/sms`;
+            const localVarPath = `/auth/password/reset/sms`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10386,7 +11826,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('respondToProposal', 'proposalId', proposalId)
             // verify required parameter 'respondProposalRequest' is not null or undefined
             assertParamExists('respondToProposal', 'respondProposalRequest', respondProposalRequest)
-            const localVarPath = `/api/disputes/negotiations/proposals/{proposalId}/respond`
+            const localVarPath = `/disputes/negotiations/proposals/{proposalId}/respond`
                 .replace(`{${"proposalId"}}`, encodeURIComponent(String(proposalId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10430,7 +11870,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('restore', 'entity', entity)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('restore', 'id', id)
-            const localVarPath = `/api/admin/soft-delete/{entity}/{id}/restore`
+            const localVarPath = `/admin/soft-delete/{entity}/{id}/restore`
                 .replace(`{${"entity"}}`, encodeURIComponent(String(entity)))
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -10472,7 +11912,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('resubscribe', 'channel', channel)
             // verify required parameter 'templateCode' is not null or undefined
             assertParamExists('resubscribe', 'templateCode', templateCode)
-            const localVarPath = `/api/notifications/preferences/unsubscribe/{channel}/{templateCode}`
+            const localVarPath = `/notifications/preferences/unsubscribe/{channel}/{templateCode}`
                 .replace(`{${"channel"}}`, encodeURIComponent(String(channel)))
                 .replace(`{${"templateCode"}}`, encodeURIComponent(String(templateCode)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -10511,7 +11951,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         resume: async (name: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('resume', 'name', name)
-            const localVarPath = `/api/tasks/{name}/resume`
+            const localVarPath = `/tasks/{name}/resume`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10552,7 +11992,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('reviewAppeal', 'appealId', appealId)
             // verify required parameter 'reviewRequest' is not null or undefined
             assertParamExists('reviewAppeal', 'reviewRequest', reviewRequest)
-            const localVarPath = `/api/admin/appeals/{appealId}/review`
+            const localVarPath = `/admin/appeals/{appealId}/review`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10593,7 +12033,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         save: async (notificationTemplate: NotificationTemplate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'notificationTemplate' is not null or undefined
             assertParamExists('save', 'notificationTemplate', notificationTemplate)
-            const localVarPath = `/api/admin/notification-templates`;
+            const localVarPath = `/admin/notification-templates`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10633,7 +12073,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         scanFileForVirus: async (materialId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'materialId' is not null or undefined
             assertParamExists('scanFileForVirus', 'materialId', materialId)
-            const localVarPath = `/api/appeals/materials/{materialId}/scan`
+            const localVarPath = `/appeals/materials/{materialId}/scan`
                 .replace(`{${"materialId"}}`, encodeURIComponent(String(materialId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10677,7 +12117,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('search', 'type', type)
             // verify required parameter 'keyword' is not null or undefined
             assertParamExists('search', 'keyword', keyword)
-            const localVarPath = `/api/search`;
+            const localVarPath = `/search`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10739,7 +12179,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         searchGoods: async (keyword?: string, minPrice?: number, maxPrice?: number, categoryId?: number, sortBy?: string, sortDirection?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/search/goods`;
+            const localVarPath = `/search/goods`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10799,6 +12239,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 在纠纷协商中搜索聊天消息，支持多种筛选条件
+         * @summary 搜索协商消息
+         * @param {MessageSearchRequest} messageSearchRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchMessages: async (messageSearchRequest: MessageSearchRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'messageSearchRequest' is not null or undefined
+            assertParamExists('searchMessages', 'messageSearchRequest', messageSearchRequest)
+            const localVarPath = `/messages/search`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(messageSearchRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 根据关键词搜索帖子
          * @summary 搜索帖子
          * @param {string} keyword 搜索关键词
@@ -10810,7 +12290,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         searchPosts: async (keyword: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'keyword' is not null or undefined
             assertParamExists('searchPosts', 'keyword', keyword)
-            const localVarPath = `/api/posts/search`;
+            const localVarPath = `/posts/search`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10859,7 +12339,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         sendMessage: async (sendMessageRequest: SendMessageRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sendMessageRequest' is not null or undefined
             assertParamExists('sendMessage', 'sendMessageRequest', sendMessageRequest)
-            const localVarPath = `/api/messages/send`;
+            const localVarPath = `/messages/send`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10899,7 +12379,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         sendMessage1: async (sendNegotiationRequest: SendNegotiationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sendNegotiationRequest' is not null or undefined
             assertParamExists('sendMessage1', 'sendNegotiationRequest', sendNegotiationRequest)
-            const localVarPath = `/api/disputes/negotiations/messages`;
+            const localVarPath = `/disputes/negotiations/messages`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10939,7 +12419,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         sendRegisterEmailCode: async (email: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'email' is not null or undefined
             assertParamExists('sendRegisterEmailCode', 'email', email)
-            const localVarPath = `/api/auth/register/code`;
+            const localVarPath = `/auth/register/code`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -10980,7 +12460,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         sendResetEmailCode: async (email: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'email' is not null or undefined
             assertParamExists('sendResetEmailCode', 'email', email)
-            const localVarPath = `/api/auth/password/reset/code/email`;
+            const localVarPath = `/auth/password/reset/code/email`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11021,7 +12501,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         sendResetSmsCode: async (phone: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'phone' is not null or undefined
             assertParamExists('sendResetSmsCode', 'phone', phone)
-            const localVarPath = `/api/auth/password/reset/code/sms`;
+            const localVarPath = `/auth/password/reset/code/sms`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11065,7 +12545,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('setChannelEnabled', 'channel', channel)
             // verify required parameter 'enabled' is not null or undefined
             assertParamExists('setChannelEnabled', 'enabled', enabled)
-            const localVarPath = `/api/notifications/preferences/channel/{channel}/enabled/{enabled}`
+            const localVarPath = `/notifications/preferences/channel/{channel}/enabled/{enabled}`
                 .replace(`{${"channel"}}`, encodeURIComponent(String(channel)))
                 .replace(`{${"enabled"}}`, encodeURIComponent(String(enabled)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -11104,7 +12584,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         setEnabled: async (enabled: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'enabled' is not null or undefined
             assertParamExists('setEnabled', 'enabled', enabled)
-            const localVarPath = `/api/admin/rate-limit/enabled/{enabled}`
+            const localVarPath = `/admin/rate-limit/enabled/{enabled}`
                 .replace(`{${"enabled"}}`, encodeURIComponent(String(enabled)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11148,7 +12628,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('setQuietHours', 'start', start)
             // verify required parameter 'end' is not null or undefined
             assertParamExists('setQuietHours', 'end', end)
-            const localVarPath = `/api/notifications/preferences/channel/{channel}/quiet-hours`
+            const localVarPath = `/notifications/preferences/channel/{channel}/quiet-hours`
                 .replace(`{${"channel"}}`, encodeURIComponent(String(channel)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11195,7 +12675,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         status: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/notifications/preferences/status`;
+            const localVarPath = `/notifications/preferences/status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11232,7 +12712,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         submitAppeal: async (createAppealRequest: CreateAppealRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createAppealRequest' is not null or undefined
             assertParamExists('submitAppeal', 'createAppealRequest', createAppealRequest)
-            const localVarPath = `/api/appeals`;
+            const localVarPath = `/appeals`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11272,7 +12752,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         submitArbitration: async (arbitrateDisputeRequest: ArbitrateDisputeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'arbitrateDisputeRequest' is not null or undefined
             assertParamExists('submitArbitration', 'arbitrateDisputeRequest', arbitrateDisputeRequest)
-            const localVarPath = `/api/disputes/arbitrations`;
+            const localVarPath = `/disputes/arbitrations`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11312,7 +12792,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         submitDispute: async (createDisputeRequest: CreateDisputeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createDisputeRequest' is not null or undefined
             assertParamExists('submitDispute', 'createDisputeRequest', createDisputeRequest)
-            const localVarPath = `/api/disputes`;
+            const localVarPath = `/disputes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11343,6 +12823,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 上传纠纷相关的证据材料
+         * @summary 提交证据
+         * @param {number} id 纠纷ID
+         * @param {UploadEvidenceRequest} uploadEvidenceRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitEvidence: async (id: number, uploadEvidenceRequest: UploadEvidenceRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('submitEvidence', 'id', id)
+            // verify required parameter 'uploadEvidenceRequest' is not null or undefined
+            assertParamExists('submitEvidence', 'uploadEvidenceRequest', uploadEvidenceRequest)
+            const localVarPath = `/admin/disputes/{id}/evidence`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(uploadEvidenceRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 订阅关键词，符合条件的商品上架会提醒
          * @summary 新增订阅
          * @param {CreateSubscriptionRequest} createSubscriptionRequest 
@@ -11352,7 +12876,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         subscribe: async (createSubscriptionRequest: CreateSubscriptionRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createSubscriptionRequest' is not null or undefined
             assertParamExists('subscribe', 'createSubscriptionRequest', createSubscriptionRequest)
-            const localVarPath = `/api/subscribe`;
+            const localVarPath = `/subscribe`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11392,7 +12916,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         syncLogistics: async (orderId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'orderId' is not null or undefined
             assertParamExists('syncLogistics', 'orderId', orderId)
-            const localVarPath = `/api/logistics/sync/{orderId}`
+            const localVarPath = `/logistics/sync/{orderId}`
                 .replace(`{${"orderId"}}`, encodeURIComponent(String(orderId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11421,6 +12945,82 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 切换标签的启用/禁用状态
+         * @summary 切换启用状态
+         * @param {number} id 标签ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        toggleEnabled: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('toggleEnabled', 'id', id)
+            const localVarPath = `/admin/tags/{id}/toggle`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 切换功能开关的启用/禁用状态（自动刷新缓存）
+         * @summary 切换启用状态
+         * @param {number} id 功能开关ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        toggleEnabled1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('toggleEnabled1', 'id', id)
+            const localVarPath = `/admin/feature-flags/{id}/toggle`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 已点赞则取消，未点赞则点赞
          * @summary 切换点赞状态
          * @param {number} reviewId 评价ID
@@ -11430,7 +13030,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         toggleLike: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reviewId' is not null or undefined
             assertParamExists('toggleLike', 'reviewId', reviewId)
-            const localVarPath = `/api/reviews/{reviewId}/like/toggle`
+            const localVarPath = `/reviews/{reviewId}/like/toggle`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11469,7 +13069,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         trigger: async (name: string, params?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             assertParamExists('trigger', 'name', name)
-            const localVarPath = `/api/tasks/{name}/trigger`
+            const localVarPath = `/tasks/{name}/trigger`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11511,7 +13111,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         unbanUser: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('unbanUser', 'userId', userId)
-            const localVarPath = `/api/admin/users/{userId}/unban`
+            const localVarPath = `/admin/users/{userId}/unban`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11549,7 +13149,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         uncollectPost: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('uncollectPost', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/collect`
+            const localVarPath = `/community/posts/{postId}/collect`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11587,7 +13187,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         unfollow: async (sellerId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sellerId' is not null or undefined
             assertParamExists('unfollow', 'sellerId', sellerId)
-            const localVarPath = `/api/follow/{sellerId}`
+            const localVarPath = `/follow/{sellerId}`
                 .replace(`{${"sellerId"}}`, encodeURIComponent(String(sellerId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11625,7 +13225,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         unfollowTopic: async (topicId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'topicId' is not null or undefined
             assertParamExists('unfollowTopic', 'topicId', topicId)
-            const localVarPath = `/api/topics/{topicId}/follow`
+            const localVarPath = `/topics/{topicId}/follow`
                 .replace(`{${"topicId"}}`, encodeURIComponent(String(topicId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11663,7 +13263,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         unfollowUser: async (userId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('unfollowUser', 'userId', userId)
-            const localVarPath = `/api/users/{userId}/follow`
+            const localVarPath = `/users/{userId}/follow`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11701,7 +13301,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         unlikePost: async (postId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'postId' is not null or undefined
             assertParamExists('unlikePost', 'postId', postId)
-            const localVarPath = `/api/community/posts/{postId}/like`
+            const localVarPath = `/community/posts/{postId}/like`
                 .replace(`{${"postId"}}`, encodeURIComponent(String(postId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11739,7 +13339,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         unlikeReview: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reviewId' is not null or undefined
             assertParamExists('unlikeReview', 'reviewId', reviewId)
-            const localVarPath = `/api/reviews/{reviewId}/like`
+            const localVarPath = `/reviews/{reviewId}/like`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11780,7 +13380,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('unsubscribe', 'channel', channel)
             // verify required parameter 'templateCode' is not null or undefined
             assertParamExists('unsubscribe', 'templateCode', templateCode)
-            const localVarPath = `/api/notifications/preferences/unsubscribe/{channel}/{templateCode}`
+            const localVarPath = `/notifications/preferences/unsubscribe/{channel}/{templateCode}`
                 .replace(`{${"channel"}}`, encodeURIComponent(String(channel)))
                 .replace(`{${"templateCode"}}`, encodeURIComponent(String(templateCode)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -11819,7 +13419,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         unsubscribe1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('unsubscribe1', 'id', id)
-            const localVarPath = `/api/subscribe/{id}`
+            const localVarPath = `/subscribe/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11848,19 +13448,19 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
-         * @summary 更新校区
-         * @param {number} id 校区ID
-         * @param {UpdateCampusRequest} updateCampusRequest 
+         * 更新校园信息
+         * @summary 编辑校园
+         * @param {number} id 校园ID
+         * @param {CampusUpdateRequest} campusUpdateRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        update: async (id: number, updateCampusRequest: UpdateCampusRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateCampus: async (id: number, campusUpdateRequest: CampusUpdateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('update', 'id', id)
-            // verify required parameter 'updateCampusRequest' is not null or undefined
-            assertParamExists('update', 'updateCampusRequest', updateCampusRequest)
-            const localVarPath = `/api/admin/campuses/{id}`
+            assertParamExists('updateCampus', 'id', id)
+            // verify required parameter 'campusUpdateRequest' is not null or undefined
+            assertParamExists('updateCampus', 'campusUpdateRequest', campusUpdateRequest)
+            const localVarPath = `/admin/campuses/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11884,7 +13484,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateCampusRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(campusUpdateRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -11892,8 +13492,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员更新分类信息
-         * @summary 更新分类
+         * 更新分类信息
+         * @summary 编辑分类
          * @param {number} id 分类ID
          * @param {UpdateCategoryRequest} updateCategoryRequest 
          * @param {*} [options] Override http request option.
@@ -11904,7 +13504,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateCategory', 'id', id)
             // verify required parameter 'updateCategoryRequest' is not null or undefined
             assertParamExists('updateCategory', 'updateCategoryRequest', updateCategoryRequest)
-            const localVarPath = `/api/admin/categories/{id}`
+            const localVarPath = `/admin/categories/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11936,6 +13536,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 更新功能开关配置（自动刷新缓存）
+         * @summary 编辑功能开关
+         * @param {number} id 功能开关ID
+         * @param {FeatureFlagUpdateRequest} featureFlagUpdateRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateFeatureFlag: async (id: number, featureFlagUpdateRequest: FeatureFlagUpdateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateFeatureFlag', 'id', id)
+            // verify required parameter 'featureFlagUpdateRequest' is not null or undefined
+            assertParamExists('updateFeatureFlag', 'featureFlagUpdateRequest', featureFlagUpdateRequest)
+            const localVarPath = `/admin/feature-flags/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(featureFlagUpdateRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 需要用户已登录，提交旧密码与新密码完成密码更新。
          * @summary 修改密码
          * @param {UpdatePasswordRequest} updatePasswordRequest 修改密码的 JSON 请求体
@@ -11945,7 +13589,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         updatePassword: async (updatePasswordRequest: UpdatePasswordRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'updatePasswordRequest' is not null or undefined
             assertParamExists('updatePassword', 'updatePasswordRequest', updatePasswordRequest)
-            const localVarPath = `/api/users/password`;
+            const localVarPath = `/users/password`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11988,7 +13632,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updatePost', 'id', id)
             // verify required parameter 'updatePostRequest' is not null or undefined
             assertParamExists('updatePost', 'updatePostRequest', updatePostRequest)
-            const localVarPath = `/api/posts/{id}`
+            const localVarPath = `/posts/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12029,7 +13673,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         updateProfile: async (updateProfileRequest: UpdateProfileRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'updateProfileRequest' is not null or undefined
             assertParamExists('updateProfile', 'updateProfileRequest', updateProfileRequest)
-            const localVarPath = `/api/users/profile`;
+            const localVarPath = `/users/profile`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12072,7 +13716,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateRole', 'roleId', roleId)
             // verify required parameter 'updateRoleRequest' is not null or undefined
             assertParamExists('updateRole', 'updateRoleRequest', updateRoleRequest)
-            const localVarPath = `/api/admin/roles/{roleId}`
+            const localVarPath = `/admin/roles/{roleId}`
                 .replace(`{${"roleId"}}`, encodeURIComponent(String(roleId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12104,8 +13748,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员修改标签名称或状态
-         * @summary 更新标签
+         * 更新标签信息
+         * @summary 编辑标签
          * @param {number} id 标签ID
          * @param {UpdateTagRequest} updateTagRequest 
          * @param {*} [options] Override http request option.
@@ -12116,7 +13760,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateTag', 'id', id)
             // verify required parameter 'updateTagRequest' is not null or undefined
             assertParamExists('updateTag', 'updateTagRequest', updateTagRequest)
-            const localVarPath = `/api/admin/tags/{id}`
+            const localVarPath = `/admin/tags/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12160,7 +13804,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateTopic', 'topicId', topicId)
             // verify required parameter 'requestBody' is not null or undefined
             assertParamExists('updateTopic', 'requestBody', requestBody)
-            const localVarPath = `/api/topics/{topicId}`
+            const localVarPath = `/topics/{topicId}`
                 .replace(`{${"topicId"}}`, encodeURIComponent(String(topicId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12204,7 +13848,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateUserRoles', 'userId', userId)
             // verify required parameter 'updateUserRolesRequest' is not null or undefined
             assertParamExists('updateUserRoles', 'updateUserRolesRequest', updateUserRolesRequest)
-            const localVarPath = `/api/admin/users/{userId}/roles`
+            const localVarPath = `/admin/users/{userId}/roles`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12245,7 +13889,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         uploadEvidence: async (uploadEvidenceRequest: UploadEvidenceRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'uploadEvidenceRequest' is not null or undefined
             assertParamExists('uploadEvidence', 'uploadEvidenceRequest', uploadEvidenceRequest)
-            const localVarPath = `/api/disputes/evidence`;
+            const localVarPath = `/disputes/evidence`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12285,7 +13929,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         uploadFile: async (file: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'file' is not null or undefined
             assertParamExists('uploadFile', 'file', file)
-            const localVarPath = `/api/files/upload`;
+            const localVarPath = `/files/upload`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12330,7 +13974,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         uploadFileWithThumbnail: async (file: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'file' is not null or undefined
             assertParamExists('uploadFileWithThumbnail', 'file', file)
-            const localVarPath = `/api/files/upload-with-thumbnail`;
+            const localVarPath = `/files/upload-with-thumbnail`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12378,7 +14022,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('uploadMaterials', 'appealId', appealId)
             // verify required parameter 'files' is not null or undefined
             assertParamExists('uploadMaterials', 'files', files)
-            const localVarPath = `/api/appeals/materials/{appealId}/upload`
+            const localVarPath = `/appeals/materials/{appealId}/upload`
                 .replace(`{${"appealId"}}`, encodeURIComponent(String(appealId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12427,7 +14071,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('uploadMedia', 'mediaType', mediaType)
             // verify required parameter 'file' is not null or undefined
             assertParamExists('uploadMedia', 'file', file)
-            const localVarPath = `/api/reviews/{reviewId}/media`
+            const localVarPath = `/reviews/{reviewId}/media`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12487,7 +14131,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('uploadMediaBatch', 'mediaType', mediaType)
             // verify required parameter 'files' is not null or undefined
             assertParamExists('uploadMediaBatch', 'files', files)
-            const localVarPath = `/api/reviews/{reviewId}/media/batch`
+            const localVarPath = `/reviews/{reviewId}/media/batch`
                 .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12530,46 +14174,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
-         * @summary 新增或更新开关
-         * @param {FeatureFlag} featureFlag 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        upsert: async (featureFlag: FeatureFlag, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'featureFlag' is not null or undefined
-            assertParamExists('upsert', 'featureFlag', featureFlag)
-            const localVarPath = `/api/feature-flags`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(featureFlag, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * 检查是否可以提交申诉
          * @summary 验证申诉资格
          * @param {CreateAppealRequest} createAppealRequest 
@@ -12579,7 +14183,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         validateAppealEligibility: async (createAppealRequest: CreateAppealRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createAppealRequest' is not null or undefined
             assertParamExists('validateAppealEligibility', 'createAppealRequest', createAppealRequest)
-            const localVarPath = `/api/appeals/validate`;
+            const localVarPath = `/appeals/validate`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12619,7 +14223,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         validateMigration: async (campusMigrationRequest: CampusMigrationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'campusMigrationRequest' is not null or undefined
             assertParamExists('validateMigration', 'campusMigrationRequest', campusMigrationRequest)
-            const localVarPath = `/api/admin/campuses/migrate-users/validate`;
+            const localVarPath = `/admin/campuses/migrate-users/validate`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12656,7 +14260,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         wechatPayNotify: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/payment/wechat/notify`;
+            const localVarPath = `/payment/wechat/notify`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12695,13 +14299,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary 删除开关
-         * @param {string} key 
+         * @summary 删除
+         * @param {number} id 模板ID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async _delete(key: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator._delete(key, options);
+        async _delete(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator._delete(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi._delete']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -12870,6 +14474,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 仲裁员提交仲裁决定
+         * @summary 仲裁纠纷
+         * @param {number} id 纠纷ID
+         * @param {ArbitrateDisputeRequest} arbitrateDisputeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async arbitrateDispute(id: number, arbitrateDisputeRequest: ArbitrateDisputeRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.arbitrateDispute(id, arbitrateDisputeRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.arbitrateDispute']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 管理员为纠纷分配仲裁员
          * @summary 分配仲裁员
          * @param {number} disputeId 纠纷ID
@@ -12909,6 +14527,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 管理员批量分配仲裁员
+         * @summary 批量分配仲裁员
+         * @param {Array<number>} disputeIds 纠纷ID列表
+         * @param {number} arbitratorId 仲裁员ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchAssignArbitrator(disputeIds: Array<number>, arbitratorId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchAssignArbitrator(disputeIds, arbitratorId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchAssignArbitrator']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 批量删除商品
          * @param {GoodsBatchRequest} goodsBatchRequest 
@@ -12919,6 +14551,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.batchDelete(goodsBatchRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 批量删除多个校园（软删除）
+         * @summary 批量删除校园
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchDeleteCampuses(requestBody: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchDeleteCampuses(requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchDeleteCampuses']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 批量删除多个标签（跳过有关联商品的标签）
+         * @summary 批量删除标签
+         * @param {Array<number>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchDeleteTags(requestBody: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchDeleteTags(requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchDeleteTags']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -12973,6 +14631,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 管理员批量解除黑名单关系
+         * @summary 批量解除黑名单
+         * @param {BatchUnblockRequest} batchUnblockRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchUnblock(batchUnblockRequest: BatchUnblockRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseInteger>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchUnblock(batchUnblockRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchUnblock']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 批量更新库存
          * @param {InventoryBatchRequest} inventoryBatchRequest 
@@ -12996,6 +14667,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.batchUpdatePrice(priceBatchRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchUpdatePrice']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 批量更新分类排序
+         * @summary 批量排序
+         * @param {CategoryBatchSortRequest} categoryBatchSortRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchUpdateSort(categoryBatchSortRequest: CategoryBatchSortRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.batchUpdateSort(categoryBatchSortRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.batchUpdateSort']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -13154,6 +14838,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 检查两个用户之间的黑名单关系（双向）
+         * @summary 检查用户黑名单关系
+         * @param {number} userId 用户ID
+         * @param {number} targetUserId 目标用户ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async checkRelation(userId: number, targetUserId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCheckBlacklistRelationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.checkRelation(userId, targetUserId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.checkRelation']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 检查是否已关注
          * @param {number} topicId 话题ID
@@ -13177,6 +14875,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.checkUsername(username, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.checkUsername']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 仲裁员认领待处理的纠纷
+         * @summary 认领纠纷
+         * @param {number} id 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async claimDispute(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.claimDispute(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.claimDispute']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -13205,6 +14916,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 清空用户在指定纠纷的消息搜索历史记录
+         * @summary 清空消息搜索历史
+         * @param {number} disputeId 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async clearSearchHistory1(disputeId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.clearSearchHistory1(disputeId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.clearSearchHistory1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 清空浏览历史
          * @param {*} [options] Override http request option.
@@ -13228,6 +14952,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.closeDispute(disputeId, closeReason, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.closeDispute']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 管理员手动关闭纠纷
+         * @summary 关闭纠纷
+         * @param {number} id 纠纷ID
+         * @param {string} reason 关闭原因
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async closeDispute1(id: number, reason: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.closeDispute1(id, reason, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.closeDispute1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -13284,19 +15022,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary 创建校区
-         * @param {CreateCampusRequest} createCampusRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async create(createCampusRequest: CreateCampusRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCampus>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.create(createCampusRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.create']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary 创建批量任务
          * @param {CreateBatchTaskRequest} createBatchTaskRequest 
          * @param {*} [options] Override http request option.
@@ -13309,7 +15034,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员创建新的分类节点
+         * 创建新的校园
+         * @summary 创建校园
+         * @param {CampusCreateRequest} campusCreateRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createCampus(campusCreateRequest: CampusCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCampus>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createCampus(campusCreateRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createCampus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 创建新的商品分类
          * @summary 创建分类
          * @param {CreateCategoryRequest} createCategoryRequest 
          * @param {*} [options] Override http request option.
@@ -13319,6 +15057,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createCategory(createCategoryRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.createCategory']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 创建新的功能开关
+         * @summary 创建功能开关
+         * @param {FeatureFlagCreateRequest} featureFlagCreateRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createFeatureFlag(featureFlagCreateRequest: FeatureFlagCreateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseLong>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createFeatureFlag(featureFlagCreateRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createFeatureFlag']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -13456,7 +15207,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员新增标签
+         * 创建新的商品标签
          * @summary 创建标签
          * @param {CreateTagRequest} createTagRequest 
          * @param {*} [options] Override http request option.
@@ -13482,32 +15233,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @summary 删除
-         * @param {number} id 模板ID
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async delete1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.delete1(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.delete1']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary 删除校区
-         * @param {number} id 校区ID
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async delete2(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.delete2(id, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.delete2']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 批量删除评价的所有图片和视频
          * @summary 删除评价的所有媒体
          * @param {number} reviewId 评价ID
@@ -13521,7 +15246,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员删除分类节点，删除前需确保无子节点及关联商品
+         * 删除指定校园（软删除）
+         * @summary 删除校园
+         * @param {number} id 校园ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteCampus(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCampus(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteCampus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 删除指定分类（需确保无子分类和关联商品）
          * @summary 删除分类
          * @param {number} id 分类ID
          * @param {*} [options] Override http request option.
@@ -13544,6 +15282,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteEvidence(evidenceId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteEvidence']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 删除指定功能开关（自动刷新缓存）
+         * @summary 删除功能开关
+         * @param {number} id 功能开关ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteFeatureFlag(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteFeatureFlag(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteFeatureFlag']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -13651,7 +15402,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员删除标签，删除前需确保无绑定
+         * 删除指定标签（需确保无关联商品）
          * @summary 删除标签
          * @param {number} id 标签ID
          * @param {*} [options] Override http request option.
@@ -13835,6 +15586,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 获取当前启用且在有效期内的轮播图列表，按排序顺序返回
+         * @summary 获取启用的轮播图
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getActiveBanners(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListBanner>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getActiveBanners(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getActiveBanners']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 管理员查询系统中的所有纠纷
          * @summary 查询所有纠纷
          * @param {GetAllDisputesStatusEnum} [status] 纠纷状态
@@ -14008,6 +15771,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 查询指定用户拉黑了哪些人
+         * @summary 查询指定用户的黑名单
+         * @param {number} userId 用户ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getBlacklistByUser(userId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListLong>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getBlacklistByUser(userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getBlacklistByUser']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 查询哪些用户拉黑了指定用户
+         * @summary 查询拉黑了指定用户的人
+         * @param {number} blockedUserId 被拉黑的用户ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getBlockedByUsers(blockedUserId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListLong>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getBlockedByUsers(blockedUserId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getBlockedByUsers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 查询买家上传的所有证据
          * @summary 查询买家证据
          * @param {number} disputeId 纠纷ID
@@ -14021,8 +15810,47 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 物品分类分布统计
-         * @summary 获取分类统计数据
+         * 根据ID获取校园详细信息
+         * @summary 获取校园详情
+         * @param {number} id 校园ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCampusById(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCampus>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCampusById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCampusById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取校园用户/商品/订单统计数据
+         * @summary 校园统计
+         * @param {number} id 校园ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCampusStatistics(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCampusStatisticsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCampusStatistics(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCampusStatistics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 根据ID获取分类详细信息
+         * @summary 获取分类详情
+         * @param {number} id 分类ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCategoryById(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCategory>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCategoryById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCategoryById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取各分类下的物品数量统计（仅管理员）
+         * @summary 获取分类统计
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14033,7 +15861,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 按层级返回完整的分类树结构
+         * 获取分类商品统计数据（在售、已售、子分类数）
+         * @summary 分类统计
+         * @param {number} id 分类ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCategoryStatistics1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCategoryStatisticsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCategoryStatistics1(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCategoryStatistics1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 按层级返回完整的分类树结构（公开接口）
          * @summary 获取分类树
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -14042,6 +15883,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCategoryTree(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCategoryTree']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取完整的分类树形结构（含子分类）
+         * @summary 获取分类树
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCategoryTree1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListCategoryNodeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCategoryTree1(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getCategoryTree1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14067,6 +15920,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getDisputeDetail(disputeId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getDisputeDetail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 查询指定纠纷的完整信息（含证据、协商记录、仲裁结果）
+         * @summary 查询纠纷详情
+         * @param {number} id 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDisputeDetail1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseDisputeDetailDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDisputeDetail1(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getDisputeDetail1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14149,6 +16015,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 根据ID获取功能开关详细信息
+         * @summary 获取功能开关详情
+         * @param {number} id 功能开关ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFeatureFlagById(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseFeatureFlag>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureFlagById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getFeatureFlagById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取粉丝数
          * @param {number} userId 用户ID
@@ -14222,18 +16101,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getGoodsDetail1(goodsId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getGoodsDetail1']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 物品相关统计
-         * @summary 获取物品统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getGoodsStatistics(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getGoodsStatistics(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getGoodsStatistics']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14432,18 +16299,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 订单相关统计
-         * @summary 获取订单统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getOrderStatistics(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getOrderStatistics(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getOrderStatistics']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 获取所有待审核的申诉列表
          * @summary 查询待审核申诉
          * @param {number} [page] 
@@ -14548,16 +16403,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 最近 N 个月的平台收入统计
-         * @summary 获取收入统计（按月）
-         * @param {number} [months] 月数
+         * 获取按月统计的收入趋势（仅管理员）
+         * @summary 获取收入趋势
+         * @param {number} [months] 统计月数
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRevenueByMonth(months?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getRevenueByMonth(months, options);
+        async getRevenueTrend(months?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRevenueTrend(months, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getRevenueByMonth']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getRevenueTrend']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14626,6 +16481,33 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 获取用户的消息搜索历史记录
+         * @summary 获取消息搜索历史
+         * @param {number} disputeId 纠纷ID
+         * @param {number} [limit] 返回数量限制
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSearchHistory(disputeId: number, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListMessageSearchHistory>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSearchHistory(disputeId, limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getSearchHistory']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取搜索相关的统计信息
+         * @summary 获取消息搜索统计
+         * @param {number} disputeId 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSearchStatistics(disputeId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMessageSearchStatistics>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSearchStatistics(disputeId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getSearchStatistics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取搜索建议
          * @param {string} [keyword] 关键词前缀
@@ -14636,6 +16518,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSearchSuggestions(keyword, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getSearchSuggestions']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 根据输入提供智能搜索建议
+         * @summary 获取消息搜索建议
+         * @param {number} disputeId 纠纷ID
+         * @param {string} [keyword] 关键词前缀
+         * @param {string} [suggestionType] 建议类型 (keyword/user/date)
+         * @param {number} [limit] 返回数量限制
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSearchSuggestions1(disputeId: number, keyword?: string, suggestionType?: string, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListMessageSearchSuggestion>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSearchSuggestions1(disputeId, keyword, suggestionType, limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getSearchSuggestions1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14679,7 +16577,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 系统整体数据概览
+         * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
+         * @summary 统计黑名单数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStatistics1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBlacklistStatsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStatistics1(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatistics1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取系统核心数据概览（仅管理员）
          * @summary 获取系统概览统计
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -14688,6 +16598,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSystemOverview(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getSystemOverview']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 根据ID获取标签详细信息
+         * @summary 获取标签详情
+         * @param {number} id 标签ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTagById(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseTag>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTagById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTagById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取标签关联商品统计数据
+         * @summary 标签统计
+         * @param {number} id 标签ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTagStatistics(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseTagStatisticsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTagStatistics(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTagStatistics']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14704,8 +16640,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 今日数据概览
-         * @summary 获取今日统计数据
+         * 获取今日核心数据统计（仅管理员）
+         * @summary 获取今日统计
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14716,9 +16652,9 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 浏览量最高的物品 Top N
-         * @summary 获取热门物品排行榜
-         * @param {number} [limit] 数量限制
+         * 获取浏览量最高的商品排行榜（仅管理员）
+         * @summary 获取热门商品排行
+         * @param {number} [limit] 返回数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14729,9 +16665,9 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 积分最高的用户 Top N
-         * @summary 获取活跃用户排行榜
-         * @param {number} [limit] 数量限制
+         * 获取发布物品最多的用户排行榜（仅管理员）
+         * @summary 获取活跃用户排行
+         * @param {number} [limit] 返回数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14768,16 +16704,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 最近 N 天的数据趋势分析
-         * @summary 获取趋势数据
-         * @param {number} [days] 天数
+         * 获取用户、物品、订单的趋势数据（仅管理员）
+         * @summary 获取趋势统计
+         * @param {number} [days] 统计天数
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTrendData(days?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getTrendData(days, options);
+        async getTrend(days?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTrend(days, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTrendData']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTrend']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -14959,18 +16895,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 用户相关统计
-         * @summary 获取用户统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getUserStatistics(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserStatistics(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getUserStatistics']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 
          * @summary 获取我的浏览历史
          * @param {number} [limit] 返回数量
@@ -15008,6 +16932,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.healthCheck(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.healthCheck']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 测试热重载 - 版本 1
+         * @summary Hello World
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async hello(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.hello(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.hello']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15089,27 +17025,15 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 查询所有功能开关
-         * @summary 开关列表
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async list1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListFeatureFlag>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.list1(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.list1']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 查询当前用户的导出任务列表
          * @summary 我的导出任务
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async list2(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListExportJob>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.list2(options);
+        async list1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListExportJob>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.list1(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.list2']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.list1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15118,22 +17042,26 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async list3(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListNotificationTemplate>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.list3(options);
+        async list2(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListNotificationTemplate>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.list2(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.list3']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.list2']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 查询全部校区
-         * @summary 校区列表
+         * 管理员查询系统中的所有黑名单记录
+         * @summary 查询所有黑名单记录（分页）
+         * @param {number} [userId] 筛选用户ID（拉黑者）
+         * @param {number} [blockedUserId] 筛选被拉黑用户ID
+         * @param {number} [page] 页码（从0开始）
+         * @param {number} [size] 每页大小
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async list4(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListCampus>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.list4(options);
+        async listAllBlacklist(userId?: number, blockedUserId?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageBlacklist>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAllBlacklist(userId, blockedUserId, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.list4']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listAllBlacklist']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15216,6 +17144,30 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 获取所有校园列表
+         * @summary 查询校园列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listCampuses(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListCampus>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCampuses(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listCampuses']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取所有分类列表（平铺）
+         * @summary 查询分类列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listCategories(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListCategory>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCategories(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listCategories']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 获取当前用户的所有私信会话，按最后消息时间倒序
          * @summary 查询会话列表
          * @param {number} [page] 页码（从0开始）
@@ -15230,6 +17182,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 管理员查询所有纠纷（支持筛选）
+         * @summary 查询纠纷列表
+         * @param {string} [keyword] 搜索关键字
+         * @param {ListDisputesStatusEnum} [status] 纠纷状态
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listDisputes(keyword?: string, status?: ListDisputesStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageDisputeDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listDisputes(keyword, status, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listDisputes']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 查询当前用户的收藏列表
          * @summary 查询收藏列表
          * @param {number} [page] 页码（从 0 开始）
@@ -15241,6 +17209,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listFavorites(page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listFavorites']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取所有功能开关列表
+         * @summary 查询功能开关列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listFeatureFlags(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListFeatureFlag>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listFeatureFlags(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listFeatureFlags']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15289,6 +17269,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listMessages(conversationId, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listMessages']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 查询当前仲裁员处理的纠纷列表
+         * @summary 查询我的仲裁纠纷
+         * @param {ListMyDisputesStatusEnum} [status] 纠纷状态
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listMyDisputes(status?: ListMyDisputesStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageDisputeDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listMyDisputes(status, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listMyDisputes']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15345,6 +17340,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listNotifications(status, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listNotifications']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 查询待仲裁状态的纠纷列表
+         * @summary 查询待处理纠纷
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listPendingDisputes(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageDisputeDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPendingDisputes(page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listPendingDisputes']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15495,6 +17504,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listTags(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listTags']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取所有标签列表
+         * @summary 查询标签列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listTags1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListTagResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listTags1(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listTags1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15650,16 +17671,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 将来源标签合并至目标标签
+         * 将源标签合并到目标标签（自动处理重复绑定）
          * @summary 合并标签
          * @param {MergeTagRequest} mergeTagRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async mergeTag(mergeTagRequest: MergeTagRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.mergeTag(mergeTagRequest, options);
+        async mergeTags(mergeTagRequest: MergeTagRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.mergeTags(mergeTagRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.mergeTag']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.mergeTags']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15773,6 +17794,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 用户点击轮播图时调用，用于统计点击次数
+         * @summary 记录轮播图点击
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async recordClick(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.recordClick(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.recordClick']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 记录商品浏览
          * @param {number} goodsId 商品ID
@@ -15784,6 +17818,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.recordView(goodsId, sourcePage, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.recordView']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 轮播图展示时调用，用于统计展示次数
+         * @summary 记录轮播图展示
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async recordView1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.recordView1(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.recordView1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -15800,15 +17847,28 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @summary 刷新全部开关缓存
+         * 刷新所有功能开关的本地缓存
+         * @summary 刷新全部缓存
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async refreshAll(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.refreshAll(options);
+        async refreshAllCache(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.refreshAllCache(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.refreshAll']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.refreshAllCache']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 刷新指定功能开关的本地缓存
+         * @summary 刷新单个缓存
+         * @param {number} id 功能开关ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async refreshCache(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.refreshCache(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.refreshCache']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16156,6 +18216,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 在纠纷协商中搜索聊天消息，支持多种筛选条件
+         * @summary 搜索协商消息
+         * @param {MessageSearchRequest} messageSearchRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchMessages(messageSearchRequest: MessageSearchRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageMessageSearchResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchMessages(messageSearchRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.searchMessages']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 根据关键词搜索帖子
          * @summary 搜索帖子
          * @param {string} keyword 搜索关键词
@@ -16329,6 +18402,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 上传纠纷相关的证据材料
+         * @summary 提交证据
+         * @param {number} id 纠纷ID
+         * @param {UploadEvidenceRequest} uploadEvidenceRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async submitEvidence(id: number, uploadEvidenceRequest: UploadEvidenceRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.submitEvidence(id, uploadEvidenceRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.submitEvidence']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 订阅关键词，符合条件的商品上架会提醒
          * @summary 新增订阅
          * @param {CreateSubscriptionRequest} createSubscriptionRequest 
@@ -16352,6 +18439,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.syncLogistics(orderId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.syncLogistics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 切换标签的启用/禁用状态
+         * @summary 切换启用状态
+         * @param {number} id 标签ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async toggleEnabled(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.toggleEnabled(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.toggleEnabled']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 切换功能开关的启用/禁用状态（自动刷新缓存）
+         * @summary 切换启用状态
+         * @param {number} id 功能开关ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async toggleEnabled1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.toggleEnabled1(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.toggleEnabled1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16500,22 +18613,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @summary 更新校区
-         * @param {number} id 校区ID
-         * @param {UpdateCampusRequest} updateCampusRequest 
+         * 更新校园信息
+         * @summary 编辑校园
+         * @param {number} id 校园ID
+         * @param {CampusUpdateRequest} campusUpdateRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async update(id: number, updateCampusRequest: UpdateCampusRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCampus>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.update(id, updateCampusRequest, options);
+        async updateCampus(id: number, campusUpdateRequest: CampusUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCampus>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateCampus(id, campusUpdateRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.update']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateCampus']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员更新分类信息
-         * @summary 更新分类
+         * 更新分类信息
+         * @summary 编辑分类
          * @param {number} id 分类ID
          * @param {UpdateCategoryRequest} updateCategoryRequest 
          * @param {*} [options] Override http request option.
@@ -16525,6 +18638,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateCategory(id, updateCategoryRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateCategory']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 更新功能开关配置（自动刷新缓存）
+         * @summary 编辑功能开关
+         * @param {number} id 功能开关ID
+         * @param {FeatureFlagUpdateRequest} featureFlagUpdateRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateFeatureFlag(id: number, featureFlagUpdateRequest: FeatureFlagUpdateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateFeatureFlag(id, featureFlagUpdateRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateFeatureFlag']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -16582,8 +18709,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员修改标签名称或状态
-         * @summary 更新标签
+         * 更新标签信息
+         * @summary 编辑标签
          * @param {number} id 标签ID
          * @param {UpdateTagRequest} updateTagRequest 
          * @param {*} [options] Override http request option.
@@ -16708,19 +18835,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
-         * @summary 新增或更新开关
-         * @param {FeatureFlag} featureFlag 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async upsert(featureFlag: FeatureFlag, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseFeatureFlag>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.upsert(featureFlag, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.upsert']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
          * 检查是否可以提交申诉
          * @summary 验证申诉资格
          * @param {CreateAppealRequest} createAppealRequest 
@@ -16770,13 +18884,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @summary 删除开关
+         * @summary 删除
          * @param {DefaultApiDeleteRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         _delete(requestParameters: DefaultApiDeleteRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
-            return localVarFp._delete(requestParameters.key, options).then((request) => request(axios, basePath));
+            return localVarFp._delete(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 用户收藏物品
@@ -16898,6 +19012,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.approvePost(requestParameters.id, requestParameters.approved, requestParameters.reason, options).then((request) => request(axios, basePath));
         },
         /**
+         * 仲裁员提交仲裁决定
+         * @summary 仲裁纠纷
+         * @param {DefaultApiArbitrateDisputeRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        arbitrateDispute(requestParameters: DefaultApiArbitrateDisputeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.arbitrateDispute(requestParameters.id, requestParameters.arbitrateDisputeRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 管理员为纠纷分配仲裁员
          * @summary 分配仲裁员
          * @param {DefaultApiAssignArbitratorRequest} requestParameters Request parameters.
@@ -16927,6 +19051,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.banUser(requestParameters.banUserRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 管理员批量分配仲裁员
+         * @summary 批量分配仲裁员
+         * @param {DefaultApiBatchAssignArbitratorRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchAssignArbitrator(requestParameters: DefaultApiBatchAssignArbitratorRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.batchAssignArbitrator(requestParameters.disputeIds, requestParameters.arbitratorId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 批量删除商品
          * @param {DefaultApiBatchDeleteRequest} requestParameters Request parameters.
@@ -16935,6 +19069,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         batchDelete(requestParameters: DefaultApiBatchDeleteRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong> {
             return localVarFp.batchDelete(requestParameters.goodsBatchRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 批量删除多个校园（软删除）
+         * @summary 批量删除校园
+         * @param {DefaultApiBatchDeleteCampusesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchDeleteCampuses(requestParameters: DefaultApiBatchDeleteCampusesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseInteger> {
+            return localVarFp.batchDeleteCampuses(requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 批量删除多个标签（跳过有关联商品的标签）
+         * @summary 批量删除标签
+         * @param {DefaultApiBatchDeleteTagsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchDeleteTags(requestParameters: DefaultApiBatchDeleteTagsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseInteger> {
+            return localVarFp.batchDeleteTags(requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -16976,6 +19130,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.batchSyncLogistics(options).then((request) => request(axios, basePath));
         },
         /**
+         * 管理员批量解除黑名单关系
+         * @summary 批量解除黑名单
+         * @param {DefaultApiBatchUnblockRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchUnblock(requestParameters: DefaultApiBatchUnblockRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseInteger> {
+            return localVarFp.batchUnblock(requestParameters.batchUnblockRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 批量更新库存
          * @param {DefaultApiBatchUpdateInventoryRequest} requestParameters Request parameters.
@@ -16994,6 +19158,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         batchUpdatePrice(requestParameters: DefaultApiBatchUpdatePriceRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong> {
             return localVarFp.batchUpdatePrice(requestParameters.priceBatchRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 批量更新分类排序
+         * @summary 批量排序
+         * @param {DefaultApiBatchUpdateSortRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchUpdateSort(requestParameters: DefaultApiBatchUpdateSortRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.batchUpdateSort(requestParameters.categoryBatchSortRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -17115,6 +19289,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.checkPostLiked(requestParameters.postId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 检查两个用户之间的黑名单关系（双向）
+         * @summary 检查用户黑名单关系
+         * @param {DefaultApiCheckRelationRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        checkRelation(requestParameters: DefaultApiCheckRelationRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCheckBlacklistRelationResponse> {
+            return localVarFp.checkRelation(requestParameters.userId, requestParameters.targetUserId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 检查是否已关注
          * @param {DefaultApiCheckTopicFollowedRequest} requestParameters Request parameters.
@@ -17133,6 +19317,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         checkUsername(requestParameters: DefaultApiCheckUsernameRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
             return localVarFp.checkUsername(requestParameters.username, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 仲裁员认领待处理的纠纷
+         * @summary 认领纠纷
+         * @param {DefaultApiClaimDisputeRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        claimDispute(requestParameters: DefaultApiClaimDisputeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.claimDispute(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -17154,6 +19348,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.clearSearchHistory(options).then((request) => request(axios, basePath));
         },
         /**
+         * 清空用户在指定纠纷的消息搜索历史记录
+         * @summary 清空消息搜索历史
+         * @param {DefaultApiClearSearchHistory1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        clearSearchHistory1(requestParameters: DefaultApiClearSearchHistory1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.clearSearchHistory1(requestParameters.disputeId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 清空浏览历史
          * @param {*} [options] Override http request option.
@@ -17171,6 +19375,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         closeDispute(requestParameters: DefaultApiCloseDisputeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
             return localVarFp.closeDispute(requestParameters.disputeId, requestParameters.closeReason, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 管理员手动关闭纠纷
+         * @summary 关闭纠纷
+         * @param {DefaultApiCloseDispute1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        closeDispute1(requestParameters: DefaultApiCloseDispute1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.closeDispute1(requestParameters.id, requestParameters.reason, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -17213,16 +19427,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary 创建校区
-         * @param {DefaultApiCreateRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        create(requestParameters: DefaultApiCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus> {
-            return localVarFp.create(requestParameters.createCampusRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 创建批量任务
          * @param {DefaultApiCreateBatchTaskRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -17232,7 +19436,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createBatchTask(requestParameters.createBatchTaskRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员创建新的分类节点
+         * 创建新的校园
+         * @summary 创建校园
+         * @param {DefaultApiCreateCampusRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createCampus(requestParameters: DefaultApiCreateCampusRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus> {
+            return localVarFp.createCampus(requestParameters.campusCreateRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 创建新的商品分类
          * @summary 创建分类
          * @param {DefaultApiCreateCategoryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -17240,6 +19454,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         createCategory(requestParameters: DefaultApiCreateCategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong> {
             return localVarFp.createCategory(requestParameters.createCategoryRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 创建新的功能开关
+         * @summary 创建功能开关
+         * @param {DefaultApiCreateFeatureFlagRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFeatureFlag(requestParameters: DefaultApiCreateFeatureFlagRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong> {
+            return localVarFp.createFeatureFlag(requestParameters.featureFlagCreateRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 用户发布二手物品信息
@@ -17343,7 +19567,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createRole(requestParameters.createRoleRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员新增标签
+         * 创建新的商品标签
          * @summary 创建标签
          * @param {DefaultApiCreateTagRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -17363,26 +19587,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createTopic(requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
-         * @summary 删除
-         * @param {DefaultApiDelete1Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        delete1(requestParameters: DefaultApiDelete1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
-            return localVarFp.delete1(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary 删除校区
-         * @param {DefaultApiDelete2Request} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        delete2(requestParameters: DefaultApiDelete2Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
-            return localVarFp.delete2(requestParameters.id, options).then((request) => request(axios, basePath));
-        },
-        /**
          * 批量删除评价的所有图片和视频
          * @summary 删除评价的所有媒体
          * @param {DefaultApiDeleteAllMediaByReviewIdRequest} requestParameters Request parameters.
@@ -17393,7 +19597,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.deleteAllMediaByReviewId(requestParameters.reviewId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员删除分类节点，删除前需确保无子节点及关联商品
+         * 删除指定校园（软删除）
+         * @summary 删除校园
+         * @param {DefaultApiDeleteCampusRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteCampus(requestParameters: DefaultApiDeleteCampusRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.deleteCampus(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 删除指定分类（需确保无子分类和关联商品）
          * @summary 删除分类
          * @param {DefaultApiDeleteCategoryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -17411,6 +19625,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         deleteEvidence(requestParameters: DefaultApiDeleteEvidenceRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
             return localVarFp.deleteEvidence(requestParameters.evidenceId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 删除指定功能开关（自动刷新缓存）
+         * @summary 删除功能开关
+         * @param {DefaultApiDeleteFeatureFlagRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteFeatureFlag(requestParameters: DefaultApiDeleteFeatureFlagRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.deleteFeatureFlag(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 删除指定的文件（包括缩略图）
@@ -17493,7 +19717,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.deleteRole(requestParameters.roleId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员删除标签，删除前需确保无绑定
+         * 删除指定标签（需确保无关联商品）
          * @summary 删除标签
          * @param {DefaultApiDeleteTagRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -17633,6 +19857,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getAcceptedProposal(requestParameters.disputeId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 获取当前启用且在有效期内的轮播图列表，按排序顺序返回
+         * @summary 获取启用的轮播图
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getActiveBanners(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListBanner> {
+            return localVarFp.getActiveBanners(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 管理员查询系统中的所有纠纷
          * @summary 查询所有纠纷
          * @param {DefaultApiGetAllDisputesRequest} requestParameters Request parameters.
@@ -17759,6 +19992,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getBehaviorHeatmap(options).then((request) => request(axios, basePath));
         },
         /**
+         * 查询指定用户拉黑了哪些人
+         * @summary 查询指定用户的黑名单
+         * @param {DefaultApiGetBlacklistByUserRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBlacklistByUser(requestParameters: DefaultApiGetBlacklistByUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListLong> {
+            return localVarFp.getBlacklistByUser(requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 查询哪些用户拉黑了指定用户
+         * @summary 查询拉黑了指定用户的人
+         * @param {DefaultApiGetBlockedByUsersRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBlockedByUsers(requestParameters: DefaultApiGetBlockedByUsersRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListLong> {
+            return localVarFp.getBlockedByUsers(requestParameters.blockedUserId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 查询买家上传的所有证据
          * @summary 查询买家证据
          * @param {DefaultApiGetBuyerEvidenceRequest} requestParameters Request parameters.
@@ -17769,8 +20022,38 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getBuyerEvidence(requestParameters.disputeId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 物品分类分布统计
-         * @summary 获取分类统计数据
+         * 根据ID获取校园详细信息
+         * @summary 获取校园详情
+         * @param {DefaultApiGetCampusByIdRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCampusById(requestParameters: DefaultApiGetCampusByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus> {
+            return localVarFp.getCampusById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取校园用户/商品/订单统计数据
+         * @summary 校园统计
+         * @param {DefaultApiGetCampusStatisticsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCampusStatistics(requestParameters: DefaultApiGetCampusStatisticsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampusStatisticsResponse> {
+            return localVarFp.getCampusStatistics(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 根据ID获取分类详细信息
+         * @summary 获取分类详情
+         * @param {DefaultApiGetCategoryByIdRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCategoryById(requestParameters: DefaultApiGetCategoryByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCategory> {
+            return localVarFp.getCategoryById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取各分类下的物品数量统计（仅管理员）
+         * @summary 获取分类统计
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -17778,13 +20061,32 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getCategoryStatistics(options).then((request) => request(axios, basePath));
         },
         /**
-         * 按层级返回完整的分类树结构
+         * 获取分类商品统计数据（在售、已售、子分类数）
+         * @summary 分类统计
+         * @param {DefaultApiGetCategoryStatistics1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCategoryStatistics1(requestParameters: DefaultApiGetCategoryStatistics1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCategoryStatisticsResponse> {
+            return localVarFp.getCategoryStatistics1(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 按层级返回完整的分类树结构（公开接口）
          * @summary 获取分类树
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getCategoryTree(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCategoryNodeResponse> {
             return localVarFp.getCategoryTree(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取完整的分类树形结构（含子分类）
+         * @summary 获取分类树
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCategoryTree1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCategoryNodeResponse> {
+            return localVarFp.getCategoryTree1(options).then((request) => request(axios, basePath));
         },
         /**
          * 需要用户已登录，返回当前账户的基础信息、状态、积分及角色等数据。
@@ -17804,6 +20106,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getDisputeDetail(requestParameters: DefaultApiGetDisputeDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseDisputeDetailDTO> {
             return localVarFp.getDisputeDetail(requestParameters.disputeId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 查询指定纠纷的完整信息（含证据、协商记录、仲裁结果）
+         * @summary 查询纠纷详情
+         * @param {DefaultApiGetDisputeDetail1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDisputeDetail1(requestParameters: DefaultApiGetDisputeDetail1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseDisputeDetailDTO> {
+            return localVarFp.getDisputeDetail1(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 查询纠纷的完整证据列表
@@ -17866,6 +20178,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getEvidenceSummary(requestParameters.disputeId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 根据ID获取功能开关详细信息
+         * @summary 获取功能开关详情
+         * @param {DefaultApiGetFeatureFlagByIdRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFeatureFlagById(requestParameters: DefaultApiGetFeatureFlagByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseFeatureFlag> {
+            return localVarFp.getFeatureFlagById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取粉丝数
          * @param {DefaultApiGetFollowerCountRequest} requestParameters Request parameters.
@@ -17922,15 +20244,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getGoodsDetail1(requestParameters: DefaultApiGetGoodsDetail1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseGoodsDetailDTO> {
             return localVarFp.getGoodsDetail1(requestParameters.goodsId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 物品相关统计
-         * @summary 获取物品统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getGoodsStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
-            return localVarFp.getGoodsStatistics(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -18080,15 +20393,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getOrderDetail(requestParameters.orderNo, options).then((request) => request(axios, basePath));
         },
         /**
-         * 订单相关统计
-         * @summary 获取订单统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getOrderStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
-            return localVarFp.getOrderStatistics(options).then((request) => request(axios, basePath));
-        },
-        /**
          * 获取所有待审核的申诉列表
          * @summary 查询待审核申诉
          * @param {DefaultApiGetPendingAppealsRequest} requestParameters Request parameters.
@@ -18168,14 +20472,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getQpsStatistics(requestParameters.hours, options).then((request) => request(axios, basePath));
         },
         /**
-         * 最近 N 个月的平台收入统计
-         * @summary 获取收入统计（按月）
-         * @param {DefaultApiGetRevenueByMonthRequest} requestParameters Request parameters.
+         * 获取按月统计的收入趋势（仅管理员）
+         * @summary 获取收入趋势
+         * @param {DefaultApiGetRevenueTrendRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRevenueByMonth(requestParameters: DefaultApiGetRevenueByMonthRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
-            return localVarFp.getRevenueByMonth(requestParameters.months, options).then((request) => request(axios, basePath));
+        getRevenueTrend(requestParameters: DefaultApiGetRevenueTrendRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
+            return localVarFp.getRevenueTrend(requestParameters.months, options).then((request) => request(axios, basePath));
         },
         /**
          * 返回图片和视频列表，按sortOrder排序
@@ -18227,6 +20531,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getRules(options).then((request) => request(axios, basePath));
         },
         /**
+         * 获取用户的消息搜索历史记录
+         * @summary 获取消息搜索历史
+         * @param {DefaultApiGetSearchHistoryRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSearchHistory(requestParameters: DefaultApiGetSearchHistoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListMessageSearchHistory> {
+            return localVarFp.getSearchHistory(requestParameters.disputeId, requestParameters.limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取搜索相关的统计信息
+         * @summary 获取消息搜索统计
+         * @param {DefaultApiGetSearchStatisticsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSearchStatistics(requestParameters: DefaultApiGetSearchStatisticsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMessageSearchStatistics> {
+            return localVarFp.getSearchStatistics(requestParameters.disputeId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取搜索建议
          * @param {DefaultApiGetSearchSuggestionsRequest} requestParameters Request parameters.
@@ -18235,6 +20559,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getSearchSuggestions(requestParameters: DefaultApiGetSearchSuggestionsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseSearchSuggestionDTO> {
             return localVarFp.getSearchSuggestions(requestParameters.keyword, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 根据输入提供智能搜索建议
+         * @summary 获取消息搜索建议
+         * @param {DefaultApiGetSearchSuggestions1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSearchSuggestions1(requestParameters: DefaultApiGetSearchSuggestions1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListMessageSearchSuggestion> {
+            return localVarFp.getSearchSuggestions1(requestParameters.disputeId, requestParameters.keyword, requestParameters.suggestionType, requestParameters.limit, options).then((request) => request(axios, basePath));
         },
         /**
          * 查询卖家上传的所有证据
@@ -18267,13 +20601,42 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getSlowQueries(requestParameters.hours, options).then((request) => request(axios, basePath));
         },
         /**
-         * 系统整体数据概览
+         * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
+         * @summary 统计黑名单数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStatistics1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBlacklistStatsResponse> {
+            return localVarFp.getStatistics1(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取系统核心数据概览（仅管理员）
          * @summary 获取系统概览统计
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getSystemOverview(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
             return localVarFp.getSystemOverview(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 根据ID获取标签详细信息
+         * @summary 获取标签详情
+         * @param {DefaultApiGetTagByIdRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTagById(requestParameters: DefaultApiGetTagByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseTag> {
+            return localVarFp.getTagById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取标签关联商品统计数据
+         * @summary 标签统计
+         * @param {DefaultApiGetTagStatisticsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTagStatistics(requestParameters: DefaultApiGetTagStatisticsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseTagStatisticsResponse> {
+            return localVarFp.getTagStatistics(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -18286,8 +20649,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getTaskProgress(requestParameters.taskId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 今日数据概览
-         * @summary 获取今日统计数据
+         * 获取今日核心数据统计（仅管理员）
+         * @summary 获取今日统计
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -18295,8 +20658,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getTodayStatistics(options).then((request) => request(axios, basePath));
         },
         /**
-         * 浏览量最高的物品 Top N
-         * @summary 获取热门物品排行榜
+         * 获取浏览量最高的商品排行榜（仅管理员）
+         * @summary 获取热门商品排行
          * @param {DefaultApiGetTopGoodsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -18305,8 +20668,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getTopGoods(requestParameters.limit, options).then((request) => request(axios, basePath));
         },
         /**
-         * 积分最高的用户 Top N
-         * @summary 获取活跃用户排行榜
+         * 获取发布物品最多的用户排行榜（仅管理员）
+         * @summary 获取活跃用户排行
          * @param {DefaultApiGetTopUsersRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -18335,14 +20698,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getTopicFollowerCount(requestParameters.topicId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 最近 N 天的数据趋势分析
-         * @summary 获取趋势数据
-         * @param {DefaultApiGetTrendDataRequest} requestParameters Request parameters.
+         * 获取用户、物品、订单的趋势数据（仅管理员）
+         * @summary 获取趋势统计
+         * @param {DefaultApiGetTrendRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTrendData(requestParameters: DefaultApiGetTrendDataRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
-            return localVarFp.getTrendData(requestParameters.days, options).then((request) => request(axios, basePath));
+        getTrend(requestParameters: DefaultApiGetTrendRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
+            return localVarFp.getTrend(requestParameters.days, options).then((request) => request(axios, basePath));
         },
         /**
          * 仲裁员查询待评估的证据列表
@@ -18478,15 +20841,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getUserSegmentStatistics(options).then((request) => request(axios, basePath));
         },
         /**
-         * 用户相关统计
-         * @summary 获取用户统计数据
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getUserStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
-            return localVarFp.getUserStatistics(options).then((request) => request(axios, basePath));
-        },
-        /**
          * 
          * @summary 获取我的浏览历史
          * @param {DefaultApiGetUserViewHistoryRequest} requestParameters Request parameters.
@@ -18514,6 +20868,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         healthCheck(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseHealthCheckResponse> {
             return localVarFp.healthCheck(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 测试热重载 - 版本 1
+         * @summary Hello World
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        hello(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseString> {
+            return localVarFp.hello(options).then((request) => request(axios, basePath));
         },
         /**
          * 按校区获取热门物品榜单
@@ -18575,22 +20938,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.list(options).then((request) => request(axios, basePath));
         },
         /**
-         * 查询所有功能开关
-         * @summary 开关列表
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        list1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListFeatureFlag> {
-            return localVarFp.list1(options).then((request) => request(axios, basePath));
-        },
-        /**
          * 查询当前用户的导出任务列表
          * @summary 我的导出任务
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        list2(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListExportJob> {
-            return localVarFp.list2(options).then((request) => request(axios, basePath));
+        list1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListExportJob> {
+            return localVarFp.list1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -18598,17 +20952,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        list3(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListNotificationTemplate> {
-            return localVarFp.list3(options).then((request) => request(axios, basePath));
+        list2(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListNotificationTemplate> {
+            return localVarFp.list2(options).then((request) => request(axios, basePath));
         },
         /**
-         * 查询全部校区
-         * @summary 校区列表
+         * 管理员查询系统中的所有黑名单记录
+         * @summary 查询所有黑名单记录（分页）
+         * @param {DefaultApiListAllBlacklistRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        list4(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCampus> {
-            return localVarFp.list4(options).then((request) => request(axios, basePath));
+        listAllBlacklist(requestParameters: DefaultApiListAllBlacklistRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageBlacklist> {
+            return localVarFp.listAllBlacklist(requestParameters.userId, requestParameters.blockedUserId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 管理员查询所有退款，支持分页、状态筛选和关键词搜索
@@ -18661,6 +21016,24 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listBuyerOrders(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 获取所有校园列表
+         * @summary 查询校园列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCampuses(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCampus> {
+            return localVarFp.listCampuses(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取所有分类列表（平铺）
+         * @summary 查询分类列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCategories(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCategory> {
+            return localVarFp.listCategories(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 获取当前用户的所有私信会话，按最后消息时间倒序
          * @summary 查询会话列表
          * @param {DefaultApiListConversationsRequest} requestParameters Request parameters.
@@ -18671,6 +21044,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listConversations(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 管理员查询所有纠纷（支持筛选）
+         * @summary 查询纠纷列表
+         * @param {DefaultApiListDisputesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listDisputes(requestParameters: DefaultApiListDisputesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO> {
+            return localVarFp.listDisputes(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 查询当前用户的收藏列表
          * @summary 查询收藏列表
          * @param {DefaultApiListFavoritesRequest} requestParameters Request parameters.
@@ -18679,6 +21062,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listFavorites(requestParameters: DefaultApiListFavoritesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse> {
             return localVarFp.listFavorites(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取所有功能开关列表
+         * @summary 查询功能开关列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listFeatureFlags(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListFeatureFlag> {
+            return localVarFp.listFeatureFlags(options).then((request) => request(axios, basePath));
         },
         /**
          * 查看我关注的卖家列表
@@ -18708,6 +21100,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listMessages(requestParameters: DefaultApiListMessagesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageMessageResponse> {
             return localVarFp.listMessages(requestParameters.conversationId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 查询当前仲裁员处理的纠纷列表
+         * @summary 查询我的仲裁纠纷
+         * @param {DefaultApiListMyDisputesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listMyDisputes(requestParameters: DefaultApiListMyDisputesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO> {
+            return localVarFp.listMyDisputes(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 用户查询自己的退款列表，支持分页和状态筛选
@@ -18747,6 +21149,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listNotifications(requestParameters: DefaultApiListNotificationsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageNotificationResponse> {
             return localVarFp.listNotifications(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 查询待仲裁状态的纠纷列表
+         * @summary 查询待处理纠纷
+         * @param {DefaultApiListPendingDisputesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPendingDisputes(requestParameters: DefaultApiListPendingDisputesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO> {
+            return localVarFp.listPendingDisputes(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 管理员查询所有待审核的物品
@@ -18853,6 +21265,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listTags(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagResponse> {
             return localVarFp.listTags(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取所有标签列表
+         * @summary 查询标签列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listTags1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagResponse> {
+            return localVarFp.listTags1(options).then((request) => request(axios, basePath));
         },
         /**
          * 返回可执行软删除治理的实体标识
@@ -18970,14 +21391,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.markReplyAsRead(requestParameters.replyId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 将来源标签合并至目标标签
+         * 将源标签合并到目标标签（自动处理重复绑定）
          * @summary 合并标签
-         * @param {DefaultApiMergeTagRequest} requestParameters Request parameters.
+         * @param {DefaultApiMergeTagsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        mergeTag(requestParameters: DefaultApiMergeTagRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
-            return localVarFp.mergeTag(requestParameters.mergeTagRequest, options).then((request) => request(axios, basePath));
+        mergeTags(requestParameters: DefaultApiMergeTagsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.mergeTags(requestParameters.mergeTagRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 将用户从源校区迁移至目标校区
@@ -19060,6 +21481,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.recordBehavior(requestParameters.userId, requestParameters.behaviorType, requestParameters.targetType, requestParameters.targetId, requestParameters.source, requestParameters.duration, options).then((request) => request(axios, basePath));
         },
         /**
+         * 用户点击轮播图时调用，用于统计点击次数
+         * @summary 记录轮播图点击
+         * @param {DefaultApiRecordClickRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        recordClick(requestParameters: DefaultApiRecordClickRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.recordClick(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 记录商品浏览
          * @param {DefaultApiRecordViewRequest} requestParameters Request parameters.
@@ -19068,6 +21499,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         recordView(requestParameters: DefaultApiRecordViewRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
             return localVarFp.recordView(requestParameters.goodsId, requestParameters.sourcePage, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 轮播图展示时调用，用于统计展示次数
+         * @summary 记录轮播图展示
+         * @param {DefaultApiRecordView1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        recordView1(requestParameters: DefaultApiRecordView1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.recordView1(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -19080,13 +21521,23 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.refresh(requestParameters.authorization, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
-         * @summary 刷新全部开关缓存
+         * 刷新所有功能开关的本地缓存
+         * @summary 刷新全部缓存
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        refreshAll(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
-            return localVarFp.refreshAll(options).then((request) => request(axios, basePath));
+        refreshAllCache(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.refreshAllCache(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 刷新指定功能开关的本地缓存
+         * @summary 刷新单个缓存
+         * @param {DefaultApiRefreshCacheRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        refreshCache(requestParameters: DefaultApiRefreshCacheRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.refreshCache(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 管理员手动刷新热门榜单缓存
@@ -19339,6 +21790,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.searchGoods(requestParameters.keyword, requestParameters.minPrice, requestParameters.maxPrice, requestParameters.categoryId, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
+         * 在纠纷协商中搜索聊天消息，支持多种筛选条件
+         * @summary 搜索协商消息
+         * @param {DefaultApiSearchMessagesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchMessages(requestParameters: DefaultApiSearchMessagesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageMessageSearchResponse> {
+            return localVarFp.searchMessages(requestParameters.messageSearchRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 根据关键词搜索帖子
          * @summary 搜索帖子
          * @param {DefaultApiSearchPostsRequest} requestParameters Request parameters.
@@ -19468,6 +21929,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.submitDispute(requestParameters.createDisputeRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 上传纠纷相关的证据材料
+         * @summary 提交证据
+         * @param {DefaultApiSubmitEvidenceRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitEvidence(requestParameters: DefaultApiSubmitEvidenceRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.submitEvidence(requestParameters.id, requestParameters.uploadEvidenceRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 订阅关键词，符合条件的商品上架会提醒
          * @summary 新增订阅
          * @param {DefaultApiSubscribeRequest} requestParameters Request parameters.
@@ -19486,6 +21957,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         syncLogistics(requestParameters: DefaultApiSyncLogisticsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLogisticsDTO> {
             return localVarFp.syncLogistics(requestParameters.orderId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 切换标签的启用/禁用状态
+         * @summary 切换启用状态
+         * @param {DefaultApiToggleEnabledRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        toggleEnabled(requestParameters: DefaultApiToggleEnabledRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.toggleEnabled(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 切换功能开关的启用/禁用状态（自动刷新缓存）
+         * @summary 切换启用状态
+         * @param {DefaultApiToggleEnabled1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        toggleEnabled1(requestParameters: DefaultApiToggleEnabled1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.toggleEnabled1(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
          * 已点赞则取消，未点赞则点赞
@@ -19598,24 +22089,34 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.unsubscribe1(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
-         * @summary 更新校区
-         * @param {DefaultApiUpdateRequest} requestParameters Request parameters.
+         * 更新校园信息
+         * @summary 编辑校园
+         * @param {DefaultApiUpdateCampusRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        update(requestParameters: DefaultApiUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus> {
-            return localVarFp.update(requestParameters.id, requestParameters.updateCampusRequest, options).then((request) => request(axios, basePath));
+        updateCampus(requestParameters: DefaultApiUpdateCampusRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus> {
+            return localVarFp.updateCampus(requestParameters.id, requestParameters.campusUpdateRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员更新分类信息
-         * @summary 更新分类
+         * 更新分类信息
+         * @summary 编辑分类
          * @param {DefaultApiUpdateCategoryRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         updateCategory(requestParameters: DefaultApiUpdateCategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
             return localVarFp.updateCategory(requestParameters.id, requestParameters.updateCategoryRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 更新功能开关配置（自动刷新缓存）
+         * @summary 编辑功能开关
+         * @param {DefaultApiUpdateFeatureFlagRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateFeatureFlag(requestParameters: DefaultApiUpdateFeatureFlagRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.updateFeatureFlag(requestParameters.id, requestParameters.featureFlagUpdateRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 需要用户已登录，提交旧密码与新密码完成密码更新。
@@ -19658,8 +22159,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.updateRole(requestParameters.roleId, requestParameters.updateRoleRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员修改标签名称或状态
-         * @summary 更新标签
+         * 更新标签信息
+         * @summary 编辑标签
          * @param {DefaultApiUpdateTagRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -19748,16 +22249,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.uploadMediaBatch(requestParameters.reviewId, requestParameters.mediaType, requestParameters.files, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
-         * @summary 新增或更新开关
-         * @param {DefaultApiUpsertRequest} requestParameters Request parameters.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        upsert(requestParameters: DefaultApiUpsertRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseFeatureFlag> {
-            return localVarFp.upsert(requestParameters.featureFlag, options).then((request) => request(axios, basePath));
-        },
-        /**
          * 检查是否可以提交申诉
          * @summary 验证申诉资格
          * @param {DefaultApiValidateAppealEligibilityRequest} requestParameters Request parameters.
@@ -19797,13 +22288,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export interface DefaultApiInterface {
     /**
      * 
-     * @summary 删除开关
-     * @param {string} key 
+     * @summary 删除
+     * @param {number} id 模板ID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    _delete(key: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+    _delete(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 用户收藏物品
@@ -19933,6 +22424,17 @@ export interface DefaultApiInterface {
     approvePost(id: number, approved: boolean, reason?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 仲裁员提交仲裁决定
+     * @summary 仲裁纠纷
+     * @param {number} id 纠纷ID
+     * @param {ArbitrateDisputeRequest} arbitrateDisputeRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    arbitrateDispute(id: number, arbitrateDisputeRequest: ArbitrateDisputeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 管理员为纠纷分配仲裁员
      * @summary 分配仲裁员
      * @param {number} disputeId 纠纷ID
@@ -19963,6 +22465,17 @@ export interface DefaultApiInterface {
     banUser(banUserRequest: BanUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 管理员批量分配仲裁员
+     * @summary 批量分配仲裁员
+     * @param {Array<number>} disputeIds 纠纷ID列表
+     * @param {number} arbitratorId 仲裁员ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batchAssignArbitrator(disputeIds: Array<number>, arbitratorId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 
      * @summary 批量删除商品
      * @param {GoodsBatchRequest} goodsBatchRequest 
@@ -19971,6 +22484,26 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     batchDelete(goodsBatchRequest: GoodsBatchRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
+
+    /**
+     * 批量删除多个校园（软删除）
+     * @summary 批量删除校园
+     * @param {Array<number>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batchDeleteCampuses(requestBody: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseInteger>;
+
+    /**
+     * 批量删除多个标签（跳过有关联商品的标签）
+     * @summary 批量删除标签
+     * @param {Array<number>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batchDeleteTags(requestBody: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseInteger>;
 
     /**
      * 
@@ -20012,6 +22545,16 @@ export interface DefaultApiInterface {
     batchSyncLogistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseInteger>;
 
     /**
+     * 管理员批量解除黑名单关系
+     * @summary 批量解除黑名单
+     * @param {BatchUnblockRequest} batchUnblockRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batchUnblock(batchUnblockRequest: BatchUnblockRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseInteger>;
+
+    /**
      * 
      * @summary 批量更新库存
      * @param {InventoryBatchRequest} inventoryBatchRequest 
@@ -20030,6 +22573,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     batchUpdatePrice(priceBatchRequest: PriceBatchRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
+
+    /**
+     * 批量更新分类排序
+     * @summary 批量排序
+     * @param {CategoryBatchSortRequest} categoryBatchSortRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    batchUpdateSort(categoryBatchSortRequest: CategoryBatchSortRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 
@@ -20151,6 +22704,17 @@ export interface DefaultApiInterface {
     checkPostLiked(postId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
 
     /**
+     * 检查两个用户之间的黑名单关系（双向）
+     * @summary 检查用户黑名单关系
+     * @param {number} userId 用户ID
+     * @param {number} targetUserId 目标用户ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    checkRelation(userId: number, targetUserId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCheckBlacklistRelationResponse>;
+
+    /**
      * 
      * @summary 检查是否已关注
      * @param {number} topicId 话题ID
@@ -20169,6 +22733,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     checkUsername(username: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
+
+    /**
+     * 仲裁员认领待处理的纠纷
+     * @summary 认领纠纷
+     * @param {number} id 纠纷ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    claimDispute(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 
@@ -20190,6 +22764,16 @@ export interface DefaultApiInterface {
     clearSearchHistory(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 清空用户在指定纠纷的消息搜索历史记录
+     * @summary 清空消息搜索历史
+     * @param {number} disputeId 纠纷ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    clearSearchHistory1(disputeId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 
      * @summary 清空浏览历史
      * @param {*} [options] Override http request option.
@@ -20208,6 +22792,17 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     closeDispute(disputeId: number, closeReason: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
+
+    /**
+     * 管理员手动关闭纠纷
+     * @summary 关闭纠纷
+     * @param {number} id 纠纷ID
+     * @param {string} reason 关闭原因
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    closeDispute1(id: number, reason: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 
@@ -20251,16 +22846,6 @@ export interface DefaultApiInterface {
 
     /**
      * 
-     * @summary 创建校区
-     * @param {CreateCampusRequest} createCampusRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApiInterface
-     */
-    create(createCampusRequest: CreateCampusRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus>;
-
-    /**
-     * 
      * @summary 创建批量任务
      * @param {CreateBatchTaskRequest} createBatchTaskRequest 
      * @param {*} [options] Override http request option.
@@ -20270,7 +22855,17 @@ export interface DefaultApiInterface {
     createBatchTask(createBatchTaskRequest: CreateBatchTaskRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
 
     /**
-     * 管理员创建新的分类节点
+     * 创建新的校园
+     * @summary 创建校园
+     * @param {CampusCreateRequest} campusCreateRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    createCampus(campusCreateRequest: CampusCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus>;
+
+    /**
+     * 创建新的商品分类
      * @summary 创建分类
      * @param {CreateCategoryRequest} createCategoryRequest 
      * @param {*} [options] Override http request option.
@@ -20278,6 +22873,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     createCategory(createCategoryRequest: CreateCategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
+
+    /**
+     * 创建新的功能开关
+     * @summary 创建功能开关
+     * @param {FeatureFlagCreateRequest} featureFlagCreateRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    createFeatureFlag(featureFlagCreateRequest: FeatureFlagCreateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
 
     /**
      * 用户发布二手物品信息
@@ -20384,7 +22989,7 @@ export interface DefaultApiInterface {
     createRole(createRoleRequest: CreateRoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRoleDetailResponse>;
 
     /**
-     * 管理员新增标签
+     * 创建新的商品标签
      * @summary 创建标签
      * @param {CreateTagRequest} createTagRequest 
      * @param {*} [options] Override http request option.
@@ -20404,26 +23009,6 @@ export interface DefaultApiInterface {
     createTopic(requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
 
     /**
-     * 
-     * @summary 删除
-     * @param {number} id 模板ID
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApiInterface
-     */
-    delete1(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
-
-    /**
-     * 
-     * @summary 删除校区
-     * @param {number} id 校区ID
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApiInterface
-     */
-    delete2(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
-
-    /**
      * 批量删除评价的所有图片和视频
      * @summary 删除评价的所有媒体
      * @param {number} reviewId 评价ID
@@ -20434,7 +23019,17 @@ export interface DefaultApiInterface {
     deleteAllMediaByReviewId(reviewId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
-     * 管理员删除分类节点，删除前需确保无子节点及关联商品
+     * 删除指定校园（软删除）
+     * @summary 删除校园
+     * @param {number} id 校园ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    deleteCampus(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 删除指定分类（需确保无子分类和关联商品）
      * @summary 删除分类
      * @param {number} id 分类ID
      * @param {*} [options] Override http request option.
@@ -20452,6 +23047,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     deleteEvidence(evidenceId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
+
+    /**
+     * 删除指定功能开关（自动刷新缓存）
+     * @summary 删除功能开关
+     * @param {number} id 功能开关ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    deleteFeatureFlag(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 删除指定的文件（包括缩略图）
@@ -20534,7 +23139,7 @@ export interface DefaultApiInterface {
     deleteRole(roleId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
-     * 管理员删除标签，删除前需确保无绑定
+     * 删除指定标签（需确保无关联商品）
      * @summary 删除标签
      * @param {number} id 标签ID
      * @param {*} [options] Override http request option.
@@ -20676,6 +23281,15 @@ export interface DefaultApiInterface {
     getAcceptedProposal(disputeId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseOptionalNegotiationMessageDTO>;
 
     /**
+     * 获取当前启用且在有效期内的轮播图列表，按排序顺序返回
+     * @summary 获取启用的轮播图
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getActiveBanners(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListBanner>;
+
+    /**
      * 管理员查询系统中的所有纠纷
      * @summary 查询所有纠纷
      * @param {GetAllDisputesStatusEnum} [status] 纠纷状态
@@ -20810,6 +23424,26 @@ export interface DefaultApiInterface {
     getBehaviorHeatmap(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
 
     /**
+     * 查询指定用户拉黑了哪些人
+     * @summary 查询指定用户的黑名单
+     * @param {number} userId 用户ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getBlacklistByUser(userId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListLong>;
+
+    /**
+     * 查询哪些用户拉黑了指定用户
+     * @summary 查询拉黑了指定用户的人
+     * @param {number} blockedUserId 被拉黑的用户ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getBlockedByUsers(blockedUserId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListLong>;
+
+    /**
      * 查询买家上传的所有证据
      * @summary 查询买家证据
      * @param {number} disputeId 纠纷ID
@@ -20820,8 +23454,38 @@ export interface DefaultApiInterface {
     getBuyerEvidence(disputeId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListEvidenceDTO>;
 
     /**
-     * 物品分类分布统计
-     * @summary 获取分类统计数据
+     * 根据ID获取校园详细信息
+     * @summary 获取校园详情
+     * @param {number} id 校园ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getCampusById(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus>;
+
+    /**
+     * 获取校园用户/商品/订单统计数据
+     * @summary 校园统计
+     * @param {number} id 校园ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getCampusStatistics(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampusStatisticsResponse>;
+
+    /**
+     * 根据ID获取分类详细信息
+     * @summary 获取分类详情
+     * @param {number} id 分类ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getCategoryById(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCategory>;
+
+    /**
+     * 获取各分类下的物品数量统计（仅管理员）
+     * @summary 获取分类统计
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -20829,13 +23493,32 @@ export interface DefaultApiInterface {
     getCategoryStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringLong>;
 
     /**
-     * 按层级返回完整的分类树结构
+     * 获取分类商品统计数据（在售、已售、子分类数）
+     * @summary 分类统计
+     * @param {number} id 分类ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getCategoryStatistics1(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCategoryStatisticsResponse>;
+
+    /**
+     * 按层级返回完整的分类树结构（公开接口）
      * @summary 获取分类树
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
     getCategoryTree(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCategoryNodeResponse>;
+
+    /**
+     * 获取完整的分类树形结构（含子分类）
+     * @summary 获取分类树
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getCategoryTree1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCategoryNodeResponse>;
 
     /**
      * 需要用户已登录，返回当前账户的基础信息、状态、积分及角色等数据。
@@ -20855,6 +23538,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     getDisputeDetail(disputeId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseDisputeDetailDTO>;
+
+    /**
+     * 查询指定纠纷的完整信息（含证据、协商记录、仲裁结果）
+     * @summary 查询纠纷详情
+     * @param {number} id 纠纷ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getDisputeDetail1(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseDisputeDetailDTO>;
 
     /**
      * 查询纠纷的完整证据列表
@@ -20918,6 +23611,16 @@ export interface DefaultApiInterface {
     getEvidenceSummary(disputeId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseEvidenceSummaryDTO>;
 
     /**
+     * 根据ID获取功能开关详细信息
+     * @summary 获取功能开关详情
+     * @param {number} id 功能开关ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getFeatureFlagById(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseFeatureFlag>;
+
+    /**
      * 
      * @summary 获取粉丝数
      * @param {number} userId 用户ID
@@ -20974,15 +23677,6 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     getGoodsDetail1(goodsId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseGoodsDetailDTO>;
-
-    /**
-     * 物品相关统计
-     * @summary 获取物品统计数据
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApiInterface
-     */
-    getGoodsStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
 
     /**
      * 
@@ -21135,15 +23829,6 @@ export interface DefaultApiInterface {
     getOrderDetail(orderNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseOrder>;
 
     /**
-     * 订单相关统计
-     * @summary 获取订单统计数据
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApiInterface
-     */
-    getOrderStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
-
-    /**
      * 获取所有待审核的申诉列表
      * @summary 查询待审核申诉
      * @param {number} [page] 
@@ -21224,14 +23909,14 @@ export interface DefaultApiInterface {
     getQpsStatistics(hours?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListQpsData>;
 
     /**
-     * 最近 N 个月的平台收入统计
-     * @summary 获取收入统计（按月）
-     * @param {number} [months] 月数
+     * 获取按月统计的收入趋势（仅管理员）
+     * @summary 获取收入趋势
+     * @param {number} [months] 统计月数
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    getRevenueByMonth(months?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
+    getRevenueTrend(months?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
 
     /**
      * 返回图片和视频列表，按sortOrder排序
@@ -21284,6 +23969,27 @@ export interface DefaultApiInterface {
     getRules(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
 
     /**
+     * 获取用户的消息搜索历史记录
+     * @summary 获取消息搜索历史
+     * @param {number} disputeId 纠纷ID
+     * @param {number} [limit] 返回数量限制
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getSearchHistory(disputeId: number, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListMessageSearchHistory>;
+
+    /**
+     * 获取搜索相关的统计信息
+     * @summary 获取消息搜索统计
+     * @param {number} disputeId 纠纷ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getSearchStatistics(disputeId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMessageSearchStatistics>;
+
+    /**
      * 
      * @summary 获取搜索建议
      * @param {string} [keyword] 关键词前缀
@@ -21292,6 +23998,19 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     getSearchSuggestions(keyword?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseSearchSuggestionDTO>;
+
+    /**
+     * 根据输入提供智能搜索建议
+     * @summary 获取消息搜索建议
+     * @param {number} disputeId 纠纷ID
+     * @param {string} [keyword] 关键词前缀
+     * @param {string} [suggestionType] 建议类型 (keyword/user/date)
+     * @param {number} [limit] 返回数量限制
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getSearchSuggestions1(disputeId: number, keyword?: string, suggestionType?: string, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListMessageSearchSuggestion>;
 
     /**
      * 查询卖家上传的所有证据
@@ -21325,13 +24044,42 @@ export interface DefaultApiInterface {
     getSlowQueries(hours?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListApiPerformanceLog>;
 
     /**
-     * 系统整体数据概览
+     * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
+     * @summary 统计黑名单数量
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getStatistics1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBlacklistStatsResponse>;
+
+    /**
+     * 获取系统核心数据概览（仅管理员）
      * @summary 获取系统概览统计
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
     getSystemOverview(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
+
+    /**
+     * 根据ID获取标签详细信息
+     * @summary 获取标签详情
+     * @param {number} id 标签ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTagById(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseTag>;
+
+    /**
+     * 获取标签关联商品统计数据
+     * @summary 标签统计
+     * @param {number} id 标签ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTagStatistics(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseTagStatisticsResponse>;
 
     /**
      * 
@@ -21344,8 +24092,8 @@ export interface DefaultApiInterface {
     getTaskProgress(taskId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBatchTaskProgressResponse>;
 
     /**
-     * 今日数据概览
-     * @summary 获取今日统计数据
+     * 获取今日核心数据统计（仅管理员）
+     * @summary 获取今日统计
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -21353,9 +24101,9 @@ export interface DefaultApiInterface {
     getTodayStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
 
     /**
-     * 浏览量最高的物品 Top N
-     * @summary 获取热门物品排行榜
-     * @param {number} [limit] 数量限制
+     * 获取浏览量最高的商品排行榜（仅管理员）
+     * @summary 获取热门商品排行
+     * @param {number} [limit] 返回数量
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -21363,9 +24111,9 @@ export interface DefaultApiInterface {
     getTopGoods(limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListMapStringObject>;
 
     /**
-     * 积分最高的用户 Top N
-     * @summary 获取活跃用户排行榜
-     * @param {number} [limit] 数量限制
+     * 获取发布物品最多的用户排行榜（仅管理员）
+     * @summary 获取活跃用户排行
+     * @param {number} [limit] 返回数量
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -21393,14 +24141,14 @@ export interface DefaultApiInterface {
     getTopicFollowerCount(topicId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
 
     /**
-     * 最近 N 天的数据趋势分析
-     * @summary 获取趋势数据
-     * @param {number} [days] 天数
+     * 获取用户、物品、订单的趋势数据（仅管理员）
+     * @summary 获取趋势统计
+     * @param {number} [days] 统计天数
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    getTrendData(days?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
+    getTrend(days?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
 
     /**
      * 仲裁员查询待评估的证据列表
@@ -21539,15 +24287,6 @@ export interface DefaultApiInterface {
     getUserSegmentStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringLong>;
 
     /**
-     * 用户相关统计
-     * @summary 获取用户统计数据
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApiInterface
-     */
-    getUserStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
-
-    /**
      * 
      * @summary 获取我的浏览历史
      * @param {number} [limit] 返回数量
@@ -21577,6 +24316,15 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     healthCheck(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseHealthCheckResponse>;
+
+    /**
+     * 测试热重载 - 版本 1
+     * @summary Hello World
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    hello(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseString>;
 
     /**
      * 按校区获取热门物品榜单
@@ -21639,22 +24387,13 @@ export interface DefaultApiInterface {
     list(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListScheduledTask>;
 
     /**
-     * 查询所有功能开关
-     * @summary 开关列表
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApiInterface
-     */
-    list1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListFeatureFlag>;
-
-    /**
      * 查询当前用户的导出任务列表
      * @summary 我的导出任务
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    list2(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListExportJob>;
+    list1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListExportJob>;
 
     /**
      * 
@@ -21663,16 +24402,20 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    list3(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListNotificationTemplate>;
+    list2(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListNotificationTemplate>;
 
     /**
-     * 查询全部校区
-     * @summary 校区列表
+     * 管理员查询系统中的所有黑名单记录
+     * @summary 查询所有黑名单记录（分页）
+     * @param {number} [userId] 筛选用户ID（拉黑者）
+     * @param {number} [blockedUserId] 筛选被拉黑用户ID
+     * @param {number} [page] 页码（从0开始）
+     * @param {number} [size] 每页大小
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    list4(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCampus>;
+    listAllBlacklist(userId?: number, blockedUserId?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageBlacklist>;
 
     /**
      * 管理员查询所有退款，支持分页、状态筛选和关键词搜索
@@ -21739,6 +24482,24 @@ export interface DefaultApiInterface {
     listBuyerOrders(status?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageOrderResponse>;
 
     /**
+     * 获取所有校园列表
+     * @summary 查询校园列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listCampuses(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCampus>;
+
+    /**
+     * 获取所有分类列表（平铺）
+     * @summary 查询分类列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listCategories(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListCategory>;
+
+    /**
      * 获取当前用户的所有私信会话，按最后消息时间倒序
      * @summary 查询会话列表
      * @param {number} [page] 页码（从0开始）
@@ -21750,6 +24511,19 @@ export interface DefaultApiInterface {
     listConversations(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageConversationResponse>;
 
     /**
+     * 管理员查询所有纠纷（支持筛选）
+     * @summary 查询纠纷列表
+     * @param {string} [keyword] 搜索关键字
+     * @param {ListDisputesStatusEnum} [status] 纠纷状态
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页大小
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listDisputes(keyword?: string, status?: ListDisputesStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO>;
+
+    /**
      * 查询当前用户的收藏列表
      * @summary 查询收藏列表
      * @param {number} [page] 页码（从 0 开始）
@@ -21759,6 +24533,15 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     listFavorites(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse>;
+
+    /**
+     * 获取所有功能开关列表
+     * @summary 查询功能开关列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listFeatureFlags(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListFeatureFlag>;
 
     /**
      * 查看我关注的卖家列表
@@ -21798,6 +24581,18 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     listMessages(conversationId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageMessageResponse>;
+
+    /**
+     * 查询当前仲裁员处理的纠纷列表
+     * @summary 查询我的仲裁纠纷
+     * @param {ListMyDisputesStatusEnum} [status] 纠纷状态
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页大小
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listMyDisputes(status?: ListMyDisputesStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO>;
 
     /**
      * 用户查询自己的退款列表，支持分页和状态筛选
@@ -21842,6 +24637,17 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     listNotifications(status?: ListNotificationsStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageNotificationResponse>;
+
+    /**
+     * 查询待仲裁状态的纠纷列表
+     * @summary 查询待处理纠纷
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页大小
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listPendingDisputes(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO>;
 
     /**
      * 管理员查询所有待审核的物品
@@ -21961,6 +24767,15 @@ export interface DefaultApiInterface {
     listTags(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagResponse>;
 
     /**
+     * 获取所有标签列表
+     * @summary 查询标签列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listTags1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagResponse>;
+
+    /**
      * 返回可执行软删除治理的实体标识
      * @summary 支持的实体列表
      * @param {*} [options] Override http request option.
@@ -22077,14 +24892,14 @@ export interface DefaultApiInterface {
     markReplyAsRead(replyId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
-     * 将来源标签合并至目标标签
+     * 将源标签合并到目标标签（自动处理重复绑定）
      * @summary 合并标签
      * @param {MergeTagRequest} mergeTagRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    mergeTag(mergeTagRequest: MergeTagRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+    mergeTags(mergeTagRequest: MergeTagRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 将用户从源校区迁移至目标校区
@@ -22173,6 +24988,16 @@ export interface DefaultApiInterface {
     recordBehavior(userId: number, behaviorType: RecordBehaviorBehaviorTypeEnum, targetType: string, targetId: number, source?: string, duration?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseUserBehaviorLogDTO>;
 
     /**
+     * 用户点击轮播图时调用，用于统计点击次数
+     * @summary 记录轮播图点击
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    recordClick(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 
      * @summary 记录商品浏览
      * @param {number} goodsId 商品ID
@@ -22182,6 +25007,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     recordView(goodsId: number, sourcePage?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 轮播图展示时调用，用于统计展示次数
+     * @summary 记录轮播图展示
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    recordView1(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 
@@ -22194,13 +25029,23 @@ export interface DefaultApiInterface {
     refresh(authorization: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLoginResponse>;
 
     /**
-     * 
-     * @summary 刷新全部开关缓存
+     * 刷新所有功能开关的本地缓存
+     * @summary 刷新全部缓存
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    refreshAll(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+    refreshAllCache(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 刷新指定功能开关的本地缓存
+     * @summary 刷新单个缓存
+     * @param {number} id 功能开关ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    refreshCache(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 管理员手动刷新热门榜单缓存
@@ -22472,6 +25317,16 @@ export interface DefaultApiInterface {
     searchGoods(keyword?: string, minPrice?: number, maxPrice?: number, categoryId?: number, sortBy?: string, sortDirection?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse>;
 
     /**
+     * 在纠纷协商中搜索聊天消息，支持多种筛选条件
+     * @summary 搜索协商消息
+     * @param {MessageSearchRequest} messageSearchRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    searchMessages(messageSearchRequest: MessageSearchRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageMessageSearchResponse>;
+
+    /**
      * 根据关键词搜索帖子
      * @summary 搜索帖子
      * @param {string} keyword 搜索关键词
@@ -22606,6 +25461,17 @@ export interface DefaultApiInterface {
     submitDispute(createDisputeRequest: CreateDisputeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
 
     /**
+     * 上传纠纷相关的证据材料
+     * @summary 提交证据
+     * @param {number} id 纠纷ID
+     * @param {UploadEvidenceRequest} uploadEvidenceRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    submitEvidence(id: number, uploadEvidenceRequest: UploadEvidenceRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 订阅关键词，符合条件的商品上架会提醒
      * @summary 新增订阅
      * @param {CreateSubscriptionRequest} createSubscriptionRequest 
@@ -22624,6 +25490,26 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     syncLogistics(orderId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLogisticsDTO>;
+
+    /**
+     * 切换标签的启用/禁用状态
+     * @summary 切换启用状态
+     * @param {number} id 标签ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    toggleEnabled(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 切换功能开关的启用/禁用状态（自动刷新缓存）
+     * @summary 切换启用状态
+     * @param {number} id 功能开关ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    toggleEnabled1(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 已点赞则取消，未点赞则点赞
@@ -22738,19 +25624,19 @@ export interface DefaultApiInterface {
     unsubscribe1(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
-     * 
-     * @summary 更新校区
-     * @param {number} id 校区ID
-     * @param {UpdateCampusRequest} updateCampusRequest 
+     * 更新校园信息
+     * @summary 编辑校园
+     * @param {number} id 校园ID
+     * @param {CampusUpdateRequest} campusUpdateRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    update(id: number, updateCampusRequest: UpdateCampusRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus>;
+    updateCampus(id: number, campusUpdateRequest: CampusUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampus>;
 
     /**
-     * 管理员更新分类信息
-     * @summary 更新分类
+     * 更新分类信息
+     * @summary 编辑分类
      * @param {number} id 分类ID
      * @param {UpdateCategoryRequest} updateCategoryRequest 
      * @param {*} [options] Override http request option.
@@ -22758,6 +25644,17 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     updateCategory(id: number, updateCategoryRequest: UpdateCategoryRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 更新功能开关配置（自动刷新缓存）
+     * @summary 编辑功能开关
+     * @param {number} id 功能开关ID
+     * @param {FeatureFlagUpdateRequest} featureFlagUpdateRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    updateFeatureFlag(id: number, featureFlagUpdateRequest: FeatureFlagUpdateRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 需要用户已登录，提交旧密码与新密码完成密码更新。
@@ -22802,8 +25699,8 @@ export interface DefaultApiInterface {
     updateRole(roleId: number, updateRoleRequest: UpdateRoleRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRoleDetailResponse>;
 
     /**
-     * 管理员修改标签名称或状态
-     * @summary 更新标签
+     * 更新标签信息
+     * @summary 编辑标签
      * @param {number} id 标签ID
      * @param {UpdateTagRequest} updateTagRequest 
      * @param {*} [options] Override http request option.
@@ -22901,16 +25798,6 @@ export interface DefaultApiInterface {
     uploadMediaBatch(reviewId: number, mediaType: UploadMediaBatchMediaTypeEnum, files: Array<File>, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListReviewMediaDTO>;
 
     /**
-     * 
-     * @summary 新增或更新开关
-     * @param {FeatureFlag} featureFlag 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApiInterface
-     */
-    upsert(featureFlag: FeatureFlag, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseFeatureFlag>;
-
-    /**
      * 检查是否可以提交申诉
      * @summary 验证申诉资格
      * @param {CreateAppealRequest} createAppealRequest 
@@ -22948,11 +25835,11 @@ export interface DefaultApiInterface {
  */
 export interface DefaultApiDeleteRequest {
     /**
-     * 
-     * @type {string}
+     * 模板ID
+     * @type {number}
      * @memberof DefaultApiDelete
      */
-    readonly key: string
+    readonly id: number
 }
 
 /**
@@ -23166,6 +26053,27 @@ export interface DefaultApiApprovePostRequest {
 }
 
 /**
+ * Request parameters for arbitrateDispute operation in DefaultApi.
+ * @export
+ * @interface DefaultApiArbitrateDisputeRequest
+ */
+export interface DefaultApiArbitrateDisputeRequest {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiArbitrateDispute
+     */
+    readonly id: number
+
+    /**
+     * 
+     * @type {ArbitrateDisputeRequest}
+     * @memberof DefaultApiArbitrateDispute
+     */
+    readonly arbitrateDisputeRequest: ArbitrateDisputeRequest
+}
+
+/**
  * Request parameters for assignArbitrator operation in DefaultApi.
  * @export
  * @interface DefaultApiAssignArbitratorRequest
@@ -23201,6 +26109,27 @@ export interface DefaultApiBanUserRequest {
 }
 
 /**
+ * Request parameters for batchAssignArbitrator operation in DefaultApi.
+ * @export
+ * @interface DefaultApiBatchAssignArbitratorRequest
+ */
+export interface DefaultApiBatchAssignArbitratorRequest {
+    /**
+     * 纠纷ID列表
+     * @type {Array<number>}
+     * @memberof DefaultApiBatchAssignArbitrator
+     */
+    readonly disputeIds: Array<number>
+
+    /**
+     * 仲裁员ID
+     * @type {number}
+     * @memberof DefaultApiBatchAssignArbitrator
+     */
+    readonly arbitratorId: number
+}
+
+/**
  * Request parameters for batchDelete operation in DefaultApi.
  * @export
  * @interface DefaultApiBatchDeleteRequest
@@ -23212,6 +26141,34 @@ export interface DefaultApiBatchDeleteRequest {
      * @memberof DefaultApiBatchDelete
      */
     readonly goodsBatchRequest: GoodsBatchRequest
+}
+
+/**
+ * Request parameters for batchDeleteCampuses operation in DefaultApi.
+ * @export
+ * @interface DefaultApiBatchDeleteCampusesRequest
+ */
+export interface DefaultApiBatchDeleteCampusesRequest {
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof DefaultApiBatchDeleteCampuses
+     */
+    readonly requestBody: Array<number>
+}
+
+/**
+ * Request parameters for batchDeleteTags operation in DefaultApi.
+ * @export
+ * @interface DefaultApiBatchDeleteTagsRequest
+ */
+export interface DefaultApiBatchDeleteTagsRequest {
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof DefaultApiBatchDeleteTags
+     */
+    readonly requestBody: Array<number>
 }
 
 /**
@@ -23257,6 +26214,20 @@ export interface DefaultApiBatchReviewAppealsRequest {
 }
 
 /**
+ * Request parameters for batchUnblock operation in DefaultApi.
+ * @export
+ * @interface DefaultApiBatchUnblockRequest
+ */
+export interface DefaultApiBatchUnblockRequest {
+    /**
+     * 
+     * @type {BatchUnblockRequest}
+     * @memberof DefaultApiBatchUnblock
+     */
+    readonly batchUnblockRequest: BatchUnblockRequest
+}
+
+/**
  * Request parameters for batchUpdateInventory operation in DefaultApi.
  * @export
  * @interface DefaultApiBatchUpdateInventoryRequest
@@ -23282,6 +26253,20 @@ export interface DefaultApiBatchUpdatePriceRequest {
      * @memberof DefaultApiBatchUpdatePrice
      */
     readonly priceBatchRequest: PriceBatchRequest
+}
+
+/**
+ * Request parameters for batchUpdateSort operation in DefaultApi.
+ * @export
+ * @interface DefaultApiBatchUpdateSortRequest
+ */
+export interface DefaultApiBatchUpdateSortRequest {
+    /**
+     * 
+     * @type {CategoryBatchSortRequest}
+     * @memberof DefaultApiBatchUpdateSort
+     */
+    readonly categoryBatchSortRequest: CategoryBatchSortRequest
 }
 
 /**
@@ -23439,6 +26424,27 @@ export interface DefaultApiCheckPostLikedRequest {
 }
 
 /**
+ * Request parameters for checkRelation operation in DefaultApi.
+ * @export
+ * @interface DefaultApiCheckRelationRequest
+ */
+export interface DefaultApiCheckRelationRequest {
+    /**
+     * 用户ID
+     * @type {number}
+     * @memberof DefaultApiCheckRelation
+     */
+    readonly userId: number
+
+    /**
+     * 目标用户ID
+     * @type {number}
+     * @memberof DefaultApiCheckRelation
+     */
+    readonly targetUserId: number
+}
+
+/**
  * Request parameters for checkTopicFollowed operation in DefaultApi.
  * @export
  * @interface DefaultApiCheckTopicFollowedRequest
@@ -23467,6 +26473,20 @@ export interface DefaultApiCheckUsernameRequest {
 }
 
 /**
+ * Request parameters for claimDispute operation in DefaultApi.
+ * @export
+ * @interface DefaultApiClaimDisputeRequest
+ */
+export interface DefaultApiClaimDisputeRequest {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiClaimDispute
+     */
+    readonly id: number
+}
+
+/**
  * Request parameters for cleanupAllHistory operation in DefaultApi.
  * @export
  * @interface DefaultApiCleanupAllHistoryRequest
@@ -23478,6 +26498,20 @@ export interface DefaultApiCleanupAllHistoryRequest {
      * @memberof DefaultApiCleanupAllHistory
      */
     readonly daysToKeep?: number
+}
+
+/**
+ * Request parameters for clearSearchHistory1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiClearSearchHistory1Request
+ */
+export interface DefaultApiClearSearchHistory1Request {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiClearSearchHistory1
+     */
+    readonly disputeId: number
 }
 
 /**
@@ -23499,6 +26533,27 @@ export interface DefaultApiCloseDisputeRequest {
      * @memberof DefaultApiCloseDispute
      */
     readonly closeReason: string
+}
+
+/**
+ * Request parameters for closeDispute1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiCloseDispute1Request
+ */
+export interface DefaultApiCloseDispute1Request {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiCloseDispute1
+     */
+    readonly id: number
+
+    /**
+     * 关闭原因
+     * @type {string}
+     * @memberof DefaultApiCloseDispute1
+     */
+    readonly reason: string
 }
 
 /**
@@ -23551,20 +26606,6 @@ export interface DefaultApiCountReviewLikesRequest {
 }
 
 /**
- * Request parameters for create operation in DefaultApi.
- * @export
- * @interface DefaultApiCreateRequest
- */
-export interface DefaultApiCreateRequest {
-    /**
-     * 
-     * @type {CreateCampusRequest}
-     * @memberof DefaultApiCreate
-     */
-    readonly createCampusRequest: CreateCampusRequest
-}
-
-/**
  * Request parameters for createBatchTask operation in DefaultApi.
  * @export
  * @interface DefaultApiCreateBatchTaskRequest
@@ -23579,6 +26620,20 @@ export interface DefaultApiCreateBatchTaskRequest {
 }
 
 /**
+ * Request parameters for createCampus operation in DefaultApi.
+ * @export
+ * @interface DefaultApiCreateCampusRequest
+ */
+export interface DefaultApiCreateCampusRequest {
+    /**
+     * 
+     * @type {CampusCreateRequest}
+     * @memberof DefaultApiCreateCampus
+     */
+    readonly campusCreateRequest: CampusCreateRequest
+}
+
+/**
  * Request parameters for createCategory operation in DefaultApi.
  * @export
  * @interface DefaultApiCreateCategoryRequest
@@ -23590,6 +26645,20 @@ export interface DefaultApiCreateCategoryRequest {
      * @memberof DefaultApiCreateCategory
      */
     readonly createCategoryRequest: CreateCategoryRequest
+}
+
+/**
+ * Request parameters for createFeatureFlag operation in DefaultApi.
+ * @export
+ * @interface DefaultApiCreateFeatureFlagRequest
+ */
+export interface DefaultApiCreateFeatureFlagRequest {
+    /**
+     * 
+     * @type {FeatureFlagCreateRequest}
+     * @memberof DefaultApiCreateFeatureFlag
+     */
+    readonly featureFlagCreateRequest: FeatureFlagCreateRequest
 }
 
 /**
@@ -23782,34 +26851,6 @@ export interface DefaultApiCreateTopicRequest {
 }
 
 /**
- * Request parameters for delete1 operation in DefaultApi.
- * @export
- * @interface DefaultApiDelete1Request
- */
-export interface DefaultApiDelete1Request {
-    /**
-     * 模板ID
-     * @type {number}
-     * @memberof DefaultApiDelete1
-     */
-    readonly id: number
-}
-
-/**
- * Request parameters for delete2 operation in DefaultApi.
- * @export
- * @interface DefaultApiDelete2Request
- */
-export interface DefaultApiDelete2Request {
-    /**
-     * 校区ID
-     * @type {number}
-     * @memberof DefaultApiDelete2
-     */
-    readonly id: number
-}
-
-/**
  * Request parameters for deleteAllMediaByReviewId operation in DefaultApi.
  * @export
  * @interface DefaultApiDeleteAllMediaByReviewIdRequest
@@ -23821,6 +26862,20 @@ export interface DefaultApiDeleteAllMediaByReviewIdRequest {
      * @memberof DefaultApiDeleteAllMediaByReviewId
      */
     readonly reviewId: number
+}
+
+/**
+ * Request parameters for deleteCampus operation in DefaultApi.
+ * @export
+ * @interface DefaultApiDeleteCampusRequest
+ */
+export interface DefaultApiDeleteCampusRequest {
+    /**
+     * 校园ID
+     * @type {number}
+     * @memberof DefaultApiDeleteCampus
+     */
+    readonly id: number
 }
 
 /**
@@ -23849,6 +26904,20 @@ export interface DefaultApiDeleteEvidenceRequest {
      * @memberof DefaultApiDeleteEvidence
      */
     readonly evidenceId: number
+}
+
+/**
+ * Request parameters for deleteFeatureFlag operation in DefaultApi.
+ * @export
+ * @interface DefaultApiDeleteFeatureFlagRequest
+ */
+export interface DefaultApiDeleteFeatureFlagRequest {
+    /**
+     * 功能开关ID
+     * @type {number}
+     * @memberof DefaultApiDeleteFeatureFlag
+     */
+    readonly id: number
 }
 
 /**
@@ -24356,6 +27425,34 @@ export interface DefaultApiGetBatchTasksRequest {
 }
 
 /**
+ * Request parameters for getBlacklistByUser operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetBlacklistByUserRequest
+ */
+export interface DefaultApiGetBlacklistByUserRequest {
+    /**
+     * 用户ID
+     * @type {number}
+     * @memberof DefaultApiGetBlacklistByUser
+     */
+    readonly userId: number
+}
+
+/**
+ * Request parameters for getBlockedByUsers operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetBlockedByUsersRequest
+ */
+export interface DefaultApiGetBlockedByUsersRequest {
+    /**
+     * 被拉黑的用户ID
+     * @type {number}
+     * @memberof DefaultApiGetBlockedByUsers
+     */
+    readonly blockedUserId: number
+}
+
+/**
  * Request parameters for getBuyerEvidence operation in DefaultApi.
  * @export
  * @interface DefaultApiGetBuyerEvidenceRequest
@@ -24370,6 +27467,62 @@ export interface DefaultApiGetBuyerEvidenceRequest {
 }
 
 /**
+ * Request parameters for getCampusById operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetCampusByIdRequest
+ */
+export interface DefaultApiGetCampusByIdRequest {
+    /**
+     * 校园ID
+     * @type {number}
+     * @memberof DefaultApiGetCampusById
+     */
+    readonly id: number
+}
+
+/**
+ * Request parameters for getCampusStatistics operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetCampusStatisticsRequest
+ */
+export interface DefaultApiGetCampusStatisticsRequest {
+    /**
+     * 校园ID
+     * @type {number}
+     * @memberof DefaultApiGetCampusStatistics
+     */
+    readonly id: number
+}
+
+/**
+ * Request parameters for getCategoryById operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetCategoryByIdRequest
+ */
+export interface DefaultApiGetCategoryByIdRequest {
+    /**
+     * 分类ID
+     * @type {number}
+     * @memberof DefaultApiGetCategoryById
+     */
+    readonly id: number
+}
+
+/**
+ * Request parameters for getCategoryStatistics1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetCategoryStatistics1Request
+ */
+export interface DefaultApiGetCategoryStatistics1Request {
+    /**
+     * 分类ID
+     * @type {number}
+     * @memberof DefaultApiGetCategoryStatistics1
+     */
+    readonly id: number
+}
+
+/**
  * Request parameters for getDisputeDetail operation in DefaultApi.
  * @export
  * @interface DefaultApiGetDisputeDetailRequest
@@ -24381,6 +27534,20 @@ export interface DefaultApiGetDisputeDetailRequest {
      * @memberof DefaultApiGetDisputeDetail
      */
     readonly disputeId: number
+}
+
+/**
+ * Request parameters for getDisputeDetail1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetDisputeDetail1Request
+ */
+export interface DefaultApiGetDisputeDetail1Request {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiGetDisputeDetail1
+     */
+    readonly id: number
 }
 
 /**
@@ -24472,6 +27639,20 @@ export interface DefaultApiGetEvidenceSummaryRequest {
      * @memberof DefaultApiGetEvidenceSummary
      */
     readonly disputeId: number
+}
+
+/**
+ * Request parameters for getFeatureFlagById operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetFeatureFlagByIdRequest
+ */
+export interface DefaultApiGetFeatureFlagByIdRequest {
+    /**
+     * 功能开关ID
+     * @type {number}
+     * @memberof DefaultApiGetFeatureFlagById
+     */
+    readonly id: number
 }
 
 /**
@@ -24825,15 +28006,15 @@ export interface DefaultApiGetQpsStatisticsRequest {
 }
 
 /**
- * Request parameters for getRevenueByMonth operation in DefaultApi.
+ * Request parameters for getRevenueTrend operation in DefaultApi.
  * @export
- * @interface DefaultApiGetRevenueByMonthRequest
+ * @interface DefaultApiGetRevenueTrendRequest
  */
-export interface DefaultApiGetRevenueByMonthRequest {
+export interface DefaultApiGetRevenueTrendRequest {
     /**
-     * 月数
+     * 统计月数
      * @type {number}
-     * @memberof DefaultApiGetRevenueByMonth
+     * @memberof DefaultApiGetRevenueTrend
      */
     readonly months?: number
 }
@@ -24902,6 +28083,41 @@ export interface DefaultApiGetRoleRequest {
 }
 
 /**
+ * Request parameters for getSearchHistory operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetSearchHistoryRequest
+ */
+export interface DefaultApiGetSearchHistoryRequest {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiGetSearchHistory
+     */
+    readonly disputeId: number
+
+    /**
+     * 返回数量限制
+     * @type {number}
+     * @memberof DefaultApiGetSearchHistory
+     */
+    readonly limit?: number
+}
+
+/**
+ * Request parameters for getSearchStatistics operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetSearchStatisticsRequest
+ */
+export interface DefaultApiGetSearchStatisticsRequest {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiGetSearchStatistics
+     */
+    readonly disputeId: number
+}
+
+/**
  * Request parameters for getSearchSuggestions operation in DefaultApi.
  * @export
  * @interface DefaultApiGetSearchSuggestionsRequest
@@ -24913,6 +28129,41 @@ export interface DefaultApiGetSearchSuggestionsRequest {
      * @memberof DefaultApiGetSearchSuggestions
      */
     readonly keyword?: string
+}
+
+/**
+ * Request parameters for getSearchSuggestions1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetSearchSuggestions1Request
+ */
+export interface DefaultApiGetSearchSuggestions1Request {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiGetSearchSuggestions1
+     */
+    readonly disputeId: number
+
+    /**
+     * 关键词前缀
+     * @type {string}
+     * @memberof DefaultApiGetSearchSuggestions1
+     */
+    readonly keyword?: string
+
+    /**
+     * 建议类型 (keyword/user/date)
+     * @type {string}
+     * @memberof DefaultApiGetSearchSuggestions1
+     */
+    readonly suggestionType?: string
+
+    /**
+     * 返回数量限制
+     * @type {number}
+     * @memberof DefaultApiGetSearchSuggestions1
+     */
+    readonly limit?: number
 }
 
 /**
@@ -24965,6 +28216,34 @@ export interface DefaultApiGetSlowQueriesRequest {
 }
 
 /**
+ * Request parameters for getTagById operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetTagByIdRequest
+ */
+export interface DefaultApiGetTagByIdRequest {
+    /**
+     * 标签ID
+     * @type {number}
+     * @memberof DefaultApiGetTagById
+     */
+    readonly id: number
+}
+
+/**
+ * Request parameters for getTagStatistics operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetTagStatisticsRequest
+ */
+export interface DefaultApiGetTagStatisticsRequest {
+    /**
+     * 标签ID
+     * @type {number}
+     * @memberof DefaultApiGetTagStatistics
+     */
+    readonly id: number
+}
+
+/**
  * Request parameters for getTaskProgress operation in DefaultApi.
  * @export
  * @interface DefaultApiGetTaskProgressRequest
@@ -24985,7 +28264,7 @@ export interface DefaultApiGetTaskProgressRequest {
  */
 export interface DefaultApiGetTopGoodsRequest {
     /**
-     * 数量限制
+     * 返回数量
      * @type {number}
      * @memberof DefaultApiGetTopGoods
      */
@@ -24999,7 +28278,7 @@ export interface DefaultApiGetTopGoodsRequest {
  */
 export interface DefaultApiGetTopUsersRequest {
     /**
-     * 数量限制
+     * 返回数量
      * @type {number}
      * @memberof DefaultApiGetTopUsers
      */
@@ -25035,15 +28314,15 @@ export interface DefaultApiGetTopicFollowerCountRequest {
 }
 
 /**
- * Request parameters for getTrendData operation in DefaultApi.
+ * Request parameters for getTrend operation in DefaultApi.
  * @export
- * @interface DefaultApiGetTrendDataRequest
+ * @interface DefaultApiGetTrendRequest
  */
-export interface DefaultApiGetTrendDataRequest {
+export interface DefaultApiGetTrendRequest {
     /**
-     * 天数
+     * 统计天数
      * @type {number}
-     * @memberof DefaultApiGetTrendData
+     * @memberof DefaultApiGetTrend
      */
     readonly days?: number
 }
@@ -25287,6 +28566,41 @@ export interface DefaultApiLikeReviewRequest {
 }
 
 /**
+ * Request parameters for listAllBlacklist operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListAllBlacklistRequest
+ */
+export interface DefaultApiListAllBlacklistRequest {
+    /**
+     * 筛选用户ID（拉黑者）
+     * @type {number}
+     * @memberof DefaultApiListAllBlacklist
+     */
+    readonly userId?: number
+
+    /**
+     * 筛选被拉黑用户ID
+     * @type {number}
+     * @memberof DefaultApiListAllBlacklist
+     */
+    readonly blockedUserId?: number
+
+    /**
+     * 页码（从0开始）
+     * @type {number}
+     * @memberof DefaultApiListAllBlacklist
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     * @type {number}
+     * @memberof DefaultApiListAllBlacklist
+     */
+    readonly size?: number
+}
+
+/**
  * Request parameters for listAllRefunds operation in DefaultApi.
  * @export
  * @interface DefaultApiListAllRefundsRequest
@@ -25476,6 +28790,41 @@ export interface DefaultApiListConversationsRequest {
 }
 
 /**
+ * Request parameters for listDisputes operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListDisputesRequest
+ */
+export interface DefaultApiListDisputesRequest {
+    /**
+     * 搜索关键字
+     * @type {string}
+     * @memberof DefaultApiListDisputes
+     */
+    readonly keyword?: string
+
+    /**
+     * 纠纷状态
+     * @type {'SUBMITTED' | 'NEGOTIATING' | 'PENDING_ARBITRATION' | 'ARBITRATING' | 'COMPLETED' | 'CLOSED'}
+     * @memberof DefaultApiListDisputes
+     */
+    readonly status?: ListDisputesStatusEnum
+
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiListDisputes
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     * @type {number}
+     * @memberof DefaultApiListDisputes
+     */
+    readonly size?: number
+}
+
+/**
  * Request parameters for listFavorites operation in DefaultApi.
  * @export
  * @interface DefaultApiListFavoritesRequest
@@ -25595,6 +28944,34 @@ export interface DefaultApiListMessagesRequest {
 }
 
 /**
+ * Request parameters for listMyDisputes operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListMyDisputesRequest
+ */
+export interface DefaultApiListMyDisputesRequest {
+    /**
+     * 纠纷状态
+     * @type {'SUBMITTED' | 'NEGOTIATING' | 'PENDING_ARBITRATION' | 'ARBITRATING' | 'COMPLETED' | 'CLOSED'}
+     * @memberof DefaultApiListMyDisputes
+     */
+    readonly status?: ListMyDisputesStatusEnum
+
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiListMyDisputes
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     * @type {number}
+     * @memberof DefaultApiListMyDisputes
+     */
+    readonly size?: number
+}
+
+/**
  * Request parameters for listMyRefunds operation in DefaultApi.
  * @export
  * @interface DefaultApiListMyRefundsRequest
@@ -25667,6 +29044,27 @@ export interface DefaultApiListNotificationsRequest {
      * 每页大小
      * @type {number}
      * @memberof DefaultApiListNotifications
+     */
+    readonly size?: number
+}
+
+/**
+ * Request parameters for listPendingDisputes operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListPendingDisputesRequest
+ */
+export interface DefaultApiListPendingDisputesRequest {
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiListPendingDisputes
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     * @type {number}
+     * @memberof DefaultApiListPendingDisputes
      */
     readonly size?: number
 }
@@ -25952,15 +29350,15 @@ export interface DefaultApiMarkReplyAsReadRequest {
 }
 
 /**
- * Request parameters for mergeTag operation in DefaultApi.
+ * Request parameters for mergeTags operation in DefaultApi.
  * @export
- * @interface DefaultApiMergeTagRequest
+ * @interface DefaultApiMergeTagsRequest
  */
-export interface DefaultApiMergeTagRequest {
+export interface DefaultApiMergeTagsRequest {
     /**
      * 
      * @type {MergeTagRequest}
-     * @memberof DefaultApiMergeTag
+     * @memberof DefaultApiMergeTags
      */
     readonly mergeTagRequest: MergeTagRequest
 }
@@ -26120,6 +29518,20 @@ export interface DefaultApiRecordBehaviorRequest {
 }
 
 /**
+ * Request parameters for recordClick operation in DefaultApi.
+ * @export
+ * @interface DefaultApiRecordClickRequest
+ */
+export interface DefaultApiRecordClickRequest {
+    /**
+     * 
+     * @type {number}
+     * @memberof DefaultApiRecordClick
+     */
+    readonly id: number
+}
+
+/**
  * Request parameters for recordView operation in DefaultApi.
  * @export
  * @interface DefaultApiRecordViewRequest
@@ -26141,6 +29553,20 @@ export interface DefaultApiRecordViewRequest {
 }
 
 /**
+ * Request parameters for recordView1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiRecordView1Request
+ */
+export interface DefaultApiRecordView1Request {
+    /**
+     * 
+     * @type {number}
+     * @memberof DefaultApiRecordView1
+     */
+    readonly id: number
+}
+
+/**
  * Request parameters for refresh operation in DefaultApi.
  * @export
  * @interface DefaultApiRefreshRequest
@@ -26152,6 +29578,20 @@ export interface DefaultApiRefreshRequest {
      * @memberof DefaultApiRefresh
      */
     readonly authorization: string
+}
+
+/**
+ * Request parameters for refreshCache operation in DefaultApi.
+ * @export
+ * @interface DefaultApiRefreshCacheRequest
+ */
+export interface DefaultApiRefreshCacheRequest {
+    /**
+     * 功能开关ID
+     * @type {number}
+     * @memberof DefaultApiRefreshCache
+     */
+    readonly id: number
 }
 
 /**
@@ -26638,6 +30078,20 @@ export interface DefaultApiSearchGoodsRequest {
 }
 
 /**
+ * Request parameters for searchMessages operation in DefaultApi.
+ * @export
+ * @interface DefaultApiSearchMessagesRequest
+ */
+export interface DefaultApiSearchMessagesRequest {
+    /**
+     * 
+     * @type {MessageSearchRequest}
+     * @memberof DefaultApiSearchMessages
+     */
+    readonly messageSearchRequest: MessageSearchRequest
+}
+
+/**
  * Request parameters for searchPosts operation in DefaultApi.
  * @export
  * @interface DefaultApiSearchPostsRequest
@@ -26841,6 +30295,27 @@ export interface DefaultApiSubmitDisputeRequest {
 }
 
 /**
+ * Request parameters for submitEvidence operation in DefaultApi.
+ * @export
+ * @interface DefaultApiSubmitEvidenceRequest
+ */
+export interface DefaultApiSubmitEvidenceRequest {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiSubmitEvidence
+     */
+    readonly id: number
+
+    /**
+     * 
+     * @type {UploadEvidenceRequest}
+     * @memberof DefaultApiSubmitEvidence
+     */
+    readonly uploadEvidenceRequest: UploadEvidenceRequest
+}
+
+/**
  * Request parameters for subscribe operation in DefaultApi.
  * @export
  * @interface DefaultApiSubscribeRequest
@@ -26866,6 +30341,34 @@ export interface DefaultApiSyncLogisticsRequest {
      * @memberof DefaultApiSyncLogistics
      */
     readonly orderId: number
+}
+
+/**
+ * Request parameters for toggleEnabled operation in DefaultApi.
+ * @export
+ * @interface DefaultApiToggleEnabledRequest
+ */
+export interface DefaultApiToggleEnabledRequest {
+    /**
+     * 标签ID
+     * @type {number}
+     * @memberof DefaultApiToggleEnabled
+     */
+    readonly id: number
+}
+
+/**
+ * Request parameters for toggleEnabled1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiToggleEnabled1Request
+ */
+export interface DefaultApiToggleEnabled1Request {
+    /**
+     * 功能开关ID
+     * @type {number}
+     * @memberof DefaultApiToggleEnabled1
+     */
+    readonly id: number
 }
 
 /**
@@ -27037,24 +30540,24 @@ export interface DefaultApiUnsubscribe1Request {
 }
 
 /**
- * Request parameters for update operation in DefaultApi.
+ * Request parameters for updateCampus operation in DefaultApi.
  * @export
- * @interface DefaultApiUpdateRequest
+ * @interface DefaultApiUpdateCampusRequest
  */
-export interface DefaultApiUpdateRequest {
+export interface DefaultApiUpdateCampusRequest {
     /**
-     * 校区ID
+     * 校园ID
      * @type {number}
-     * @memberof DefaultApiUpdate
+     * @memberof DefaultApiUpdateCampus
      */
     readonly id: number
 
     /**
      * 
-     * @type {UpdateCampusRequest}
-     * @memberof DefaultApiUpdate
+     * @type {CampusUpdateRequest}
+     * @memberof DefaultApiUpdateCampus
      */
-    readonly updateCampusRequest: UpdateCampusRequest
+    readonly campusUpdateRequest: CampusUpdateRequest
 }
 
 /**
@@ -27076,6 +30579,27 @@ export interface DefaultApiUpdateCategoryRequest {
      * @memberof DefaultApiUpdateCategory
      */
     readonly updateCategoryRequest: UpdateCategoryRequest
+}
+
+/**
+ * Request parameters for updateFeatureFlag operation in DefaultApi.
+ * @export
+ * @interface DefaultApiUpdateFeatureFlagRequest
+ */
+export interface DefaultApiUpdateFeatureFlagRequest {
+    /**
+     * 功能开关ID
+     * @type {number}
+     * @memberof DefaultApiUpdateFeatureFlag
+     */
+    readonly id: number
+
+    /**
+     * 
+     * @type {FeatureFlagUpdateRequest}
+     * @memberof DefaultApiUpdateFeatureFlag
+     */
+    readonly featureFlagUpdateRequest: FeatureFlagUpdateRequest
 }
 
 /**
@@ -27338,20 +30862,6 @@ export interface DefaultApiUploadMediaBatchRequest {
 }
 
 /**
- * Request parameters for upsert operation in DefaultApi.
- * @export
- * @interface DefaultApiUpsertRequest
- */
-export interface DefaultApiUpsertRequest {
-    /**
-     * 
-     * @type {FeatureFlag}
-     * @memberof DefaultApiUpsert
-     */
-    readonly featureFlag: FeatureFlag
-}
-
-/**
  * Request parameters for validateAppealEligibility operation in DefaultApi.
  * @export
  * @interface DefaultApiValidateAppealEligibilityRequest
@@ -27388,14 +30898,14 @@ export interface DefaultApiValidateMigrationRequest {
 export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     /**
      * 
-     * @summary 删除开关
+     * @summary 删除
      * @param {DefaultApiDeleteRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
     public _delete(requestParameters: DefaultApiDeleteRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration)._delete(requestParameters.key, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration)._delete(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -27542,6 +31052,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 仲裁员提交仲裁决定
+     * @summary 仲裁纠纷
+     * @param {DefaultApiArbitrateDisputeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public arbitrateDispute(requestParameters: DefaultApiArbitrateDisputeRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).arbitrateDispute(requestParameters.id, requestParameters.arbitrateDisputeRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 管理员为纠纷分配仲裁员
      * @summary 分配仲裁员
      * @param {DefaultApiAssignArbitratorRequest} requestParameters Request parameters.
@@ -27577,6 +31099,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 管理员批量分配仲裁员
+     * @summary 批量分配仲裁员
+     * @param {DefaultApiBatchAssignArbitratorRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public batchAssignArbitrator(requestParameters: DefaultApiBatchAssignArbitratorRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).batchAssignArbitrator(requestParameters.disputeIds, requestParameters.arbitratorId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 批量删除商品
      * @param {DefaultApiBatchDeleteRequest} requestParameters Request parameters.
@@ -27586,6 +31120,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public batchDelete(requestParameters: DefaultApiBatchDeleteRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).batchDelete(requestParameters.goodsBatchRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 批量删除多个校园（软删除）
+     * @summary 批量删除校园
+     * @param {DefaultApiBatchDeleteCampusesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public batchDeleteCampuses(requestParameters: DefaultApiBatchDeleteCampusesRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).batchDeleteCampuses(requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 批量删除多个标签（跳过有关联商品的标签）
+     * @summary 批量删除标签
+     * @param {DefaultApiBatchDeleteTagsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public batchDeleteTags(requestParameters: DefaultApiBatchDeleteTagsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).batchDeleteTags(requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -27636,6 +31194,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 管理员批量解除黑名单关系
+     * @summary 批量解除黑名单
+     * @param {DefaultApiBatchUnblockRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public batchUnblock(requestParameters: DefaultApiBatchUnblockRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).batchUnblock(requestParameters.batchUnblockRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 批量更新库存
      * @param {DefaultApiBatchUpdateInventoryRequest} requestParameters Request parameters.
@@ -27657,6 +31227,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public batchUpdatePrice(requestParameters: DefaultApiBatchUpdatePriceRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).batchUpdatePrice(requestParameters.priceBatchRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 批量更新分类排序
+     * @summary 批量排序
+     * @param {DefaultApiBatchUpdateSortRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public batchUpdateSort(requestParameters: DefaultApiBatchUpdateSortRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).batchUpdateSort(requestParameters.categoryBatchSortRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -27803,6 +31385,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 检查两个用户之间的黑名单关系（双向）
+     * @summary 检查用户黑名单关系
+     * @param {DefaultApiCheckRelationRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public checkRelation(requestParameters: DefaultApiCheckRelationRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).checkRelation(requestParameters.userId, requestParameters.targetUserId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 检查是否已关注
      * @param {DefaultApiCheckTopicFollowedRequest} requestParameters Request parameters.
@@ -27824,6 +31418,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public checkUsername(requestParameters: DefaultApiCheckUsernameRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).checkUsername(requestParameters.username, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 仲裁员认领待处理的纠纷
+     * @summary 认领纠纷
+     * @param {DefaultApiClaimDisputeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public claimDispute(requestParameters: DefaultApiClaimDisputeRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).claimDispute(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -27850,6 +31456,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 清空用户在指定纠纷的消息搜索历史记录
+     * @summary 清空消息搜索历史
+     * @param {DefaultApiClearSearchHistory1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public clearSearchHistory1(requestParameters: DefaultApiClearSearchHistory1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).clearSearchHistory1(requestParameters.disputeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 清空浏览历史
      * @param {*} [options] Override http request option.
@@ -27870,6 +31488,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public closeDispute(requestParameters: DefaultApiCloseDisputeRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).closeDispute(requestParameters.disputeId, requestParameters.closeReason, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 管理员手动关闭纠纷
+     * @summary 关闭纠纷
+     * @param {DefaultApiCloseDispute1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public closeDispute1(requestParameters: DefaultApiCloseDispute1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).closeDispute1(requestParameters.id, requestParameters.reason, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -27921,18 +31551,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
 
     /**
      * 
-     * @summary 创建校区
-     * @param {DefaultApiCreateRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public create(requestParameters: DefaultApiCreateRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).create(requestParameters.createCampusRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary 创建批量任务
      * @param {DefaultApiCreateBatchTaskRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -27944,7 +31562,19 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员创建新的分类节点
+     * 创建新的校园
+     * @summary 创建校园
+     * @param {DefaultApiCreateCampusRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public createCampus(requestParameters: DefaultApiCreateCampusRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createCampus(requestParameters.campusCreateRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 创建新的商品分类
      * @summary 创建分类
      * @param {DefaultApiCreateCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -27953,6 +31583,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public createCategory(requestParameters: DefaultApiCreateCategoryRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).createCategory(requestParameters.createCategoryRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 创建新的功能开关
+     * @summary 创建功能开关
+     * @param {DefaultApiCreateFeatureFlagRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public createFeatureFlag(requestParameters: DefaultApiCreateFeatureFlagRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createFeatureFlag(requestParameters.featureFlagCreateRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -28077,7 +31719,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员新增标签
+     * 创建新的商品标签
      * @summary 创建标签
      * @param {DefaultApiCreateTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -28101,30 +31743,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 
-     * @summary 删除
-     * @param {DefaultApiDelete1Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public delete1(requestParameters: DefaultApiDelete1Request, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).delete1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 删除校区
-     * @param {DefaultApiDelete2Request} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public delete2(requestParameters: DefaultApiDelete2Request, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).delete2(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * 批量删除评价的所有图片和视频
      * @summary 删除评价的所有媒体
      * @param {DefaultApiDeleteAllMediaByReviewIdRequest} requestParameters Request parameters.
@@ -28137,7 +31755,19 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员删除分类节点，删除前需确保无子节点及关联商品
+     * 删除指定校园（软删除）
+     * @summary 删除校园
+     * @param {DefaultApiDeleteCampusRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deleteCampus(requestParameters: DefaultApiDeleteCampusRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteCampus(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 删除指定分类（需确保无子分类和关联商品）
      * @summary 删除分类
      * @param {DefaultApiDeleteCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -28158,6 +31788,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public deleteEvidence(requestParameters: DefaultApiDeleteEvidenceRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deleteEvidence(requestParameters.evidenceId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 删除指定功能开关（自动刷新缓存）
+     * @summary 删除功能开关
+     * @param {DefaultApiDeleteFeatureFlagRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deleteFeatureFlag(requestParameters: DefaultApiDeleteFeatureFlagRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteFeatureFlag(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -28257,7 +31899,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员删除标签，删除前需确保无绑定
+     * 删除指定标签（需确保无关联商品）
      * @summary 删除标签
      * @param {DefaultApiDeleteTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -28425,6 +32067,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 获取当前启用且在有效期内的轮播图列表，按排序顺序返回
+     * @summary 获取启用的轮播图
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getActiveBanners(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getActiveBanners(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 管理员查询系统中的所有纠纷
      * @summary 查询所有纠纷
      * @param {DefaultApiGetAllDisputesRequest} requestParameters Request parameters.
@@ -28577,6 +32230,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 查询指定用户拉黑了哪些人
+     * @summary 查询指定用户的黑名单
+     * @param {DefaultApiGetBlacklistByUserRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getBlacklistByUser(requestParameters: DefaultApiGetBlacklistByUserRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getBlacklistByUser(requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 查询哪些用户拉黑了指定用户
+     * @summary 查询拉黑了指定用户的人
+     * @param {DefaultApiGetBlockedByUsersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getBlockedByUsers(requestParameters: DefaultApiGetBlockedByUsersRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getBlockedByUsers(requestParameters.blockedUserId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 查询买家上传的所有证据
      * @summary 查询买家证据
      * @param {DefaultApiGetBuyerEvidenceRequest} requestParameters Request parameters.
@@ -28589,8 +32266,44 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 物品分类分布统计
-     * @summary 获取分类统计数据
+     * 根据ID获取校园详细信息
+     * @summary 获取校园详情
+     * @param {DefaultApiGetCampusByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getCampusById(requestParameters: DefaultApiGetCampusByIdRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getCampusById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取校园用户/商品/订单统计数据
+     * @summary 校园统计
+     * @param {DefaultApiGetCampusStatisticsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getCampusStatistics(requestParameters: DefaultApiGetCampusStatisticsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getCampusStatistics(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 根据ID获取分类详细信息
+     * @summary 获取分类详情
+     * @param {DefaultApiGetCategoryByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getCategoryById(requestParameters: DefaultApiGetCategoryByIdRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getCategoryById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取各分类下的物品数量统计（仅管理员）
+     * @summary 获取分类统计
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
@@ -28600,7 +32313,19 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 按层级返回完整的分类树结构
+     * 获取分类商品统计数据（在售、已售、子分类数）
+     * @summary 分类统计
+     * @param {DefaultApiGetCategoryStatistics1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getCategoryStatistics1(requestParameters: DefaultApiGetCategoryStatistics1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getCategoryStatistics1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 按层级返回完整的分类树结构（公开接口）
      * @summary 获取分类树
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -28608,6 +32333,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getCategoryTree(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getCategoryTree(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取完整的分类树形结构（含子分类）
+     * @summary 获取分类树
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getCategoryTree1(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getCategoryTree1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -28631,6 +32367,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getDisputeDetail(requestParameters: DefaultApiGetDisputeDetailRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getDisputeDetail(requestParameters.disputeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 查询指定纠纷的完整信息（含证据、协商记录、仲裁结果）
+     * @summary 查询纠纷详情
+     * @param {DefaultApiGetDisputeDetail1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getDisputeDetail1(requestParameters: DefaultApiGetDisputeDetail1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getDisputeDetail1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -28706,6 +32454,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 根据ID获取功能开关详细信息
+     * @summary 获取功能开关详情
+     * @param {DefaultApiGetFeatureFlagByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getFeatureFlagById(requestParameters: DefaultApiGetFeatureFlagByIdRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getFeatureFlagById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取粉丝数
      * @param {DefaultApiGetFollowerCountRequest} requestParameters Request parameters.
@@ -28773,17 +32533,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getGoodsDetail1(requestParameters: DefaultApiGetGoodsDetail1Request, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getGoodsDetail1(requestParameters.goodsId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 物品相关统计
-     * @summary 获取物品统计数据
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public getGoodsStatistics(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getGoodsStatistics(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -28964,17 +32713,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 订单相关统计
-     * @summary 获取订单统计数据
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public getOrderStatistics(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getOrderStatistics(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * 获取所有待审核的申诉列表
      * @summary 查询待审核申诉
      * @param {DefaultApiGetPendingAppealsRequest} requestParameters Request parameters.
@@ -29070,15 +32808,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 最近 N 个月的平台收入统计
-     * @summary 获取收入统计（按月）
-     * @param {DefaultApiGetRevenueByMonthRequest} requestParameters Request parameters.
+     * 获取按月统计的收入趋势（仅管理员）
+     * @summary 获取收入趋势
+     * @param {DefaultApiGetRevenueTrendRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getRevenueByMonth(requestParameters: DefaultApiGetRevenueByMonthRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getRevenueByMonth(requestParameters.months, options).then((request) => request(this.axios, this.basePath));
+    public getRevenueTrend(requestParameters: DefaultApiGetRevenueTrendRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getRevenueTrend(requestParameters.months, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29141,6 +32879,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 获取用户的消息搜索历史记录
+     * @summary 获取消息搜索历史
+     * @param {DefaultApiGetSearchHistoryRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getSearchHistory(requestParameters: DefaultApiGetSearchHistoryRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getSearchHistory(requestParameters.disputeId, requestParameters.limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取搜索相关的统计信息
+     * @summary 获取消息搜索统计
+     * @param {DefaultApiGetSearchStatisticsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getSearchStatistics(requestParameters: DefaultApiGetSearchStatisticsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getSearchStatistics(requestParameters.disputeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取搜索建议
      * @param {DefaultApiGetSearchSuggestionsRequest} requestParameters Request parameters.
@@ -29150,6 +32912,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getSearchSuggestions(requestParameters: DefaultApiGetSearchSuggestionsRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getSearchSuggestions(requestParameters.keyword, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 根据输入提供智能搜索建议
+     * @summary 获取消息搜索建议
+     * @param {DefaultApiGetSearchSuggestions1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getSearchSuggestions1(requestParameters: DefaultApiGetSearchSuggestions1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getSearchSuggestions1(requestParameters.disputeId, requestParameters.keyword, requestParameters.suggestionType, requestParameters.limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29189,7 +32963,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 系统整体数据概览
+     * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
+     * @summary 统计黑名单数量
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getStatistics1(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStatistics1(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取系统核心数据概览（仅管理员）
      * @summary 获取系统概览统计
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -29197,6 +32982,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getSystemOverview(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getSystemOverview(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 根据ID获取标签详细信息
+     * @summary 获取标签详情
+     * @param {DefaultApiGetTagByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getTagById(requestParameters: DefaultApiGetTagByIdRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getTagById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取标签关联商品统计数据
+     * @summary 标签统计
+     * @param {DefaultApiGetTagStatisticsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getTagStatistics(requestParameters: DefaultApiGetTagStatisticsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getTagStatistics(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29212,8 +33021,8 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 今日数据概览
-     * @summary 获取今日统计数据
+     * 获取今日核心数据统计（仅管理员）
+     * @summary 获取今日统计
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
@@ -29223,8 +33032,8 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 浏览量最高的物品 Top N
-     * @summary 获取热门物品排行榜
+     * 获取浏览量最高的商品排行榜（仅管理员）
+     * @summary 获取热门商品排行
      * @param {DefaultApiGetTopGoodsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -29235,8 +33044,8 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 积分最高的用户 Top N
-     * @summary 获取活跃用户排行榜
+     * 获取发布物品最多的用户排行榜（仅管理员）
+     * @summary 获取活跃用户排行
      * @param {DefaultApiGetTopUsersRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -29271,15 +33080,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 最近 N 天的数据趋势分析
-     * @summary 获取趋势数据
-     * @param {DefaultApiGetTrendDataRequest} requestParameters Request parameters.
+     * 获取用户、物品、订单的趋势数据（仅管理员）
+     * @summary 获取趋势统计
+     * @param {DefaultApiGetTrendRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getTrendData(requestParameters: DefaultApiGetTrendDataRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getTrendData(requestParameters.days, options).then((request) => request(this.axios, this.basePath));
+    public getTrend(requestParameters: DefaultApiGetTrendRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getTrend(requestParameters.days, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29444,17 +33253,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 用户相关统计
-     * @summary 获取用户统计数据
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public getUserStatistics(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getUserStatistics(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * 
      * @summary 获取我的浏览历史
      * @param {DefaultApiGetUserViewHistoryRequest} requestParameters Request parameters.
@@ -29487,6 +33285,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public healthCheck(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).healthCheck(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 测试热重载 - 版本 1
+     * @summary Hello World
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public hello(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).hello(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29561,8 +33370,8 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 查询所有功能开关
-     * @summary 开关列表
+     * 查询当前用户的导出任务列表
+     * @summary 我的导出任务
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
@@ -29572,8 +33381,8 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 查询当前用户的导出任务列表
-     * @summary 我的导出任务
+     * 
+     * @summary 列表
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
@@ -29583,25 +33392,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 
-     * @summary 列表
+     * 管理员查询系统中的所有黑名单记录
+     * @summary 查询所有黑名单记录（分页）
+     * @param {DefaultApiListAllBlacklistRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public list3(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).list3(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 查询全部校区
-     * @summary 校区列表
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public list4(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).list4(options).then((request) => request(this.axios, this.basePath));
+    public listAllBlacklist(requestParameters: DefaultApiListAllBlacklistRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listAllBlacklist(requestParameters.userId, requestParameters.blockedUserId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29665,6 +33464,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 获取所有校园列表
+     * @summary 查询校园列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listCampuses(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listCampuses(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取所有分类列表（平铺）
+     * @summary 查询分类列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listCategories(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listCategories(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 获取当前用户的所有私信会话，按最后消息时间倒序
      * @summary 查询会话列表
      * @param {DefaultApiListConversationsRequest} requestParameters Request parameters.
@@ -29677,6 +33498,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 管理员查询所有纠纷（支持筛选）
+     * @summary 查询纠纷列表
+     * @param {DefaultApiListDisputesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listDisputes(requestParameters: DefaultApiListDisputesRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listDisputes(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 查询当前用户的收藏列表
      * @summary 查询收藏列表
      * @param {DefaultApiListFavoritesRequest} requestParameters Request parameters.
@@ -29686,6 +33519,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listFavorites(requestParameters: DefaultApiListFavoritesRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listFavorites(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取所有功能开关列表
+     * @summary 查询功能开关列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listFeatureFlags(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listFeatureFlags(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29721,6 +33565,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listMessages(requestParameters: DefaultApiListMessagesRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listMessages(requestParameters.conversationId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 查询当前仲裁员处理的纠纷列表
+     * @summary 查询我的仲裁纠纷
+     * @param {DefaultApiListMyDisputesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listMyDisputes(requestParameters: DefaultApiListMyDisputesRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listMyDisputes(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29768,6 +33624,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listNotifications(requestParameters: DefaultApiListNotificationsRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listNotifications(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 查询待仲裁状态的纠纷列表
+     * @summary 查询待处理纠纷
+     * @param {DefaultApiListPendingDisputesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listPendingDisputes(requestParameters: DefaultApiListPendingDisputesRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listPendingDisputes(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -29896,6 +33764,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listTags(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listTags(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取所有标签列表
+     * @summary 查询标签列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listTags1(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listTags1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30038,15 +33917,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 将来源标签合并至目标标签
+     * 将源标签合并到目标标签（自动处理重复绑定）
      * @summary 合并标签
-     * @param {DefaultApiMergeTagRequest} requestParameters Request parameters.
+     * @param {DefaultApiMergeTagsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public mergeTag(requestParameters: DefaultApiMergeTagRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).mergeTag(requestParameters.mergeTagRequest, options).then((request) => request(this.axios, this.basePath));
+    public mergeTags(requestParameters: DefaultApiMergeTagsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).mergeTags(requestParameters.mergeTagRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30146,6 +34025,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 用户点击轮播图时调用，用于统计点击次数
+     * @summary 记录轮播图点击
+     * @param {DefaultApiRecordClickRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public recordClick(requestParameters: DefaultApiRecordClickRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).recordClick(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 记录商品浏览
      * @param {DefaultApiRecordViewRequest} requestParameters Request parameters.
@@ -30155,6 +34046,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public recordView(requestParameters: DefaultApiRecordViewRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).recordView(requestParameters.goodsId, requestParameters.sourcePage, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 轮播图展示时调用，用于统计展示次数
+     * @summary 记录轮播图展示
+     * @param {DefaultApiRecordView1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public recordView1(requestParameters: DefaultApiRecordView1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).recordView1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30170,14 +34073,26 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 
-     * @summary 刷新全部开关缓存
+     * 刷新所有功能开关的本地缓存
+     * @summary 刷新全部缓存
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public refreshAll(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).refreshAll(options).then((request) => request(this.axios, this.basePath));
+    public refreshAllCache(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).refreshAllCache(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 刷新指定功能开关的本地缓存
+     * @summary 刷新单个缓存
+     * @param {DefaultApiRefreshCacheRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public refreshCache(requestParameters: DefaultApiRefreshCacheRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).refreshCache(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30481,6 +34396,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 在纠纷协商中搜索聊天消息，支持多种筛选条件
+     * @summary 搜索协商消息
+     * @param {DefaultApiSearchMessagesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public searchMessages(requestParameters: DefaultApiSearchMessagesRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).searchMessages(requestParameters.messageSearchRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 根据关键词搜索帖子
      * @summary 搜索帖子
      * @param {DefaultApiSearchPostsRequest} requestParameters Request parameters.
@@ -30636,6 +34563,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 上传纠纷相关的证据材料
+     * @summary 提交证据
+     * @param {DefaultApiSubmitEvidenceRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public submitEvidence(requestParameters: DefaultApiSubmitEvidenceRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).submitEvidence(requestParameters.id, requestParameters.uploadEvidenceRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 订阅关键词，符合条件的商品上架会提醒
      * @summary 新增订阅
      * @param {DefaultApiSubscribeRequest} requestParameters Request parameters.
@@ -30657,6 +34596,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public syncLogistics(requestParameters: DefaultApiSyncLogisticsRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).syncLogistics(requestParameters.orderId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 切换标签的启用/禁用状态
+     * @summary 切换启用状态
+     * @param {DefaultApiToggleEnabledRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public toggleEnabled(requestParameters: DefaultApiToggleEnabledRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).toggleEnabled(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 切换功能开关的启用/禁用状态（自动刷新缓存）
+     * @summary 切换启用状态
+     * @param {DefaultApiToggleEnabled1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public toggleEnabled1(requestParameters: DefaultApiToggleEnabled1Request, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).toggleEnabled1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30792,20 +34755,20 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 
-     * @summary 更新校区
-     * @param {DefaultApiUpdateRequest} requestParameters Request parameters.
+     * 更新校园信息
+     * @summary 编辑校园
+     * @param {DefaultApiUpdateCampusRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public update(requestParameters: DefaultApiUpdateRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).update(requestParameters.id, requestParameters.updateCampusRequest, options).then((request) => request(this.axios, this.basePath));
+    public updateCampus(requestParameters: DefaultApiUpdateCampusRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateCampus(requestParameters.id, requestParameters.campusUpdateRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * 管理员更新分类信息
-     * @summary 更新分类
+     * 更新分类信息
+     * @summary 编辑分类
      * @param {DefaultApiUpdateCategoryRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -30813,6 +34776,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public updateCategory(requestParameters: DefaultApiUpdateCategoryRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).updateCategory(requestParameters.id, requestParameters.updateCategoryRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 更新功能开关配置（自动刷新缓存）
+     * @summary 编辑功能开关
+     * @param {DefaultApiUpdateFeatureFlagRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public updateFeatureFlag(requestParameters: DefaultApiUpdateFeatureFlagRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateFeatureFlag(requestParameters.id, requestParameters.featureFlagUpdateRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30864,8 +34839,8 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员修改标签名称或状态
-     * @summary 更新标签
+     * 更新标签信息
+     * @summary 编辑标签
      * @param {DefaultApiUpdateTagRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -30969,18 +34944,6 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public uploadMediaBatch(requestParameters: DefaultApiUploadMediaBatchRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).uploadMediaBatch(requestParameters.reviewId, requestParameters.mediaType, requestParameters.files, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary 新增或更新开关
-     * @param {DefaultApiUpsertRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public upsert(requestParameters: DefaultApiUpsertRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).upsert(requestParameters.featureFlag, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -31154,6 +35117,30 @@ export const ListAuditLogsActionTypeEnum = {
     Delete: 'DELETE'
 } as const;
 export type ListAuditLogsActionTypeEnum = typeof ListAuditLogsActionTypeEnum[keyof typeof ListAuditLogsActionTypeEnum];
+/**
+ * @export
+ */
+export const ListDisputesStatusEnum = {
+    Submitted: 'SUBMITTED',
+    Negotiating: 'NEGOTIATING',
+    PendingArbitration: 'PENDING_ARBITRATION',
+    Arbitrating: 'ARBITRATING',
+    Completed: 'COMPLETED',
+    Closed: 'CLOSED'
+} as const;
+export type ListDisputesStatusEnum = typeof ListDisputesStatusEnum[keyof typeof ListDisputesStatusEnum];
+/**
+ * @export
+ */
+export const ListMyDisputesStatusEnum = {
+    Submitted: 'SUBMITTED',
+    Negotiating: 'NEGOTIATING',
+    PendingArbitration: 'PENDING_ARBITRATION',
+    Arbitrating: 'ARBITRATING',
+    Completed: 'COMPLETED',
+    Closed: 'CLOSED'
+} as const;
+export type ListMyDisputesStatusEnum = typeof ListMyDisputesStatusEnum[keyof typeof ListMyDisputesStatusEnum];
 /**
  * @export
  */

@@ -73,12 +73,6 @@ export interface PageRefundRequest {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageRefundRequest
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageRefundRequest
      */
@@ -89,6 +83,12 @@ export interface PageRefundRequest {
      * @memberof PageRefundRequest
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageRefundRequest
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

@@ -40,6 +40,6 @@ export interface ApiResponseFeatureFlag {
      * @type {FeatureFlag}
      * @memberof ApiResponseFeatureFlag
      */
-    'data'?: FeatureFlag;
+    'data'?: FeatureFlag | null;
 }
 

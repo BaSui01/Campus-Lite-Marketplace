@@ -70,12 +70,6 @@ export interface PageObject {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageObject
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageObject
      */
@@ -86,6 +80,12 @@ export interface PageObject {
      * @memberof PageObject
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageObject
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

@@ -73,12 +73,6 @@ export interface PageGoodsResponse {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageGoodsResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageGoodsResponse
      */
@@ -89,6 +83,12 @@ export interface PageGoodsResponse {
      * @memberof PageGoodsResponse
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageGoodsResponse
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

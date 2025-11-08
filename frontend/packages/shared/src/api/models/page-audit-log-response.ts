@@ -73,12 +73,6 @@ export interface PageAuditLogResponse {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageAuditLogResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageAuditLogResponse
      */
@@ -89,6 +83,12 @@ export interface PageAuditLogResponse {
      * @memberof PageAuditLogResponse
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageAuditLogResponse
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

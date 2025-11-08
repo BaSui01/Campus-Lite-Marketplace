@@ -73,12 +73,6 @@ export interface PagePostResponse {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PagePostResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PagePostResponse
      */
@@ -89,6 +83,12 @@ export interface PagePostResponse {
      * @memberof PagePostResponse
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PagePostResponse
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

@@ -73,12 +73,6 @@ export interface PageSearchResultItem {
     'numberOfElements'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageSearchResultItem
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageSearchResultItem
      */
@@ -89,6 +83,12 @@ export interface PageSearchResultItem {
      * @memberof PageSearchResultItem
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageSearchResultItem
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}
