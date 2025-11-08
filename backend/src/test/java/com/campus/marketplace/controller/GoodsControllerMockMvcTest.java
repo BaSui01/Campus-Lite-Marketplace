@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.ApproveGoodsRequest;
 import com.campus.marketplace.common.dto.request.CreateGoodsRequest;
 import com.campus.marketplace.common.dto.response.GoodsDetailResponse;

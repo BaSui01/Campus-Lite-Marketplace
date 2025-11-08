@@ -3,7 +3,6 @@ package com.campus.marketplace.controller;
 import com.campus.marketplace.common.support.SpringContextHolder;
 import com.campus.marketplace.common.utils.JwtUtil;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,21 +29,25 @@ public class TestSecurityConfig {
      *
      * 🔧 解决问题：JwtAuthenticationFilter 需要 JwtUtil Bean
      * 在测试环境中，我们不需要真正的 JWT 验证逻辑
-     * 使用 @MockBean 创建一个 Mock 对象即可
+     * 使用 @Bean + Mockito.mock() 创建一个 Mock 对象
      */
-    @MockBean
-    private JwtUtil jwtUtil;
+    @Bean
+    public JwtUtil jwtUtil() {
+        return org.mockito.Mockito.mock(JwtUtil.class);
+    }
 
     /**
      * Mock RedisTemplate Bean
      *
      * 🔧 解决问题：JwtAuthenticationFilter 的构造函数还需要 RedisTemplate
      * 在测试环境中，我们不需要真正的 Redis 连接
-     * 使用 @MockBean 创建一个 Mock 对象即可
+     * 使用 @Bean + Mockito.mock() 创建一个 Mock 对象
      */
-    @MockBean
+    @Bean
     @SuppressWarnings("rawtypes")
-    private org.springframework.data.redis.core.RedisTemplate redisTemplate;
+    public org.springframework.data.redis.core.RedisTemplate redisTemplate() {
+        return org.mockito.Mockito.mock(org.springframework.data.redis.core.RedisTemplate.class);
+    }
 
     /**
      * SpringContextHolder Bean

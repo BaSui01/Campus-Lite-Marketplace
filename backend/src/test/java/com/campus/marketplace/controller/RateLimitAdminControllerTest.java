@@ -2,7 +2,6 @@ package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.component.RateLimitRuleManager;
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

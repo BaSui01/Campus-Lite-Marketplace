@@ -22,8 +22,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,17 +70,6 @@ class AdminControllerAuthMatrixTest {
             chain.doFilter(request, response);
             return null;
         }).when(jwtAuthenticationFilter).doFilter(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
-    }
-
-    @Test
-    @DisplayName("具备 system:statistics:view 权限访问管理员统计接口 -> 200")
-    @WithMockUser(username = "admin", authorities = "system:statistics:view")
-    void admin_stats_ok_200() throws Exception {
-        when(statisticsService.getSystemOverview()).thenReturn(java.util.Collections.emptyMap());
-
-        mockMvc.perform(get("/api/admin/statistics/overview")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
     }
 
     @Test

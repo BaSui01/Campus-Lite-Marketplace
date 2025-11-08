@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.response.SearchResultItem;
 import com.campus.marketplace.service.SearchService;
 import org.junit.jupiter.api.DisplayName;

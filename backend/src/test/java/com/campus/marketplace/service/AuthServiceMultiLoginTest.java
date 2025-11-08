@@ -63,6 +63,12 @@ class AuthServiceMultiLoginTest {
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
+    @Mock
+    private com.campus.marketplace.common.utils.CryptoUtil cryptoUtil;
+
+    @Mock
+    private VerificationCodeService verificationCodeService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -74,6 +80,9 @@ class AuthServiceMultiLoginTest {
     void setUp() {
         // 设置 JWT 过期时间
         ReflectionTestUtils.setField(authService, "jwtExpiration", 7200000L);
+
+        // 🎯 Mock CryptoUtil 行为：默认返回明文密码（兼容模式）
+        when(cryptoUtil.isEncrypted(anyString())).thenReturn(false);
 
         // 创建权限
         viewPermission = Permission.builder()

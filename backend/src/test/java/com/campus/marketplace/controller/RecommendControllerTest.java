@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
 import com.campus.marketplace.service.RecommendService;
 import org.junit.jupiter.api.DisplayName;

@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
 import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.service.OrderService;

@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.CompletePrivacyRequest;
 import com.campus.marketplace.common.dto.request.CreatePrivacyRequest;
 import com.campus.marketplace.common.dto.response.PrivacyRequestResponse;
