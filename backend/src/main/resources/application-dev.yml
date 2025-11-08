@@ -29,10 +29,10 @@ spring:
     hibernate:
       # 开发环境使用 update（自动更新表结构）
       ddl-auto: update
-    show-sql: false  # ✅ BaSui: 改为 false 关闭 SQL 输出，避免控制台太长
+    show-sql: ${JPA_SHOW_SQL:false}  # ✅ BaSui: 从 .env 读取，默认 false
     properties:
       hibernate:
-        format_sql: false  # ✅ BaSui: 同时关闭 SQL 格式化
+        format_sql: ${JPA_FORMAT_SQL:false}  # ✅ BaSui: 从 .env 读取，默认 false
         # 禁用二级缓存（避免开发时缓存问题）
         cache:
           use_second_level_cache: false

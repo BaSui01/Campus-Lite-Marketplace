@@ -241,10 +241,6 @@
             <version>3.1.8</version>
         </dependency>
 
-        <!-- Springdoc OpenAPI (Swagger UI) -->
-        <!-- ⚠️ 版本限制：2.6.x 兼容 Spring Boot 3.2.x (Spring Framework 6.1.x) -->
-        <!-- ⚠️ 安全漏洞：2.7.0 修复了 DOMPurify CVE-2024-45801，但需要 Spring Boot 3.3+ -->
-        <!-- 💡 解决方案：等待升级 Spring Boot 3.3+ 后再升级 SpringDoc 2.7.0 -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
