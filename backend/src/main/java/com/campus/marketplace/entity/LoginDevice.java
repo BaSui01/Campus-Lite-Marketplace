@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "login_devices", indexes = {
-    @Index(name = "idx_user_id", columnList = "user_id"),
-    @Index(name = "idx_last_active_at", columnList = "last_active_at")
+    @Index(name = "idx_login_device_user_id", columnList = "user_id"),
+    @Index(name = "idx_login_device_last_active_at", columnList = "last_active_at")
 })
 @Data
 @Builder

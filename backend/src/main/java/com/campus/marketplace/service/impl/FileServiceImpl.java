@@ -67,25 +67,23 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String uploadFile(MultipartFile file) throws IOException {
+        return uploadFile(file, "general");
+    }
+
+    @Override
+    public String uploadFile(MultipartFile file, String category) throws IOException {
         // 🎯 第一步：执行完整的安全检查（集成 FileSecurityService）
         try {
-            // 1. 执行基础安全检查（文件非空、文件名、类型、扩展名匹配）
             fileSecurityService.performSecurityCheck(file);
-
-            // 2. 验证文件大小
             fileSecurityService.validateFileSize(file, maxFileSize);
-
-            // 3. 验证文件魔数（防止伪造Content-Type）
             fileSecurityService.validateFileMagicNumber(file);
-
             log.info("文件安全检查全部通过: {}", file.getOriginalFilename());
         } catch (IllegalArgumentException e) {
-            // 将安全检查异常转换为业务异常
             throw new BusinessException(ErrorCode.INVALID_PARAM, e.getMessage());
         }
 
-        // 🎯 第二步：根据文件类型确定分类目录
-        String categoryDir = determineFileCategory(file.getContentType());
+        // 🎯 第二步：根据业务场景确定分类目录
+        String categoryDir = determineCategoryDir(category);
 
         // 🎯 第三步：生成唯一文件名
         String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
@@ -100,8 +98,6 @@ public class FileServiceImpl implements FileService {
 
         // 🎯 第五步：保存文件（使用重试机制防止文件名冲突）
         Path filePath = uploadPath.resolve(uniqueFileName);
-
-        // 🛑 安全检查：如果文件已存在，重新生成文件名
         int retryCount = 0;
         while (Files.exists(filePath) && retryCount < 3) {
             log.warn("文件已存在，重新生成文件名: {}", uniqueFileName);
@@ -115,10 +111,8 @@ public class FileServiceImpl implements FileService {
         }
 
         Files.copy(file.getInputStream(), filePath);
-
         log.info("文件上传成功: {}/{}/{}", categoryDir, dateDir, uniqueFileName);
 
-        // 🎯 返回访问URL（包含分类和日期路径）
         return "/uploads/" + categoryDir + "/" + dateDir + "/" + uniqueFileName;
     }
 
@@ -216,36 +210,22 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * 根据文件MIME类型确定分类目录
+     * 根据业务场景确定分类目录
      *
-     * @param contentType 文件MIME类型
+     * @param category 业务场景（avatar/goods/post/message/general）
      * @return 分类目录名称
      */
-    private String determineFileCategory(String contentType) {
-        if (contentType == null) {
-            return "others";
+    private String determineCategoryDir(String category) {
+        if (category == null || category.isEmpty()) {
+            return "general";
         }
 
-        // 🎨 图片文件 → images/
-        if (contentType.startsWith("image/")) {
-            return "images";
-        }
-
-        // 🎬 视频文件 → videos/
-        if (contentType.startsWith("video/")) {
-            return "videos";
-        }
-
-        // 📄 文档文件 → documents/
-        if (contentType.startsWith("application/pdf") ||
-            contentType.startsWith("application/msword") ||
-            contentType.startsWith("application/vnd.openxmlformats") ||
-            contentType.startsWith("application/vnd.ms-excel") ||
-            contentType.startsWith("text/plain")) {
-            return "documents";
-        }
-
-        // 🗂️ 其他文件 → others/
-        return "others";
+        return switch (category.toLowerCase()) {
+            case "avatar" -> "avatars";
+            case "goods" -> "goods";
+            case "post" -> "posts";
+            case "message" -> "messages";
+            default -> "general";
+        };
     }
 }

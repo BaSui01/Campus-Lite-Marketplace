@@ -17,10 +17,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "t_batch_task", indexes = {
     @Index(name = "idx_task_code", columnList = "task_code", unique = true),
-    @Index(name = "idx_user_id", columnList = "user_id"),
-    @Index(name = "idx_status", columnList = "status"),
-    @Index(name = "idx_batch_type", columnList = "batch_type"),
-    @Index(name = "idx_created_at", columnList = "created_at")
+    @Index(name = "idx_batch_task_user_id", columnList = "user_id"),
+    @Index(name = "idx_batch_task_status", columnList = "status"),
+    @Index(name = "idx_batch_task_type", columnList = "batch_type"),
+    @Index(name = "idx_batch_task_created_at", columnList = "created_at")
 })
 @Getter
 @Setter

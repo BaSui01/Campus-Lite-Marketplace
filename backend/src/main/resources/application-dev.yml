@@ -32,7 +32,7 @@ spring:
   # JPA 配置（开发环境）
   jpa:
     hibernate:
-      # 开发环境使用 update（自动更新表结构）
+      # ✅ BaSui: 改为 update，自动建表和更新索引（开发环境）
       ddl-auto: update
     show-sql: ${JPA_SHOW_SQL:false}  # ✅ BaSui: 从 .env 读取，默认 false
     properties:
@@ -47,9 +47,9 @@ spring:
   cache:
     type: simple
 
-  # Flyway 配置（开发环境可选禁用）
+  # Flyway 配置（开发环境禁用，改用 JPA 自动建表）
   flyway:
-    enabled: false  # 开发时可禁用 Flyway，使用 JPA 的 ddl-auto
+    enabled: false  # ✅ BaSui: 禁用 Flyway，改用 JPA 自动建表
 
   # 热部署配置（兼容老版本）
   freemarker:
@@ -101,3 +101,17 @@ server:
   port: 8200
   servlet:
     context-path: /api
+
+# 推荐配置（🎯 BaSui 新增）
+recommend:
+  enabled: true  # 是否启用推荐功能
+  algorithm: HYBRID  # 推荐算法：HYBRID（混合）、COLLABORATIVE（协同过滤）、CONTENT（基于内容）
+  weights:
+    collaborative: 0.4  # 协同过滤权重
+    content: 0.3  # 基于内容权重
+    hot: 0.2  # 热门榜单权重
+    personalized: 0.1  # 个性化权重
+  params:
+    maxRecommendations: 20  # 最大推荐数量
+    minScore: 0.3  # 最小相似度阈值
+    refreshInterval: 3600  # 缓存刷新间隔（秒）

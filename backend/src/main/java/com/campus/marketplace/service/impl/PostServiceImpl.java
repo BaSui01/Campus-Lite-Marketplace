@@ -3,6 +3,8 @@ package com.campus.marketplace.service.impl;
 import com.campus.marketplace.common.dto.request.CreatePostRequest;
 import com.campus.marketplace.common.dto.response.PostResponse;
 import com.campus.marketplace.common.entity.Post;
+import com.campus.marketplace.common.entity.PostTag;
+import com.campus.marketplace.common.entity.Tag;
 import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
@@ -11,6 +13,8 @@ import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.common.utils.SensitiveWordFilter;
 import com.campus.marketplace.repository.PostRepository;
+import com.campus.marketplace.repository.PostTagRepository;
+import com.campus.marketplace.repository.TagRepository;
 import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.PostService;
 import com.campus.marketplace.service.MessageService;
@@ -26,7 +30,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * 帖子服务实现类
@@ -43,6 +51,8 @@ import java.util.concurrent.TimeUnit;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final PostTagRepository postTagRepository;
+    private final TagRepository tagRepository;
     private final UserRepository userRepository;
     private final SensitiveWordFilter sensitiveWordFilter;
     private final com.campus.marketplace.service.ComplianceService complianceService;
@@ -126,6 +136,7 @@ public class PostServiceImpl implements PostService {
 
         // 5. 保存帖子
         postRepository.save(post);
+        syncPostTags(post.getId(), request.tagIds());
 
         // 6. 更新 Redis 发帖计数（+1）
         redisTemplate.opsForValue().increment(limitKey, 1L);
@@ -329,6 +340,7 @@ public class PostServiceImpl implements PostService {
         }
 
         postRepository.save(post);
+        syncPostTags(post.getId(), request.tagIds());
         log.info("帖子修改成功: postId={}, resetToPending={}", id, contentChanged);
     }
 
@@ -345,5 +357,56 @@ public class PostServiceImpl implements PostService {
                 log.warn("增加浏览量失败: postId={}, error={}", post.getId(), e.getMessage());
             }
         });
+    }
+
+    /**
+     * 同步帖子标签
+     *
+     * @param postId 帖子ID
+     * @param tagIds 标签ID列表
+     * @author BaSui 😎
+     */
+    private void syncPostTags(Long postId, List<Long> tagIds) {
+        // 1. 先删除旧关联
+        postTagRepository.deleteByPostId(postId);
+
+        // 2. 如果标签列表为空，直接返回
+        if (tagIds == null || tagIds.isEmpty()) {
+            return;
+        }
+
+        // 3. 去重并过滤空值
+        List<Long> distinct = tagIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 4. 校验标签数量限制
+        if (distinct.size() > 10) {
+            throw new BusinessException(ErrorCode.INVALID_PARAMETER, "最多绑定 10 个标签");
+        }
+
+        // 5. 校验标签是否存在
+        List<Tag> tags = StreamSupport.stream(
+                        tagRepository.findAllById(distinct).spliterator(), false)
+                .toList();
+
+        if (tags.size() != distinct.size()) {
+            throw new BusinessException(ErrorCode.TAG_NOT_FOUND, "存在已失效的标签");
+        }
+
+        // 6. 校验标签是否被禁用
+        tags.forEach(tag -> {
+            if (Boolean.FALSE.equals(tag.getEnabled())) {
+                throw new BusinessException(ErrorCode.OPERATION_FAILED, "标签已被禁用: " + tag.getName());
+            }
+        });
+
+        // 7. 创建新关联
+        distinct.forEach(tagId -> postTagRepository.save(
+                PostTag.builder().postId(postId).tagId(tagId).build()
+        ));
+
+        log.info("帖子标签同步成功: postId={}, tagIds={}", postId, distinct);
     }
 }

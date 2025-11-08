@@ -3,6 +3,9 @@ package com.campus.marketplace.service;
 import com.campus.marketplace.common.dto.LogisticsDTO;
 import com.campus.marketplace.common.dto.LogisticsStatisticsDTO;
 import com.campus.marketplace.common.enums.LogisticsCompany;
+import com.campus.marketplace.common.enums.LogisticsStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 
@@ -96,4 +99,17 @@ public interface LogisticsService {
      * @return 物流统计DTO
      */
     LogisticsStatisticsDTO getLogisticsStatistics(LocalDateTime startDate, LocalDateTime endDate);
+
+    /**
+     * 🎯 BaSui 新增：分页查询物流列表（管理端）
+     * <p>
+     * 管理员查看所有物流信息时调用，支持搜索和状态筛选。
+     * </p>
+     *
+     * @param keyword  关键词（可选，搜索订单ID或快递单号）
+     * @param status   物流状态（可选）
+     * @param pageable 分页参数
+     * @return 物流信息分页结果
+     */
+    Page<LogisticsDTO> listLogistics(String keyword, LogisticsStatus status, Pageable pageable);
 }

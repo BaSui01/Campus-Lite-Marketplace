@@ -4,6 +4,7 @@ import com.campus.marketplace.common.entity.Logistics;
 import com.campus.marketplace.common.enums.LogisticsCompany;
 import com.campus.marketplace.common.enums.LogisticsStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,7 +20,7 @@ import java.util.Optional;
  * @since 2025-11-03
  */
 @Repository
-public interface LogisticsRepository extends JpaRepository<Logistics, Long> {
+public interface LogisticsRepository extends JpaRepository<Logistics, Long>, JpaSpecificationExecutor<Logistics> {
 
     /**
      * 根据订单ID查找物流信息

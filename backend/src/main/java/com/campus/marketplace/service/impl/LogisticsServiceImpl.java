@@ -17,8 +17,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.criteria.Predicate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -252,6 +256,47 @@ public class LogisticsServiceImpl implements LogisticsService {
                 .totalOrders(totalOrders)
                 .overtimeOrders(overtimeOrders)
                 .build();
+    }
+
+    @Override
+    public Page<LogisticsDTO> listLogistics(String keyword, LogisticsStatus status, Pageable pageable) {
+        log.info("🎯 BaSui：分页查询物流列表 - keyword={}, status={}, page={}, size={}",
+                keyword, status, pageable.getPageNumber(), pageable.getPageSize());
+
+        // 构建动态查询条件
+        Specification<Logistics> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // 关键词搜索（订单ID或快递单号）
+            if (keyword != null && !keyword.isBlank()) {
+                try {
+                    // 尝试解析为订单ID
+                    Long orderId = Long.parseLong(keyword.trim());
+                    predicates.add(cb.or(
+                            cb.equal(root.get("orderId"), orderId),
+                            cb.like(root.get("trackingNumber"), "%" + keyword.trim() + "%")
+                    ));
+                } catch (NumberFormatException e) {
+                    // 如果不是数字，只搜索快递单号
+                    predicates.add(cb.like(root.get("trackingNumber"), "%" + keyword.trim() + "%"));
+                }
+            }
+
+            // 状态筛选
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // 执行分页查询
+        Page<Logistics> logisticsPage = logisticsRepository.findAll(spec, pageable);
+
+        log.info("✅ BaSui：查询完成 - 共 {} 条记录", logisticsPage.getTotalElements());
+
+        // 转换为DTO
+        return logisticsPage.map(this::convertToDTO);
     }
 
     /**

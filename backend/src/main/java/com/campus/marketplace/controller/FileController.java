@@ -34,16 +34,21 @@ public class FileController {
 
         @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "上传图片", description = "上传单个图片文件，返回访问URL")
+    @Operation(summary = "上传文件", description = "上传文件，支持按业务场景分类存储")
     @RateLimit(key = "file:upload", maxRequests = 30, timeWindow = 60)
-    public ApiResponse<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        log.info("收到文件上传请求: {}", file.getOriginalFilename());
+    public ApiResponse<Map<String, String>> uploadFile(
+            @Parameter(description = "文件", required = true) @RequestParam("file") MultipartFile file,
+            @Parameter(description = "业务场景（avatar/goods/post/message/general）", example = "avatar")
+            @RequestParam(value = "category", required = false, defaultValue = "general") String category
+    ) throws IOException {
+        log.info("收到文件上传请求: {}, category: {}", file.getOriginalFilename(), category);
 
-        String fileUrl = fileService.uploadFile(file);
+        String fileUrl = fileService.uploadFile(file, category);
 
         Map<String, String> result = new HashMap<>();
         result.put("url", fileUrl);
         result.put("filename", file.getOriginalFilename());
+        result.put("category", category);
 
         return ApiResponse.success(result);
     }

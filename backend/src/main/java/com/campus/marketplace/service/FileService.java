@@ -22,6 +22,16 @@ public interface FileService {
     String uploadFile(MultipartFile file) throws IOException;
 
     /**
+     * 上传文件 - 支持业务场景分类
+     *
+     * @param file 上传的文件
+     * @param category 业务场景（avatar/goods/post/message/general）
+     * @return 文件访问URL
+     * @throws IOException 上传失败
+     */
+    String uploadFile(MultipartFile file, String category) throws IOException;
+
+    /**
      * 上传文件并生成缩略图 - 增强版本
      *
      * @param file 上传的图片文件
