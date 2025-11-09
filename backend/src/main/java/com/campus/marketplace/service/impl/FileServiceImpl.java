@@ -5,6 +5,7 @@ import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.service.FileSecurityService;
 import com.campus.marketplace.service.FileService;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FilenameUtils;
@@ -18,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -28,6 +30,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
     private final FileSecurityService fileSecurityService;
@@ -40,11 +43,6 @@ public class FileServiceImpl implements FileService {
 
     @Value("${file.upload.allowed-types:image/jpeg,image/png,image/gif,image/webp,video/mp4,video/mpeg,video/quicktime,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet}")
     private String[] allowedTypes;
-
-    // 🎯 构造函数注入 FileSecurityService
-    public FileServiceImpl(FileSecurityService fileSecurityService) {
-        this.fileSecurityService = fileSecurityService;
-    }
 
     /**
      * 初始化方法：确保上传目录存在
@@ -227,5 +225,185 @@ public class FileServiceImpl implements FileService {
             case "message" -> "messages";
             default -> "general";
         };
+    }
+
+    /**
+     * 上传头像并生成多尺寸缩略图
+     * <p>
+     * 自动生成以下尺寸的缩略图：
+     * - 原图（自动压缩，质量 85%）
+     * - 256x256（中等尺寸，用于个人中心）
+     * - 128x128（小尺寸，用于评论列表）
+     * - 64x64（超小尺寸，用于消息列表）
+     * </p>
+     *
+     * @param file 上传的头像文件
+     * @return 包含所有尺寸图片 URL 的 Map（original, large, medium, small）
+     * @throws IOException 上传失败
+     */
+    @Override
+    public java.util.Map<String, String> uploadAvatarWithMultipleSizes(MultipartFile file) throws IOException {
+        // 🎯 第一步：执行完整的安全检查
+        try {
+            fileSecurityService.performSecurityCheck(file);
+            fileSecurityService.validateFileSize(file, maxFileSize);
+            fileSecurityService.validateFileMagicNumber(file);
+            // ✅ 验证图片尺寸（最大 2048x2048）
+            fileSecurityService.validateImageDimensions(file, 2048, 2048);
+            log.info("文件安全检查全部通过: {}", file.getOriginalFilename());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.INVALID_PARAM, e.getMessage());
+        }
+
+        // 🎯 第二步：上传原图（自动压缩）
+        String originalUrl = uploadFile(file, "avatar");
+
+        // 🎯 第三步：生成多尺寸缩略图
+        java.util.Map<String, String> result = new java.util.HashMap<>();
+        result.put("original", originalUrl);
+
+        try {
+            // 提取文件路径
+            String relativePath = originalUrl.replace("/uploads/", "");
+            Path originalFile = Paths.get(uploadDir, relativePath);
+
+            // 生成文件名前缀
+            String fileName = originalFile.getFileName().toString();
+            String extension = FilenameUtils.getExtension(fileName);
+            String baseName = FilenameUtils.getBaseName(fileName);
+
+            // 生成 256x256 缩略图（中等尺寸）
+            String mediumFileName = baseName + "_256." + extension;
+            Path mediumPath = originalFile.getParent().resolve(mediumFileName);
+            Thumbnails.of(originalFile.toFile())
+                    .size(256, 256)
+                    .keepAspectRatio(true)
+                    .outputQuality(0.85)
+                    .toFile(mediumPath.toFile());
+            result.put("medium", originalUrl.replace(fileName, mediumFileName));
+            log.info("256x256 缩略图生成成功: {}", mediumPath);
+
+            // 生成 128x128 缩略图（小尺寸）
+            String smallFileName = baseName + "_128." + extension;
+            Path smallPath = originalFile.getParent().resolve(smallFileName);
+            Thumbnails.of(originalFile.toFile())
+                    .size(128, 128)
+                    .keepAspectRatio(true)
+                    .outputQuality(0.85)
+                    .toFile(smallPath.toFile());
+            result.put("small", originalUrl.replace(fileName, smallFileName));
+            log.info("128x128 缩略图生成成功: {}", smallPath);
+
+            // 生成 64x64 缩略图（超小尺寸）
+            String tinyFileName = baseName + "_64." + extension;
+            Path tinyPath = originalFile.getParent().resolve(tinyFileName);
+            Thumbnails.of(originalFile.toFile())
+                    .size(64, 64)
+                    .keepAspectRatio(true)
+                    .outputQuality(0.85)
+                    .toFile(tinyPath.toFile());
+            result.put("tiny", originalUrl.replace(fileName, tinyFileName));
+            log.info("64x64 缩略图生成成功: {}", tinyPath);
+
+        } catch (Exception e) {
+            log.warn("缩略图生成失败（但原图上传成功）: {}", e.getMessage());
+            // 缩略图生成失败不影响主流程，只记录警告
+        }
+
+        return result;
+    }
+
+    /**
+     * 上传 Base64 编码的图片
+     * <p>
+     * 支持场景：
+     * - 图片裁剪后上传
+     * - 剪贴板图片上传
+     * - Canvas 绘图上传
+     * </p>
+     *
+     * @param base64Data Base64 编码的图片数据（支持 data:image/png;base64,xxx 格式）
+     * @param category 业务场景（avatar/goods/post/message/general）
+     * @return 文件访问URL
+     * @throws IOException 上传失败
+     */
+    @Override
+    public String uploadBase64Image(String base64Data, String category) throws IOException {
+        // 🎯 第一步：参数校验
+        if (base64Data == null || base64Data.isEmpty()) {
+            throw new BusinessException(ErrorCode.INVALID_PARAM, "Base64 数据不能为空");
+        }
+
+        // 🎯 第二步：解析 Base64 数据（支持 data:image/png;base64,xxx 格式）
+        String base64String;
+        String mimeType = "image/png"; // 默认 PNG
+        String extension = "png";
+
+        if (base64Data.startsWith("data:")) {
+            // 格式：data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...
+            int commaIndex = base64Data.indexOf(",");
+            if (commaIndex == -1) {
+                throw new BusinessException(ErrorCode.INVALID_PARAM, "Base64 数据格式错误");
+            }
+
+            // 提取 MIME 类型
+            String dataHeader = base64Data.substring(0, commaIndex);
+            if (dataHeader.contains("image/jpeg") || dataHeader.contains("image/jpg")) {
+                mimeType = "image/jpeg";
+                extension = "jpg";
+            } else if (dataHeader.contains("image/png")) {
+                mimeType = "image/png";
+                extension = "png";
+            } else if (dataHeader.contains("image/gif")) {
+                mimeType = "image/gif";
+                extension = "gif";
+            } else if (dataHeader.contains("image/webp")) {
+                mimeType = "image/webp";
+                extension = "webp";
+            }
+
+            // 提取 Base64 字符串
+            base64String = base64Data.substring(commaIndex + 1);
+        } else {
+            // 纯 Base64 字符串
+            base64String = base64Data;
+        }
+
+        // 🎯 第三步：解码 Base64 数据
+        byte[] imageBytes;
+        try {
+            imageBytes = Base64.getDecoder().decode(base64String);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.INVALID_PARAM, "Base64 解码失败：" + e.getMessage());
+        }
+
+        // 🎯 第四步：文件大小校验
+        if (imageBytes.length > maxFileSize) {
+            throw new BusinessException(ErrorCode.INVALID_PARAM,
+                    String.format("文件大小超过限制：%d bytes > %d bytes", imageBytes.length, maxFileSize));
+        }
+
+        // 🎯 第五步：根据业务场景确定分类目录
+        String categoryDir = determineCategoryDir(category);
+
+        // 🎯 第六步：生成唯一文件名
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String randomCode = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        String uniqueFileName = timestamp + "_" + randomCode + "." + extension;
+
+        // 🎯 第七步：按日期分类创建子目录（格式：category/yyyy/MM/dd）
+        String dateDir = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        Path uploadPath = Paths.get(uploadDir, categoryDir, dateDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+            log.debug("创建分类子目录: {}", uploadPath);
+        }
+
+        // 🎯 第八步：保存文件
+        Path filePath = uploadPath.resolve(uniqueFileName);
+        Files.write(filePath, imageBytes);
+        log.info("Base64 图片上传成功: {}/{}/{} ({})", categoryDir, dateDir, uniqueFileName, mimeType);
+
+        return "/uploads/" + categoryDir + "/" + dateDir + "/" + uniqueFileName;
     }
 }

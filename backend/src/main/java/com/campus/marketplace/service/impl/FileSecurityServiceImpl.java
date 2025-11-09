@@ -407,4 +407,59 @@ public class FileSecurityServiceImpl implements FileSecurityService {
 
         return null;
     }
+
+    /**
+     * 验证图片尺寸是否在限制范围内
+     *
+     * @param file 待验证的图片文件
+     * @param maxWidth 最大宽度（像素）
+     * @param maxHeight 最大高度（像素）
+     * @throws IllegalArgumentException 如果图片尺寸超过限制或无法读取图片
+     */
+    @Override
+    public void validateImageDimensions(MultipartFile file, int maxWidth, int maxHeight) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("文件不能为空");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType)) {
+            log.warn("非图片文件，跳过尺寸验证: {}", contentType);
+            return; // 非图片文件，跳过尺寸验证
+        }
+
+        try {
+            // 使用 ImageIO 读取图片尺寸
+            java.awt.image.BufferedImage image = javax.imageio.ImageIO.read(file.getInputStream());
+
+            if (image == null) {
+                log.warn("无法读取图片尺寸: {}", file.getOriginalFilename());
+                throw new IllegalArgumentException("无法读取图片，文件可能已损坏");
+            }
+
+            int width = image.getWidth();
+            int height = image.getHeight();
+
+            log.debug("图片尺寸: {}x{}, 文件名: {}", width, height, file.getOriginalFilename());
+
+            // 验证尺寸是否超过限制
+            if (width > maxWidth || height > maxHeight) {
+                log.warn("图片尺寸超过限制: {}x{} > {}x{}, 文件名: {}",
+                        width, height, maxWidth, maxHeight, file.getOriginalFilename());
+                throw new IllegalArgumentException(
+                        String.format("图片尺寸超过限制：%dx%d（最大允许：%dx%d）",
+                                width, height, maxWidth, maxHeight)
+                );
+            }
+
+            log.debug("图片尺寸验证通过: {}x{}", width, height);
+
+        } catch (IllegalArgumentException e) {
+            // 重新抛出业务异常
+            throw e;
+        } catch (Exception e) {
+            log.error("图片尺寸验证失败: {}", file.getOriginalFilename(), e);
+            throw new IllegalArgumentException("无法验证图片尺寸：" + e.getMessage());
+        }
+    }
 }

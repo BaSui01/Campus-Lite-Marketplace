@@ -122,11 +122,51 @@ public class UserServiceImpl implements UserService {
 
         // 更新头像
         if (request.avatar() != null) {
+            // ✅ 验证头像 URL 是否合法（防止恶意 URL 注入）
+            if (!isValidAvatarUrl(request.avatar())) {
+                throw new BusinessException(ErrorCode.INVALID_PARAM, "头像URL不合法，只允许本站上传的图片");
+            }
             user.setAvatar(request.avatar());
         }
 
         userRepository.save(user);
         log.info("用户资料更新成功: userId={}", user.getId());
+    }
+
+    /**
+     * 验证头像 URL 是否合法
+     * <p>
+     * 只允许以下来源的头像：
+     * - 本站上传的图片（/uploads/）
+     * - 本地开发环境（localhost）
+     * - 可信 CDN 域名
+     * </p>
+     *
+     * @param avatarUrl 头像 URL
+     * @return 是否合法
+     */
+    private boolean isValidAvatarUrl(String avatarUrl) {
+        if (avatarUrl == null || avatarUrl.trim().isEmpty()) {
+            return false;
+        }
+
+        // 允许的域名和路径前缀
+        String[] allowedPatterns = {
+            "/uploads/",                // 本地上传路径
+            "localhost",                // 本地开发
+            "127.0.0.1",                // 本地开发
+            "cdn.campus.com",           // 生产 CDN（根据实际情况修改）
+        };
+
+        for (String pattern : allowedPatterns) {
+            if (avatarUrl.contains(pattern)) {
+                log.debug("头像 URL 验证通过: {}", avatarUrl);
+                return true;
+            }
+        }
+
+        log.warn("⚠️ 非法头像 URL 被拒绝: {}", avatarUrl);
+        return false;
     }
 
     /**
