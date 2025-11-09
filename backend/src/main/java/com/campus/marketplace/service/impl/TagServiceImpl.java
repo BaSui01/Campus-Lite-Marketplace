@@ -127,6 +127,44 @@ public class TagServiceImpl implements TagService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<TagResponse> listTags(String keyword, Boolean enabled, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Tag> tagPage;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            tagPage = tagRepository.findByNameContainingIgnoreCase(keyword.trim(), pageable);
+        } else if (enabled != null) {
+            tagPage = tagRepository.findByEnabled(enabled, pageable);
+        } else {
+            tagPage = tagRepository.findAll(pageable);
+        }
+
+        return tagPage.map(this::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TagStatisticsResponse> getHotTags(int limit) {
+        List<Object[]> results = goodsTagRepository.findTopTagsByUsageCount(org.springframework.data.domain.PageRequest.of(0, limit));
+        return results.stream()
+                .map(row -> {
+                    Long tagId = (Long) row[0];
+                    Long count = (Long) row[1];
+                    Tag tag = tagRepository.findById(tagId).orElse(null);
+                    if (tag == null) return null;
+                    return TagStatisticsResponse.builder()
+                            .tagId(tagId)
+                            .tagName(tag.getName())
+                            .goodsCount(count)
+                            .enabled(tag.getEnabled())
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
     // 🎯 BaSui 新增方法实现（标签管理扩展）
 
     @Override

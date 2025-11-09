@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -86,6 +87,16 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        // 更新昵称
+        if (request.nickname() != null) {
+            user.setNickname(request.nickname());
+        }
+
+        // 更新个人简介
+        if (request.bio() != null) {
+            user.setBio(request.bio());
+        }
 
         // 更新邮箱
         if (request.email() != null && !request.email().equals(user.getEmail())) {
@@ -166,15 +177,35 @@ public class UserServiceImpl implements UserService {
                 .map(Role::getName)
                 .collect(Collectors.toList());
 
+        // 获取校区名称
+        String campusName = null;
+        if (user.getCampus() != null) {
+            campusName = user.getCampus().getName();
+        }
+
+        // 获取封禁原因
+        String banReason = null;
+        if (user.getStatus() == com.campus.marketplace.common.enums.UserStatus.BANNED) {
+            List<com.campus.marketplace.common.entity.BanLog> banLogs = banLogRepository
+                .findTopByUserIdAndIsUnbannedFalseOrderByCreatedAtDesc(user.getId());
+            if (!banLogs.isEmpty()) {
+                banReason = banLogs.get(0).getReason();
+            }
+        }
+
         return UserProfileResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .nickname(user.getNickname())
                 .email(maskedEmail)
                 .phone(maskedPhone)
                 .studentId(user.getStudentId())
                 .avatar(user.getAvatar())
                 .status(user.getStatus().name())
                 .points(user.getPoints())
+                .campusId(user.getCampusId())
+                .campusName(campusName)
+                .banReason(banReason)
                 .roles(roles)
                 .createdAt(user.getCreatedAt())
                 .build();
@@ -744,5 +775,66 @@ public class UserServiceImpl implements UserService {
             log.error("❌ TOTP 验证失败：{}", e.getMessage(), e);
             return false;
         }
+    }
+
+    /**
+     * 获取用户列表（管理端）
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<UserProfileResponse> listUsers(String keyword, String status, int page, int size) {
+        log.info("查询用户列表: keyword={}, status={}, page={}, size={}", keyword, status, page, size);
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size,
+                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+
+        org.springframework.data.domain.Page<User> userPage;
+
+        if (keyword != null && !keyword.isEmpty() && status != null && !status.isEmpty()) {
+            userPage = userRepository.findByUsernameContainingAndStatus(keyword, com.campus.marketplace.common.enums.UserStatus.valueOf(status), pageable);
+        } else if (keyword != null && !keyword.isEmpty()) {
+            userPage = userRepository.findByUsernameContaining(keyword, pageable);
+        } else if (status != null && !status.isEmpty()) {
+            userPage = userRepository.findByStatus(com.campus.marketplace.common.enums.UserStatus.valueOf(status), pageable);
+        } else {
+            userPage = userRepository.findAllWithCampusAndRoles(pageable);
+        }
+
+        return userPage.map(this::convertToUserProfileResponse);
+    }
+
+    private UserProfileResponse convertToUserProfileResponse(User user) {
+        // 获取校区名称
+        String campusName = null;
+        if (user.getCampus() != null) {
+            campusName = user.getCampus().getName();
+        }
+
+        // 获取封禁原因
+        String banReason = null;
+        if (user.getStatus() == com.campus.marketplace.common.enums.UserStatus.BANNED) {
+            List<com.campus.marketplace.common.entity.BanLog> banLogs = banLogRepository
+                .findTopByUserIdAndIsUnbannedFalseOrderByCreatedAtDesc(user.getId());
+            if (!banLogs.isEmpty()) {
+                banReason = banLogs.get(0).getReason();
+            }
+        }
+
+        return UserProfileResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .email(encryptUtil.maskEmail(user.getEmail()))
+                .phone(encryptUtil.maskPhone(user.getPhone()))
+                .studentId(user.getStudentId())
+                .avatar(user.getAvatar())
+                .status(user.getStatus().name())
+                .points(user.getPoints())
+                .campusId(user.getCampusId())
+                .campusName(campusName)
+                .banReason(banReason)
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 }

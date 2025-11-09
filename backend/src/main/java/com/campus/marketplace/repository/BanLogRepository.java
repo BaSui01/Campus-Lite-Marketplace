@@ -46,4 +46,10 @@ public interface BanLogRepository extends JpaRepository<BanLog, Long> {
      * 根据用户ID和封禁状态查询（分页）
      */
     Page<BanLog> findByUserIdAndIsUnbanned(Long userId, Boolean isUnbanned, Pageable pageable);
+
+    /**
+     * 查询用户最新的未解封记录
+     */
+    @Query("SELECT b FROM BanLog b WHERE b.userId = :userId AND b.isUnbanned = false ORDER BY b.createdAt DESC")
+    List<BanLog> findTopByUserIdAndIsUnbannedFalseOrderByCreatedAtDesc(@Param("userId") Long userId);
 }

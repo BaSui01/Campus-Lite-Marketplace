@@ -41,8 +41,26 @@ public class UserController {
     private final UserService userService;
 
     /**
+     * 获取用户列表（管理端）
+     *
+     * GET /api/users
+     */
+    @GetMapping
+    @PreAuthorize("hasAuthority('system:user:list')")
+    @Operation(summary = "获取用户列表", description = "管理端查询用户列表（分页）")
+    public ApiResponse<org.springframework.data.domain.Page<UserProfileResponse>> listUsers(
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String keyword,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String status,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "20") int size) {
+        log.info("查询用户列表: keyword={}, status={}, page={}, size={}", keyword, status, page, size);
+        org.springframework.data.domain.Page<UserProfileResponse> users = userService.listUsers(keyword, status, page, size);
+        return ApiResponse.success(users);
+    }
+
+    /**
      * 获取当前登录用户资料
-     * 
+     *
      * GET /api/users/profile
      */
     @GetMapping("/profile")

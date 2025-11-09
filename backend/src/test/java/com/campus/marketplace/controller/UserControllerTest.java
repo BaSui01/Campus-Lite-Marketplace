@@ -99,6 +99,8 @@ class UserControllerTest {
     @WithMockUser(username = "alice")
     void updateProfile_success() throws Exception {
         UpdateProfileRequest request = new UpdateProfileRequest(
+                "小明",
+                "热爱生活，喜欢交友",
                 "alice@example.com",
                 "13812345678",
                 "20240001",
@@ -119,6 +121,8 @@ class UserControllerTest {
     @DisplayName("未登录更新资料被拒绝")
     void updateProfile_forbidden() throws Exception {
         UpdateProfileRequest request = new UpdateProfileRequest(
+                "小明",
+                "热爱生活，喜欢交友",
                 "alice@example.com",
                 "13812345678",
                 "20240001",

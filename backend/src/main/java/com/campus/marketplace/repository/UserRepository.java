@@ -134,4 +134,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT COUNT(u) FROM User u WHERE u.campusId = :campusId AND u.lastLoginTime >= :since")
     long countActiveByCampusIdSince(@Param("campusId") Long campusId,
                                    @Param("since") java.time.LocalDateTime since);
+
+    /**
+     * 根据学号查询用户
+     */
+    Optional<User> findByStudentId(String studentId);
+
+    // 用户列表查询（管理端 - 优化版：JOIN FETCH 避免 N+1 查询）
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.campus LEFT JOIN FETCH u.roles WHERE u.username LIKE %:keyword%")
+    org.springframework.data.domain.Page<User> findByUsernameContaining(@Param("keyword") String keyword, org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.campus LEFT JOIN FETCH u.roles WHERE u.status = :status")
+    org.springframework.data.domain.Page<User> findByStatus(@Param("status") com.campus.marketplace.common.enums.UserStatus status, org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.campus LEFT JOIN FETCH u.roles WHERE u.username LIKE %:keyword% AND u.status = :status")
+    org.springframework.data.domain.Page<User> findByUsernameContainingAndStatus(@Param("keyword") String keyword, @Param("status") com.campus.marketplace.common.enums.UserStatus status, org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.campus LEFT JOIN FETCH u.roles")
+    org.springframework.data.domain.Page<User> findAllWithCampusAndRoles(org.springframework.data.domain.Pageable pageable);
 }

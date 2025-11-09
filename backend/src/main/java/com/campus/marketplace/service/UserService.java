@@ -42,8 +42,19 @@ public interface UserService {
     void updatePassword(UpdatePasswordRequest request);
 
     /**
+     * 获取用户列表（管理端）
+     *
+     * @param keyword 关键词
+     * @param status 状态
+     * @param page 页码
+     * @param size 每页数量
+     * @return 用户列表（分页）
+     */
+    org.springframework.data.domain.Page<UserProfileResponse> listUsers(String keyword, String status, int page, int size);
+
+    /**
      * 封禁用户
-     * 
+     *
      * @param request 封禁请求
      */
     void banUser(com.campus.marketplace.common.dto.request.BanUserRequest request);

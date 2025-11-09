@@ -1,6 +1,9 @@
 package com.campus.marketplace.repository;
 
 import com.campus.marketplace.common.entity.Review;
+import com.campus.marketplace.common.enums.ReviewStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -34,4 +37,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * 根据订单ID列表查询评价
      */
     java.util.List<Review> findByOrderIdIn(java.util.List<Long> orderIds);
+
+    /**
+     * 根据状态查询评价（分页）
+     */
+    Page<Review> findByStatus(ReviewStatus status, Pageable pageable);
 }

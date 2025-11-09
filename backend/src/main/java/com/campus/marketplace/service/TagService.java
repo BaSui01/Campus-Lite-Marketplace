@@ -28,6 +28,16 @@ public interface TagService {
 
     List<TagResponse> listAllTags();
 
+    /**
+     * 分页查询标签列表（支持筛选）
+     */
+    org.springframework.data.domain.Page<TagResponse> listTags(String keyword, Boolean enabled, int page, int size);
+
+    /**
+     * 获取热门标签列表
+     */
+    List<com.campus.marketplace.common.dto.response.TagStatisticsResponse> getHotTags(int limit);
+
     // 🎯 BaSui 新增方法（标签管理扩展）
     /**
      * 根据ID获取标签详情
