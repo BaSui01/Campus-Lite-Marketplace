@@ -1,0 +1,362 @@
+/**
+ * 积分中心页样式 - 让积分管理更美观！💰
+ * @author BaSui 😎
+ */
+
+.points-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 24px 0;
+}
+
+/* ==================== 主容器 ==================== */
+
+.points-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.points-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==================== 积分概览 ==================== */
+
+.points-overview {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+.points-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.points-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.points-card__icon {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.points-card__content {
+  flex: 1;
+}
+
+.points-card__label {
+  font-size: 16px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+}
+
+.points-card__value {
+  font-size: 48px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 签到卡片 */
+.points-card--sign-in {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+}
+
+.sign-in-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 24px;
+}
+
+.sign-in-info {
+  flex: 1;
+}
+
+.sign-in-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.sign-in-desc {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.sign-in-days {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+/* ==================== 积分规则 ==================== */
+
+.points-rules {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.points-rules__title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.points-rules__content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.rule-item:hover {
+  background: #e6f7ff;
+  transform: translateX(4px);
+}
+
+.rule-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.rule-text {
+  font-size: 14px;
+  color: #595959;
+  font-weight: 500;
+}
+
+/* ==================== 积分流水 ==================== */
+
+.points-logs {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.points-logs__title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.points-logs__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.empty-text {
+  font-size: 18px;
+  color: #595959;
+  margin: 0 0 8px 0;
+}
+
+.empty-tip {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+.points-logs__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.log-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.log-item:hover {
+  background: #f0f0f0;
+  transform: translateX(4px);
+}
+
+.log-item__icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.log-item__content {
+  flex: 1;
+}
+
+.log-item__title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.log-item__desc {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 4px;
+}
+
+.log-item__time {
+  font-size: 12px;
+  color: #bfbfbf;
+}
+
+.log-item__points {
+  font-size: 24px;
+  font-weight: bold;
+  min-width: 80px;
+  text-align: right;
+}
+
+.log-item__points--positive {
+  color: #52c41a;
+}
+
+.log-item__points--negative {
+  color: #ff4d4f;
+}
+
+.log-item__balance {
+  font-size: 14px;
+  color: #8c8c8c;
+  min-width: 100px;
+  text-align: right;
+}
+
+.points-logs__pagination {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .points-page {
+    padding: 12px 0;
+  }
+
+  .points-container {
+    padding: 0 10px;
+  }
+
+  .points-title {
+    font-size: 24px;
+  }
+
+  .points-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .points-card {
+    padding: 24px;
+  }
+
+  .points-card__icon {
+    font-size: 48px;
+  }
+
+  .points-card__value {
+    font-size: 36px;
+  }
+
+  .sign-in-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sign-in-title {
+    font-size: 20px;
+  }
+
+  .points-rules__content {
+    grid-template-columns: 1fr;
+  }
+
+  .log-item {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+
+  .log-item__points {
+    min-width: auto;
+  }
+
+  .log-item__balance {
+    width: 100%;
+    text-align: left;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .points-card__value {
+    font-size: 28px;
+  }
+
+  .log-item__icon {
+    font-size: 24px;
+  }
+
+  .log-item__title {
+    font-size: 14px;
+  }
+
+  .log-item__points {
+    font-size: 20px;
+  }
+}

@@ -66,26 +66,88 @@
 /* ==================== 顶部导航栏 ==================== */
 
 .main-layout__header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: var(--shadow-sm);
+  /* 🎨 卡片质感：渐变背景 + 毛玻璃效果 */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(248, 249, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.98) 100%
+  );
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+
+  /* 🎨 增强阴影：多层阴影营造立体感 */
+  box-shadow:
+    0 2px 8px rgba(102, 126, 234, 0.08),
+    0 4px 16px rgba(102, 126, 234, 0.04),
+    0 0 0 1px rgba(102, 126, 234, 0.06) inset;
+
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  /* 🎨 渐变边框 */
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(
+    90deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.15) 50%,
+    rgba(102, 126, 234, 0.1) 100%
+  ) 1;
+
   transition: all var(--transition-slow);
   animation: headerSlideDown 0.5s ease-out;
+
+  /* 🎨 微妙的顶部光晕 */
+  position: relative;
+}
+
+/* 🎨 顶部光晕效果 */
+.main-layout__header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(102, 126, 234, 0.4) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+}
+
+.main-layout__header:hover::before {
+  opacity: 1;
 }
 
 /* 滚动时增强阴影效果 */
 .main-layout__header.scrolled {
-  box-shadow: var(--shadow-xl);
-  background: rgba(255, 255, 255, 0.98);
+  /* 🎨 滚动时更强的卡片质感 */
+  box-shadow:
+    0 4px 12px rgba(102, 126, 234, 0.12),
+    0 8px 24px rgba(102, 126, 234, 0.08),
+    0 0 0 1px rgba(102, 126, 234, 0.1) inset;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.99) 0%,
+    rgba(248, 249, 255, 0.98) 50%,
+    rgba(255, 255, 255, 0.99) 100%
+  );
 }
 
 .main-layout__header:hover {
-  box-shadow: var(--shadow-lg);
+  /* 🎨 hover时的立体感 */
+  box-shadow:
+    0 6px 16px rgba(102, 126, 234, 0.15),
+    0 12px 32px rgba(102, 126, 234, 0.1),
+    0 0 0 1px rgba(102, 126, 234, 0.12) inset;
+
+  transform: translateY(-1px);
 }
 
 @keyframes headerSlideDown {

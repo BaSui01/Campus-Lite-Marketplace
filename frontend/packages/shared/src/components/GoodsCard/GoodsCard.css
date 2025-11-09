@@ -1,27 +1,61 @@
 /**
- * GoodsCard 组件样式
+ * 💎 GoodsCard 组件样式 - 终极升级版
  * @author BaSui 😎
- * @updated 2025-11-06 - 现代化美化升级
+ * @updated 2025-11-09 - 添加毛玻璃、渐变边框、发光效果、主题适配
  * @description 商品卡片组件样式 - 精致优雅的设计
  */
 
 /* ==================== GoodsCard 容器 ==================== */
 .campus-goods-card {
+  position: relative;
   width: 100%;
   max-width: 320px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 16px;
+  border-radius: var(--radius-xl, 16px);
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  /* 🌫️ 增强毛玻璃效果 */
+  background: var(--backdrop-bg, rgba(255, 255, 255, 0.85));
+  backdrop-filter: var(--backdrop-blur, blur(12px)) saturate(180%);
+  -webkit-backdrop-filter: var(--backdrop-blur, blur(12px)) saturate(180%);
+
+  /* 🎨 基础边框 */
+  border: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.06));
+
+  /* ⚡ 性能优化 */
+  contain: layout style paint;
+  will-change: transform, box-shadow;
+}
+
+/* 🌈 渐变边框效果（使用伪元素） */
+.campus-goods-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--radius-xl, 16px);
+  padding: 2px;
+  background: var(--gradient-primary, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.campus-goods-card:hover::before {
+  opacity: 1;
 }
 
 .campus-goods-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 6px 12px rgba(102, 126, 234, 0.15);
-  border-color: rgba(102, 126, 234, 0.2);
+  box-shadow: var(--shadow-card-hover, 0 12px 28px rgba(0, 0, 0, 0.12)),
+              0 6px 12px rgba(102, 126, 234, 0.15);
+  border-color: transparent;
 }
 
 /* ==================== 图片区域 ==================== */
@@ -145,10 +179,30 @@
 .campus-goods-card__price {
   font-size: 24px;
   font-weight: 700;
-  color: #ff4d4f;
+  color: var(--color-error, #ff4d4f);
   line-height: 1;
   letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(255, 77, 79, 0.2);
+
+  /* ✨ 价格发光效果 */
+  text-shadow: 0 2px 4px rgba(255, 77, 79, 0.2),
+               0 0 10px rgba(255, 77, 79, 0.15),
+               0 0 20px rgba(255, 77, 79, 0.1);
+
+  /* 🎭 发光动画 */
+  animation: price-glow 2s ease-in-out infinite;
+}
+
+@keyframes price-glow {
+  0%, 100% {
+    text-shadow: 0 2px 4px rgba(255, 77, 79, 0.2),
+                 0 0 10px rgba(255, 77, 79, 0.15),
+                 0 0 20px rgba(255, 77, 79, 0.1);
+  }
+  50% {
+    text-shadow: 0 2px 4px rgba(255, 77, 79, 0.3),
+                 0 0 15px rgba(255, 77, 79, 0.25),
+                 0 0 30px rgba(255, 77, 79, 0.2);
+  }
 }
 
 .campus-goods-card__original-price {
@@ -404,4 +458,136 @@
   .campus-goods-card__price {
     font-size: 18px;
   }
+}
+
+/* ==================== 🌙 暗色主题适配 ==================== */
+[data-theme='dark'] .campus-goods-card,
+.dark-theme .campus-goods-card {
+  background: var(--backdrop-bg, rgba(26, 26, 26, 0.85));
+  border-color: var(--color-border-light, rgba(255, 255, 255, 0.1));
+  box-shadow: var(--shadow-card, 0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+[data-theme='dark'] .campus-goods-card:hover,
+.dark-theme .campus-goods-card:hover {
+  box-shadow: var(--shadow-card-hover, 0 12px 28px rgba(0, 0, 0, 0.6)),
+              0 6px 12px rgba(124, 143, 240, 0.2);
+}
+
+/* 暗色主题下的图片背景 */
+[data-theme='dark'] .campus-goods-card__image-wrapper,
+.dark-theme .campus-goods-card__image-wrapper {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+}
+
+/* 暗色主题下的文字颜色 */
+[data-theme='dark'] .campus-goods-card__name,
+.dark-theme .campus-goods-card__name {
+  color: var(--color-text-primary, #e8e8e8);
+}
+
+[data-theme='dark'] .campus-goods-card:hover .campus-goods-card__name,
+.dark-theme .campus-goods-card:hover .campus-goods-card__name {
+  color: var(--color-primary-light, #a5b4f5);
+}
+
+[data-theme='dark'] .campus-goods-card__description,
+.dark-theme .campus-goods-card__description {
+  color: var(--color-text-secondary, #b3b3b3);
+}
+
+/* 暗色主题下的价格发光效果（更明显） */
+[data-theme='dark'] .campus-goods-card__price,
+.dark-theme .campus-goods-card__price {
+  color: var(--color-error, #ff7875);
+  text-shadow: 0 2px 4px rgba(255, 120, 117, 0.3),
+               0 0 15px rgba(255, 120, 117, 0.25),
+               0 0 30px rgba(255, 120, 117, 0.15);
+}
+
+@keyframes price-glow-dark {
+  0%, 100% {
+    text-shadow: 0 2px 4px rgba(255, 120, 117, 0.3),
+                 0 0 15px rgba(255, 120, 117, 0.25),
+                 0 0 30px rgba(255, 120, 117, 0.15);
+  }
+  50% {
+    text-shadow: 0 2px 4px rgba(255, 120, 117, 0.4),
+                 0 0 20px rgba(255, 120, 117, 0.35),
+                 0 0 40px rgba(255, 120, 117, 0.25);
+  }
+}
+
+[data-theme='dark'] .campus-goods-card__price,
+.dark-theme .campus-goods-card__price {
+  animation: price-glow-dark 2s ease-in-out infinite;
+}
+
+/* 暗色主题下的底部信息 */
+[data-theme='dark'] .campus-goods-card__footer,
+.dark-theme .campus-goods-card__footer {
+  border-top-color: var(--color-border-light, rgba(255, 255, 255, 0.1));
+}
+
+[data-theme='dark'] .campus-goods-card__seller:hover,
+.dark-theme .campus-goods-card__seller:hover {
+  background: rgba(124, 143, 240, 0.15);
+}
+
+[data-theme='dark'] .campus-goods-card__sold-count,
+.dark-theme .campus-goods-card__sold-count {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-tertiary, #808080);
+}
+
+/* 暗色主题下的按钮 */
+[data-theme='dark'] .campus-goods-card__action-btn--primary,
+.dark-theme .campus-goods-card__action-btn--primary {
+  background: var(--gradient-primary, linear-gradient(135deg, #7c8ff0 0%, #9d6bc8 100%));
+  box-shadow: 0 4px 12px rgba(124, 143, 240, 0.4);
+}
+
+[data-theme='dark'] .campus-goods-card__action-btn--primary:hover,
+.dark-theme .campus-goods-card__action-btn--primary:hover {
+  box-shadow: 0 6px 16px rgba(124, 143, 240, 0.5);
+}
+
+[data-theme='dark'] .campus-goods-card__action-btn--secondary,
+.dark-theme .campus-goods-card__action-btn--secondary {
+  color: var(--color-primary-light, #a5b4f5);
+  border-color: var(--color-primary-light, #a5b4f5);
+}
+
+[data-theme='dark'] .campus-goods-card__action-btn--secondary:hover,
+.dark-theme .campus-goods-card__action-btn--secondary:hover {
+  background-color: rgba(124, 143, 240, 0.15);
+}
+
+/* ==================== 🎭 无障碍优化 ==================== */
+
+/* 减少动画（用户偏好） */
+@media (prefers-reduced-motion: reduce) {
+  .campus-goods-card,
+  .campus-goods-card__image,
+  .campus-goods-card__action-btn {
+    transition: none;
+  }
+
+  .campus-goods-card__price {
+    animation: none;
+  }
+
+  .campus-goods-card__discount {
+    animation: none;
+  }
+
+  .campus-goods-card:hover {
+    transform: none;
+  }
+}
+
+/* 键盘焦点样式 */
+.campus-goods-card:focus-visible {
+  outline: 2px solid var(--color-primary, #667eea);
+  outline-offset: 2px;
 }

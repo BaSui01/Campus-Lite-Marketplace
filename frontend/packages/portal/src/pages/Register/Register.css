@@ -616,3 +616,100 @@
 .form-field:focus-within label {
   color: #667eea;
 }
+
+/* ==================== 实时校验状态样式 ==================== */
+
+/* 输入框容器（带状态图标） */
+.input-with-status {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* 校验状态图标容器 */
+.validation-status {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Loading 状态 */
+.status-loading {
+  font-size: 18px;
+  animation: rotate-loading 1s linear infinite;
+}
+
+@keyframes rotate-loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 成功状态 */
+.status-success {
+  font-size: 18px;
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 错误状态 */
+.status-error {
+  font-size: 18px;
+  animation: shake-error 0.5s;
+}
+
+@keyframes shake-error {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+/* 成功提示文字 */
+.form-field-success {
+  font-size: 13px;
+  color: #52c41a;
+  padding-left: 4px;
+  animation: fade-in-success 0.5s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@keyframes fade-in-success {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -90,22 +90,25 @@ export const useAuthStore = create<AuthState>()(
           const response = await authService.login(data);
 
           if (response.code === 200 && response.data) {
-            // ✅ 适配后端实际返回的数据结构
-            const { token, userInfo } = response.data;
+            // ✅ 适配后端实际返回的数据结构（双 Token 模式）
+            const { accessToken, refreshToken, userInfo } = response.data;
 
             // 保存到 LocalStorage
-            setItem(TOKEN_KEY, token || '');
+            setItem(TOKEN_KEY, accessToken || '');
+            setItem(REFRESH_TOKEN_KEY, refreshToken || '');
 
             // 更新状态
             set({
               user: userInfo as any, // 将 UserInfo 转换为 User
-              accessToken: token,
-              refreshToken: null, // 后端暂不返回 refreshToken
+              accessToken: accessToken,
+              refreshToken: refreshToken, // ✅ 保存 refreshToken
               isAuthenticated: true,
               isLoading: false,
             });
 
             console.log('✅ 登录成功:', userInfo?.username);
+            console.log('✅ Access Token 已保存（15分钟有效）');
+            console.log('✅ Refresh Token 已保存（7天有效）');
           } else {
             throw new Error(response.message || '登录失败');
           }

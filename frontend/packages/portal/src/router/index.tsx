@@ -5,8 +5,9 @@
  */
 
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Loading } from '@campus/shared';
+import { isTokenValid, getAccessToken } from '@campus/shared/utils';
 import MainLayout from '../layouts/MainLayout';
 import AuthLayout from '../layouts/AuthLayout';
 import { useAuthStore } from '../store';
@@ -37,6 +38,7 @@ const BlacklistSettings = lazy(() => import('../pages/Settings/BlacklistSettings
 const Notifications = lazy(() => import('../pages/Notifications'));
 const Favorites = lazy(() => import('../pages/Favorites'));
 const Following = lazy(() => import('../pages/Following'));
+const Points = lazy(() => import('../pages/Points'));
 const Report = lazy(() => import('../pages/Report'));
 const UserProfile = lazy(() => import('../pages/UserProfile'));
 const RefundApply = lazy(() => import('../pages/RefundApply'));
@@ -105,15 +107,69 @@ const RequireAuth = ({ children }: { children: React.ReactNode }) => {
 
 /**
  * 已登录时重定向（登录/注册页）
+ * @description 检查用户是否已登录且 Token 有效，如果是则重定向到首页
+ * @author BaSui 😎
  */
 const RedirectIfAuth = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
+  const [isChecking, setIsChecking] = useState(true);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
-  if (isAuthenticated) {
-    // 已登录，重定向到首页
+  useEffect(() => {
+    const checkAuth = async () => {
+      console.log('[RedirectIfAuth] 🔍 开始检查认证状态...');
+
+      // 1. 检查 Zustand 状态
+      if (!isAuthenticated) {
+        console.log('[RedirectIfAuth] ✅ 未登录，允许访问登录页');
+        setIsChecking(false);
+        return;
+      }
+
+      // 2. 检查 Token 是否存在且有效
+      const token = getAccessToken();
+      if (!token) {
+        console.log('[RedirectIfAuth] ⚠️ Token 不存在，清理状态');
+        await logout(); // 清理无效状态
+        setIsChecking(false);
+        return;
+      }
+
+      // 3. 检查 Token 是否过期
+      const isValid = isTokenValid(token);
+      if (!isValid) {
+        console.log('[RedirectIfAuth] ⏰ Token 已过期，清理状态');
+        await logout(); // 清理过期状态
+        setIsChecking(false);
+        return;
+      }
+
+      // 4. Token 有效，重定向到首页
+      console.log('[RedirectIfAuth] ✅ 已登录且 Token 有效，重定向到首页');
+      setShouldRedirect(true);
+      setIsChecking(false);
+    };
+
+    checkAuth();
+  }, [isAuthenticated, logout]);
+
+  // 显示加载状态
+  if (isChecking) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <Loading size="large" />
+        <p className="mt-4 text-gray-600 animate-pulse">正在检查登录状态...</p>
+      </div>
+    );
+  }
+
+  // 重定向到首页
+  if (shouldRedirect) {
     return <Navigate to="/" replace />;
   }
 
+  // 允许访问登录页
   return <>{children}</>;
 };
 
@@ -226,6 +282,16 @@ export const router = createBrowserRouter(
           <RequireAuth>
             <LazyLoadWrapper>
               <Profile />
+            </LazyLoadWrapper>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'points',
+        element: (
+          <RequireAuth>
+            <LazyLoadWrapper>
+              <Points />
             </LazyLoadWrapper>
           </RequireAuth>
         ),

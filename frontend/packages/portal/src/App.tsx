@@ -10,7 +10,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useWebSocketService } from '@campus/shared';
 import { useAuthStore } from './store';
 import { router } from './router';
+import { useTheme } from './hooks/useTheme';
 import ErrorBoundary from './components/ErrorBoundary';
+import './styles/theme.css';
 import './App.css';
 
 // 创建 React Query 客户端
@@ -29,6 +31,9 @@ const queryClient = new QueryClient({
  */
 function App() {
   const { init: initAuth, isAuthenticated } = useAuthStore();
+
+  // 初始化主题（自动应用保存的主题偏好）
+  useTheme();
 
   // 初始化认证状态
   useEffect(() => {

@@ -7,8 +7,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Tabs } from '@campus/shared/components';
-import { notificationService, NotificationType } from '@campus/shared/services';;
+import { notificationService, NotificationType } from '@campus/shared/services';
 import { websocketService } from '@campus/shared/utils';
+import { getApi } from '@campus/shared/utils/apiClient';
 import type { NotificationResponse } from '@campus/shared/api/models';
 import type { AxiosError } from 'axios';
 import { useNotificationStore } from '../../store';

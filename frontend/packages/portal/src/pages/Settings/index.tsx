@@ -8,8 +8,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Tabs } from '@campus/shared/components';
 import { useAuthStore, useNotificationStore } from '../../store';
-import { authService } from '@campus/shared/services';;
+import { authService, userService } from '@campus/shared/services';
 import { encryptPassword } from '@campus/shared/utils';
+import LoginDevices from './LoginDevices';
 import './Settings.css';
 
 /**
@@ -43,6 +44,22 @@ const Settings: React.FC = () => {
   const [likeNotification, setLikeNotification] = useState(true);
   const [commentNotification, setCommentNotification] = useState(true);
   const [savingNotification, setSavingNotification] = useState(false);
+
+  // 邮箱绑定
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [emailCode, setEmailCode] = useState('');
+  const [emailCountdown, setEmailCountdown] = useState(0);
+  const [sendingEmailCode, setSendingEmailCode] = useState(false);
+  const [bindingEmail, setBindingEmail] = useState(false);
+
+  // 手机号绑定
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [phoneCode, setPhoneCode] = useState('');
+  const [phoneCountdown, setPhoneCountdown] = useState(0);
+  const [sendingPhoneCode, setSendingPhoneCode] = useState(false);
+  const [bindingPhone, setBindingPhone] = useState(false);
 
   // ==================== 事件处理 ====================
 
@@ -175,6 +192,152 @@ const Settings: React.FC = () => {
     }
   };
 
+  /**
+   * 发送邮箱验证码
+   */
+  const handleSendEmailCode = async () => {
+    // 验证邮箱格式
+    if (!emailInput.trim()) {
+      toast.warning('请输入邮箱地址！😰');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)) {
+      toast.warning('邮箱格式不正确！😰');
+      return;
+    }
+
+    setSendingEmailCode(true);
+    try {
+      await userService.sendEmailCode(emailInput);
+      toast.success('验证码已发送！📧');
+
+      // 开始倒计时
+      setEmailCountdown(60);
+      const timer = setInterval(() => {
+        setEmailCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      console.error('发送邮箱验证码失败：', err);
+      toast.error(err.response?.data?.message || '发送失败！😭');
+    } finally {
+      setSendingEmailCode(false);
+    }
+  };
+
+  /**
+   * 绑定邮箱
+   */
+  const handleBindEmail = async () => {
+    // 验证表单
+    if (!emailInput.trim()) {
+      toast.warning('请输入邮箱地址！😰');
+      return;
+    }
+    if (!emailCode.trim()) {
+      toast.warning('请输入验证码！😰');
+      return;
+    }
+
+    setBindingEmail(true);
+    try {
+      await userService.bindEmail(currentUser!.id, {
+        email: emailInput,
+        code: emailCode,
+      });
+      toast.success('邮箱绑定成功！🎉');
+
+      // 关闭弹窗并刷新页面
+      setShowEmailModal(false);
+      setEmailInput('');
+      setEmailCode('');
+      window.location.reload();
+    } catch (err: any) {
+      console.error('绑定邮箱失败：', err);
+      toast.error(err.response?.data?.message || '绑定失败！😭');
+    } finally {
+      setBindingEmail(false);
+    }
+  };
+
+  /**
+   * 发送手机验证码
+   */
+  const handleSendPhoneCode = async () => {
+    // 验证手机号格式
+    if (!phoneInput.trim()) {
+      toast.warning('请输入手机号！😰');
+      return;
+    }
+    if (!/^1[3-9]\d{9}$/.test(phoneInput)) {
+      toast.warning('手机号格式不正确！😰');
+      return;
+    }
+
+    setSendingPhoneCode(true);
+    try {
+      await userService.sendPhoneCode(phoneInput);
+      toast.success('验证码已发送！📱');
+
+      // 开始倒计时
+      setPhoneCountdown(60);
+      const timer = setInterval(() => {
+        setPhoneCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      console.error('发送手机验证码失败：', err);
+      toast.error(err.response?.data?.message || '发送失败！😭');
+    } finally {
+      setSendingPhoneCode(false);
+    }
+  };
+
+  /**
+   * 绑定手机号
+   */
+  const handleBindPhone = async () => {
+    // 验证表单
+    if (!phoneInput.trim()) {
+      toast.warning('请输入手机号！😰');
+      return;
+    }
+    if (!phoneCode.trim()) {
+      toast.warning('请输入验证码！😰');
+      return;
+    }
+
+    setBindingPhone(true);
+    try {
+      await userService.bindPhone(currentUser!.id, {
+        phone: phoneInput,
+        code: phoneCode,
+      });
+      toast.success('手机号绑定成功！🎉');
+
+      // 关闭弹窗并刷新页面
+      setShowPhoneModal(false);
+      setPhoneInput('');
+      setPhoneCode('');
+      window.location.reload();
+    } catch (err: any) {
+      console.error('绑定手机号失败：', err);
+      toast.error(err.response?.data?.message || '绑定失败！😭');
+    } finally {
+      setBindingPhone(false);
+    }
+  };
+
   // ==================== 渲染 ====================
 
   return (
@@ -192,6 +355,7 @@ const Settings: React.FC = () => {
               { label: '🔒 隐私设置', value: 'privacy' },
               { label: '🔔 通知设置', value: 'notification' },
               { label: '🚫 黑名单', value: 'blacklist' },
+              { label: '🖥️ 登录设备', value: 'devices' },
             ]}
           />
         </div>
@@ -209,11 +373,33 @@ const Settings: React.FC = () => {
                 </div>
                 <div className="settings-item">
                   <div className="settings-item__label">邮箱</div>
-                  <div className="settings-item__value">{currentUser?.email || '未绑定'}</div>
+                  <div className="settings-item__value-with-action">
+                    <span>{currentUser?.email || '未绑定'}</span>
+                    {!currentUser?.email && (
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={() => setShowEmailModal(true)}
+                      >
+                        绑定邮箱
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div className="settings-item">
                   <div className="settings-item__label">手机号</div>
-                  <div className="settings-item__value">{currentUser?.phone || '未绑定'}</div>
+                  <div className="settings-item__value-with-action">
+                    <span>{currentUser?.phone || '未绑定'}</span>
+                    {!currentUser?.phone && (
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={() => setShowPhoneModal(true)}
+                      >
+                        绑定手机号
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -471,7 +657,143 @@ const Settings: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* ==================== 登录设备管理 ==================== */}
+        {activeTab === 'devices' && (
+          <div className="settings-content">
+            <div className="settings-section">
+              <LoginDevices />
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* ==================== 邮箱绑定弹窗 ==================== */}
+      {showEmailModal && (
+        <div className="modal-overlay" onClick={() => setShowEmailModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">📧 绑定邮箱</h2>
+            <div className="modal-body">
+              <div className="settings-field">
+                <label className="settings-field__label">邮箱地址</label>
+                <Input
+                  type="email"
+                  size="large"
+                  placeholder="请输入邮箱地址"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                />
+              </div>
+              <div className="settings-field">
+                <label className="settings-field__label">验证码</label>
+                <div className="verification-code-field">
+                  <Input
+                    size="large"
+                    placeholder="请输入验证码"
+                    value={emailCode}
+                    onChange={(e) => setEmailCode(e.target.value)}
+                    maxLength={6}
+                  />
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={handleSendEmailCode}
+                    loading={sendingEmailCode}
+                    disabled={emailCountdown > 0}
+                  >
+                    {emailCountdown > 0
+                      ? `${emailCountdown}秒后重试`
+                      : sendingEmailCode
+                      ? '发送中...'
+                      : '获取验证码'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <Button
+                type="default"
+                size="large"
+                onClick={() => setShowEmailModal(false)}
+              >
+                取消
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleBindEmail}
+                loading={bindingEmail}
+              >
+                {bindingEmail ? '绑定中...' : '确认绑定'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== 手机号绑定弹窗 ==================== */}
+      {showPhoneModal && (
+        <div className="modal-overlay" onClick={() => setShowPhoneModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">📱 绑定手机号</h2>
+            <div className="modal-body">
+              <div className="settings-field">
+                <label className="settings-field__label">手机号</label>
+                <Input
+                  type="tel"
+                  size="large"
+                  placeholder="请输入手机号"
+                  value={phoneInput}
+                  onChange={(e) => setPhoneInput(e.target.value)}
+                  maxLength={11}
+                />
+              </div>
+              <div className="settings-field">
+                <label className="settings-field__label">验证码</label>
+                <div className="verification-code-field">
+                  <Input
+                    size="large"
+                    placeholder="请输入验证码"
+                    value={phoneCode}
+                    onChange={(e) => setPhoneCode(e.target.value)}
+                    maxLength={6}
+                  />
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={handleSendPhoneCode}
+                    loading={sendingPhoneCode}
+                    disabled={phoneCountdown > 0}
+                  >
+                    {phoneCountdown > 0
+                      ? `${phoneCountdown}秒后重试`
+                      : sendingPhoneCode
+                      ? '发送中...'
+                      : '获取验证码'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <Button
+                type="default"
+                size="large"
+                onClick={() => setShowPhoneModal(false)}
+              >
+                取消
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleBindPhone}
+                loading={bindingPhone}
+              >
+                {bindingPhone ? '绑定中...' : '确认绑定'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

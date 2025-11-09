@@ -4,4 +4,4 @@
  */
 
 export { TopLoadingBar } from './TopLoadingBar';
-export default TopLoadingBar;
+export { TopLoadingBar as default } from './TopLoadingBar';

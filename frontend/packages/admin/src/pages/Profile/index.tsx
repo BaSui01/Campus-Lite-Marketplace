@@ -56,7 +56,7 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userService, uploadService } from '@campus/shared';
+import { userService, uploadService, ImageUploadWithCrop } from '@campus/shared';
 import { useAuth } from '@/hooks';
 import type { UploadFile } from 'antd';
 import type { RcFile } from 'antd/es/upload';
@@ -166,22 +166,13 @@ export const ProfilePage: React.FC = () => {
     },
   });
 
-  // 上传头像 Mutation
-  const uploadAvatarMutation = useMutation({
-    mutationFn: async (file: RcFile) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await uploadService.uploadImage(formData);
-      return response.data.url;
-    },
-    onSuccess: (url: string) => {
-      setAvatarUrl(url);
+  // 处理头像变化（支持 Base64 上传）
+  const handleAvatarChange = async (urls: string[]) => {
+    if (urls.length > 0) {
+      setAvatarUrl(urls[0]);
       message.success('头像上传成功！记得保存修改 ✅');
-    },
-    onError: (error: any) => {
-      message.error(`上传失败：${error.message} 😰`);
-    },
-  });
+    }
+  };
 
   // 发送邮箱验证码 Mutation
   const sendEmailCodeMutation = useMutation({
@@ -418,21 +409,6 @@ export const ProfilePage: React.FC = () => {
     });
   };
 
-  // 头像上传前校验
-  const beforeUpload = (file: RcFile) => {
-    const isImage = file.type.startsWith('image/');
-    if (!isImage) {
-      message.error('只能上传图片文件！');
-      return false;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('图片大小不能超过 2MB！');
-      return false;
-    }
-    uploadAvatarMutation.mutate(file);
-    return false;
-  };
 
   // 登录设备表格列定义
   const deviceColumns: ColumnsType<LoginDevice> = [
@@ -508,7 +484,7 @@ export const ProfilePage: React.FC = () => {
               bio: userProfile?.bio,
             }}
           >
-            {/* 头像上传 */}
+            {/* 头像上传（带裁剪功能）✂️ */}
             <Form.Item label="头像">
               <Space direction="vertical" align="center" style={{ width: '100%' }}>
                 <Avatar
@@ -516,19 +492,17 @@ export const ProfilePage: React.FC = () => {
                   src={avatarUrl || userProfile?.avatar}
                   icon={<UserOutlined />}
                 />
-                <Upload
-                  accept="image/*"
-                  showUploadList={false}
-                  beforeUpload={beforeUpload}
-                  fileList={avatarFileList}
-                >
-                  <Button icon={<CameraOutlined />} loading={uploadAvatarMutation.isPending}>
-                    更换头像
-                  </Button>
-                </Upload>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  支持 JPG、PNG 格式，大小不超过 2MB
-                </Text>
+                <ImageUploadWithCrop
+                  value={avatarUrl ? [avatarUrl] : []}
+                  onChange={handleAvatarChange}
+                  maxCount={1}
+                  enableCrop={true}
+                  cropAspect={1}  // 1:1 正方形裁剪
+                  category="avatar"
+                  uploadText="更换头像"
+                  maxSize={2}  // 2MB
+                  tip="支持 JPG、PNG 格式，大小不超过 2MB。支持裁剪和粘贴板上传（Ctrl+V）"
+                />
               </Space>
             </Form.Item>
 

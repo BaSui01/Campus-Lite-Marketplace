@@ -141,6 +141,18 @@ export { UserAvatar, type UserAvatarProps, type UserOnlineStatus } from './UserA
 export { ImageUpload, type ImageUploadProps } from './ImageUpload';
 
 /**
+ * ImageCropper - 图片裁剪组件
+ * @description 基于 react-image-crop 的图片裁剪组件，支持裁剪、缩放、旋转
+ */
+export { ImageCropper, type ImageCropperProps } from './ImageCropper';
+
+/**
+ * ImageUploadWithCrop - 带裁剪功能的图片上传组件
+ * @description 集成图片上传和裁剪功能，支持裁剪后上传、粘贴板上传
+ */
+export { ImageUploadWithCrop, type ImageUploadWithCropProps } from './ImageUploadWithCrop';
+
+/**
  * RichTextEditor - 富文本编辑器组件
  * @description 基于 contentEditable 实现，支持基础格式化功能（粗体、斜体、对齐、列表等）
  */

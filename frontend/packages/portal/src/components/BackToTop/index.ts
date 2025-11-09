@@ -4,4 +4,4 @@
  */
 
 export { BackToTop, type BackToTopProps } from './BackToTop';
-export default BackToTop;
+export { BackToTop as default } from './BackToTop';

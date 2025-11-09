@@ -1,0 +1,271 @@
+/**
+ * 🎨 主题系统 - CSS 变量定义
+ * @author BaSui 😎
+ * @description 统一管理亮色/暗色主题的颜色、阴影、渐变等视觉变量
+ * @date 2025-11-09
+ */
+
+/* ==================== 根变量（全局通用） ==================== */
+:root {
+  /* 🎯 过渡动画 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* 📏 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* 📐 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* 🔤 字体 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+
+  /* 🎭 Z-index 层级 */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+/* ==================== 亮色主题（默认） ==================== */
+:root,
+[data-theme='light'],
+.light-theme {
+  /* 🎨 主色调 */
+  --color-primary: #667eea;
+  --color-primary-light: #7c8ff0;
+  --color-primary-lighter: #a5b4f5;
+  --color-primary-dark: #5568d3;
+  --color-primary-darker: #4451b8;
+
+  /* 🌈 辅助色 */
+  --color-secondary: #764ba2;
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #ff4d4f;
+  --color-info: #1890ff;
+
+  /* 🖤 中性色（文字、边框、背景） */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --color-text-disabled: #cccccc;
+
+  --color-border-light: #f0f0f0;
+  --color-border: #d9d9d9;
+  --color-border-dark: #bfbfbf;
+
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #fafafa;
+  --color-bg-tertiary: #f5f5f5;
+  --color-bg-hover: #f0f0f0;
+  --color-bg-active: #e6e6e6;
+
+  /* 🌟 渐变色 */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-warm: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --gradient-cool: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+
+  /* 💎 阴影 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
+  --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.20);
+
+  /* ✨ 卡片阴影（悬浮效果） */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  /* 🌫️ 毛玻璃效果 */
+  --backdrop-blur: blur(10px);
+  --backdrop-bg: rgba(255, 255, 255, 0.8);
+  --backdrop-border: rgba(255, 255, 255, 0.3);
+
+  /* 🎭 遮罩 */
+  --overlay-light: rgba(0, 0, 0, 0.3);
+  --overlay-medium: rgba(0, 0, 0, 0.5);
+  --overlay-dark: rgba(0, 0, 0, 0.7);
+}
+
+/* ==================== 暗色主题 ==================== */
+[data-theme='dark'],
+.dark-theme {
+  /* 🎨 主色调（暗色模式下稍微调亮） */
+  --color-primary: #7c8ff0;
+  --color-primary-light: #a5b4f5;
+  --color-primary-lighter: #c5cff8;
+  --color-primary-dark: #667eea;
+  --color-primary-darker: #5568d3;
+
+  /* 🌈 辅助色（暗色模式下调整饱和度） */
+  --color-secondary: #9d6bc8;
+  --color-success: #73d13d;
+  --color-warning: #ffc53d;
+  --color-error: #ff7875;
+  --color-info: #40a9ff;
+
+  /* 🖤 中性色（暗色模式） */
+  --color-text-primary: #e8e8e8;
+  --color-text-secondary: #b3b3b3;
+  --color-text-tertiary: #808080;
+  --color-text-disabled: #4d4d4d;
+
+  --color-border-light: #2a2a2a;
+  --color-border: #3a3a3a;
+  --color-border-dark: #4a4a4a;
+
+  --color-bg-primary: #1a1a1a;
+  --color-bg-secondary: #242424;
+  --color-bg-tertiary: #2e2e2e;
+  --color-bg-hover: #333333;
+  --color-bg-active: #3d3d3d;
+
+  /* 🌟 渐变色（暗色模式下调整亮度） */
+  --gradient-primary: linear-gradient(135deg, #7c8ff0 0%, #9d6bc8 100%);
+  --gradient-secondary: linear-gradient(135deg, #f5a3fc 0%, #ff7a8a 100%);
+  --gradient-success: linear-gradient(135deg, #6bc5ff 0%, #40e0ff 100%);
+  --gradient-warm: linear-gradient(135deg, #ff8ab8 0%, #ffd966 100%);
+  --gradient-cool: linear-gradient(135deg, #50dfe0 0%, #5030a7 100%);
+
+  /* 💎 阴影（暗色模式下使用更深的阴影） */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.7);
+  --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.8);
+
+  /* ✨ 卡片阴影（暗色模式） */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+  /* 🌫️ 毛玻璃效果（暗色模式） */
+  --backdrop-blur: blur(10px);
+  --backdrop-bg: rgba(26, 26, 26, 0.8);
+  --backdrop-border: rgba(255, 255, 255, 0.1);
+
+  /* 🎭 遮罩（暗色模式） */
+  --overlay-light: rgba(0, 0, 0, 0.5);
+  --overlay-medium: rgba(0, 0, 0, 0.7);
+  --overlay-dark: rgba(0, 0, 0, 0.85);
+}
+
+/* ==================== 主题切换过渡动画 ==================== */
+* {
+  transition: background-color var(--transition-normal),
+              color var(--transition-normal),
+              border-color var(--transition-normal),
+              box-shadow var(--transition-normal);
+}
+
+/* 🚫 禁用某些元素的过渡（避免闪烁） */
+*:focus,
+*:active,
+input,
+textarea,
+select,
+button {
+  transition: none;
+}
+
+/* ==================== 全局样式应用 ==================== */
+body {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 🎯 滚动条样式（亮色/暗色自适应） */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-dark);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* ==================== 工具类 ==================== */
+
+/* 🎨 渐变背景 */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-secondary {
+  background: var(--gradient-secondary);
+}
+
+.gradient-success {
+  background: var(--gradient-success);
+}
+
+/* 💎 阴影 */
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+.shadow-card-hover:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* 🌫️ 毛玻璃效果 */
+.glass-effect {
+  background: var(--backdrop-bg);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--backdrop-border);
+}
+
+/* 🎭 文字渐变 */
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ✨ 发光效果 */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+}
+
+[data-theme='dark'] .glow-effect {
+  box-shadow: 0 0 20px rgba(124, 143, 240, 0.6);
+}

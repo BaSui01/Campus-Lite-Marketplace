@@ -30,8 +30,8 @@ export class UserService {
    */
   async getProfile(): Promise<User> {
     const api = getApi();
-    // 注意：后端可能需要传userId，这里先尝试getCurrentUser
-    const response = await api.getCurrentUser();
+    // ✅ 使用 OpenAPI 生成的正确方法名：getCurrentUserProfile
+    const response = await api.getCurrentUserProfile();
     return response.data.data as User;
   }
 

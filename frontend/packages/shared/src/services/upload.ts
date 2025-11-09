@@ -125,11 +125,29 @@ export class UploadService {
   }
 
   /**
-   * ⚠️ 上传Base64图片（暂未实现）
-   * TODO: 等待后端实现 POST /api/files/upload/base64
+   * ✅ 上传 Base64 图片
+   * POST /api/files/upload-base64
+   * @param base64Data Base64 编码的图片数据（支持 data:image/png;base64,xxx 格式）
+   * @param options 上传选项（category）
+   * @returns 上传结果（包含图片URL）
    */
-  async uploadBase64Image(base64: string): Promise<UploadResponse> {
-    throw new Error('uploadBase64Image() 方法暂未实现，等待后端接口');
+  async uploadBase64Image(
+    base64Data: string,
+    options?: UploadOptions
+  ): Promise<UploadResponse> {
+    const api = getApi();
+    const response = await api.post('/files/upload-base64', {
+      base64Data,
+      category: options?.category || 'general',
+    });
+
+    const data = response.data.data as Record<string, string>;
+    return {
+      url: data.url || '',
+      fileName: data.fileName,
+      fileSize: data.fileSize ? parseInt(data.fileSize) : undefined,
+      mimeType: data.mimeType,
+    };
   }
 
   /**

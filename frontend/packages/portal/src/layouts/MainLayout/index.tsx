@@ -14,6 +14,7 @@ import { MAIN_NAV_ITEMS, USER_MENU_ITEMS, MOBILE_TAB_BAR, type NavItem } from '.
 import { SearchSuggestion } from '../../components/SearchSuggestion';
 import { TopLoadingBar } from '../../components/TopLoadingBar';
 import { BackToTop } from '../../components/BackToTop';
+import { ThemeToggle } from '../../components/ThemeToggle';
 import './MainLayout.css';
 
 /**
@@ -252,6 +253,9 @@ const MainLayout = () => {
 
           {/* 右侧操作区 */}
           <div className="main-layout__actions">
+            {/* 🌓 主题切换 */}
+            <ThemeToggle />
+
             {/* 通知 */}
             {isAuthenticated && (
               <Badge count={unreadCount} dot={unreadCount > 0}>

@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { websocketService, WebSocketReadyState } from '../utils/websocket';
+import { getAccessToken } from '../utils/apiClient';
 
 /**
  * useWebSocketService 配置选项
@@ -190,9 +191,13 @@ export const useWebSocketService = (
 
     // 自动连接（响应 autoConnect 变化！🎯）
     if (autoConnect) {
-      if (!websocketService.isConnected()) {
+      // ✅ 检查 Token 是否存在，避免未登录时尝试连接
+      const token = getAccessToken();
+      if (token && !websocketService.isConnected()) {
         console.log('🔌 [useWebSocketService] 自动连接 WebSocket...');
         connect();
+      } else if (!token) {
+        console.log('⚠️ [useWebSocketService] Token 不存在，跳过 WebSocket 连接');
       }
     } else {
       // autoConnect 为 false 时断开连接

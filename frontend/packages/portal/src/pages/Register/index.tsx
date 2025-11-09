@@ -4,7 +4,7 @@
  * @description 手机号/邮箱注册，验证码验证
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { Input, Button } from '@campus/shared/components';
@@ -32,6 +32,12 @@ export const Register: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [codeSent, setCodeSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
+
+  // 实时校验状态
+  const [usernameChecking, setUsernameChecking] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
 
   // 发送验证码
   const sendCodeMutation = useMutation({
@@ -203,6 +209,103 @@ export const Register: React.FC = () => {
     setCountdown(0);
   };
 
+  // ==================== 实时校验逻辑 ====================
+
+  /**
+   * 用户名实时校验（防抖 500ms）
+   */
+  useEffect(() => {
+    // 重置校验状态
+    setUsernameAvailable(null);
+
+    // 用户名长度不足，不校验
+    if (formData.username.length < 2) {
+      return;
+    }
+
+    // 防抖：500ms 后执行校验
+    const timer = setTimeout(async () => {
+      setUsernameChecking(true);
+
+      try {
+        console.log('[Register] 🔍 校验用户名:', formData.username);
+        const response = await authService.checkUsername(formData.username);
+        const exists = response.data; // true-已存在，false-可用
+
+        setUsernameAvailable(!exists);
+
+        if (exists) {
+          setErrors((prev) => ({ ...prev, username: '❌ 用户名已被占用' }));
+        } else {
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.username;
+            return newErrors;
+          });
+        }
+
+        console.log('[Register] ✅ 用户名校验完成:', exists ? '已占用' : '可用');
+      } catch (error: any) {
+        console.error('[Register] ❌ 用户名校验失败:', error);
+        // 校验失败不影响注册流程
+      } finally {
+        setUsernameChecking(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.username]);
+
+  /**
+   * 邮箱实时校验（防抖 500ms）
+   */
+  useEffect(() => {
+    // 只在邮箱注册模式下校验
+    if (registerType !== 'email') {
+      return;
+    }
+
+    // 重置校验状态
+    setEmailAvailable(null);
+
+    // 邮箱格式不正确，不校验
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return;
+    }
+
+    // 防抖：500ms 后执行校验
+    const timer = setTimeout(async () => {
+      setEmailChecking(true);
+
+      try {
+        console.log('[Register] 🔍 校验邮箱:', formData.email);
+        const response = await authService.checkEmail(formData.email);
+        const exists = response.data; // true-已存在，false-可用
+
+        setEmailAvailable(!exists);
+
+        if (exists) {
+          setErrors((prev) => ({ ...prev, email: '❌ 邮箱已被注册' }));
+        } else {
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.email;
+            return newErrors;
+          });
+        }
+
+        console.log('[Register] ✅ 邮箱校验完成:', exists ? '已注册' : '可用');
+      } catch (error: any) {
+        console.error('[Register] ❌ 邮箱校验失败:', error);
+        // 校验失败不影响注册流程
+      } finally {
+        setEmailChecking(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.email, registerType]);
+
   return (
     <div className="register-page">
       <div className="register-container">
@@ -248,16 +351,35 @@ export const Register: React.FC = () => {
             {/* 用户名 */}
             <div className="form-field">
               <label>用户名</label>
-              <Input
-                size="large"
-                placeholder="请输入用户名（2-20个字符）"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                prefix={<span>👤</span>}
-                allowClear
-              />
+              <div className="input-with-status">
+                <Input
+                  size="large"
+                  placeholder="请输入用户名（2-20个字符）"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  prefix={<span>👤</span>}
+                  allowClear
+                />
+                {/* 校验状态图标 */}
+                {formData.username.length >= 2 && (
+                  <span className="validation-status">
+                    {usernameChecking ? (
+                      <span className="status-loading">🔄</span>
+                    ) : usernameAvailable === true ? (
+                      <span className="status-success">✅</span>
+                    ) : usernameAvailable === false ? (
+                      <span className="status-error">❌</span>
+                    ) : null}
+                  </span>
+                )}
+              </div>
+              {/* 错误提示 */}
               {errors.username && (
                 <div className="form-field-error">{errors.username}</div>
+              )}
+              {/* 成功提示 */}
+              {!errors.username && usernameAvailable === true && (
+                <div className="form-field-success">✅ 用户名可用</div>
               )}
             </div>
 
@@ -280,17 +402,36 @@ export const Register: React.FC = () => {
             ) : (
               <div className="form-field">
                 <label>邮箱</label>
-                <Input
-                  size="large"
-                  type="email"
-                  placeholder="请输入邮箱"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  prefix={<span>📧</span>}
-                  allowClear
-                />
+                <div className="input-with-status">
+                  <Input
+                    size="large"
+                    type="email"
+                    placeholder="请输入邮箱"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    prefix={<span>📧</span>}
+                    allowClear
+                  />
+                  {/* 校验状态图标 */}
+                  {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && (
+                    <span className="validation-status">
+                      {emailChecking ? (
+                        <span className="status-loading">🔄</span>
+                      ) : emailAvailable === true ? (
+                        <span className="status-success">✅</span>
+                      ) : emailAvailable === false ? (
+                        <span className="status-error">❌</span>
+                      ) : null}
+                    </span>
+                  )}
+                </div>
+                {/* 错误提示 */}
                 {errors.email && (
                   <div className="form-field-error">{errors.email}</div>
+                )}
+                {/* 成功提示 */}
+                {!errors.email && emailAvailable === true && (
+                  <div className="form-field-success">✅ 邮箱可用</div>
                 )}
               </div>
             )}
