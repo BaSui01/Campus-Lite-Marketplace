@@ -63,6 +63,12 @@ class AuthServiceLoginTest {
     @Mock
     private VerificationCodeService verificationCodeService;
 
+    @Mock
+    private jakarta.servlet.http.HttpServletRequest httpRequest;
+
+    @Mock
+    private com.campus.marketplace.service.LoginNotificationService loginNotificationService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -79,8 +85,8 @@ class AuthServiceLoginTest {
         // 🎯 Mock CryptoUtil 行为：默认返回明文密码（兼容模式）
         when(cryptoUtil.isEncrypted(anyString())).thenReturn(false);
 
-        // 准备测试数据（新增验证码字段，测试中传 null）
-        validLoginRequest = new LoginRequest("testuser", "Password123", null, null, null);
+        // 准备测试数据（新增验证码字段和2FA字段，测试中传 null）
+        validLoginRequest = new LoginRequest("testuser", "Password123", null, null, null, null);
 
         // 创建权限
         viewPermission = Permission.builder()
@@ -124,7 +130,7 @@ class AuthServiceLoginTest {
                 .thenReturn("mock-jwt-token");
 
         // Act
-        LoginResponse response = authService.login(validLoginRequest);
+        LoginResponse response = authService.login(validLoginRequest, httpRequest);
 
         // Assert
         assertNotNull(response);
@@ -157,11 +163,11 @@ class AuthServiceLoginTest {
         when(userRepository.findByUsernameWithRoles("nonexistent"))
                 .thenReturn(Optional.empty());
 
-        LoginRequest request = new LoginRequest("nonexistent", "Password123", null, null, null);
+        LoginRequest request = new LoginRequest("nonexistent", "Password123", null, null, null, null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            authService.login(request);
+            authService.login(request, httpRequest);
         });
 
         assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
@@ -178,11 +184,11 @@ class AuthServiceLoginTest {
         when(passwordEncoder.matches("WrongPassword", "$2a$10$encodedPassword"))
                 .thenReturn(false);
 
-        LoginRequest request = new LoginRequest("testuser", "WrongPassword", null, null, null);
+        LoginRequest request = new LoginRequest("testuser", "WrongPassword", null, null, null, null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            authService.login(request);
+            authService.login(request, httpRequest);
         });
 
         assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
@@ -204,7 +210,7 @@ class AuthServiceLoginTest {
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            authService.login(validLoginRequest);
+            authService.login(validLoginRequest, httpRequest);
         });
 
         assertEquals(ErrorCode.USER_BANNED.getCode(), exception.getCode());
@@ -225,7 +231,7 @@ class AuthServiceLoginTest {
                 .thenReturn("mock-jwt-token");
 
         // Act
-        authService.login(validLoginRequest);
+        authService.login(validLoginRequest, httpRequest);
 
         // Assert - 验证 JWT Token 生成时传入的参数
         verify(jwtUtil).generateToken(
@@ -248,7 +254,7 @@ class AuthServiceLoginTest {
                 .thenReturn("generated-token-12345");
 
         // Act
-        authService.login(validLoginRequest);
+        authService.login(validLoginRequest, httpRequest);
 
         // Assert - 验证 Token 存入 Redis
         verify(valueOperations).set(

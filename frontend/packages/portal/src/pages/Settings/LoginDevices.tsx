@@ -64,6 +64,33 @@ const LoginDevices: React.FC = () => {
   };
 
   /**
+   * 踢出登录设备（新增 - BaSui 2025-11-09）
+   */
+  const handleRemoveDevice = async (deviceId: number) => {
+    if (!currentUser?.id) {
+      toast.error('用户信息不存在！😭');
+      return;
+    }
+
+    // 确认操作
+    if (!window.confirm('确定要踢出该设备吗？该设备将需要重新登录。')) {
+      return;
+    }
+
+    try {
+      // 🚀 调用真实后端 API 踢出设备
+      await userService.kickDevice(currentUser.id, deviceId);
+      toast.success('设备已踢出！🎉');
+
+      // 重新加载设备列表
+      loadDevices();
+    } catch (err: any) {
+      console.error('踢出设备失败：', err);
+      toast.error(err.response?.data?.message || '踢出设备失败！😭');
+    }
+  };
+
+  /**
    * 获取设备类型图标
    */
   const getDeviceIcon = (deviceType: string): string => {
@@ -178,14 +205,14 @@ const LoginDevices: React.FC = () => {
                 </div>
               </div>
 
-              {/* 操作按钮（预留，后端支持后可添加踢出设备功能） */}
-              {/* {!device.isCurrent && (
+              {/* 操作按钮（新增 - BaSui 2025-11-09） */}
+              {!device.isCurrent && (
                 <div className="device-item__actions">
                   <button className="btn-remove" onClick={() => handleRemoveDevice(device.id)}>
                     踢出设备
                   </button>
                 </div>
-              )} */}
+              )}
             </div>
           ))}
         </div>

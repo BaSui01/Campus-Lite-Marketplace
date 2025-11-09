@@ -56,16 +56,18 @@ const API_BASE_URL = normalizeBaseUrl(resolveEnvBaseUrl() || DEFAULT_BASE_PATH);
 // ==================== Token 管理 ====================
 
 /**
- * 获取访问 Token
+ * 获取访问 Token（内部使用）
+ * @internal
  */
-export const getAccessToken = (): string | null => {
+const getAccessTokenInternal = (): string | null => {
   return localStorage.getItem(TOKEN_KEY);
 };
 
 /**
- * 获取刷新 Token
+ * 获取刷新 Token（内部使用）
+ * @internal
  */
-export const getRefreshToken = (): string | null => {
+const getRefreshTokenInternal = (): string | null => {
   return localStorage.getItem(REFRESH_TOKEN_KEY);
 };
 
@@ -103,7 +105,7 @@ export const clearTokens = (): void => {
  * 检查 Token 是否存在
  */
 export const hasToken = (): boolean => {
-  return !!getAccessToken();
+  return !!getAccessTokenInternal();
 };
 
 // ==================== Axios 实例 ====================
@@ -125,7 +127,7 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       // 💉 注入 JWT Token
-      const token = getAccessToken();
+      const token = getAccessTokenInternal();
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -226,7 +228,7 @@ export const createApi = (options?: CreateApiOptions): DefaultApi => {
   const basePath = resolveBasePath(options);
   const axiosClient = resolveAxiosInstance(options, basePath);
   const configuration = new Configuration({
-    accessToken: options?.accessToken ?? getAccessToken() ?? undefined,
+    accessToken: options?.accessToken ?? getAccessTokenInternal() ?? undefined,
     basePath,
   });
   return new DefaultApi(configuration, basePath, axiosClient);

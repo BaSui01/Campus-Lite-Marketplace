@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { websocketService, WebSocketReadyState } from '../utils/websocket';
-import { getAccessToken } from '../utils/apiClient';
+import { getAccessToken } from '../utils/tokenUtils';
 
 /**
  * useWebSocketService 配置选项

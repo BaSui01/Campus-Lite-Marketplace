@@ -9,7 +9,7 @@ import {
   WEBSOCKET_RECONNECT_INTERVAL,
   WEBSOCKET_MAX_RECONNECT,
 } from '../constants';
-import { getAccessToken } from './apiClient';
+import { getAccessToken } from './tokenUtils';
 
 // ==================== 基础类型 ====================
 

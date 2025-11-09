@@ -25,10 +25,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
-    "typescript": "^5.4.5",
-    "prettier": "^3.3.3",
     "husky": "^9.1.6",
-    "lint-staged": "^15.2.10"
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -43,5 +43,9 @@
     "*.{json,css,scss,md}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "echarts-for-react": "^3.0.5",
+    "react-toastify": "^11.0.5"
   }
 }

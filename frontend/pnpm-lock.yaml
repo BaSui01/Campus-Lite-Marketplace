@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      echarts-for-react:
+        specifier: ^3.0.5
+        version: 3.0.5(echarts@5.6.0)(react@18.3.1)
+      react-toastify:
+        specifier: ^11.0.5
+        version: 11.0.5(react-dom@18.3.1)(react@18.3.1)
     devDependencies:
       '@types/node':
         specifier: ^20.14.0
@@ -4553,6 +4560,17 @@ packages:
     dependencies:
       '@remix-run/router': 1.23.0
       react: 18.3.1
+    dev: false
+
+  /react-toastify@11.0.5(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-EpqHBGvnSTtHYhCPLxML05NLY2ZX0JURbAdNYa6BUkk+amz4wbKBQvoKQAB0ardvSarUBuY4Q4s1sluAzZwkmA==}
+    peerDependencies:
+      react: ^18 || ^19
+      react-dom: ^18 || ^19
+    dependencies:
+      clsx: 2.1.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
     dev: false
 
   /react-transition-group@4.4.5(react-dom@18.3.1)(react@18.3.1):

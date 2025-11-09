@@ -59,5 +59,17 @@ export interface LoginResponse {
      * @memberof LoginResponse
      */
     'userInfo'?: UserInfo;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof LoginResponse
+     */
+    'requires2FA'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginResponse
+     */
+    'tempToken'?: string;
 }
 

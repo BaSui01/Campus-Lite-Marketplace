@@ -31,5 +31,8 @@ export * from './crypto';
 // 🎫 Token 工具
 export * from './tokenUtils';
 
+// 🛡️ ECharts 错误抑制器
+export * from './suppressEChartsError';
+
 // 🚧 TODO: 后续添加工具函数
 // export * from './upload';

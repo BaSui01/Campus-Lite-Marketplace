@@ -9,9 +9,9 @@ import { persist } from 'zustand/middleware';
 import {
   setTokens,
   clearTokens,
-  getAccessToken,
   hasToken,
 } from '../utils/apiClient';
+import { getAccessToken } from '../utils/tokenUtils';
 
 // ==================== 类型定义 ====================
 

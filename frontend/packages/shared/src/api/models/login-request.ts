@@ -50,5 +50,11 @@ export interface LoginRequest {
      * @memberof LoginRequest
      */
     'slidePosition'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginRequest
+     */
+    'twoFactorCode'?: string;
 }
 

@@ -13,51 +13,18 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
- * 
+ * 验证 2FA 代码请求
  * @export
- * @interface PageableObject
+ * @interface Verify2FARequest
  */
-export interface PageableObject {
+export interface Verify2FARequest {
     /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
+     * 6位数字验证码
+     * @type {string}
+     * @memberof Verify2FARequest
      */
-    'offset'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageableObject
-     */
-    'sort'?: Array<SortObject>;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'paged'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'unpaged'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageSize'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageNumber'?: number;
+    'code': string;
 }
 

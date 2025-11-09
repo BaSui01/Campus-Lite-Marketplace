@@ -3,6 +3,7 @@ package com.campus.marketplace.service.impl;
 import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
+import com.campus.marketplace.common.utils.IpLocationUtil;
 import com.campus.marketplace.entity.LoginDevice;
 import com.campus.marketplace.repository.LoginDeviceRepository;
 import com.campus.marketplace.repository.UserRepository;
@@ -34,6 +35,7 @@ public class LoginNotificationServiceImpl implements LoginNotificationService {
     private final UserRepository userRepository;
     private final LoginDeviceRepository loginDeviceRepository;
     private final JavaMailSender mailSender;
+    private final IpLocationUtil ipLocationUtil;
 
     @Value("${spring.mail.from:${spring.mail.username:}}")
     private String mailFrom;
@@ -236,21 +238,16 @@ public class LoginNotificationServiceImpl implements LoginNotificationService {
     }
 
     /**
-     * 获取地理位置（简化版，生产环境建议使用 IP 地理位置服务）
+     * 获取地理位置
+     * <p>
+     * 使用 IpLocationUtil 解析 IP 地址的地理位置信息。
+     * 离线查询，速度快，准确度高！😎
+     * </p>
+     *
+     * @param ip IP 地址
+     * @return 地理位置字符串（如：广东省深圳市）
      */
     private String getLocation(String ip) {
-        // TODO: 集成 IP 地理位置服务（如 ip2region、GeoIP2 等）
-        // 这里返回简化版本
-        if (ip == null || ip.isEmpty()) {
-            return "未知位置";
-        }
-
-        // 本地 IP
-        if (ip.startsWith("127.") || ip.startsWith("192.168.") || ip.startsWith("10.") || ip.equals("0:0:0:0:0:0:0:1")) {
-            return "本地网络";
-        }
-
-        // 生产环境应该调用 IP 地理位置服务
-        return "未知位置（IP: " + ip + "）";
+        return ipLocationUtil.getLocation(ip);
     }
 }

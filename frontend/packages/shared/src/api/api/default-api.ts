@@ -344,6 +344,8 @@ import type { CreateSubscriptionRequest } from '../models';
 // @ts-ignore
 import type { CreateTagRequest } from '../models';
 // @ts-ignore
+import type { Disable2FARequest } from '../models';
+// @ts-ignore
 import type { FeatureFlagCreateRequest } from '../models';
 // @ts-ignore
 import type { FeatureFlagUpdateRequest } from '../models';
@@ -403,6 +405,8 @@ import type { UpdateTagRequest } from '../models';
 import type { UpdateUserRolesRequest } from '../models';
 // @ts-ignore
 import type { UploadEvidenceRequest } from '../models';
+// @ts-ignore
+import type { Verify2FARequest } from '../models';
 /**
  * DefaultApi - axios parameter creator
  * @export
@@ -2073,6 +2077,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             }
 
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 查询当前用户是否启用了 2FA
+         * @summary 检查 2FA 状态
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        check2FAStatus: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/auth/2fa/status`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -4309,6 +4347,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 禁用双因素认证，需要验证用户密码
+         * @summary 禁用 2FA
+         * @param {Disable2FARequest} disable2FARequest 密码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        disable2FA: async (disable2FARequest: Disable2FARequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'disable2FARequest' is not null or undefined
+            assertParamExists('disable2FA', 'disable2FARequest', disable2FARequest)
+            const localVarPath = `/auth/2fa/disable`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(disable2FARequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 关闭用户的两步验证功能。
          * @summary 关闭两步验证
          * @param {number} userId 用户 ID
@@ -4404,6 +4482,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             }
 
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 生成 TOTP 密钥和 QR 码，返回恢复码（仅显示一次）
+         * @summary 启用 2FA
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enable2FA: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/auth/2fa/enable`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -13078,6 +13190,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 重新生成 2FA 恢复码，需要验证用户密码
+         * @summary 重新生成恢复码
+         * @param {Disable2FARequest} disable2FARequest 密码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        regenerateRecoveryCodes: async (disable2FARequest: Disable2FARequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'disable2FARequest' is not null or undefined
+            assertParamExists('regenerateRecoveryCodes', 'disable2FARequest', disable2FARequest)
+            const localVarPath = `/auth/2fa/recovery-codes/regenerate`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(disable2FARequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 使用校园邮箱注册新账号，注册成功后赠送 100 积分
          * @summary 用户注册
          * @param {RegisterRequest} registerRequest 注册信息
@@ -16377,6 +16529,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 验证用户输入的 6 位数字验证码，验证成功后正式启用 2FA
+         * @summary 验证 2FA 代码并完成启用
+         * @param {Verify2FARequest} verify2FARequest 验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verify2FA: async (verify2FARequest: Verify2FARequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'verify2FARequest' is not null or undefined
+            assertParamExists('verify2FA', 'verify2FARequest', verify2FARequest)
+            const localVarPath = `/auth/2fa/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(verify2FARequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 验证用户滑动的位置是否正确（允许±5px误差）
          * @summary 验证滑块验证码（简单版本）
          * @param {string} slideId 
@@ -17097,6 +17289,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cancelOrder(orderNo, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.cancelOrder']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 查询当前用户是否启用了 2FA
+         * @summary 检查 2FA 状态
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async check2FAStatus(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.check2FAStatus(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.check2FAStatus']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17833,6 +18037,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 禁用双因素认证，需要验证用户密码
+         * @summary 禁用 2FA
+         * @param {Disable2FARequest} disable2FARequest 密码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async disable2FA(disable2FARequest: Disable2FARequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.disable2FA(disable2FARequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.disable2FA']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 关闭用户的两步验证功能。
          * @summary 关闭两步验证
          * @param {number} userId 用户 ID
@@ -17869,6 +18086,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.downloadFile(materialId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.downloadFile']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 生成 TOTP 密钥和 QR 码，返回恢复码（仅显示一次）
+         * @summary 启用 2FA
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async enable2FA(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.enable2FA(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.enable2FA']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -20723,6 +20952,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 重新生成 2FA 恢复码，需要验证用户密码
+         * @summary 重新生成恢复码
+         * @param {Disable2FARequest} disable2FARequest 密码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async regenerateRecoveryCodes(disable2FARequest: Disable2FARequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.regenerateRecoveryCodes(disable2FARequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.regenerateRecoveryCodes']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 使用校园邮箱注册新账号，注册成功后赠送 100 积分
          * @summary 用户注册
          * @param {RegisterRequest} registerRequest 注册信息
@@ -21778,6 +22020,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 验证用户输入的 6 位数字验证码，验证成功后正式启用 2FA
+         * @summary 验证 2FA 代码并完成启用
+         * @param {Verify2FARequest} verify2FARequest 验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verify2FA(verify2FARequest: Verify2FARequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verify2FA(verify2FARequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.verify2FA']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 验证用户滑动的位置是否正确（允许±5px误差）
          * @summary 验证滑块验证码（简单版本）
          * @param {string} slideId 
@@ -22245,6 +22500,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         cancelOrder(requestParameters: DefaultApiCancelOrderRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
             return localVarFp.cancelOrder(requestParameters.orderNo, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 查询当前用户是否启用了 2FA
+         * @summary 检查 2FA 状态
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        check2FAStatus(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse> {
+            return localVarFp.check2FAStatus(options).then((request) => request(axios, basePath));
         },
         /**
          * 注册时实时校验邮箱是否已被注册
@@ -22805,6 +23069,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.detail(requestParameters.refundNo, options).then((request) => request(axios, basePath));
         },
         /**
+         * 禁用双因素认证，需要验证用户密码
+         * @summary 禁用 2FA
+         * @param {DefaultApiDisable2FARequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        disable2FA(requestParameters: DefaultApiDisable2FARequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse> {
+            return localVarFp.disable2FA(requestParameters.disable2FARequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 关闭用户的两步验证功能。
          * @summary 关闭两步验证
          * @param {DefaultApiDisableTwoFactorRequest} requestParameters Request parameters.
@@ -22833,6 +23107,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         downloadFile(requestParameters: DefaultApiDownloadFileRequest, options?: RawAxiosRequestConfig): AxiosPromise<File> {
             return localVarFp.downloadFile(requestParameters.materialId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 生成 TOTP 密钥和 QR 码，返回恢复码（仅显示一次）
+         * @summary 启用 2FA
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        enable2FA(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse> {
+            return localVarFp.enable2FA(options).then((request) => request(axios, basePath));
         },
         /**
          * 生成 TOTP 密钥和二维码 URL，用户需要使用 Google Authenticator 等应用扫描二维码。
@@ -24923,6 +25206,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.refreshHot(requestParameters.campusId, requestParameters.topN, options).then((request) => request(axios, basePath));
         },
         /**
+         * 重新生成 2FA 恢复码，需要验证用户密码
+         * @summary 重新生成恢复码
+         * @param {DefaultApiRegenerateRecoveryCodesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        regenerateRecoveryCodes(requestParameters: DefaultApiRegenerateRecoveryCodesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse> {
+            return localVarFp.regenerateRecoveryCodes(requestParameters.disable2FARequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 使用校园邮箱注册新账号，注册成功后赠送 100 积分
          * @summary 用户注册
          * @param {DefaultApiRegisterRequest} requestParameters Request parameters.
@@ -25702,6 +25995,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.validateMigration(requestParameters.campusMigrationRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 验证用户输入的 6 位数字验证码，验证成功后正式启用 2FA
+         * @summary 验证 2FA 代码并完成启用
+         * @param {DefaultApiVerify2FARequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verify2FA(requestParameters: DefaultApiVerify2FARequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse> {
+            return localVarFp.verify2FA(requestParameters.verify2FARequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 验证用户滑动的位置是否正确（允许±5px误差）
          * @summary 验证滑块验证码（简单版本）
          * @param {DefaultApiVerifySlideCaptchaRequest} requestParameters Request parameters.
@@ -26172,6 +26475,15 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     cancelOrder(orderNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 查询当前用户是否启用了 2FA
+     * @summary 检查 2FA 状态
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    check2FAStatus(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse>;
 
     /**
      * 注册时实时校验邮箱是否已被注册
@@ -26739,6 +27051,16 @@ export interface DefaultApiInterface {
     detail(refundNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundRequest>;
 
     /**
+     * 禁用双因素认证，需要验证用户密码
+     * @summary 禁用 2FA
+     * @param {Disable2FARequest} disable2FARequest 密码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    disable2FA(disable2FARequest: Disable2FARequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse>;
+
+    /**
      * 关闭用户的两步验证功能。
      * @summary 关闭两步验证
      * @param {number} userId 用户 ID
@@ -26767,6 +27089,15 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     downloadFile(materialId: number, options?: RawAxiosRequestConfig): AxiosPromise<File>;
+
+    /**
+     * 生成 TOTP 密钥和 QR 码，返回恢复码（仅显示一次）
+     * @summary 启用 2FA
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enable2FA(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse>;
 
     /**
      * 生成 TOTP 密钥和二维码 URL，用户需要使用 Google Authenticator 等应用扫描二维码。
@@ -28978,6 +29309,16 @@ export interface DefaultApiInterface {
     refreshHot(campusId?: number, topN?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 重新生成 2FA 恢复码，需要验证用户密码
+     * @summary 重新生成恢复码
+     * @param {Disable2FARequest} disable2FARequest 密码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    regenerateRecoveryCodes(disable2FARequest: Disable2FARequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse>;
+
+    /**
      * 使用校园邮箱注册新账号，注册成功后赠送 100 积分
      * @summary 用户注册
      * @param {RegisterRequest} registerRequest 注册信息
@@ -29797,6 +30138,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     validateMigration(campusMigrationRequest: CampusMigrationRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampusMigrationValidationResponse>;
+
+    /**
+     * 验证用户输入的 6 位数字验证码，验证成功后正式启用 2FA
+     * @summary 验证 2FA 代码并完成启用
+     * @param {Verify2FARequest} verify2FARequest 验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    verify2FA(verify2FARequest: Verify2FARequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse>;
 
     /**
      * 验证用户滑动的位置是否正确（允许±5px误差）
@@ -31274,6 +31625,20 @@ export interface DefaultApiDetailRequest {
      * @memberof DefaultApiDetail
      */
     readonly refundNo: string
+}
+
+/**
+ * Request parameters for disable2FA operation in DefaultApi.
+ * @export
+ * @interface DefaultApiDisable2FARequest
+ */
+export interface DefaultApiDisable2FARequest {
+    /**
+     * 密码
+     * @type {Disable2FARequest}
+     * @memberof DefaultApiDisable2FA
+     */
+    readonly disable2FARequest: Disable2FARequest
 }
 
 /**
@@ -34434,6 +34799,20 @@ export interface DefaultApiRefreshHotRequest {
 }
 
 /**
+ * Request parameters for regenerateRecoveryCodes operation in DefaultApi.
+ * @export
+ * @interface DefaultApiRegenerateRecoveryCodesRequest
+ */
+export interface DefaultApiRegenerateRecoveryCodesRequest {
+    /**
+     * 密码
+     * @type {Disable2FARequest}
+     * @memberof DefaultApiRegenerateRecoveryCodes
+     */
+    readonly disable2FARequest: Disable2FARequest
+}
+
+/**
  * Request parameters for register operation in DefaultApi.
  * @export
  * @interface DefaultApiRegisterRequest
@@ -35806,6 +36185,20 @@ export interface DefaultApiValidateMigrationRequest {
 }
 
 /**
+ * Request parameters for verify2FA operation in DefaultApi.
+ * @export
+ * @interface DefaultApiVerify2FARequest
+ */
+export interface DefaultApiVerify2FARequest {
+    /**
+     * 验证码
+     * @type {Verify2FARequest}
+     * @memberof DefaultApiVerify2FA
+     */
+    readonly verify2FARequest: Verify2FARequest
+}
+
+/**
  * Request parameters for verifySlideCaptcha operation in DefaultApi.
  * @export
  * @interface DefaultApiVerifySlideCaptchaRequest
@@ -36354,6 +36747,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public cancelOrder(requestParameters: DefaultApiCancelOrderRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).cancelOrder(requestParameters.orderNo, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 查询当前用户是否启用了 2FA
+     * @summary 检查 2FA 状态
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public check2FAStatus(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).check2FAStatus(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -37027,6 +37431,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 禁用双因素认证，需要验证用户密码
+     * @summary 禁用 2FA
+     * @param {DefaultApiDisable2FARequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public disable2FA(requestParameters: DefaultApiDisable2FARequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).disable2FA(requestParameters.disable2FARequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 关闭用户的两步验证功能。
      * @summary 关闭两步验证
      * @param {DefaultApiDisableTwoFactorRequest} requestParameters Request parameters.
@@ -37060,6 +37476,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public downloadFile(requestParameters: DefaultApiDownloadFileRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).downloadFile(requestParameters.materialId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 生成 TOTP 密钥和 QR 码，返回恢复码（仅显示一次）
+     * @summary 启用 2FA
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public enable2FA(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).enable2FA(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39579,6 +40006,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 重新生成 2FA 恢复码，需要验证用户密码
+     * @summary 重新生成恢复码
+     * @param {DefaultApiRegenerateRecoveryCodesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public regenerateRecoveryCodes(requestParameters: DefaultApiRegenerateRecoveryCodesRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).regenerateRecoveryCodes(requestParameters.disable2FARequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 使用校园邮箱注册新账号，注册成功后赠送 100 积分
      * @summary 用户注册
      * @param {DefaultApiRegisterRequest} requestParameters Request parameters.
@@ -40511,6 +40950,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public validateMigration(requestParameters: DefaultApiValidateMigrationRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).validateMigration(requestParameters.campusMigrationRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 验证用户输入的 6 位数字验证码，验证成功后正式启用 2FA
+     * @summary 验证 2FA 代码并完成启用
+     * @param {DefaultApiVerify2FARequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public verify2FA(requestParameters: DefaultApiVerify2FARequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).verify2FA(requestParameters.verify2FARequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -3,10 +3,10 @@
  * @author BaSui 😎
  * @description 只导出真正两端共享的服务和通用工具服务
  *
- * ⚠️ 重构说明：
- * - 管理端专属服务已移至 admin/src/services
- * - 客户端专属服务已移至 portal/src/services
- * - 此处仅保留两端都使用的核心服务
+ * ⚠️ 重要说明：
+ * - 此文件只导出 Service 类，不导出类型定义
+ * - 所有类型定义应从 '@campus/shared/api' 导入（OpenAPI 生成）
+ * - 避免与 API 自动生成的类型冲突
  */
 
 // ==================== 认证服务（两端共享）====================
@@ -23,14 +23,8 @@ export type { GoodsService } from './goods';
 
 // ==================== 评价服务（两端共享）====================
 export { reviewService } from './goods/review';
-export type {
-  ReviewService,
-  CreateReviewRequest,
-  ReviewListQuery,
-  ReviewListResponse,
-  ReviewDetail,
-  ReviewStatistics,
-} from './goods/review';
+export type { ReviewService, ReviewListQuery, ReviewDetail, ReviewStatistics } from './goods/review';
+// 注意：CreateReviewRequest 应从 '@campus/shared/api' 导入，避免冲突
 
 // ==================== 订单服务（两端共享）====================
 export { orderService } from './order';
@@ -42,41 +36,22 @@ export type { MessageService } from './message';
 
 // ==================== 支付服务（两端共享）====================
 export { paymentService } from './payment';
-export type {
-  PaymentService,
-  PaymentRecord,
-  PaymentStatistics,
-  PaymentListParams
-} from './payment';
+export type { PaymentService, PaymentRecord, PaymentStatistics, PaymentListParams } from './payment';
 
 // ==================== 导出服务（两端共享）====================
 export { exportService, ExportType } from './export';
-export type {
-  ExportService,
-  ExportJob,
-  ExportRequest
-} from './export';
+export type { ExportService, ExportRequest } from './export';
+// 注意：ExportJob 应从 '@campus/shared/api' 导入，避免冲突
 
 // ==================== 分类服务（两端共享）====================
 export { categoryService, CategoryStatus } from './category';
-export type {
-  CategoryService,
-  Category,
-  CategoryTreeNode,
-  CategoryListParams,
-  CategoryRequest,
-  CategorySortRequest,
-  CategoryStatistics
-} from './category';
+export type { CategoryService, CategoryTreeNode, CategoryListParams, CategoryRequest, CategorySortRequest, CategoryStatistics } from './category';
+// 注意：Category 应从 '@campus/shared/api' 导入，避免冲突
 
 // ==================== 物流服务（两端共享）====================
 export { logisticsService } from './logistics';
-export type {
-  LogisticsService,
-  Logistics,
-  LogisticsTrack,
-  LogisticsStatistics
-} from './logistics';
+export type { LogisticsService, LogisticsTrack, LogisticsStatistics } from './logistics';
+// 注意：Logistics 应从 '@campus/shared/api' 导入，避免冲突
 
 // ==================== 通用工具服务 ====================
 
@@ -86,12 +61,8 @@ export type { UploadService } from './upload';
 
 // 退款服务
 export { refundService, RefundStatus } from './refund';
-export type {
-  RefundService,
-  Refund,
-  RefundListParams,
-  RefundReviewRequest
-} from './refund';
+export type { RefundService, RefundListParams, RefundReviewRequest } from './refund';
+// 注意：Refund 应从 '@campus/shared/api' 导入，避免冲突
 
 // 帖子服务
 export { postService } from './post';
@@ -99,68 +70,37 @@ export type { PostService } from './post';
 
 // 校园服务
 export { campusService, CampusStatus } from './campus';
-export type {
-  CampusService,
-  Campus,
-  CampusListParams,
-  CampusStatistics,
-  CampusRequest
-} from './campus';
+export type { CampusService, CampusListParams, CampusStatistics, CampusRequest } from './campus';
+// 注意：Campus 应从 '@campus/shared/api' 导入，避免冲突
 
 // 标签服务
 export { tagService, TagType, TagStatus } from './tag';
-export type {
-  TagService,
-  Tag,
-  TagListParams,
-  TagRequest,
-  TagMergeRequest,
-  HotTag
-} from './tag';
+export type { TagService, TagListParams, TagRequest, TagMergeRequest, HotTag } from './tag';
+// 注意：Tag 应从 '@campus/shared/api' 导入，避免冲突
 
 // 社区服务
 export { communityService } from './community';
-export type {
-  CommunityService,
-  UserFeed,
-  PostTopicTag,
-  PostInteractionStats
-} from './community';
+export type { CommunityService, PostTopicTag, PostInteractionStats } from './community';
+// 注意：UserFeed 应从 '@campus/shared/api' 导入，避免冲突
 
 // 话题服务
 export { topicService } from './topic';
-export type {
-  TopicService,
-  Topic,
-  TopicStatistics,
-  CreateTopicRequest,
-  UpdateTopicRequest
-} from './topic';
+export type { TopicService, TopicStatistics, CreateTopicRequest, UpdateTopicRequest } from './topic';
+// 注意：Topic 应从 '@campus/shared/api' 导入，避免冲突
 
 // 任务服务
 export { taskService, TaskStatus } from './task';
-export type {
-  TaskService,
-  ScheduledTask,
-  TaskExecutionLog,
-  TaskStatistics
-} from './task';
+export type { TaskService, TaskExecutionLog, TaskStatistics } from './task';
+// 注意：ScheduledTask 应从 '@campus/shared/api' 导入，避免冲突
 
 // 通知服务
 export { notificationService, NotificationStatus } from './notification';
-export type {
-  NotificationService,
-  NotificationListParams,
-  PageNotificationResponse
-} from './notification';
+export type { NotificationService, NotificationListParams } from './notification';
+// 注意：PageNotificationResponse 应从 '@campus/shared/api' 导入，避免冲突
 
 // 通知偏好服务
 export { notificationPreferenceService, NotificationChannel, NotificationType } from './notificationPreference';
-export type {
-  NotificationPreference,
-  QuietHoursConfig,
-  NotificationTypeInfo
-} from './notificationPreference';
+export type { NotificationPreference, QuietHoursConfig, NotificationTypeInfo } from './notificationPreference';
 
 // 通知模板服务
 export { notificationTemplateService } from './notificationTemplate';
@@ -172,11 +112,8 @@ export type { SoftDeleteService } from './softDelete';
 
 // 撤销操作服务
 export { revertService, RevertService } from './revert';
-export type {
-  CreateRevertRequest,
-  RevertExecutionResult,
-  RevertRequestParams
-} from './revert';
+export type { RevertRequestParams } from './revert';
+// 注意：CreateRevertRequest, RevertExecutionResult 应从 '@campus/shared/api' 导入，避免冲突
 
 // 限流服务
 export { rateLimitService } from './rateLimit';
@@ -184,11 +121,8 @@ export type { RateLimitService } from './rateLimit';
 
 // 批量任务服务
 export { batchService, BatchTaskStatus, BatchType } from './batch';
-export type {
-  BatchService,
-  BatchTaskListParams,
-  PageBatchTaskResponse
-} from './batch';
+export type { BatchService, BatchTaskListParams } from './batch';
+// 注意：PageBatchTaskResponse 应从 '@campus/shared/api' 导入，避免冲突
 
 // ==================== ❌ 已移除的服务导出 ====================
 //

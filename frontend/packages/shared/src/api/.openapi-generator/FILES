@@ -206,6 +206,7 @@ models/create-review-request.ts
 models/create-role-request.ts
 models/create-subscription-request.ts
 models/create-tag-request.ts
+models/disable2-farequest.ts
 models/dispute-detail-dto.ts
 models/dispute-dto.ts
 models/dispute-statistics-dto.ts
@@ -343,3 +344,4 @@ models/user-persona-dto.ts
 models/user-profile-response.ts
 models/user-ranking-item.ts
 models/user.ts
+models/verify2-farequest.ts

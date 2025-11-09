@@ -6,7 +6,6 @@ import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.TwoFactorSetupResponse;
 import com.campus.marketplace.service.TwoFactorAuthService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

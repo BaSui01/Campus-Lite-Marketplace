@@ -136,6 +136,18 @@ export interface User {
     'twoFactorSecret'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof User
+     */
+    'twoFactorRecoveryCodes'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'twoFactorEnabledAt'?: string;
+    /**
+     * 
      * @type {Set<Role>}
      * @memberof User
      */

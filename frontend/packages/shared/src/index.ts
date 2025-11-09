@@ -4,26 +4,29 @@
  * @description 导出所有公共模块：API、组件、工具、类型、常量、Services
  */
 
-// 导出 API 层（OpenAPI 自动生成）
+// ==================== API 层（OpenAPI 自动生成，优先级最高）====================
+// 🎯 优先导出 OpenAPI 生成的类型，这些类型与后端保持同步
 export * from './api';
 
-// 导出公共组件
+// ==================== 本地类型定义（命名空间隔离）====================
+// 🎯 本地手写类型统一导出为 Local 命名空间，避免与 API 类型冲突
+// 使用方式：import { Local } from '@campus/shared'; const user: Local.User = ...;
+export * as Local from './types';
+
+// ==================== 公共组件 ====================
 export * from './components';
 
-// 导出工具函数
+// ==================== 工具函数 ====================
 export * from './utils';
 
-// 导出类型定义
-export * from './types';
-
-// 导出常量
+// ==================== 常量 ====================
 export * from './constants';
 
-// 导出自定义 Hooks
+// ==================== 自定义 Hooks ====================
 export * from './hooks';
 
-// 导出 API 服务（新增）
+// ==================== API 服务（新增）====================
 export * from './services';
 
-// 导出工厂方法（Store 等）
+// ==================== 工厂方法（Store 等）====================
 export * from './factories';
