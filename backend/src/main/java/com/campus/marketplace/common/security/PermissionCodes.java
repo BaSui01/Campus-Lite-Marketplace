@@ -29,6 +29,7 @@ public final class PermissionCodes {
     public static final String SYSTEM_ROLE_ASSIGN = "system:role:assign";
 
     // ===== 商品与帖子 =====
+    public static final String SYSTEM_GOODS_VIEW = "system:goods:view";
     public static final String SYSTEM_GOODS_APPROVE = "system:goods:approve";
     public static final String SYSTEM_GOODS_DELETE = "system:goods:delete";
     public static final String SYSTEM_POST_APPROVE = "system:post:approve";
@@ -51,13 +52,26 @@ public final class PermissionCodes {
     public static final String SYSTEM_COMPLIANCE_REVIEW = "system:compliance:review";
     public static final String SYSTEM_REPORT_HANDLE = "system:report:handle";
 
+    // ===== 订单与履约 =====
+    public static final String SYSTEM_ORDER_VIEW = "system:order:view";
+    public static final String SYSTEM_ORDER_MANAGE = "system:order:manage";
+
+    // ===== 监控与运维 =====
+    public static final String SYSTEM_MONITOR_VIEW = "system:monitor:view";
+    public static final String SYSTEM_TASK_MANAGE = "system:task:manage";
+
     // ===== 用户申诉与纠纷 =====
+    public static final String SYSTEM_APPEAL_VIEW = "system:appeal:view";
+    public static final String SYSTEM_APPEAL_HANDLE = "system:appeal:handle";
     public static final String SYSTEM_USER_APPEAL = "system:user:appeal";
     public static final String SYSTEM_USER_APPEAL_HANDLE = "system:user:appeal:handle";
-    public static final String SYSTEM_DISPUTE_HANDLE = "system:dispute:handle";
     public static final String SYSTEM_DISPUTE_VIEW = "system:dispute:view";
+    public static final String SYSTEM_DISPUTE_HANDLE = "system:dispute:handle";
+    public static final String SYSTEM_DISPUTE_MANAGE = "system:dispute:manage";
+    public static final String SYSTEM_DISPUTE_STATISTICS = "system:dispute:statistics";
 
     // ===== 批量操作 =====
+    public static final String SYSTEM_BATCH_MANAGE = "system:batch:manage";
     public static final String SYSTEM_BATCH_GOODS_OFFLINE = "system:batch:goods:offline";
     public static final String SYSTEM_BATCH_GOODS_UPDATE = "system:batch:goods:update";
     public static final String SYSTEM_BATCH_GOODS_DELETE = "system:batch:goods:delete";
@@ -91,6 +105,10 @@ public final class PermissionCodes {
     // ===== 安全管理 =====
     public static final String SYSTEM_SECURITY_VIEW = "system:security:view";
     public static final String SYSTEM_SECURITY_MANAGE = "system:security:manage";
+
+    // ===== 社区与内容 =====
+    public static final String SYSTEM_TOPIC_MANAGE = "system:topic:manage";
+    public static final String SYSTEM_COMMUNITY_MANAGE = "system:community:manage";
 
     // ===== 缓存管理 =====
     public static final String SYSTEM_CACHE_VIEW = "system:cache:view";
@@ -174,6 +192,7 @@ public final class PermissionCodes {
                 SYSTEM_USER_DELETE,
                 SYSTEM_USER_BAN,
                 SYSTEM_ROLE_ASSIGN,
+                SYSTEM_GOODS_VIEW,
                 SYSTEM_GOODS_APPROVE,
                 SYSTEM_GOODS_DELETE,
                 SYSTEM_POST_APPROVE,
@@ -183,16 +202,27 @@ public final class PermissionCodes {
                 SYSTEM_STATISTICS_VIEW,
                 SYSTEM_AUDIT_VIEW,
                 SYSTEM_RATE_LIMIT_MANAGE,
+                SYSTEM_MONITOR_VIEW,
+                SYSTEM_TASK_MANAGE,
                 SYSTEM_CAMPUS_MANAGE,
                 SYSTEM_CAMPUS_CROSS,
                 SYSTEM_CATEGORY_MANAGE,
                 SYSTEM_TAG_MANAGE,
                 SYSTEM_COMPLIANCE_REVIEW,
                 SYSTEM_REPORT_HANDLE,
+                SYSTEM_TOPIC_MANAGE,
+                SYSTEM_COMMUNITY_MANAGE,
+                SYSTEM_ORDER_VIEW,
+                SYSTEM_ORDER_MANAGE,
+                SYSTEM_APPEAL_VIEW,
+                SYSTEM_APPEAL_HANDLE,
                 SYSTEM_USER_APPEAL,
                 SYSTEM_USER_APPEAL_HANDLE,
-                SYSTEM_DISPUTE_HANDLE,
                 SYSTEM_DISPUTE_VIEW,
+                SYSTEM_DISPUTE_HANDLE,
+                SYSTEM_DISPUTE_MANAGE,
+                SYSTEM_DISPUTE_STATISTICS,
+                SYSTEM_BATCH_MANAGE,
                 SYSTEM_BATCH_GOODS_OFFLINE,
                 SYSTEM_BATCH_GOODS_UPDATE,
                 SYSTEM_BATCH_GOODS_DELETE,
@@ -262,6 +292,7 @@ public final class PermissionCodes {
                 SYSTEM_USER_DELETE,
                 SYSTEM_USER_BAN,
                 SYSTEM_ROLE_ASSIGN,
+                SYSTEM_GOODS_VIEW,
                 SYSTEM_GOODS_APPROVE,
                 SYSTEM_GOODS_DELETE,
                 SYSTEM_POST_APPROVE,
@@ -271,16 +302,27 @@ public final class PermissionCodes {
                 SYSTEM_STATISTICS_VIEW,
                 SYSTEM_AUDIT_VIEW,
                 SYSTEM_RATE_LIMIT_MANAGE,
+                SYSTEM_MONITOR_VIEW,
+                SYSTEM_TASK_MANAGE,
                 SYSTEM_CAMPUS_MANAGE,
                 SYSTEM_CAMPUS_CROSS,
                 SYSTEM_CATEGORY_MANAGE,
                 SYSTEM_TAG_MANAGE,
                 SYSTEM_COMPLIANCE_REVIEW,
                 SYSTEM_REPORT_HANDLE,
+                SYSTEM_TOPIC_MANAGE,
+                SYSTEM_COMMUNITY_MANAGE,
+                SYSTEM_ORDER_VIEW,
+                SYSTEM_ORDER_MANAGE,
+                SYSTEM_APPEAL_VIEW,
+                SYSTEM_APPEAL_HANDLE,
                 SYSTEM_USER_APPEAL,
                 SYSTEM_USER_APPEAL_HANDLE,
-                SYSTEM_DISPUTE_HANDLE,
                 SYSTEM_DISPUTE_VIEW,
+                SYSTEM_DISPUTE_HANDLE,
+                SYSTEM_DISPUTE_MANAGE,
+                SYSTEM_DISPUTE_STATISTICS,
+                SYSTEM_BATCH_MANAGE,
                 SYSTEM_BATCH_GOODS_OFFLINE,
                 SYSTEM_BATCH_GOODS_UPDATE,
                 SYSTEM_BATCH_GOODS_DELETE,
@@ -350,6 +392,7 @@ public final class PermissionCodes {
         descriptions.put(SYSTEM_USER_BAN, "封禁用户");
         descriptions.put(SYSTEM_ROLE_ASSIGN, "分配角色");
 
+        descriptions.put(SYSTEM_GOODS_VIEW, "查看商品");
         descriptions.put(SYSTEM_GOODS_APPROVE, "审核物品");
         descriptions.put(SYSTEM_GOODS_DELETE, "删除物品");
         descriptions.put(SYSTEM_POST_APPROVE, "审核帖子");
@@ -360,6 +403,8 @@ public final class PermissionCodes {
         descriptions.put(SYSTEM_STATISTICS_VIEW, "查看统计看板");
         descriptions.put(SYSTEM_AUDIT_VIEW, "查看审计日志");
         descriptions.put(SYSTEM_RATE_LIMIT_MANAGE, "管理限流规则");
+        descriptions.put(SYSTEM_MONITOR_VIEW, "查看系统监控");
+        descriptions.put(SYSTEM_TASK_MANAGE, "管理定时任务");
 
         descriptions.put(SYSTEM_CAMPUS_MANAGE, "管理校区");
         descriptions.put(SYSTEM_CAMPUS_CROSS, "跨校区访问权限");
@@ -368,12 +413,22 @@ public final class PermissionCodes {
 
         descriptions.put(SYSTEM_COMPLIANCE_REVIEW, "审核隐私请求");
         descriptions.put(SYSTEM_REPORT_HANDLE, "处理用户举报");
+        descriptions.put(SYSTEM_TOPIC_MANAGE, "管理话题");
+        descriptions.put(SYSTEM_COMMUNITY_MANAGE, "管理社区");
 
+        descriptions.put(SYSTEM_ORDER_VIEW, "查看订单");
+        descriptions.put(SYSTEM_ORDER_MANAGE, "管理订单");
+
+        descriptions.put(SYSTEM_APPEAL_VIEW, "查看申诉");
+        descriptions.put(SYSTEM_APPEAL_HANDLE, "处理申诉");
         descriptions.put(SYSTEM_USER_APPEAL, "用户申诉");
         descriptions.put(SYSTEM_USER_APPEAL_HANDLE, "申诉处理");
-        descriptions.put(SYSTEM_DISPUTE_HANDLE, "纠纷仲裁");
         descriptions.put(SYSTEM_DISPUTE_VIEW, "纠纷查看");
+        descriptions.put(SYSTEM_DISPUTE_HANDLE, "纠纷仲裁");
+        descriptions.put(SYSTEM_DISPUTE_MANAGE, "管理纠纷仲裁");
+        descriptions.put(SYSTEM_DISPUTE_STATISTICS, "查看纠纷统计");
 
+        descriptions.put(SYSTEM_BATCH_MANAGE, "管理批量任务");
         descriptions.put(SYSTEM_BATCH_GOODS_OFFLINE, "批量下架商品");
         descriptions.put(SYSTEM_BATCH_GOODS_UPDATE, "批量更新商品");
         descriptions.put(SYSTEM_BATCH_GOODS_DELETE, "批量删除商品");
