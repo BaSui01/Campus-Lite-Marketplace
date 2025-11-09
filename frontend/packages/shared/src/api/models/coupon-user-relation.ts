@@ -13,87 +13,93 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { Appeal } from './appeal';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageAppeal
+ * @interface CouponUserRelation
  */
-export interface PageAppeal {
+export interface CouponUserRelation {
     /**
      * 
      * @type {number}
-     * @memberof PageAppeal
+     * @memberof CouponUserRelation
      */
-    'totalPages'?: number;
+    'id'?: number;
     /**
      * 
-     * @type {number}
-     * @memberof PageAppeal
+     * @type {string}
+     * @memberof CouponUserRelation
      */
-    'totalElements'?: number;
+    'createdAt'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PageAppeal
+     * @type {string}
+     * @memberof CouponUserRelation
      */
-    'size'?: number;
-    /**
-     * 
-     * @type {Array<Appeal>}
-     * @memberof PageAppeal
-     */
-    'content'?: Array<Appeal>;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageAppeal
-     */
-    'number'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageAppeal
-     */
-    'sort'?: Array<SortObject>;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageAppeal
-     */
-    'numberOfElements'?: number;
+    'updatedAt'?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof PageAppeal
+     * @memberof CouponUserRelation
      */
-    'first'?: boolean;
+    'deleted'?: boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageAppeal
+     * @type {string}
+     * @memberof CouponUserRelation
      */
-    'last'?: boolean;
+    'deletedAt'?: string;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageAppeal
+     * @type {number}
+     * @memberof CouponUserRelation
      */
-    'pageable'?: PageableObject;
+    'userId'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageAppeal
+     * @type {number}
+     * @memberof CouponUserRelation
      */
-    'empty'?: boolean;
+    'couponId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponUserRelation
+     */
+    'status'?: CouponUserRelationStatusEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponUserRelation
+     */
+    'receiveTime'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponUserRelation
+     */
+    'useTime'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CouponUserRelation
+     */
+    'orderId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponUserRelation
+     */
+    'expireTime'?: string;
 }
+
+export const CouponUserRelationStatusEnum = {
+    Available: 'AVAILABLE',
+    Used: 'USED',
+    Expired: 'EXPIRED'
+} as const;
+
+export type CouponUserRelationStatusEnum = typeof CouponUserRelationStatusEnum[keyof typeof CouponUserRelationStatusEnum];
+
 

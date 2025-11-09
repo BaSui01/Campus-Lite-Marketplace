@@ -13,87 +13,96 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { MessageSearchResponse } from './message-search-response';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageMessageSearchResponse
+ * @interface CouponStatisticsResponse
  */
-export interface PageMessageSearchResponse {
+export interface CouponStatisticsResponse {
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof CouponStatisticsResponse
      */
-    'totalPages'?: number;
+    'couponId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponStatisticsResponse
+     */
+    'code'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponStatisticsResponse
+     */
+    'name'?: string;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof CouponStatisticsResponse
      */
-    'totalElements'?: number;
+    'totalCount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof CouponStatisticsResponse
      */
-    'size'?: number;
-    /**
-     * 
-     * @type {Array<MessageSearchResponse>}
-     * @memberof PageMessageSearchResponse
-     */
-    'content'?: Array<MessageSearchResponse>;
+    'receivedCount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof CouponStatisticsResponse
      */
-    'number'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageMessageSearchResponse
-     */
-    'sort'?: Array<SortObject>;
+    'usedCount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof CouponStatisticsResponse
      */
-    'numberOfElements'?: number;
+    'receiveRate'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CouponStatisticsResponse
+     */
+    'useRate'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CouponStatisticsResponse
+     */
+    'totalDiscountAmount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CouponStatisticsResponse
+     */
+    'avgDiscountAmount'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponStatisticsResponse
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponStatisticsResponse
+     */
+    'startTime'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CouponStatisticsResponse
+     */
+    'endTime'?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof PageMessageSearchResponse
+     * @memberof CouponStatisticsResponse
      */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageMessageSearchResponse
-     */
-    'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageMessageSearchResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageMessageSearchResponse
-     */
-    'empty'?: boolean;
+    'isActive'?: boolean;
 }
 

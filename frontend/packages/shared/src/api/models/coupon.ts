@@ -15,135 +15,133 @@
 
 
 /**
- * 
+ * 业务数据载荷
  * @export
- * @interface PostResponse
+ * @interface Coupon
  */
-export interface PostResponse {
+export interface Coupon {
     /**
      * 
      * @type {number}
-     * @memberof PostResponse
+     * @memberof Coupon
      */
     'id'?: number;
     /**
      * 
      * @type {string}
-     * @memberof PostResponse
-     */
-    'title'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostResponse
-     */
-    'content'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof PostResponse
-     */
-    'authorId'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostResponse
-     */
-    'authorName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostResponse
-     */
-    'authorAvatar'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostResponse
-     */
-    'status'?: PostResponseStatusEnum;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PostResponse
-     */
-    'isTop'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PostResponse
-     */
-    'isHot'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PostResponse
-     */
-    'viewCount'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PostResponse
-     */
-    'replyCount'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PostResponse
-     */
-    'likeCount'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PostResponse
-     */
-    'collectCount'?: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PostResponse
-     */
-    'isLiked'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PostResponse
-     */
-    'isCollected'?: boolean;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof PostResponse
-     */
-    'images'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostResponse
-     */
-    'campusName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostResponse
+     * @memberof Coupon
      */
     'createdAt'?: string;
     /**
      * 
      * @type {string}
-     * @memberof PostResponse
+     * @memberof Coupon
      */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Coupon
+     */
+    'deleted'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof Coupon
+     */
+    'deletedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Coupon
+     */
+    'code'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Coupon
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Coupon
+     */
+    'type'?: CouponTypeEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof Coupon
+     */
+    'discountAmount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Coupon
+     */
+    'discountRate'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Coupon
+     */
+    'minAmount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Coupon
+     */
+    'totalCount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Coupon
+     */
+    'receivedCount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Coupon
+     */
+    'usedCount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Coupon
+     */
+    'limitPerUser'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Coupon
+     */
+    'startTime'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Coupon
+     */
+    'endTime'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Coupon
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Coupon
+     */
+    'isActive'?: boolean;
 }
 
-export const PostResponseStatusEnum = {
-    Pending: 'PENDING',
-    Approved: 'APPROVED',
-    Rejected: 'REJECTED',
-    Sold: 'SOLD',
-    Offline: 'OFFLINE'
+export const CouponTypeEnum = {
+    Fixed: 'FIXED',
+    Percent: 'PERCENT',
+    FreeShipping: 'FREE_SHIPPING'
 } as const;
 
-export type PostResponseStatusEnum = typeof PostResponseStatusEnum[keyof typeof PostResponseStatusEnum];
+export type CouponTypeEnum = typeof CouponTypeEnum[keyof typeof CouponTypeEnum];
 
 

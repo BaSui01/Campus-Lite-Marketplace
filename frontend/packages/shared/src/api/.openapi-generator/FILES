@@ -16,6 +16,7 @@ models/api-response-appeal.ts
 models/api-response-batch-review-result.ts
 models/api-response-batch-task-progress-response.ts
 models/api-response-batch-task-response.ts
+models/api-response-big-decimal.ts
 models/api-response-blacklist-stats-response.ts
 models/api-response-boolean.ts
 models/api-response-campus-migration-validation-response.ts
@@ -25,10 +26,16 @@ models/api-response-category-statistics-response.ts
 models/api-response-category.ts
 models/api-response-check-blacklist-relation-response.ts
 models/api-response-compliance-whitelist.ts
+models/api-response-coupon-statistics-response.ts
+models/api-response-coupon-trend-statistics-response.ts
+models/api-response-coupon-user-ranking-response.ts
+models/api-response-coupon-user-relation.ts
+models/api-response-coupon.ts
 models/api-response-dispute-detail-dto.ts
 models/api-response-dispute-statistics-dto.ts
 models/api-response-double.ts
 models/api-response-evidence-summary-dto.ts
+models/api-response-export-task-response.ts
 models/api-response-feature-flag.ts
 models/api-response-goods-detail-dto.ts
 models/api-response-goods-detail-response.ts
@@ -41,6 +48,7 @@ models/api-response-list-banner.ts
 models/api-response-list-campus.ts
 models/api-response-list-category-node-response.ts
 models/api-response-list-category.ts
+models/api-response-list-coupon-statistics-response.ts
 models/api-response-list-endpoint-stats.ts
 models/api-response-list-error-log.ts
 models/api-response-list-evidence-dto.ts
@@ -92,6 +100,8 @@ models/api-response-page-batch-task-response.ts
 models/api-response-page-blacklist.ts
 models/api-response-page-compliance-audit-log.ts
 models/api-response-page-conversation-response.ts
+models/api-response-page-coupon-response.ts
+models/api-response-page-coupon-user-relation.ts
 models/api-response-page-dispute-dto.ts
 models/api-response-page-goods-response.ts
 models/api-response-page-logistics-dto.ts
@@ -108,6 +118,7 @@ models/api-response-page-search-result-item.ts
 models/api-response-page-user-profile-response.ts
 models/api-response-performance-report-response.ts
 models/api-response-post-response.ts
+models/api-response-post-stats-response.ts
 models/api-response-recommend-config-dto.ts
 models/api-response-recommend-statistics-dto.ts
 models/api-response-refund-request.ts
@@ -166,9 +177,16 @@ models/compliance-whitelist.ts
 models/component-health.ts
 models/confirm-register-by-email-request.ts
 models/conversation-response.ts
+models/coupon-response.ts
+models/coupon-statistics-response.ts
+models/coupon-trend-statistics-response.ts
+models/coupon-user-ranking-response.ts
+models/coupon-user-relation.ts
+models/coupon.ts
 models/create-appeal-request.ts
 models/create-batch-task-request.ts
 models/create-category-request.ts
+models/create-coupon-request.ts
 models/create-dispute-request.ts
 models/create-goods-request.ts
 models/create-order-request.ts
@@ -190,6 +208,7 @@ models/error-statistics.ts
 models/evidence-dto.ts
 models/evidence-summary-dto.ts
 models/export-job.ts
+models/export-task-response.ts
 models/feature-flag-create-request.ts
 models/feature-flag-update-request.ts
 models/feature-flag.ts
@@ -232,6 +251,8 @@ models/page-batch-task-response.ts
 models/page-blacklist.ts
 models/page-compliance-audit-log.ts
 models/page-conversation-response.ts
+models/page-coupon-response.ts
+models/page-coupon-user-relation.ts
 models/page-dispute-dto.ts
 models/page-goods-response.ts
 models/page-logistics-dto.ts
@@ -253,6 +274,7 @@ models/performance-report-response.ts
 models/permission.ts
 models/popular-keyword.ts
 models/post-response.ts
+models/post-stats-response.ts
 models/price-batch-request.ts
 models/privacy-request-response.ts
 models/propose-dispute-request.ts
@@ -291,6 +313,7 @@ models/tag-statistics-response.ts
 models/tag.ts
 models/text-highlight.ts
 models/topic.ts
+models/trend-data-point.ts
 models/two-factor-request.ts
 models/update-category-request.ts
 models/update-password-request.ts
@@ -301,8 +324,10 @@ models/update-tag-request.ts
 models/update-user-roles-request.ts
 models/upload-evidence-request.ts
 models/user-behavior-log-dto.ts
+models/user-brief-info.ts
 models/user-feed.ts
 models/user-info.ts
 models/user-persona-dto.ts
 models/user-profile-response.ts
+models/user-ranking-item.ts
 models/user.ts

@@ -13,87 +13,87 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { Appeal } from './appeal';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
- * 业务数据载荷
+ * 
  * @export
- * @interface PageAppeal
+ * @interface CreateCouponRequest
  */
-export interface PageAppeal {
+export interface CreateCouponRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCouponRequest
+     */
+    'code': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCouponRequest
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCouponRequest
+     */
+    'type': CreateCouponRequestTypeEnum;
     /**
      * 
      * @type {number}
-     * @memberof PageAppeal
+     * @memberof CreateCouponRequest
      */
-    'totalPages'?: number;
+    'discountAmount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageAppeal
+     * @memberof CreateCouponRequest
      */
-    'totalElements'?: number;
+    'discountRate'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageAppeal
+     * @memberof CreateCouponRequest
      */
-    'size'?: number;
-    /**
-     * 
-     * @type {Array<Appeal>}
-     * @memberof PageAppeal
-     */
-    'content'?: Array<Appeal>;
+    'minAmount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageAppeal
+     * @memberof CreateCouponRequest
      */
-    'number'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageAppeal
-     */
-    'sort'?: Array<SortObject>;
+    'totalCount': number;
     /**
      * 
      * @type {number}
-     * @memberof PageAppeal
+     * @memberof CreateCouponRequest
      */
-    'numberOfElements'?: number;
+    'limitPerUser'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageAppeal
+     * @type {string}
+     * @memberof CreateCouponRequest
      */
-    'first'?: boolean;
+    'startTime': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageAppeal
+     * @type {string}
+     * @memberof CreateCouponRequest
      */
-    'last'?: boolean;
+    'endTime': string;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageAppeal
+     * @type {string}
+     * @memberof CreateCouponRequest
      */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageAppeal
-     */
-    'empty'?: boolean;
+    'description'?: string;
 }
+
+export const CreateCouponRequestTypeEnum = {
+    Fixed: 'FIXED',
+    Percent: 'PERCENT',
+    FreeShipping: 'FREE_SHIPPING'
+} as const;
+
+export type CreateCouponRequestTypeEnum = typeof CreateCouponRequestTypeEnum[keyof typeof CreateCouponRequestTypeEnum];
+
 

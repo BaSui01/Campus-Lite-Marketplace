@@ -15,85 +15,61 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { MessageResponse } from './message-response';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
+import type { UserBriefInfo } from './user-brief-info';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageMessageResponse
+ * @interface PostStatsResponse
  */
-export interface PageMessageResponse {
+export interface PostStatsResponse {
     /**
      * 
      * @type {number}
-     * @memberof PageMessageResponse
+     * @memberof PostStatsResponse
      */
-    'totalPages'?: number;
+    'postId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PostStatsResponse
+     */
+    'title'?: string;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageResponse
+     * @memberof PostStatsResponse
      */
-    'totalElements'?: number;
+    'viewCount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageResponse
+     * @memberof PostStatsResponse
      */
-    'size'?: number;
-    /**
-     * 
-     * @type {Array<MessageResponse>}
-     * @memberof PageMessageResponse
-     */
-    'content'?: Array<MessageResponse>;
+    'replyCount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageResponse
+     * @memberof PostStatsResponse
      */
-    'number'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageMessageResponse
-     */
-    'sort'?: Array<SortObject>;
+    'likeCount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageResponse
+     * @memberof PostStatsResponse
      */
-    'numberOfElements'?: number;
+    'collectCount'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageMessageResponse
+     * @type {Array<UserBriefInfo>}
+     * @memberof PostStatsResponse
      */
-    'first'?: boolean;
+    'likeUsers'?: Array<UserBriefInfo>;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageMessageResponse
+     * @type {Array<UserBriefInfo>}
+     * @memberof PostStatsResponse
      */
-    'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageMessageResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageMessageResponse
-     */
-    'empty'?: boolean;
+    'collectUsers'?: Array<UserBriefInfo>;
 }
 

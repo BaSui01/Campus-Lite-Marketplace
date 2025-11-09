@@ -13,84 +13,66 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageObject
+ * @interface ExportTaskResponse
  */
-export interface PageObject {
+export interface ExportTaskResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ExportTaskResponse
+     */
+    'taskId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ExportTaskResponse
+     */
+    'taskType'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ExportTaskResponse
+     */
+    'format'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ExportTaskResponse
+     */
+    'status'?: string;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof ExportTaskResponse
      */
-    'totalPages'?: number;
+    'progress'?: number;
     /**
      * 
-     * @type {number}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof ExportTaskResponse
      */
-    'totalElements'?: number;
+    'downloadUrl'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof ExportTaskResponse
      */
-    'size'?: number;
+    'errorMessage'?: string;
     /**
      * 
-     * @type {Array<object>}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof ExportTaskResponse
      */
-    'content'?: Array<object>;
+    'createdAt'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof ExportTaskResponse
      */
-    'number'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageObject
-     */
-    'sort'?: Array<SortObject>;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageObject
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageObject
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'empty'?: boolean;
+    'completedAt'?: string;
 }
 

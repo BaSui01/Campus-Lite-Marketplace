@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { MessageSearchResponse } from './message-search-response';
+import type { CouponResponse } from './coupon-response';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { PageableObject } from './pageable-object';
@@ -26,73 +26,73 @@ import type { SortObject } from './sort-object';
 /**
  * 业务数据载荷
  * @export
- * @interface PageMessageSearchResponse
+ * @interface PageCouponResponse
  */
-export interface PageMessageSearchResponse {
+export interface PageCouponResponse {
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'totalPages'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'totalElements'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'size'?: number;
     /**
      * 
-     * @type {Array<MessageSearchResponse>}
-     * @memberof PageMessageSearchResponse
+     * @type {Array<CouponResponse>}
+     * @memberof PageCouponResponse
      */
-    'content'?: Array<MessageSearchResponse>;
+    'content'?: Array<CouponResponse>;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'number'?: number;
     /**
      * 
      * @type {Array<SortObject>}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'sort'?: Array<SortObject>;
     /**
      * 
      * @type {number}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'numberOfElements'?: number;
     /**
      * 
      * @type {boolean}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'first'?: boolean;
     /**
      * 
      * @type {boolean}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'last'?: boolean;
     /**
      * 
      * @type {PageableObject}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageMessageSearchResponse
+     * @memberof PageCouponResponse
      */
     'empty'?: boolean;
 }
