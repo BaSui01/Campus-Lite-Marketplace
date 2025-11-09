@@ -15,7 +15,7 @@
     "lint": "pnpm -r lint",
     "type-check": "pnpm -r type-check",
     "clean": "pnpm -r clean && rm -rf node_modules",
-    "api:generate": "cd ../backend && mvn clean && mvn -Dspring-boot.run.arguments=\"--openapi.export.enabled=true,--openapi.export.path=target/openapi-frontend.json\" spring-boot:run && mvn -P openapi openapi-generator:generate",
+    "api:generate": "node ../scripts/generate-openapi.js",
     "api:clean": "rm -rf packages/shared/src/api/models && rm -rf packages/shared/src/api/api && rm packages/shared/src/api/*.d.ts",
     "api:watch": "node ../scripts/watch-api.js",
     "api:watch:bash": "chmod +x ../scripts/watch-api.sh && ../scripts/watch-api.sh",

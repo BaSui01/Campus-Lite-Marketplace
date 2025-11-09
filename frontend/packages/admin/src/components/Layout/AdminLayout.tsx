@@ -227,7 +227,14 @@ export const AdminLayout: React.FC = () => {
 
   // 菜单内容组件（Sider和Drawer共用）
   const MenuContent = () => (
-    <>
+    <div
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
       {/* 🎨 优化后的Logo区域 - 现代化设计 */}
       <div
         style={{
@@ -287,14 +294,26 @@ export const AdminLayout: React.FC = () => {
         )}
       </div>
 
-      <Menu
-        theme="dark"
-        mode="inline"
-        selectedKeys={getSelectedKeys()}
-        items={filterMenuByPermission(MENU_ITEMS)}
-        onClick={handleMenuClick}
-      />
-    </>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          paddingBottom: 16, // 预留底部空间，避免最后一项被挡
+        }}
+      >
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={getSelectedKeys()}
+          items={filterMenuByPermission(MENU_ITEMS)}
+          onClick={handleMenuClick}
+          style={{
+            borderInlineEnd: 0,
+          }}
+        />
+      </div>
+    </div>
   );
 
   return (
@@ -306,7 +325,15 @@ export const AdminLayout: React.FC = () => {
           closable={false}
           onClose={() => setDrawerVisible(false)}
           open={drawerVisible}
-          styles={{ body: { padding: 0, background: '#001529' } }}
+          styles={{
+            body: {
+              padding: 0,
+              background: '#001529',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+            },
+          }}
           width={250}
         >
           <MenuContent />
@@ -324,6 +351,8 @@ export const AdminLayout: React.FC = () => {
             top: 0,
             bottom: 0,
             zIndex: 999,
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <MenuContent />
