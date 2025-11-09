@@ -151,6 +151,56 @@ export class AuthService {
     const response = await this.api.checkEmail({ email });
     return response.data as ApiResponse<boolean>;
   }
+
+  // ==================== 2FA 相关接口（新增 - BaSui 2025-11-09） ====================
+
+  /**
+   * 启用 2FA（生成密钥和 QR 码）
+   * @returns 2FA 设置响应（包含密钥、QR 码、恢复码）
+   */
+  async enable2FA(): Promise<ApiResponse<any>> {
+    const response = await this.api.axiosInstance.post('/auth/2fa/enable');
+    return response.data as ApiResponse<any>;
+  }
+
+  /**
+   * 验证 2FA 代码并完成启用
+   * @param data 验证码
+   * @returns 验证结果
+   */
+  async verify2FA(data: { code: string }): Promise<ApiResponse<void>> {
+    const response = await this.api.axiosInstance.post('/auth/2fa/verify', data);
+    return response.data as ApiResponse<void>;
+  }
+
+  /**
+   * 禁用 2FA
+   * @param data 密码
+   * @returns 禁用结果
+   */
+  async disable2FA(data: { password: string }): Promise<ApiResponse<void>> {
+    const response = await this.api.axiosInstance.post('/auth/2fa/disable', data);
+    return response.data as ApiResponse<void>;
+  }
+
+  /**
+   * 重新生成恢复码
+   * @param data 密码
+   * @returns 新的恢复码列表
+   */
+  async regenerateRecoveryCodes(data: { password: string }): Promise<ApiResponse<string[]>> {
+    const response = await this.api.axiosInstance.post('/auth/2fa/recovery-codes/regenerate', data);
+    return response.data as ApiResponse<string[]>;
+  }
+
+  /**
+   * 检查 2FA 状态
+   * @returns 是否启用 2FA
+   */
+  async check2FAStatus(): Promise<ApiResponse<boolean>> {
+    const response = await this.api.axiosInstance.get('/auth/2fa/status');
+    return response.data as ApiResponse<boolean>;
+  }
 }
 
 // 导出单例
