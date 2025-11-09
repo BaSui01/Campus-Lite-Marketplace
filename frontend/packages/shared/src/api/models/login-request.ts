@@ -32,5 +32,23 @@ export interface LoginRequest {
      * @memberof LoginRequest
      */
     'password': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginRequest
+     */
+    'captchaId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginRequest
+     */
+    'captchaCode'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof LoginRequest
+     */
+    'slidePosition'?: number;
 }
 

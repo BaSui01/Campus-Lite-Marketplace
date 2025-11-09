@@ -13,51 +13,30 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { UserInfo } from './user-info';
 
 /**
  * 业务数据载荷
  * @export
- * @interface LoginResponse
+ * @interface CaptchaResponse
  */
-export interface LoginResponse {
+export interface CaptchaResponse {
     /**
      * 
      * @type {string}
-     * @memberof LoginResponse
+     * @memberof CaptchaResponse
      */
-    'accessToken'?: string;
+    'captchaId'?: string;
     /**
      * 
      * @type {string}
-     * @memberof LoginResponse
+     * @memberof CaptchaResponse
      */
-    'refreshToken'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LoginResponse
-     */
-    'tokenType'?: string;
+    'imageBase64'?: string;
     /**
      * 
      * @type {number}
-     * @memberof LoginResponse
+     * @memberof CaptchaResponse
      */
     'expiresIn'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LoginResponse
-     */
-    'refreshExpiresIn'?: number;
-    /**
-     * 
-     * @type {UserInfo}
-     * @memberof LoginResponse
-     */
-    'userInfo'?: UserInfo;
 }
 

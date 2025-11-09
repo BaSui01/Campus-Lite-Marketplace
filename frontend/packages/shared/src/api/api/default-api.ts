@@ -48,6 +48,8 @@ import type { ApiResponseCampusMigrationValidationResponse } from '../models';
 // @ts-ignore
 import type { ApiResponseCampusStatisticsResponse } from '../models';
 // @ts-ignore
+import type { ApiResponseCaptchaResponse } from '../models';
+// @ts-ignore
 import type { ApiResponseCategory } from '../models';
 // @ts-ignore
 import type { ApiResponseCategoryStatisticsResponse } from '../models';
@@ -262,6 +264,8 @@ import type { ApiResponseRoleDetailResponse } from '../models';
 // @ts-ignore
 import type { ApiResponseSearchSuggestionDTO } from '../models';
 // @ts-ignore
+import type { ApiResponseSlideCaptchaResponse } from '../models';
+// @ts-ignore
 import type { ApiResponseString } from '../models';
 // @ts-ignore
 import type { ApiResponseSystemMetricsResponse } from '../models';
@@ -379,6 +383,8 @@ import type { ReviewRequest } from '../models';
 import type { SendMessageRequest } from '../models';
 // @ts-ignore
 import type { SendNegotiationRequest } from '../models';
+// @ts-ignore
+import type { SlideVerifyRequest } from '../models';
 // @ts-ignore
 import type { TwoFactorRequest } from '../models';
 // @ts-ignore
@@ -4741,6 +4747,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
+         * @summary 生成图形验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateImageCaptcha: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/captcha/image`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 生成性能报表
          * @param {number} [hours] 
@@ -4767,6 +4807,74 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (hours !== undefined) {
                 localVarQueryParameter['hours'] = hours;
             }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 生成滑块验证码，返回滑块ID和目标位置
+         * @summary 生成滑块验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateSlideCaptcha: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/captcha/slide`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 生成滑块验证码，返回背景图、滑块图和Y轴位置
+         * @summary 生成滑块验证码（带图片）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateSlideCaptchaWithImage: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/captcha/slide/image`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
@@ -12814,15 +12922,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 
+         * 使用 Refresh Token 刷新 Access Token，返回新的双 Token
          * @summary 刷新Token
-         * @param {string} authorization 
+         * @param {{ [key: string]: string; }} requestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        refresh: async (authorization: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'authorization' is not null or undefined
-            assertParamExists('refresh', 'authorization', authorization)
+        refresh: async (requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('refresh', 'requestBody', requestBody)
             const localVarPath = `/auth/refresh`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12839,15 +12947,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (authorization != null) {
-                localVarHeaderParameter['Authorization'] = String(authorization);
-            }
-
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -15806,6 +15913,91 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 上传头像并自动生成多尺寸缩略图（256/128/64）
+         * @summary 上传头像（多尺寸）
+         * @param {File} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadAvatar: async (file: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'file' is not null or undefined
+            assertParamExists('uploadAvatar', 'file', file)
+            const localVarPath = `/files/upload-avatar`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 上传 Base64 编码的图片（支持裁剪、粘贴板、Canvas 等场景）
+         * @summary 上传 Base64 图片
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadBase64Image: async (requestBody: { [key: string]: string; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('uploadBase64Image', 'requestBody', requestBody)
+            const localVarPath = `/files/upload-base64`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 买卖双方上传图片、视频或聊天记录作为证据
          * @summary 上传证据
          * @param {UploadEvidenceRequest} uploadEvidenceRequest 
@@ -16178,6 +16370,94 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(campusMigrationRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 验证用户滑动的位置是否正确（允许±5px误差）
+         * @summary 验证滑块验证码（简单版本）
+         * @param {string} slideId 
+         * @param {number} position 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifySlideCaptcha: async (slideId: string, position: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'slideId' is not null or undefined
+            assertParamExists('verifySlideCaptcha', 'slideId', slideId)
+            // verify required parameter 'position' is not null or undefined
+            assertParamExists('verifySlideCaptcha', 'position', position)
+            const localVarPath = `/api/captcha/slide/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (slideId !== undefined) {
+                localVarQueryParameter['slideId'] = slideId;
+            }
+
+            if (position !== undefined) {
+                localVarQueryParameter['position'] = position;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 验证用户滑动的位置和轨迹，防止机器人作弊
+         * @summary 验证滑块验证码（带轨迹分析）
+         * @param {SlideVerifyRequest} slideVerifyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifySlideCaptchaWithTrack: async (slideVerifyRequest: SlideVerifyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'slideVerifyRequest' is not null or undefined
+            assertParamExists('verifySlideCaptchaWithTrack', 'slideVerifyRequest', slideVerifyRequest)
+            const localVarPath = `/api/captcha/slide/verify/track`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(slideVerifyRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -17699,6 +17979,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
+         * @summary 生成图形验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async generateImageCaptcha(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCaptchaResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.generateImageCaptcha(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.generateImageCaptcha']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 生成性能报表
          * @param {number} [hours] 
@@ -17709,6 +18001,30 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.generatePerformanceReport(hours, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.generatePerformanceReport']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 生成滑块验证码，返回滑块ID和目标位置
+         * @summary 生成滑块验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async generateSlideCaptcha(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseCaptchaResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.generateSlideCaptcha(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.generateSlideCaptcha']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 生成滑块验证码，返回背景图、滑块图和Y轴位置
+         * @summary 生成滑块验证码（带图片）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async generateSlideCaptchaWithImage(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseSlideCaptchaResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.generateSlideCaptchaWithImage(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.generateSlideCaptchaWithImage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -20355,14 +20671,14 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 
+         * 使用 Refresh Token 刷新 Access Token，返回新的双 Token
          * @summary 刷新Token
-         * @param {string} authorization 
+         * @param {{ [key: string]: string; }} requestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async refresh(authorization: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseLoginResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.refresh(authorization, options);
+        async refresh(requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseLoginResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.refresh(requestBody, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.refresh']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -21325,6 +21641,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 上传头像并自动生成多尺寸缩略图（256/128/64）
+         * @summary 上传头像（多尺寸）
+         * @param {File} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async uploadAvatar(file: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadAvatar(file, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.uploadAvatar']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 上传 Base64 编码的图片（支持裁剪、粘贴板、Canvas 等场景）
+         * @summary 上传 Base64 图片
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async uploadBase64Image(requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringString>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.uploadBase64Image(requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.uploadBase64Image']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 买卖双方上传图片、视频或聊天记录作为证据
          * @summary 上传证据
          * @param {UploadEvidenceRequest} uploadEvidenceRequest 
@@ -21433,6 +21775,33 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.validateMigration(campusMigrationRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.validateMigration']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 验证用户滑动的位置是否正确（允许±5px误差）
+         * @summary 验证滑块验证码（简单版本）
+         * @param {string} slideId 
+         * @param {number} position 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verifySlideCaptcha(slideId: string, position: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBoolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verifySlideCaptcha(slideId, position, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.verifySlideCaptcha']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 验证用户滑动的位置和轨迹，防止机器人作弊
+         * @summary 验证滑块验证码（带轨迹分析）
+         * @param {SlideVerifyRequest} slideVerifyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verifySlideCaptchaWithTrack(slideVerifyRequest: SlideVerifyRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBoolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verifySlideCaptchaWithTrack(slideVerifyRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.verifySlideCaptchaWithTrack']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -22546,6 +22915,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.followUser(requestParameters.userId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
+         * @summary 生成图形验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateImageCaptcha(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCaptchaResponse> {
+            return localVarFp.generateImageCaptcha(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 生成性能报表
          * @param {DefaultApiGeneratePerformanceReportRequest} requestParameters Request parameters.
@@ -22554,6 +22932,24 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         generatePerformanceReport(requestParameters: DefaultApiGeneratePerformanceReportRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePerformanceReportResponse> {
             return localVarFp.generatePerformanceReport(requestParameters.hours, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 生成滑块验证码，返回滑块ID和目标位置
+         * @summary 生成滑块验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateSlideCaptcha(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCaptchaResponse> {
+            return localVarFp.generateSlideCaptcha(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 生成滑块验证码，返回背景图、滑块图和Y轴位置
+         * @summary 生成滑块验证码（带图片）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateSlideCaptchaWithImage(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseSlideCaptchaResponse> {
+            return localVarFp.generateSlideCaptchaWithImage(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -24488,14 +24884,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.recordView1(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * 使用 Refresh Token 刷新 Access Token，返回新的双 Token
          * @summary 刷新Token
          * @param {DefaultApiRefreshRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         refresh(requestParameters: DefaultApiRefreshRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLoginResponse> {
-            return localVarFp.refresh(requestParameters.authorization, options).then((request) => request(axios, basePath));
+            return localVarFp.refresh(requestParameters.requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * 刷新所有功能开关的本地缓存
@@ -25206,6 +25602,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.updateUserRoles(requestParameters.userId, requestParameters.updateUserRolesRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 上传头像并自动生成多尺寸缩略图（256/128/64）
+         * @summary 上传头像（多尺寸）
+         * @param {DefaultApiUploadAvatarRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadAvatar(requestParameters: DefaultApiUploadAvatarRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringString> {
+            return localVarFp.uploadAvatar(requestParameters.file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 上传 Base64 编码的图片（支持裁剪、粘贴板、Canvas 等场景）
+         * @summary 上传 Base64 图片
+         * @param {DefaultApiUploadBase64ImageRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        uploadBase64Image(requestParameters: DefaultApiUploadBase64ImageRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringString> {
+            return localVarFp.uploadBase64Image(requestParameters.requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 买卖双方上传图片、视频或聊天记录作为证据
          * @summary 上传证据
          * @param {DefaultApiUploadEvidenceRequest} requestParameters Request parameters.
@@ -25284,6 +25700,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         validateMigration(requestParameters: DefaultApiValidateMigrationRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampusMigrationValidationResponse> {
             return localVarFp.validateMigration(requestParameters.campusMigrationRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 验证用户滑动的位置是否正确（允许±5px误差）
+         * @summary 验证滑块验证码（简单版本）
+         * @param {DefaultApiVerifySlideCaptchaRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifySlideCaptcha(requestParameters: DefaultApiVerifySlideCaptchaRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
+            return localVarFp.verifySlideCaptcha(requestParameters.slideId, requestParameters.position, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 验证用户滑动的位置和轨迹，防止机器人作弊
+         * @summary 验证滑块验证码（带轨迹分析）
+         * @param {DefaultApiVerifySlideCaptchaWithTrackRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifySlideCaptchaWithTrack(requestParameters: DefaultApiVerifySlideCaptchaWithTrackRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
+            return localVarFp.verifySlideCaptchaWithTrack(requestParameters.slideVerifyRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 输入 Google Authenticator 中的 6 位验证码，验证成功后启用两步验证。
@@ -26416,6 +26852,15 @@ export interface DefaultApiInterface {
     followUser(userId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
+     * @summary 生成图形验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    generateImageCaptcha(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCaptchaResponse>;
+
+    /**
      * 
      * @summary 生成性能报表
      * @param {number} [hours] 
@@ -26424,6 +26869,24 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     generatePerformanceReport(hours?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePerformanceReportResponse>;
+
+    /**
+     * 生成滑块验证码，返回滑块ID和目标位置
+     * @summary 生成滑块验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    generateSlideCaptcha(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCaptchaResponse>;
+
+    /**
+     * 生成滑块验证码，返回背景图、滑块图和Y轴位置
+     * @summary 生成滑块验证码（带图片）
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    generateSlideCaptchaWithImage(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseSlideCaptchaResponse>;
 
     /**
      * 
@@ -28475,14 +28938,14 @@ export interface DefaultApiInterface {
     recordView1(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
-     * 
+     * 使用 Refresh Token 刷新 Access Token，返回新的双 Token
      * @summary 刷新Token
-     * @param {string} authorization 
+     * @param {{ [key: string]: string; }} requestBody 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    refresh(authorization: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLoginResponse>;
+    refresh(requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLoginResponse>;
 
     /**
      * 刷新所有功能开关的本地缓存
@@ -29229,6 +29692,26 @@ export interface DefaultApiInterface {
     updateUserRoles(userId: number, updateUserRolesRequest: UpdateUserRolesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 上传头像并自动生成多尺寸缩略图（256/128/64）
+     * @summary 上传头像（多尺寸）
+     * @param {File} file 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    uploadAvatar(file: File, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringString>;
+
+    /**
+     * 上传 Base64 编码的图片（支持裁剪、粘贴板、Canvas 等场景）
+     * @summary 上传 Base64 图片
+     * @param {{ [key: string]: string; }} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    uploadBase64Image(requestBody: { [key: string]: string; }, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringString>;
+
+    /**
      * 买卖双方上传图片、视频或聊天记录作为证据
      * @summary 上传证据
      * @param {UploadEvidenceRequest} uploadEvidenceRequest 
@@ -29314,6 +29797,27 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     validateMigration(campusMigrationRequest: CampusMigrationRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseCampusMigrationValidationResponse>;
+
+    /**
+     * 验证用户滑动的位置是否正确（允许±5px误差）
+     * @summary 验证滑块验证码（简单版本）
+     * @param {string} slideId 
+     * @param {number} position 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    verifySlideCaptcha(slideId: string, position: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
+
+    /**
+     * 验证用户滑动的位置和轨迹，防止机器人作弊
+     * @summary 验证滑块验证码（带轨迹分析）
+     * @param {SlideVerifyRequest} slideVerifyRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    verifySlideCaptchaWithTrack(slideVerifyRequest: SlideVerifyRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
 
     /**
      * 输入 Google Authenticator 中的 6 位验证码，验证成功后启用两步验证。
@@ -33888,10 +34392,10 @@ export interface DefaultApiRecordView1Request {
 export interface DefaultApiRefreshRequest {
     /**
      * 
-     * @type {string}
+     * @type {{ [key: string]: string; }}
      * @memberof DefaultApiRefresh
      */
-    readonly authorization: string
+    readonly requestBody: { [key: string]: string; }
 }
 
 /**
@@ -35113,6 +35617,34 @@ export interface DefaultApiUpdateUserRolesRequest {
 }
 
 /**
+ * Request parameters for uploadAvatar operation in DefaultApi.
+ * @export
+ * @interface DefaultApiUploadAvatarRequest
+ */
+export interface DefaultApiUploadAvatarRequest {
+    /**
+     * 
+     * @type {File}
+     * @memberof DefaultApiUploadAvatar
+     */
+    readonly file: File
+}
+
+/**
+ * Request parameters for uploadBase64Image operation in DefaultApi.
+ * @export
+ * @interface DefaultApiUploadBase64ImageRequest
+ */
+export interface DefaultApiUploadBase64ImageRequest {
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof DefaultApiUploadBase64Image
+     */
+    readonly requestBody: { [key: string]: string; }
+}
+
+/**
  * Request parameters for uploadEvidence operation in DefaultApi.
  * @export
  * @interface DefaultApiUploadEvidenceRequest
@@ -35271,6 +35803,41 @@ export interface DefaultApiValidateMigrationRequest {
      * @memberof DefaultApiValidateMigration
      */
     readonly campusMigrationRequest: CampusMigrationRequest
+}
+
+/**
+ * Request parameters for verifySlideCaptcha operation in DefaultApi.
+ * @export
+ * @interface DefaultApiVerifySlideCaptchaRequest
+ */
+export interface DefaultApiVerifySlideCaptchaRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof DefaultApiVerifySlideCaptcha
+     */
+    readonly slideId: string
+
+    /**
+     * 
+     * @type {number}
+     * @memberof DefaultApiVerifySlideCaptcha
+     */
+    readonly position: number
+}
+
+/**
+ * Request parameters for verifySlideCaptchaWithTrack operation in DefaultApi.
+ * @export
+ * @interface DefaultApiVerifySlideCaptchaWithTrackRequest
+ */
+export interface DefaultApiVerifySlideCaptchaWithTrackRequest {
+    /**
+     * 
+     * @type {SlideVerifyRequest}
+     * @memberof DefaultApiVerifySlideCaptchaWithTrack
+     */
+    readonly slideVerifyRequest: SlideVerifyRequest
 }
 
 /**
@@ -36592,6 +37159,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
+     * @summary 生成图形验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public generateImageCaptcha(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).generateImageCaptcha(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 生成性能报表
      * @param {DefaultApiGeneratePerformanceReportRequest} requestParameters Request parameters.
@@ -36601,6 +37179,28 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public generatePerformanceReport(requestParameters: DefaultApiGeneratePerformanceReportRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).generatePerformanceReport(requestParameters.hours, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 生成滑块验证码，返回滑块ID和目标位置
+     * @summary 生成滑块验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public generateSlideCaptcha(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).generateSlideCaptcha(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 生成滑块验证码，返回背景图、滑块图和Y轴位置
+     * @summary 生成滑块验证码（带图片）
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public generateSlideCaptchaWithImage(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).generateSlideCaptchaWithImage(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -38932,7 +39532,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 
+     * 使用 Refresh Token 刷新 Access Token，返回新的双 Token
      * @summary 刷新Token
      * @param {DefaultApiRefreshRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -38940,7 +39540,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      * @memberof DefaultApi
      */
     public refresh(requestParameters: DefaultApiRefreshRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).refresh(requestParameters.authorization, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).refresh(requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39794,6 +40394,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 上传头像并自动生成多尺寸缩略图（256/128/64）
+     * @summary 上传头像（多尺寸）
+     * @param {DefaultApiUploadAvatarRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public uploadAvatar(requestParameters: DefaultApiUploadAvatarRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).uploadAvatar(requestParameters.file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 上传 Base64 编码的图片（支持裁剪、粘贴板、Canvas 等场景）
+     * @summary 上传 Base64 图片
+     * @param {DefaultApiUploadBase64ImageRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public uploadBase64Image(requestParameters: DefaultApiUploadBase64ImageRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).uploadBase64Image(requestParameters.requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 买卖双方上传图片、视频或聊天记录作为证据
      * @summary 上传证据
      * @param {DefaultApiUploadEvidenceRequest} requestParameters Request parameters.
@@ -39887,6 +40511,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public validateMigration(requestParameters: DefaultApiValidateMigrationRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).validateMigration(requestParameters.campusMigrationRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 验证用户滑动的位置是否正确（允许±5px误差）
+     * @summary 验证滑块验证码（简单版本）
+     * @param {DefaultApiVerifySlideCaptchaRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public verifySlideCaptcha(requestParameters: DefaultApiVerifySlideCaptchaRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).verifySlideCaptcha(requestParameters.slideId, requestParameters.position, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 验证用户滑动的位置和轨迹，防止机器人作弊
+     * @summary 验证滑块验证码（带轨迹分析）
+     * @param {DefaultApiVerifySlideCaptchaWithTrackRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public verifySlideCaptchaWithTrack(requestParameters: DefaultApiVerifySlideCaptchaWithTrackRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).verifySlideCaptchaWithTrack(requestParameters.slideVerifyRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

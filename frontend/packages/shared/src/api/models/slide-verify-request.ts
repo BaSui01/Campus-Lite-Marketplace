@@ -15,49 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { UserInfo } from './user-info';
+import type { TrackPoint } from './track-point';
 
 /**
- * 业务数据载荷
+ * 
  * @export
- * @interface LoginResponse
+ * @interface SlideVerifyRequest
  */
-export interface LoginResponse {
+export interface SlideVerifyRequest {
     /**
      * 
      * @type {string}
-     * @memberof LoginResponse
+     * @memberof SlideVerifyRequest
      */
-    'accessToken'?: string;
+    'slideId': string;
     /**
      * 
-     * @type {string}
-     * @memberof LoginResponse
+     * @type {Array<TrackPoint>}
+     * @memberof SlideVerifyRequest
      */
-    'refreshToken'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LoginResponse
-     */
-    'tokenType'?: string;
+    'track'?: Array<TrackPoint>;
     /**
      * 
      * @type {number}
-     * @memberof LoginResponse
+     * @memberof SlideVerifyRequest
      */
-    'expiresIn'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LoginResponse
-     */
-    'refreshExpiresIn'?: number;
-    /**
-     * 
-     * @type {UserInfo}
-     * @memberof LoginResponse
-     */
-    'userInfo'?: UserInfo;
+    'xposition'?: number;
 }
 

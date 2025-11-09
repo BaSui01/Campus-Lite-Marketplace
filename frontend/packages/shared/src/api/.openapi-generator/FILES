@@ -22,6 +22,7 @@ models/api-response-boolean.ts
 models/api-response-campus-migration-validation-response.ts
 models/api-response-campus-statistics-response.ts
 models/api-response-campus.ts
+models/api-response-captcha-response.ts
 models/api-response-category-statistics-response.ts
 models/api-response-category.ts
 models/api-response-check-blacklist-relation-response.ts
@@ -130,6 +131,7 @@ models/api-response-review-media-dto.ts
 models/api-response-review-reply-dto.ts
 models/api-response-role-detail-response.ts
 models/api-response-search-suggestion-dto.ts
+models/api-response-slide-captcha-response.ts
 models/api-response-string.ts
 models/api-response-system-metrics-response.ts
 models/api-response-tag-statistics-response.ts
@@ -169,6 +171,7 @@ models/campus-migration-validation-response.ts
 models/campus-statistics-response.ts
 models/campus-update-request.ts
 models/campus.ts
+models/captcha-response.ts
 models/category-batch-sort-request.ts
 models/category-node-response.ts
 models/category-statistics-response.ts
@@ -310,6 +313,8 @@ models/seller-info-dto.ts
 models/seller-info.ts
 models/send-message-request.ts
 models/send-negotiation-request.ts
+models/slide-captcha-response.ts
+models/slide-verify-request.ts
 models/sort-item.ts
 models/sort-object.ts
 models/subscription-response.ts
@@ -319,6 +324,7 @@ models/tag-statistics-response.ts
 models/tag.ts
 models/text-highlight.ts
 models/topic.ts
+models/track-point.ts
 models/trend-data-point.ts
 models/two-factor-request.ts
 models/update-category-request.ts

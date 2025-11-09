@@ -13,51 +13,30 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { UserInfo } from './user-info';
 
 /**
- * 业务数据载荷
+ * 
  * @export
- * @interface LoginResponse
+ * @interface TrackPoint
  */
-export interface LoginResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof LoginResponse
-     */
-    'accessToken'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LoginResponse
-     */
-    'refreshToken'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LoginResponse
-     */
-    'tokenType'?: string;
+export interface TrackPoint {
     /**
      * 
      * @type {number}
-     * @memberof LoginResponse
+     * @memberof TrackPoint
      */
-    'expiresIn'?: number;
+    'x'?: number;
     /**
      * 
      * @type {number}
-     * @memberof LoginResponse
+     * @memberof TrackPoint
      */
-    'refreshExpiresIn'?: number;
+    'y'?: number;
     /**
      * 
-     * @type {UserInfo}
-     * @memberof LoginResponse
+     * @type {number}
+     * @memberof TrackPoint
      */
-    'userInfo'?: UserInfo;
+    't'?: number;
 }
 

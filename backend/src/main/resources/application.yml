@@ -116,7 +116,8 @@ spring:
 # JWT 配置
 jwt:
   secret: ${JWT_SECRET:9K2X7pRhqJYbkbs8pNgEUpNLefMRNOySx2dWFOBxr-sTVZq_nb191fPLvLNaLUN3jkUumjU70TlhQTt5SQOQJA}
-  expiration: ${JWT_EXPIRATION:7200000}
+  expiration: ${JWT_EXPIRATION:900000}  # Access Token 过期时间（15分钟 = 900000ms）
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # Refresh Token 过期时间（7天 = 604800000ms）
   header: ${JWT_HEADER:Authorization}
   prefix: ${JWT_PREFIX:Bearer }
 

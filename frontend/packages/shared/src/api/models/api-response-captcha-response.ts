@@ -15,49 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { UserInfo } from './user-info';
+import type { CaptchaResponse } from './captcha-response';
 
 /**
- * 业务数据载荷
+ * 统一响应包装结构
  * @export
- * @interface LoginResponse
+ * @interface ApiResponseCaptchaResponse
  */
-export interface LoginResponse {
+export interface ApiResponseCaptchaResponse {
     /**
-     * 
-     * @type {string}
-     * @memberof LoginResponse
-     */
-    'accessToken'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LoginResponse
-     */
-    'refreshToken'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof LoginResponse
-     */
-    'tokenType'?: string;
-    /**
-     * 
+     * 业务状态码，0 表示成功
      * @type {number}
-     * @memberof LoginResponse
+     * @memberof ApiResponseCaptchaResponse
      */
-    'expiresIn'?: number;
+    'code'?: number;
+    /**
+     * 人类可读的响应消息
+     * @type {string}
+     * @memberof ApiResponseCaptchaResponse
+     */
+    'message'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof LoginResponse
+     * @type {CaptchaResponse}
+     * @memberof ApiResponseCaptchaResponse
      */
-    'refreshExpiresIn'?: number;
-    /**
-     * 
-     * @type {UserInfo}
-     * @memberof LoginResponse
-     */
-    'userInfo'?: UserInfo;
+    'data'?: CaptchaResponse | null;
 }
 

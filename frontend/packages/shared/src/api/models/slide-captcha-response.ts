@@ -13,51 +13,42 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { UserInfo } from './user-info';
 
 /**
  * 业务数据载荷
  * @export
- * @interface LoginResponse
+ * @interface SlideCaptchaResponse
  */
-export interface LoginResponse {
+export interface SlideCaptchaResponse {
     /**
      * 
      * @type {string}
-     * @memberof LoginResponse
+     * @memberof SlideCaptchaResponse
      */
-    'accessToken'?: string;
+    'slideId'?: string;
     /**
      * 
      * @type {string}
-     * @memberof LoginResponse
+     * @memberof SlideCaptchaResponse
      */
-    'refreshToken'?: string;
+    'backgroundImage'?: string;
     /**
      * 
      * @type {string}
-     * @memberof LoginResponse
+     * @memberof SlideCaptchaResponse
      */
-    'tokenType'?: string;
+    'sliderImage'?: string;
     /**
      * 
      * @type {number}
-     * @memberof LoginResponse
+     * @memberof SlideCaptchaResponse
      */
     'expiresIn'?: number;
     /**
      * 
      * @type {number}
-     * @memberof LoginResponse
+     * @memberof SlideCaptchaResponse
      */
-    'refreshExpiresIn'?: number;
-    /**
-     * 
-     * @type {UserInfo}
-     * @memberof LoginResponse
-     */
-    'userInfo'?: UserInfo;
+    'yposition'?: number;
 }
 
