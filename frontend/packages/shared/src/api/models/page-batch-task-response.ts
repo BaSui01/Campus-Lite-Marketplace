@@ -34,13 +34,13 @@ export interface PageBatchTaskResponse {
      * @type {number}
      * @memberof PageBatchTaskResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageBatchTaskResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

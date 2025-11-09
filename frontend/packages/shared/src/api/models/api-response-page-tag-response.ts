@@ -13,48 +13,33 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { PageTagResponse } from './page-tag-response';
 
 /**
- * 更新用户资料请求体
+ * 统一响应包装结构
  * @export
- * @interface UpdateProfileRequest
+ * @interface ApiResponsePageTagResponse
  */
-export interface UpdateProfileRequest {
+export interface ApiResponsePageTagResponse {
     /**
-     * 昵称
-     * @type {string}
-     * @memberof UpdateProfileRequest
+     * 业务状态码，0 表示成功
+     * @type {number}
+     * @memberof ApiResponsePageTagResponse
      */
-    'nickname'?: string;
+    'code'?: number;
     /**
-     * 个人简介
+     * 人类可读的响应消息
      * @type {string}
-     * @memberof UpdateProfileRequest
+     * @memberof ApiResponsePageTagResponse
      */
-    'bio'?: string;
+    'message'?: string;
     /**
-     * 联系邮箱
-     * @type {string}
-     * @memberof UpdateProfileRequest
+     * 
+     * @type {PageTagResponse}
+     * @memberof ApiResponsePageTagResponse
      */
-    'email'?: string;
-    /**
-     * 联系手机号
-     * @type {string}
-     * @memberof UpdateProfileRequest
-     */
-    'phone'?: string;
-    /**
-     * 学号
-     * @type {string}
-     * @memberof UpdateProfileRequest
-     */
-    'studentId'?: string;
-    /**
-     * 头像地址
-     * @type {string}
-     * @memberof UpdateProfileRequest
-     */
-    'avatar'?: string;
+    'data'?: PageTagResponse | null;
 }
 

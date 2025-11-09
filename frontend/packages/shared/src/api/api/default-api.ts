@@ -148,6 +148,8 @@ import type { ApiResponseListSubscriptionResponse } from '../models';
 // @ts-ignore
 import type { ApiResponseListTagResponse } from '../models';
 // @ts-ignore
+import type { ApiResponseListTagStatisticsResponse } from '../models';
+// @ts-ignore
 import type { ApiResponseListTopic } from '../models';
 // @ts-ignore
 import type { ApiResponseListUser } from '../models';
@@ -230,7 +232,11 @@ import type { ApiResponsePageReplyResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageReportResponse } from '../models';
 // @ts-ignore
+import type { ApiResponsePageReview } from '../models';
+// @ts-ignore
 import type { ApiResponsePageSearchResultItem } from '../models';
+// @ts-ignore
+import type { ApiResponsePageTagResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageUserProfileResponse } from '../models';
 // @ts-ignore
@@ -325,6 +331,8 @@ import type { CreateReportRequest } from '../models';
 import type { CreateRevertRequestDto } from '../models';
 // @ts-ignore
 import type { CreateReviewReplyRequest } from '../models';
+// @ts-ignore
+import type { CreateReviewRequest } from '../models';
 // @ts-ignore
 import type { CreateRoleRequest } from '../models';
 // @ts-ignore
@@ -1049,6 +1057,56 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (arbitratorId !== undefined) {
                 localVarQueryParameter['arbitratorId'] = arbitratorId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理员审核评价
+         * @summary 审核评价
+         * @param {number} reviewId 评价ID
+         * @param {boolean} approved 是否通过
+         * @param {string} [reason] 审核意见
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        auditReview: async (reviewId: number, approved: boolean, reason?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'reviewId' is not null or undefined
+            assertParamExists('auditReview', 'reviewId', reviewId)
+            // verify required parameter 'approved' is not null or undefined
+            assertParamExists('auditReview', 'approved', approved)
+            const localVarPath = `/reviews/{reviewId}/audit`
+                .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (approved !== undefined) {
+                localVarQueryParameter['approved'] = approved;
+            }
+
+            if (reason !== undefined) {
+                localVarQueryParameter['reason'] = reason;
             }
 
 
@@ -3396,6 +3454,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 买家对订单进行评价
+         * @summary 创建评价
+         * @param {CreateReviewRequest} createReviewRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createReview: async (createReviewRequest: CreateReviewRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createReviewRequest' is not null or undefined
+            assertParamExists('createReview', 'createReviewRequest', createReviewRequest)
+            const localVarPath = `/reviews`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createReviewRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 创建新的角色并绑定权限
          * @summary 创建角色
          * @param {CreateRoleRequest} createRoleRequest 
@@ -3988,6 +4086,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('deleteReply1', 'id', id)
             const localVarPath = `/replies/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 删除自己发布的评价
+         * @summary 删除评价
+         * @param {number} reviewId 评价ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteReview: async (reviewId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'reviewId' is not null or undefined
+            assertParamExists('deleteReview', 'reviewId', reviewId)
+            const localVarPath = `/reviews/{reviewId}`
+                .replace(`{${"reviewId"}}`, encodeURIComponent(String(reviewId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6488,6 +6624,54 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 查询指定商品的所有评价
+         * @summary 获取商品评价列表
+         * @param {number} goodsId 商品ID
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getGoodsReviews: async (goodsId: number, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'goodsId' is not null or undefined
+            assertParamExists('getGoodsReviews', 'goodsId', goodsId)
+            const localVarPath = `/reviews/goods/{goodsId}`
+                .replace(`{${"goodsId"}}`, encodeURIComponent(String(goodsId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary 获取健康检查历史
          * @param {number} [hours] 
@@ -6574,6 +6758,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          */
         getHotKeywords: async (limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/search/hot-keywords`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取热门标签列表（按使用次数排序）
+         * @summary 热门标签
+         * @param {number} [limit] 返回数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getHotTags: async (limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/tags/hot`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7035,6 +7258,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 查询当前用户发布的所有评价
+         * @summary 获取我的评价列表
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMyReviews: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/reviews/my`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 查询纠纷的所有协商消息和方案
          * @summary 查询协商历史
          * @param {number} disputeId 纠纷ID
@@ -7214,6 +7481,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理员查询待审核评价
+         * @summary 获取待审核评价列表
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPendingReviews: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/reviews/admin/pending`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
 
 
     
@@ -11401,12 +11712,16 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 获取所有标签列表
+         * 支持分页和筛选的标签列表
          * @summary 查询标签列表
+         * @param {string} [keyword] 关键词
+         * @param {boolean} [enabled] 启用状态
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTags1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listTags1: async (keyword?: string, enabled?: boolean, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/admin/tags`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11422,6 +11737,22 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (enabled !== undefined) {
+                localVarQueryParameter['enabled'] = enabled;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
 
 
     
@@ -11456,6 +11787,60 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理端查询用户列表（分页）
+         * @summary 获取用户列表
+         * @param {string} [keyword] 
+         * @param {string} [status] 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listUsers: async (keyword?: string, status?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/users`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
 
 
     
@@ -16105,6 +16490,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 管理员审核评价
+         * @summary 审核评价
+         * @param {number} reviewId 评价ID
+         * @param {boolean} approved 是否通过
+         * @param {string} [reason] 审核意见
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async auditReview(reviewId: number, approved: boolean, reason?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.auditReview(reviewId, approved, reason, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.auditReview']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 定时任务：自动解封封禁已过期的用户
          * @summary 自动解封过期用户
          * @param {*} [options] Override http request option.
@@ -16867,6 +17267,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 买家对订单进行评价
+         * @summary 创建评价
+         * @param {CreateReviewRequest} createReviewRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createReview(createReviewRequest: CreateReviewRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseLong>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createReview(createReviewRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createReview']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 创建新的角色并绑定权限
          * @summary 创建角色
          * @param {CreateRoleRequest} createRoleRequest 
@@ -17072,6 +17485,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteReply1(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteReply1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 删除自己发布的评价
+         * @summary 删除评价
+         * @param {number} reviewId 评价ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteReview(reviewId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteReview(reviewId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteReview']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -17910,6 +18336,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 查询指定商品的所有评价
+         * @summary 获取商品评价列表
+         * @param {number} goodsId 商品ID
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getGoodsReviews(goodsId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageReview>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getGoodsReviews(goodsId, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getGoodsReviews']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary 获取健康检查历史
          * @param {number} [hours] 
@@ -17946,6 +18387,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getHotKeywords(limit, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getHotKeywords']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取热门标签列表（按使用次数排序）
+         * @summary 热门标签
+         * @param {number} [limit] 返回数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getHotTags(limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListTagStatisticsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getHotTags(limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getHotTags']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -18092,6 +18546,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 查询当前用户发布的所有评价
+         * @summary 获取我的评价列表
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMyReviews(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageReview>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyReviews(page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getMyReviews']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 查询纠纷的所有协商消息和方案
          * @summary 查询协商历史
          * @param {number} disputeId 纠纷ID
@@ -18154,6 +18622,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPendingProposal(disputeId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getPendingProposal']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 管理员查询待审核评价
+         * @summary 获取待审核评价列表
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页数量
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPendingReviews(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageReview>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPendingReviews(page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getPendingReviews']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -19513,13 +19995,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 获取所有标签列表
+         * 支持分页和筛选的标签列表
          * @summary 查询标签列表
+         * @param {string} [keyword] 关键词
+         * @param {boolean} [enabled] 启用状态
+         * @param {number} [page] 页码
+         * @param {number} [size] 每页大小
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listTags1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListTagResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listTags1(options);
+        async listTags1(keyword?: string, enabled?: boolean, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageTagResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listTags1(keyword, enabled, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listTags1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -19534,6 +20020,22 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listTargets(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listTargets']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 管理端查询用户列表（分页）
+         * @summary 获取用户列表
+         * @param {string} [keyword] 
+         * @param {string} [status] 
+         * @param {number} [page] 
+         * @param {number} [size] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listUsers(keyword?: string, status?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageUserProfileResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(keyword, status, page, size, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listUsers']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -21129,6 +21631,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.assignArbitrator(requestParameters.disputeId, requestParameters.arbitratorId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 管理员审核评价
+         * @summary 审核评价
+         * @param {DefaultApiAuditReviewRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        auditReview(requestParameters: DefaultApiAuditReviewRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.auditReview(requestParameters.reviewId, requestParameters.approved, requestParameters.reason, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 定时任务：自动解封封禁已过期的用户
          * @summary 自动解封过期用户
          * @param {*} [options] Override http request option.
@@ -21704,6 +22216,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.createReport(requestParameters.createReportRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 买家对订单进行评价
+         * @summary 创建评价
+         * @param {DefaultApiCreateReviewRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createReview(requestParameters: DefaultApiCreateReviewRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong> {
+            return localVarFp.createReview(requestParameters.createReviewRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 创建新的角色并绑定权限
          * @summary 创建角色
          * @param {DefaultApiCreateRoleRequest} requestParameters Request parameters.
@@ -21862,6 +22384,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         deleteReply1(requestParameters: DefaultApiDeleteReply1Request, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
             return localVarFp.deleteReply1(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 删除自己发布的评价
+         * @summary 删除评价
+         * @param {DefaultApiDeleteReviewRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteReview(requestParameters: DefaultApiDeleteReviewRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.deleteReview(requestParameters.reviewId, options).then((request) => request(axios, basePath));
         },
         /**
          * 删除角色（若有用户绑定则无法删除）
@@ -22492,6 +23024,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getGoodsDetail1(requestParameters.goodsId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 查询指定商品的所有评价
+         * @summary 获取商品评价列表
+         * @param {DefaultApiGetGoodsReviewsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getGoodsReviews(requestParameters: DefaultApiGetGoodsReviewsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview> {
+            return localVarFp.getGoodsReviews(requestParameters.goodsId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取健康检查历史
          * @param {DefaultApiGetHealthHistoryRequest} requestParameters Request parameters.
@@ -22520,6 +23062,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getHotKeywords(requestParameters: DefaultApiGetHotKeywordsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListString> {
             return localVarFp.getHotKeywords(requestParameters.limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取热门标签列表（按使用次数排序）
+         * @summary 热门标签
+         * @param {DefaultApiGetHotTagsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getHotTags(requestParameters: DefaultApiGetHotTagsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagStatisticsResponse> {
+            return localVarFp.getHotTags(requestParameters.limit, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -22629,6 +23181,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getMyRefund(requestParameters.refundNo, options).then((request) => request(axios, basePath));
         },
         /**
+         * 查询当前用户发布的所有评价
+         * @summary 获取我的评价列表
+         * @param {DefaultApiGetMyReviewsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMyReviews(requestParameters: DefaultApiGetMyReviewsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview> {
+            return localVarFp.getMyReviews(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 查询纠纷的所有协商消息和方案
          * @summary 查询协商历史
          * @param {DefaultApiGetNegotiationHistoryRequest} requestParameters Request parameters.
@@ -22676,6 +23238,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getPendingProposal(requestParameters: DefaultApiGetPendingProposalRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseOptionalNegotiationMessageDTO> {
             return localVarFp.getPendingProposal(requestParameters.disputeId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 管理员查询待审核评价
+         * @summary 获取待审核评价列表
+         * @param {DefaultApiGetPendingReviewsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPendingReviews(requestParameters: DefaultApiGetPendingReviewsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview> {
+            return localVarFp.getPendingReviews(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -23651,13 +24223,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listTags(options).then((request) => request(axios, basePath));
         },
         /**
-         * 获取所有标签列表
+         * 支持分页和筛选的标签列表
          * @summary 查询标签列表
+         * @param {DefaultApiListTags1Request} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTags1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagResponse> {
-            return localVarFp.listTags1(options).then((request) => request(axios, basePath));
+        listTags1(requestParameters: DefaultApiListTags1Request = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageTagResponse> {
+            return localVarFp.listTags1(requestParameters.keyword, requestParameters.enabled, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 返回可执行软删除治理的实体标识
@@ -23667,6 +24240,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         listTargets(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListString> {
             return localVarFp.listTargets(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 管理端查询用户列表（分页）
+         * @summary 获取用户列表
+         * @param {DefaultApiListUsersRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listUsers(requestParameters: DefaultApiListUsersRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageUserProfileResponse> {
+            return localVarFp.listUsers(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 使用用户名和密码登录，返回 JWT Token
@@ -24900,6 +25483,18 @@ export interface DefaultApiInterface {
     assignArbitrator(disputeId: number, arbitratorId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
 
     /**
+     * 管理员审核评价
+     * @summary 审核评价
+     * @param {number} reviewId 评价ID
+     * @param {boolean} approved 是否通过
+     * @param {string} [reason] 审核意见
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    auditReview(reviewId: number, approved: boolean, reason?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 定时任务：自动解封封禁已过期的用户
      * @summary 自动解封过期用户
      * @param {*} [options] Override http request option.
@@ -25488,6 +26083,16 @@ export interface DefaultApiInterface {
     createReport(createReportRequest: CreateReportRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
 
     /**
+     * 买家对订单进行评价
+     * @summary 创建评价
+     * @param {CreateReviewRequest} createReviewRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    createReview(createReviewRequest: CreateReviewRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseLong>;
+
+    /**
      * 创建新的角色并绑定权限
      * @summary 创建角色
      * @param {CreateRoleRequest} createRoleRequest 
@@ -25646,6 +26251,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     deleteReply1(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 删除自己发布的评价
+     * @summary 删除评价
+     * @param {number} reviewId 评价ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    deleteReview(reviewId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 删除角色（若有用户绑定则无法删除）
@@ -26291,6 +26906,18 @@ export interface DefaultApiInterface {
     getGoodsDetail1(goodsId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseGoodsDetailDTO>;
 
     /**
+     * 查询指定商品的所有评价
+     * @summary 获取商品评价列表
+     * @param {number} goodsId 商品ID
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页数量
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getGoodsReviews(goodsId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview>;
+
+    /**
      * 
      * @summary 获取健康检查历史
      * @param {number} [hours] 
@@ -26319,6 +26946,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     getHotKeywords(limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListString>;
+
+    /**
+     * 获取热门标签列表（按使用次数排序）
+     * @summary 热门标签
+     * @param {number} [limit] 返回数量
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getHotTags(limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagStatisticsResponse>;
 
     /**
      * 
@@ -26431,6 +27068,17 @@ export interface DefaultApiInterface {
     getMyRefund(refundNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundRequest>;
 
     /**
+     * 查询当前用户发布的所有评价
+     * @summary 获取我的评价列表
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页数量
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getMyReviews(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview>;
+
+    /**
      * 查询纠纷的所有协商消息和方案
      * @summary 查询协商历史
      * @param {number} disputeId 纠纷ID
@@ -26479,6 +27127,17 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     getPendingProposal(disputeId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseOptionalNegotiationMessageDTO>;
+
+    /**
+     * 管理员查询待审核评价
+     * @summary 获取待审核评价列表
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页数量
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getPendingReviews(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview>;
 
     /**
      * 
@@ -27537,13 +28196,17 @@ export interface DefaultApiInterface {
     listTags(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagResponse>;
 
     /**
-     * 获取所有标签列表
+     * 支持分页和筛选的标签列表
      * @summary 查询标签列表
+     * @param {string} [keyword] 关键词
+     * @param {boolean} [enabled] 启用状态
+     * @param {number} [page] 页码
+     * @param {number} [size] 每页大小
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listTags1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListTagResponse>;
+    listTags1(keyword?: string, enabled?: boolean, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageTagResponse>;
 
     /**
      * 返回可执行软删除治理的实体标识
@@ -27553,6 +28216,19 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     listTargets(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListString>;
+
+    /**
+     * 管理端查询用户列表（分页）
+     * @summary 获取用户列表
+     * @param {string} [keyword] 
+     * @param {string} [status] 
+     * @param {number} [page] 
+     * @param {number} [size] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listUsers(keyword?: string, status?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageUserProfileResponse>;
 
     /**
      * 使用用户名和密码登录，返回 JWT Token
@@ -28942,6 +29618,34 @@ export interface DefaultApiAssignArbitratorRequest {
 }
 
 /**
+ * Request parameters for auditReview operation in DefaultApi.
+ * @export
+ * @interface DefaultApiAuditReviewRequest
+ */
+export interface DefaultApiAuditReviewRequest {
+    /**
+     * 评价ID
+     * @type {number}
+     * @memberof DefaultApiAuditReview
+     */
+    readonly reviewId: number
+
+    /**
+     * 是否通过
+     * @type {boolean}
+     * @memberof DefaultApiAuditReview
+     */
+    readonly approved: boolean
+
+    /**
+     * 审核意见
+     * @type {string}
+     * @memberof DefaultApiAuditReview
+     */
+    readonly reason?: string
+}
+
+/**
  * Request parameters for banUser operation in DefaultApi.
  * @export
  * @interface DefaultApiBanUserRequest
@@ -29761,6 +30465,20 @@ export interface DefaultApiCreateReportRequest {
 }
 
 /**
+ * Request parameters for createReview operation in DefaultApi.
+ * @export
+ * @interface DefaultApiCreateReviewRequest
+ */
+export interface DefaultApiCreateReviewRequest {
+    /**
+     * 
+     * @type {CreateReviewRequest}
+     * @memberof DefaultApiCreateReview
+     */
+    readonly createReviewRequest: CreateReviewRequest
+}
+
+/**
  * Request parameters for createRole operation in DefaultApi.
  * @export
  * @interface DefaultApiCreateRoleRequest
@@ -29982,6 +30700,20 @@ export interface DefaultApiDeleteReply1Request {
      * @memberof DefaultApiDeleteReply1
      */
     readonly id: number
+}
+
+/**
+ * Request parameters for deleteReview operation in DefaultApi.
+ * @export
+ * @interface DefaultApiDeleteReviewRequest
+ */
+export interface DefaultApiDeleteReviewRequest {
+    /**
+     * 评价ID
+     * @type {number}
+     * @memberof DefaultApiDeleteReview
+     */
+    readonly reviewId: number
 }
 
 /**
@@ -30818,6 +31550,34 @@ export interface DefaultApiGetGoodsDetail1Request {
 }
 
 /**
+ * Request parameters for getGoodsReviews operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetGoodsReviewsRequest
+ */
+export interface DefaultApiGetGoodsReviewsRequest {
+    /**
+     * 商品ID
+     * @type {number}
+     * @memberof DefaultApiGetGoodsReviews
+     */
+    readonly goodsId: number
+
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiGetGoodsReviews
+     */
+    readonly page?: number
+
+    /**
+     * 每页数量
+     * @type {number}
+     * @memberof DefaultApiGetGoodsReviews
+     */
+    readonly size?: number
+}
+
+/**
  * Request parameters for getHealthHistory operation in DefaultApi.
  * @export
  * @interface DefaultApiGetHealthHistoryRequest
@@ -30855,6 +31615,20 @@ export interface DefaultApiGetHotKeywordsRequest {
      * 返回数量
      * @type {number}
      * @memberof DefaultApiGetHotKeywords
+     */
+    readonly limit?: number
+}
+
+/**
+ * Request parameters for getHotTags operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetHotTagsRequest
+ */
+export interface DefaultApiGetHotTagsRequest {
+    /**
+     * 返回数量
+     * @type {number}
+     * @memberof DefaultApiGetHotTags
      */
     readonly limit?: number
 }
@@ -30993,6 +31767,27 @@ export interface DefaultApiGetMyRefundRequest {
 }
 
 /**
+ * Request parameters for getMyReviews operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetMyReviewsRequest
+ */
+export interface DefaultApiGetMyReviewsRequest {
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiGetMyReviews
+     */
+    readonly page?: number
+
+    /**
+     * 每页数量
+     * @type {number}
+     * @memberof DefaultApiGetMyReviews
+     */
+    readonly size?: number
+}
+
+/**
  * Request parameters for getNegotiationHistory operation in DefaultApi.
  * @export
  * @interface DefaultApiGetNegotiationHistoryRequest
@@ -31053,6 +31848,27 @@ export interface DefaultApiGetPendingProposalRequest {
      * @memberof DefaultApiGetPendingProposal
      */
     readonly disputeId: number
+}
+
+/**
+ * Request parameters for getPendingReviews operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetPendingReviewsRequest
+ */
+export interface DefaultApiGetPendingReviewsRequest {
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiGetPendingReviews
+     */
+    readonly page?: number
+
+    /**
+     * 每页数量
+     * @type {number}
+     * @memberof DefaultApiGetPendingReviews
+     */
+    readonly size?: number
 }
 
 /**
@@ -32656,6 +33472,76 @@ export interface DefaultApiListSubRepliesRequest {
      * @memberof DefaultApiListSubReplies
      */
     readonly parentId: number
+}
+
+/**
+ * Request parameters for listTags1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListTags1Request
+ */
+export interface DefaultApiListTags1Request {
+    /**
+     * 关键词
+     * @type {string}
+     * @memberof DefaultApiListTags1
+     */
+    readonly keyword?: string
+
+    /**
+     * 启用状态
+     * @type {boolean}
+     * @memberof DefaultApiListTags1
+     */
+    readonly enabled?: boolean
+
+    /**
+     * 页码
+     * @type {number}
+     * @memberof DefaultApiListTags1
+     */
+    readonly page?: number
+
+    /**
+     * 每页大小
+     * @type {number}
+     * @memberof DefaultApiListTags1
+     */
+    readonly size?: number
+}
+
+/**
+ * Request parameters for listUsers operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListUsersRequest
+ */
+export interface DefaultApiListUsersRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof DefaultApiListUsers
+     */
+    readonly keyword?: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof DefaultApiListUsers
+     */
+    readonly status?: string
+
+    /**
+     * 
+     * @type {number}
+     * @memberof DefaultApiListUsers
+     */
+    readonly page?: number
+
+    /**
+     * 
+     * @type {number}
+     * @memberof DefaultApiListUsers
+     */
+    readonly size?: number
 }
 
 /**
@@ -34607,6 +35493,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 管理员审核评价
+     * @summary 审核评价
+     * @param {DefaultApiAuditReviewRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public auditReview(requestParameters: DefaultApiAuditReviewRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).auditReview(requestParameters.reviewId, requestParameters.approved, requestParameters.reason, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 定时任务：自动解封封禁已过期的用户
      * @summary 自动解封过期用户
      * @param {*} [options] Override http request option.
@@ -35298,6 +36196,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 买家对订单进行评价
+     * @summary 创建评价
+     * @param {DefaultApiCreateReviewRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public createReview(requestParameters: DefaultApiCreateReviewRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).createReview(requestParameters.createReviewRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 创建新的角色并绑定权限
      * @summary 创建角色
      * @param {DefaultApiCreateRoleRequest} requestParameters Request parameters.
@@ -35487,6 +36397,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public deleteReply1(requestParameters: DefaultApiDeleteReply1Request, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deleteReply1(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 删除自己发布的评价
+     * @summary 删除评价
+     * @param {DefaultApiDeleteReviewRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deleteReview(requestParameters: DefaultApiDeleteReviewRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteReview(requestParameters.reviewId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -36246,6 +37168,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 查询指定商品的所有评价
+     * @summary 获取商品评价列表
+     * @param {DefaultApiGetGoodsReviewsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getGoodsReviews(requestParameters: DefaultApiGetGoodsReviewsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getGoodsReviews(requestParameters.goodsId, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取健康检查历史
      * @param {DefaultApiGetHealthHistoryRequest} requestParameters Request parameters.
@@ -36279,6 +37213,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getHotKeywords(requestParameters: DefaultApiGetHotKeywordsRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getHotKeywords(requestParameters.limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取热门标签列表（按使用次数排序）
+     * @summary 热门标签
+     * @param {DefaultApiGetHotTagsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getHotTags(requestParameters: DefaultApiGetHotTagsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getHotTags(requestParameters.limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -36411,6 +37357,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 查询当前用户发布的所有评价
+     * @summary 获取我的评价列表
+     * @param {DefaultApiGetMyReviewsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getMyReviews(requestParameters: DefaultApiGetMyReviewsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getMyReviews(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 查询纠纷的所有协商消息和方案
      * @summary 查询协商历史
      * @param {DefaultApiGetNegotiationHistoryRequest} requestParameters Request parameters.
@@ -36467,6 +37425,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getPendingProposal(requestParameters: DefaultApiGetPendingProposalRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getPendingProposal(requestParameters.disputeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 管理员查询待审核评价
+     * @summary 获取待审核评价列表
+     * @param {DefaultApiGetPendingReviewsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getPendingReviews(requestParameters: DefaultApiGetPendingReviewsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getPendingReviews(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -37643,14 +38613,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 获取所有标签列表
+     * 支持分页和筛选的标签列表
      * @summary 查询标签列表
+     * @param {DefaultApiListTags1Request} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listTags1(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listTags1(options).then((request) => request(this.axios, this.basePath));
+    public listTags1(requestParameters: DefaultApiListTags1Request = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listTags1(requestParameters.keyword, requestParameters.enabled, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -37662,6 +38633,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public listTargets(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listTargets(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 管理端查询用户列表（分页）
+     * @summary 获取用户列表
+     * @param {DefaultApiListUsersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listUsers(requestParameters: DefaultApiListUsersRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listUsers(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

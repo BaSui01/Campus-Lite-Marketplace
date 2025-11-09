@@ -183,6 +183,22 @@ export interface ReviewService {
    * @param reviewId 评价ID
    */
   deleteAllReviewMedia(reviewId: number): Promise<void>;
+
+  // ==================== 管理员审核接口 ====================
+
+  /**
+   * 获取待审核评价列表（管理员）
+   * @param params 查询参数
+   * @returns 待审核评价列表
+   */
+  listPendingReviews(params?: { page?: number; size?: number }): Promise<ReviewListResponse>;
+
+  /**
+   * 审核评价（管理员）
+   * @param reviewId 评价ID
+   * @param data 审核数据
+   */
+  auditReview(reviewId: number, data: { approved: boolean; reason?: string }): Promise<void>;
 }
 
 /**
@@ -192,7 +208,7 @@ class ReviewServiceImpl implements ReviewService {
   // ==================== 核心评价接口实现 ====================
 
   async createReview(request: CreateReviewRequest): Promise<number> {
-    const response = await axiosInstance.post<{ data: number }>('/api/reviews', request);
+    const response = await axiosInstance.post<{ data: number }>('/reviews', request);
     return response.data.data;
   }
 
@@ -201,7 +217,7 @@ class ReviewServiceImpl implements ReviewService {
     params: ReviewListQuery
   ): Promise<ReviewListResponse> {
     const response = await axiosInstance.get<ReviewListResponse>(
-      `/api/goods/${goodsId}/reviews`,
+      `/goods/${goodsId}/reviews`,
       { params }
     );
     return response.data;
@@ -211,40 +227,40 @@ class ReviewServiceImpl implements ReviewService {
     page: number;
     size: number;
   }): Promise<ReviewListResponse> {
-    const response = await axiosInstance.get<ReviewListResponse>('/api/reviews/my', {
+    const response = await axiosInstance.get<ReviewListResponse>('/reviews/my', {
       params,
     });
     return response.data;
   }
 
   async deleteReview(reviewId: number): Promise<void> {
-    await axiosInstance.delete(`/api/reviews/${reviewId}`);
+    await axiosInstance.delete(`/reviews/${reviewId}`);
   }
 
   // ==================== 点赞接口实现 ====================
 
   async likeReview(reviewId: number): Promise<void> {
-    await axiosInstance.post(`/api/reviews/${reviewId}/like`);
+    await axiosInstance.post(`/reviews/${reviewId}/like`);
   }
 
   async unlikeReview(reviewId: number): Promise<void> {
-    await axiosInstance.delete(`/api/reviews/${reviewId}/like`);
+    await axiosInstance.delete(`/reviews/${reviewId}/like`);
   }
 
   async toggleLike(reviewId: number): Promise<void> {
-    await axiosInstance.post(`/api/reviews/${reviewId}/like/toggle`);
+    await axiosInstance.post(`/reviews/${reviewId}/like/toggle`);
   }
 
   async getLikeStatus(reviewId: number): Promise<boolean> {
     const response = await axiosInstance.get<{ data: boolean }>(
-      `/api/reviews/${reviewId}/like/status`
+      `/reviews/${reviewId}/like/status`
     );
     return response.data.data;
   }
 
   async getLikeCount(reviewId: number): Promise<number> {
     const response = await axiosInstance.get<{ data: number }>(
-      `/api/reviews/${reviewId}/likes/count`
+      `/reviews/${reviewId}/likes/count`
     );
     return response.data.data;
   }
@@ -253,7 +269,7 @@ class ReviewServiceImpl implements ReviewService {
 
   async replyReview(reviewId: number, content: string): Promise<ReviewReplyDTO> {
     const response = await axiosInstance.post<{ data: ReviewReplyDTO }>(
-      `/api/reviews/${reviewId}/replies`,
+      `/reviews/${reviewId}/replies`,
       { content, replyType: 'SELLER_REPLY' }
     );
     return response.data.data;
@@ -261,28 +277,28 @@ class ReviewServiceImpl implements ReviewService {
 
   async getReviewReplies(reviewId: number): Promise<ReviewReplyDTO[]> {
     const response = await axiosInstance.get<{ data: ReviewReplyDTO[] }>(
-      `/api/reviews/${reviewId}/replies`
+      `/reviews/${reviewId}/replies`
     );
     return response.data.data;
   }
 
   async getUnreadReplyCount(): Promise<number> {
     const response = await axiosInstance.get<{ data: number }>(
-      '/api/reviews/replies/unread/count'
+      '/reviews/replies/unread/count'
     );
     return response.data.data;
   }
 
   async markReplyAsRead(replyId: number): Promise<void> {
-    await axiosInstance.put(`/api/reviews/replies/${replyId}/read`);
+    await axiosInstance.put(`/reviews/replies/${replyId}/read`);
   }
 
   async markAllRepliesAsRead(): Promise<void> {
-    await axiosInstance.put('/api/reviews/replies/read/all');
+    await axiosInstance.put('/reviews/replies/read/all');
   }
 
   async deleteReply(replyId: number): Promise<void> {
-    await axiosInstance.delete(`/api/reviews/replies/${replyId}`);
+    await axiosInstance.delete(`/reviews/replies/${replyId}`);
   }
 
   // ==================== 媒体接口实现 ====================
@@ -294,7 +310,7 @@ class ReviewServiceImpl implements ReviewService {
     });
 
     const response = await axiosInstance.post<{ data: string[] }>(
-      `/api/reviews/${reviewId}/media`,
+      `/reviews/${reviewId}/media`,
       formData,
       {
         headers: {
@@ -315,7 +331,7 @@ class ReviewServiceImpl implements ReviewService {
     });
 
     const response = await axiosInstance.post<{ data: ReviewMediaDTO[] }>(
-      `/api/reviews/${reviewId}/media/batch`,
+      `/reviews/${reviewId}/media/batch`,
       formData,
       {
         headers: {
@@ -328,7 +344,7 @@ class ReviewServiceImpl implements ReviewService {
 
   async getReviewMedia(reviewId: number): Promise<ReviewMediaDTO[]> {
     const response = await axiosInstance.get<{ data: ReviewMediaDTO[] }>(
-      `/api/reviews/${reviewId}/media`
+      `/reviews/${reviewId}/media`
     );
     return response.data.data;
   }
@@ -338,17 +354,30 @@ class ReviewServiceImpl implements ReviewService {
     mediaType: 'IMAGE' | 'VIDEO'
   ): Promise<ReviewMediaDTO[]> {
     const response = await axiosInstance.get<{ data: ReviewMediaDTO[] }>(
-      `/api/reviews/${reviewId}/media/${mediaType}`
+      `/reviews/${reviewId}/media/${mediaType}`
     );
     return response.data.data;
   }
 
   async deleteReviewMedia(mediaId: number): Promise<void> {
-    await axiosInstance.delete(`/api/reviews/media/${mediaId}`);
+    await axiosInstance.delete(`/reviews/media/${mediaId}`);
   }
 
   async deleteAllReviewMedia(reviewId: number): Promise<void> {
-    await axiosInstance.delete(`/api/reviews/${reviewId}/media`);
+    await axiosInstance.delete(`/reviews/${reviewId}/media`);
+  }
+
+  // ==================== 管理员审核接口实现 ====================
+
+  async listPendingReviews(params?: { page?: number; size?: number }): Promise<ReviewListResponse> {
+    const response = await axiosInstance.get<ReviewListResponse>('/admin/reviews/pending', {
+      params,
+    });
+    return response.data;
+  }
+
+  async auditReview(reviewId: number, data: { approved: boolean; reason?: string }): Promise<void> {
+    await axiosInstance.post(`/reviews/${reviewId}/audit`, data);
   }
 }
 

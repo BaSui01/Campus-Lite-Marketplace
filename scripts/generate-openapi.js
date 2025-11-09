@@ -16,14 +16,15 @@ const openapiFile = path.join(backendDir, 'target', 'openapi-frontend.json');
 const mvnCmd = process.platform === 'win32' ? 'mvn.cmd' : 'mvn';
 
 const SPRING_BOOT_ARGS =
-  '--openapi.export.enabled=true --openapi.export.path=target/openapi-frontend.json';
+  '--openapi.export.enabled=true,--openapi.export.path=target/openapi-frontend.json';
 
 function runMaven(stepName, args, { ignoreFailure = false } = {}) {
   console.log(`\n[api:generate] 开始执行 ${stepName}: mvn ${args.join(' ')}`);
   const result = spawnSync(mvnCmd, args, {
     cwd: backendDir,
     stdio: 'inherit',
-    shell: false,
+    shell: true,
+    windowsHide: true,
   });
 
   if (result.error) {

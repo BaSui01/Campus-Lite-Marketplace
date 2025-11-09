@@ -34,13 +34,13 @@ export interface PageCouponResponse {
      * @type {number}
      * @memberof PageCouponResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageCouponResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

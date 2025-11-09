@@ -1,20 +1,10 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
  * 话题管理服务
  * @author BaSui 😎
- * @description 话题CRUD、关注、热门推荐
+ * @description 话题CRUD、关注、热门推荐（基于 OpenAPI 生成代码）
  */
 
 import { getApi } from '../utils/apiClient';
-import type { BaseResponse } from '@campus/shared/api';
 
 // ==================== 类型定义 ====================
 
@@ -105,67 +95,69 @@ export interface TopicService {
 // ==================== 服务实现 ====================
 
 class TopicServiceImpl implements TopicService {
-  private readonly BASE_PATH = '/api/topics';
-
   async create(request: CreateTopicRequest): Promise<number> {
-    const response = await http.post<BaseResponse<number>>(`${this.BASE_PATH}`, request);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.createTopic({ requestBody: request });
+    return response.data.data as number;
   }
 
   async update(topicId: number, request: UpdateTopicRequest): Promise<void> {
-    await http.put(`${this.BASE_PATH}/${topicId}`, request);
+    const api = getApi();
+    await api.updateTopic({ topicId, requestBody: request });
   }
 
   async delete(topicId: number): Promise<void> {
-    await http.delete(`${this.BASE_PATH}/${topicId}`);
+    const api = getApi();
+    await api.deleteTopic({ topicId });
   }
 
   async getById(topicId: number): Promise<Topic> {
-    const response = await http.get<BaseResponse<Topic>>(`${this.BASE_PATH}/${topicId}`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getTopicById({ topicId });
+    return response.data.data as Topic;
   }
 
   async getAll(): Promise<Topic[]> {
-    const response = await http.get<BaseResponse<Topic[]>>(`${this.BASE_PATH}`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getAllTopics();
+    return response.data.data as Topic[];
   }
 
   async getHotTopics(): Promise<Topic[]> {
-    const response = await http.get<BaseResponse<Topic[]>>(`${this.BASE_PATH}/hot`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getHotTopics1();
+    return response.data.data as Topic[];
   }
 
   async follow(topicId: number): Promise<void> {
-    await http.post(`${this.BASE_PATH}/${topicId}/follow`);
+    const api = getApi();
+    await api.followTopic({ topicId });
   }
 
   async unfollow(topicId: number): Promise<void> {
-    await http.delete(`${this.BASE_PATH}/${topicId}/follow`);
+    const api = getApi();
+    await api.unfollowTopic({ topicId });
   }
 
   async getMyFollowedTopics(): Promise<Topic[]> {
-    const response = await http.get<BaseResponse<Topic[]>>(`${this.BASE_PATH}/followed`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getMyFollowedTopics();
+    return response.data.data as Topic[];
   }
 
   async checkFollowed(topicId: number): Promise<boolean> {
-    const response = await http.get<BaseResponse<boolean>>(`${this.BASE_PATH}/${topicId}/followed`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.isTopicFollowed({ topicId });
+    return response.data.data as boolean;
   }
 
   async getFollowerCount(topicId: number): Promise<number> {
-    const response = await http.get<BaseResponse<number>>(`${this.BASE_PATH}/${topicId}/followers/count`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getTopicFollowerCount({ topicId });
+    return response.data.data as number;
   }
 
   async getStatistics(topicId: number): Promise<TopicStatistics> {
-    // 扩展接口，假设后端会添加
-    // const response = await http.get<BaseResponse<TopicStatistics>>(
-    //   `${this.BASE_PATH}/${topicId}/statistics`
-    // );
-    // return response.data.data;
-    
-    // 临时实现：从详情接口获取基本统计
     const topic = await this.getById(topicId);
     return {
       topicId: topic.id,

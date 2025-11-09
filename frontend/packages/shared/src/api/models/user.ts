@@ -70,6 +70,12 @@ export interface User {
     'nickname'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof User
+     */
+    'bio'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof User
      */

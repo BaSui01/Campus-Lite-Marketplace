@@ -183,6 +183,13 @@ export class CategoryService {
   }
 
   /**
+   * 更新分类状态
+   */
+  async updateStatus(id: number, status: CategoryStatus): Promise<void> {
+    return this.update(id, { status } as UpdateCategoryRequest);
+  }
+
+  /**
    * 标准化树节点，补充层级/路径等元数据
    */
   private normalizeTree(

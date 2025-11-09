@@ -19,6 +19,12 @@ import type {
   CampusStatisticsResponse,
 } from '../api';
 
+// ==================== 类型重导出 ====================
+export type { Campus, CampusCreateRequest, CampusUpdateRequest, CampusStatisticsResponse } from '../api';
+
+export type CampusRequest = CampusCreateRequest;
+export type CampusStatistics = CampusStatisticsResponse;
+
 /**
  * 校园状态枚举
  */
@@ -43,12 +49,27 @@ export interface CampusListParams {
 export class CampusService {
   /**
    * 获取校园列表
+   * @param params 查询参数
    * @returns 校园列表
    */
-  async list(): Promise<Campus[]> {
+  async list(params?: CampusListParams): Promise<Campus[]> {
     const api = getApi();
     const response = await api.listCampuses();
-    return response.data.data as Campus[];
+    let campuses = response.data.data as Campus[];
+
+    // 前端筛选（如果后端不支持）
+    if (params?.keyword) {
+      campuses = campuses.filter(c =>
+        c.name?.toLowerCase().includes(params.keyword!.toLowerCase()) ||
+        c.code?.toLowerCase().includes(params.keyword!.toLowerCase())
+      );
+    }
+
+    if (params?.status) {
+      campuses = campuses.filter(c => c.status === params.status);
+    }
+
+    return campuses;
   }
 
   /**

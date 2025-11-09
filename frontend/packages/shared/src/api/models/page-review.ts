@@ -18,81 +18,81 @@
 import type { PageableObject } from './pageable-object';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { SortObject } from './sort-object';
+import type { Review } from './review';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { UserProfileResponse } from './user-profile-response';
+import type { SortObject } from './sort-object';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageUserProfileResponse
+ * @interface PageReview
  */
-export interface PageUserProfileResponse {
+export interface PageReview {
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'totalElements'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'totalPages'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'size'?: number;
     /**
      * 
-     * @type {Array<UserProfileResponse>}
-     * @memberof PageUserProfileResponse
+     * @type {Array<Review>}
+     * @memberof PageReview
      */
-    'content'?: Array<UserProfileResponse>;
+    'content'?: Array<Review>;
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'number'?: number;
     /**
      * 
      * @type {Array<SortObject>}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'sort'?: Array<SortObject>;
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'numberOfElements'?: number;
     /**
      * 
      * @type {boolean}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'first'?: boolean;
     /**
      * 
      * @type {boolean}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'last'?: boolean;
     /**
      * 
      * @type {PageableObject}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageUserProfileResponse
+     * @memberof PageReview
      */
     'empty'?: boolean;
 }

@@ -34,13 +34,13 @@ export interface PageCouponUserRelation {
      * @type {number}
      * @memberof PageCouponUserRelation
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageCouponUserRelation
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

@@ -34,13 +34,13 @@ export interface PageAuditLogResponse {
      * @type {number}
      * @memberof PageAuditLogResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageAuditLogResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

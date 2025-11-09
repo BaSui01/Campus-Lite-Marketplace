@@ -34,13 +34,13 @@ export interface PageAppealMaterial {
      * @type {number}
      * @memberof PageAppealMaterial
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageAppealMaterial
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

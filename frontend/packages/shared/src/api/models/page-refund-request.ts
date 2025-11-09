@@ -34,13 +34,13 @@ export interface PageRefundRequest {
      * @type {number}
      * @memberof PageRefundRequest
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageRefundRequest
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

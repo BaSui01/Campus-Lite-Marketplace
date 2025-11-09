@@ -133,13 +133,13 @@ export interface DisputeDTO {
      * @type {boolean}
      * @memberof DisputeDTO
      */
-    'negotiating'?: boolean;
+    'arbitrating'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof DisputeDTO
      */
-    'arbitrating'?: boolean;
+    'negotiating'?: boolean;
 }
 
 export const DisputeDTOInitiatorRoleEnum = {

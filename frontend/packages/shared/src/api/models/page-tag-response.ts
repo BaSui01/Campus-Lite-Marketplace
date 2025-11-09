@@ -21,78 +21,78 @@ import type { PageableObject } from './pageable-object';
 import type { SortObject } from './sort-object';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { UserProfileResponse } from './user-profile-response';
+import type { TagResponse } from './tag-response';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageUserProfileResponse
+ * @interface PageTagResponse
  */
-export interface PageUserProfileResponse {
+export interface PageTagResponse {
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'totalElements'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'totalPages'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'size'?: number;
     /**
      * 
-     * @type {Array<UserProfileResponse>}
-     * @memberof PageUserProfileResponse
+     * @type {Array<TagResponse>}
+     * @memberof PageTagResponse
      */
-    'content'?: Array<UserProfileResponse>;
+    'content'?: Array<TagResponse>;
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'number'?: number;
     /**
      * 
      * @type {Array<SortObject>}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'sort'?: Array<SortObject>;
     /**
      * 
      * @type {number}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'numberOfElements'?: number;
     /**
      * 
      * @type {boolean}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'first'?: boolean;
     /**
      * 
      * @type {boolean}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'last'?: boolean;
     /**
      * 
      * @type {PageableObject}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageUserProfileResponse
+     * @memberof PageTagResponse
      */
     'empty'?: boolean;
 }

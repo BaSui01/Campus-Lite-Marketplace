@@ -1,20 +1,10 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
  * 社区广场服务
  * @author BaSui 😎
- * @description 社区广场话题标签、动态流、互动功能
+ * @description 社区广场话题标签、动态流、互动功能（基于 OpenAPI 生成代码）
  */
 
 import { getApi } from '../utils/apiClient';
-import type { BaseResponse } from '@campus/shared/api';
 
 // ==================== 类型定义 ====================
 
@@ -101,65 +91,76 @@ export interface CommunityService {
 // ==================== 服务实现 ====================
 
 class CommunityServiceImpl implements CommunityService {
-  private readonly BASE_PATH = '/api/community';
-
   async getHotTopics(): Promise<any[]> {
-    const response = await http.get<BaseResponse<any[]>>(`${this.BASE_PATH}/topics/hot`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getHotTopics();
+    return response.data.data as any[];
   }
 
   async addTopicTagsToPost(postId: number, topicIds: number[]): Promise<void> {
-    await http.post(`${this.BASE_PATH}/posts/${postId}/topics`, { topicIds });
+    const api = getApi();
+    await api.addTopicsToPost({ postId, requestBody: { topicIds } });
   }
 
   async removeTopicTagsFromPost(postId: number): Promise<void> {
-    await http.delete(`${this.BASE_PATH}/posts/${postId}/topics`);
+    const api = getApi();
+    await api.removeTopicsFromPost({ postId });
   }
 
   async likePost(postId: number): Promise<void> {
-    await http.post(`${this.BASE_PATH}/posts/${postId}/like`);
+    const api = getApi();
+    await api.likePost({ postId });
   }
 
   async unlikePost(postId: number): Promise<void> {
-    await http.delete(`${this.BASE_PATH}/posts/${postId}/like`);
+    const api = getApi();
+    await api.unlikePost({ postId });
   }
 
   async collectPost(postId: number): Promise<void> {
-    await http.post(`${this.BASE_PATH}/posts/${postId}/collect`);
+    const api = getApi();
+    await api.collectPost({ postId });
   }
 
   async uncollectPost(postId: number): Promise<void> {
-    await http.delete(`${this.BASE_PATH}/posts/${postId}/collect`);
+    const api = getApi();
+    await api.uncollectPost({ postId });
   }
 
   async getUserFeed(): Promise<UserFeed[]> {
-    const response = await http.get<BaseResponse<UserFeed[]>>(`${this.BASE_PATH}/feed`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getUserFeed();
+    return response.data.data as UserFeed[];
   }
 
   async getPostsByTopic(topicId: number): Promise<number[]> {
-    const response = await http.get<BaseResponse<number[]>>(`${this.BASE_PATH}/topics/${topicId}/posts`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getPostsByTopic({ topicId });
+    return response.data.data as number[];
   }
 
   async checkPostLiked(postId: number): Promise<boolean> {
-    const response = await http.get<BaseResponse<boolean>>(`${this.BASE_PATH}/posts/${postId}/liked`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.isPostLiked({ postId });
+    return response.data.data as boolean;
   }
 
   async checkPostCollected(postId: number): Promise<boolean> {
-    const response = await http.get<BaseResponse<boolean>>(`${this.BASE_PATH}/posts/${postId}/collected`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.isPostCollected({ postId });
+    return response.data.data as boolean;
   }
 
   async getPostLikeCount(postId: number): Promise<number> {
-    const response = await http.get<BaseResponse<number>>(`${this.BASE_PATH}/posts/${postId}/likes/count`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getPostLikeCount({ postId });
+    return response.data.data as number;
   }
 
   async getPostCollectCount(postId: number): Promise<number> {
-    const response = await http.get<BaseResponse<number>>(`${this.BASE_PATH}/posts/${postId}/collects/count`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getPostCollectCount({ postId });
+    return response.data.data as number;
   }
 }
 

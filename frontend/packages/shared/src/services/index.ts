@@ -182,6 +182,14 @@ export type {
 export { rateLimitService } from './rateLimit';
 export type { RateLimitService } from './rateLimit';
 
+// 批量任务服务
+export { batchService, BatchTaskStatus, BatchType } from './batch';
+export type {
+  BatchService,
+  BatchTaskListParams,
+  PageBatchTaskResponse
+} from './batch';
+
 // ==================== ❌ 已移除的服务导出 ====================
 //
 // 以下服务已移至对应的包，不再从 shared 导出：

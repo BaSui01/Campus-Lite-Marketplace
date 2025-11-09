@@ -198,6 +198,16 @@ export class PostService {
     });
     return response.data.data as PagePostReplyResponse;
   }
+
+  /**
+   * 审核帖子（管理员）
+   * @param postId 帖子ID
+   * @param data 审核数据
+   */
+  async auditPost(postId: number, data: { approved: boolean; reason?: string }): Promise<void> {
+    const api = getApi();
+    await api.auditPost({ postId, auditPostRequest: data });
+  }
 }
 
 /**

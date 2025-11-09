@@ -34,13 +34,13 @@ export interface PageBanLogResponse {
      * @type {number}
      * @memberof PageBanLogResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageBanLogResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

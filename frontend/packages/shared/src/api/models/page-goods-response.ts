@@ -34,13 +34,13 @@ export interface PageGoodsResponse {
      * @type {number}
      * @memberof PageGoodsResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageGoodsResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

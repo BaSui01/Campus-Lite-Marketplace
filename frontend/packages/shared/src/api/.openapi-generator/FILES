@@ -73,6 +73,7 @@ models/api-response-list-scheduled-task.ts
 models/api-response-list-string.ts
 models/api-response-list-subscription-response.ts
 models/api-response-list-tag-response.ts
+models/api-response-list-tag-statistics-response.ts
 models/api-response-list-topic.ts
 models/api-response-list-user-behavior-log-dto.ts
 models/api-response-list-user-feed.ts
@@ -114,7 +115,9 @@ models/api-response-page-post-response.ts
 models/api-response-page-refund-request.ts
 models/api-response-page-reply-response.ts
 models/api-response-page-report-response.ts
+models/api-response-page-review.ts
 models/api-response-page-search-result-item.ts
+models/api-response-page-tag-response.ts
 models/api-response-page-user-profile-response.ts
 models/api-response-performance-report-response.ts
 models/api-response-post-response.ts
@@ -196,6 +199,7 @@ models/create-privacy-request.ts
 models/create-report-request.ts
 models/create-revert-request-dto.ts
 models/create-review-reply-request.ts
+models/create-review-request.ts
 models/create-role-request.ts
 models/create-subscription-request.ts
 models/create-tag-request.ts
@@ -265,7 +269,9 @@ models/page-post-response.ts
 models/page-refund-request.ts
 models/page-reply-response.ts
 models/page-report-response.ts
+models/page-review.ts
 models/page-search-result-item.ts
+models/page-tag-response.ts
 models/page-user-profile-response.ts
 models/pageable-object.ts
 models/pageable.ts

@@ -13,48 +13,33 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { TagStatisticsResponse } from './tag-statistics-response';
 
 /**
- * 更新用户资料请求体
+ * 统一响应包装结构
  * @export
- * @interface UpdateProfileRequest
+ * @interface ApiResponseListTagStatisticsResponse
  */
-export interface UpdateProfileRequest {
+export interface ApiResponseListTagStatisticsResponse {
     /**
-     * 昵称
-     * @type {string}
-     * @memberof UpdateProfileRequest
+     * 业务状态码，0 表示成功
+     * @type {number}
+     * @memberof ApiResponseListTagStatisticsResponse
      */
-    'nickname'?: string;
+    'code'?: number;
     /**
-     * 个人简介
+     * 人类可读的响应消息
      * @type {string}
-     * @memberof UpdateProfileRequest
+     * @memberof ApiResponseListTagStatisticsResponse
      */
-    'bio'?: string;
+    'message'?: string;
     /**
-     * 联系邮箱
-     * @type {string}
-     * @memberof UpdateProfileRequest
+     * 业务数据载荷
+     * @type {Array<TagStatisticsResponse>}
+     * @memberof ApiResponseListTagStatisticsResponse
      */
-    'email'?: string;
-    /**
-     * 联系手机号
-     * @type {string}
-     * @memberof UpdateProfileRequest
-     */
-    'phone'?: string;
-    /**
-     * 学号
-     * @type {string}
-     * @memberof UpdateProfileRequest
-     */
-    'studentId'?: string;
-    /**
-     * 头像地址
-     * @type {string}
-     * @memberof UpdateProfileRequest
-     */
-    'avatar'?: string;
+    'data'?: Array<TagStatisticsResponse> | null;
 }
 

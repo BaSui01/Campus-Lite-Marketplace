@@ -34,13 +34,13 @@ export interface PageComplianceAuditLog {
      * @type {number}
      * @memberof PageComplianceAuditLog
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageComplianceAuditLog
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

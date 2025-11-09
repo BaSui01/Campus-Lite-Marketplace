@@ -34,13 +34,13 @@ export interface PageConversationResponse {
      * @type {number}
      * @memberof PageConversationResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageConversationResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

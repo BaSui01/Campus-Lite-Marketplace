@@ -34,13 +34,13 @@ export interface PageOrderResponse {
      * @type {number}
      * @memberof PageOrderResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageOrderResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

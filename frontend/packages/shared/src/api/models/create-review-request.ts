@@ -13,84 +13,54 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
- * 业务数据载荷
+ * 
  * @export
- * @interface PageObject
+ * @interface CreateReviewRequest
  */
-export interface PageObject {
+export interface CreateReviewRequest {
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof CreateReviewRequest
      */
-    'totalElements'?: number;
+    'orderId': number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof CreateReviewRequest
      */
-    'totalPages'?: number;
+    'rating': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateReviewRequest
+     */
+    'content': string;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof CreateReviewRequest
      */
-    'size'?: number;
-    /**
-     * 
-     * @type {Array<object>}
-     * @memberof PageObject
-     */
-    'content'?: Array<object>;
+    'qualityScore'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof CreateReviewRequest
      */
-    'number'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageObject
-     */
-    'sort'?: Array<SortObject>;
+    'serviceScore'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof CreateReviewRequest
      */
-    'numberOfElements'?: number;
+    'deliveryScore'?: number;
     /**
      * 
      * @type {boolean}
-     * @memberof PageObject
+     * @memberof CreateReviewRequest
      */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageObject
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'empty'?: boolean;
+    'isAnonymous'?: boolean;
 }
 

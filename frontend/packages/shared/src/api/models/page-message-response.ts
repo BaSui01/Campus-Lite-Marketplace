@@ -34,13 +34,13 @@ export interface PageMessageResponse {
      * @type {number}
      * @memberof PageMessageResponse
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageMessageResponse
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

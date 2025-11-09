@@ -11,6 +11,8 @@ import type { TagResponse, CreateTagRequest, UpdateTagRequest, MergeTagRequest, 
 // ==================== 类型重导出（使用 OpenAPI 生成的类型）====================
 export type { TagResponse as Tag, CreateTagRequest, UpdateTagRequest, MergeTagRequest, TagStatisticsResponse } from '../api/models';
 
+export type TagRequest = CreateTagRequest;
+
 // ==================== 标签类型枚举（保持兼容）====================
 export enum TagType {
   GOODS = 'GOODS',
@@ -23,19 +25,61 @@ export enum TagStatus {
   DISABLED = 'DISABLED'
 }
 
+// ==================== 热门标签类型 ====================
+export interface HotTag {
+  id: number;
+  name: string;
+  usageCount: number;
+}
+
+// ==================== 标签列表查询参数 ====================
+export interface TagListParams {
+  keyword?: string;
+  type?: TagType;
+  status?: TagStatus;
+  page?: number;
+  size?: number;
+}
+
 /**
  * 标签 API 服务类
  * ✅ 完全基于 OpenAPI 生成的 DefaultApi
  */
 export class TagService {
   /**
-   * 获取标签列表
-   * @returns 标签列表
+   * 获取标签列表（分页）
+   * @param params 查询参数
+   * @returns 标签分页数据
    */
-  async list(): Promise<TagResponse[]> {
+  async list(params?: TagListParams): Promise<TagResponse[]> {
     const api = getApi();
-    const response = await api.listTags();
-    return response.data.data as TagResponse[];
+    const response = await api.listTags(
+      params?.keyword,
+      params?.status === TagStatus.ENABLED ? true : params?.status === TagStatus.DISABLED ? false : undefined,
+      params?.page,
+      params?.size
+    );
+
+    // 如果返回的是分页数据，提取 content
+    const data = response.data.data as any;
+    return (data?.content || data) as TagResponse[];
+  }
+
+  /**
+   * 获取热门标签
+   * @param limit 返回数量
+   * @returns 热门标签列表
+   */
+  async getHotTags(limit: number = 20): Promise<HotTag[]> {
+    const api = getApi();
+    const response = await api.getHotTags({ limit });
+    const hotTags = response.data.data as any[];
+
+    return hotTags.map(tag => ({
+      id: tag.tagId,
+      name: tag.tagName,
+      usageCount: tag.goodsCount || 0
+    }));
   }
 
   /**
@@ -107,6 +151,16 @@ export class TagService {
     const api = getApi();
     const response = await api.getTagStatistics({ id });
     return response.data.data as TagStatisticsResponse;
+  }
+
+  /**
+   * 更新标签状态
+   * @param id 标签ID
+   * @param status 标签状态
+   */
+  async updateStatus(id: number, status: TagStatus): Promise<void> {
+    const api = getApi();
+    await api.toggleEnabled({ id });
   }
 }
 

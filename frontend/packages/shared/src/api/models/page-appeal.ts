@@ -34,13 +34,13 @@ export interface PageAppeal {
      * @type {number}
      * @memberof PageAppeal
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageAppeal
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

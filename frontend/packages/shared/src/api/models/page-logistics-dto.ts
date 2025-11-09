@@ -34,13 +34,13 @@ export interface PageLogisticsDTO {
      * @type {number}
      * @memberof PageLogisticsDTO
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageLogisticsDTO
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}

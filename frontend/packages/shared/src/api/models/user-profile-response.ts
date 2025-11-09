@@ -33,6 +33,12 @@ export interface UserProfileResponse {
      */
     'username'?: string;
     /**
+     * 昵称
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'nickname'?: string;
+    /**
      * 邮箱（脱敏后）
      * @type {string}
      * @memberof UserProfileResponse
@@ -68,6 +74,24 @@ export interface UserProfileResponse {
      * @memberof UserProfileResponse
      */
     'points'?: number;
+    /**
+     * 校区ID
+     * @type {number}
+     * @memberof UserProfileResponse
+     */
+    'campusId'?: number;
+    /**
+     * 校区名称
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'campusName'?: string;
+    /**
+     * 封禁原因（仅封禁状态时有值）
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'banReason'?: string;
     /**
      * 角色列表
      * @type {Array<string>}

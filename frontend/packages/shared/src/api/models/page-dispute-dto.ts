@@ -34,13 +34,13 @@ export interface PageDisputeDTO {
      * @type {number}
      * @memberof PageDisputeDTO
      */
-    'totalPages'?: number;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageDisputeDTO
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}
