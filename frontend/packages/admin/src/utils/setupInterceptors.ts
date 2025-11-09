@@ -6,7 +6,9 @@
 
 import { message as antdMessage } from 'antd';
 import { axiosInstance, installErrorHandler, initTabSync } from '@campus/shared';
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore, forceLogoutWithoutBroadcast } from '@/stores/auth';
+
+let isHandlingUnauthorized = false;
 
 /**
  * 初始化全局拦截器
@@ -20,8 +22,35 @@ export const setupInterceptors = (): void => {
       antdMessage.error(message, duration);
     },
     onUnauthorized: () => {
-      console.warn('[Error Handler] 401 未授权');
-      // Token 刷新会自动处理，这里只记录日志
+      if (isHandlingUnauthorized) {
+        return;
+      }
+      isHandlingUnauthorized = true;
+
+      console.warn('[Error Handler] 401 未授权，触发强制登出');
+      antdMessage.warning('登录状态已失效，请重新登录', 3);
+
+      const { logout, isAuthenticated } = useAuthStore.getState();
+      const redirectToLogin = () => {
+        setTimeout(() => {
+          window.location.href = '/admin/login';
+        }, 800);
+      };
+      const finalize = () => {
+        isHandlingUnauthorized = false;
+        redirectToLogin();
+      };
+
+      if (isAuthenticated) {
+        logout()
+          .catch((error) => {
+            console.warn('[Error Handler] 强制登出失败', error);
+          })
+          .finally(finalize);
+      } else {
+        forceLogoutWithoutBroadcast();
+        finalize();
+      }
     },
     onForbidden: () => {
       console.warn('[Error Handler] 403 无权限');
@@ -50,7 +79,7 @@ export const setupInterceptors = (): void => {
       setTimeout(() => window.location.reload(), 1000);
     },
     onLogout: () => {
-      useAuthStore.getState().logout();
+      forceLogoutWithoutBroadcast();
       antdMessage.warning('其他标签页已登出，即将跳转...', 1);
       setTimeout(() => window.location.href = '/admin/login', 1500);
     },

@@ -8,6 +8,7 @@ import {
   createAuthStore,
   authService,
   getTabSync,
+  clearTokens,
   type LoginRequest,
   type LoginResponse,
   type ApiResponse,
@@ -133,3 +134,19 @@ export const useAuthStore = createAuthStore<AdminUser, LoginRequest>({
     getRoles: (user) => user?.roles ?? [],
   },
 });
+
+/**
+ * ⚠️ 仅用于被动登出场景（例如 401、Tab 同步）：清理本地状态但不再广播
+ */
+export const forceLogoutWithoutBroadcast = (): void => {
+  clearTokens();
+  useAuthStore.setState((state) => ({
+    ...state,
+    token: null,
+    accessToken: null,
+    refreshToken: null,
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+  }));
+};

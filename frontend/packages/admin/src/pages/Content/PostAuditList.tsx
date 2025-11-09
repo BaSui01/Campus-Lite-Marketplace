@@ -28,6 +28,7 @@ import {
   Col,
   Statistic,
   Image,
+  Input,
 } from 'antd';
 import {
   CheckOutlined,
@@ -35,7 +36,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { postService } from '@campus/shared';
 
 const { Option } = Select;
 const { TextArea } = Form.Item;
@@ -60,24 +61,13 @@ export const PostAuditList: React.FC = () => {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['posts', 'audit', { status, page, size }],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.listPosts(
-        undefined, // keyword
-        status as any,
-        page,
-        size
-      );
-      return response.data.data;
-    },
+    queryFn: () => postService.getPosts({ page, size }),
     staleTime: 2 * 60 * 1000,
   });
 
   const auditMutation = useMutation({
-    mutationFn: async ({ postId, approved, reason }: { postId: number; approved: boolean; reason?: string }) => {
-      const api = getApi();
-      await api.auditPost(postId, { approved, reason });
-    },
+    mutationFn: ({ postId, approved, reason }: { postId: number; approved: boolean; reason?: string }) =>
+      postService.auditPost(postId, { approved, reason }),
     onSuccess: () => {
       message.success('审核成功');
       setAuditModalVisible(false);

@@ -13,6 +13,28 @@ import type {
 } from '@campus/shared/api';
 
 export class BlacklistService {
+  async list(params?: {
+    userId?: number;
+    blockedUserId?: number;
+    page?: number;
+    size?: number;
+  }): Promise<PageBlacklistEntry> {
+    const api = getApi();
+    const response = await api.listAllBlacklist({
+      userId: params?.userId,
+      blockedUserId: params?.blockedUserId,
+      page: params?.page,
+      size: params?.size,
+    });
+    return response.data.data as PageBlacklistEntry;
+  }
+
+  async getStatistics(): Promise<any> {
+    const api = getApi();
+    const response = await api.getBlacklistStatistics();
+    return response.data.data;
+  }
+
   async listBlacklist(params?: {
     page?: number;
     size?: number;

@@ -69,30 +69,22 @@ export const BlacklistManagement: React.FC = () => {
   const [searchBlockedUserId, setSearchBlockedUserId] = useState<string>('');
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
 
-  // 查询黑名单列表（调用真实API）
+  // 查询黑名单列表
   const { data, isLoading } = useQuery({
     queryKey: ['blacklistRecords', page, size, searchUserId, searchBlockedUserId],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.listAllBlacklist(
-        searchUserId ? parseInt(searchUserId) : undefined,
-        searchBlockedUserId ? parseInt(searchBlockedUserId) : undefined,
-        page,
-        size
-      );
-      return response.data.data;
-    },
+    queryFn: () => blacklistService.list({
+      userId: searchUserId ? parseInt(searchUserId) : undefined,
+      blockedUserId: searchBlockedUserId ? parseInt(searchBlockedUserId) : undefined,
+      page,
+      size,
+    }),
     staleTime: 2 * 60 * 1000,
   });
 
-  // 查询黑名单统计（调用真实API）
+  // 查询黑名单统计
   const { data: statistics } = useQuery({
     queryKey: ['blacklistStatistics'],
-    queryFn: async (): Promise<BlacklistStatistics> => {
-      const api = getApi();
-      const response = await api.getBlacklistStatistics();
-      return response.data.data as BlacklistStatistics;
-    },
+    queryFn: () => blacklistService.getStatistics(),
     staleTime: 5 * 60 * 1000,
   });
 

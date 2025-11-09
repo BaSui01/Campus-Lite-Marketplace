@@ -108,6 +108,7 @@ const OperationLogList = lazy(() => import('@/pages/Logs').then(m => ({ default:
 // 内容管理
 const PostAuditList = lazy(() => import('@/pages/Content').then(m => ({ default: m.PostAuditList })));
 const ReportList = lazy(() => import('@/pages/Content').then(m => ({ default: m.ReportList })));
+const ReviewAuditList = lazy(() => import('@/pages/Content').then(m => ({ default: m.ReviewAuditList })));
 
 // 社区管理
 const TopicList = lazy(() => import('@/pages/Community').then(m => ({ default: m.TopicList })));
@@ -391,6 +392,14 @@ export const router = createBrowserRouter([
         element: (
           <PermissionGuard permission={PERMISSION_CODES.SYSTEM_REPORT_HANDLE}>
             <ReportList />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: 'content/reviews',
+        element: (
+          <PermissionGuard permission={PERMISSION_CODES.SYSTEM_REVIEW_MANAGE}>
+            <ReviewAuditList />
           </PermissionGuard>
         ),
       },

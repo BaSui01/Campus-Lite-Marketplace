@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Input, Select, Space, Tag, Card, Row, Col, Statistic } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { disputeService } from '@/services/dispute';
 
 const { Option } = Select;
 
@@ -28,16 +28,7 @@ export const DisputeList: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['disputes', { keyword, status, page, size }],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.listAllDisputes(
-        keyword || undefined,
-        status as any,
-        page,
-        size
-      );
-      return response.data.data;
-    },
+    queryFn: () => disputeService.listDisputes({ keyword, status, page, size }),
   });
 
   const columns = [

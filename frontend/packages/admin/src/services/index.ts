@@ -20,3 +20,5 @@ export * from './featureFlag';
 export * from './role';
 export * from './bannedUser';
 export * from './operationLog';
+export * from './auditLog';
+export * from './recommend';

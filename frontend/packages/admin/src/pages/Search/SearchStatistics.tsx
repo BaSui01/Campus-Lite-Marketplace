@@ -291,9 +291,10 @@ export const SearchStatistics: React.FC = () => {
 
       {/* 热门关键词列表 */}
       <Card title={<><FireOutlined /> 热门搜索词</>}>
+        {/* ✅ BaSui 修复：使用真实API数据 */}
         <Table
           columns={keywordColumns}
-          dataSource={popularKeywords || []} {/* ✅ BaSui 修复：使用真实API数据 */}
+          dataSource={popularKeywords || []}
           loading={isLoading}
           rowKey="keyword"
           pagination={{

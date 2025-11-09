@@ -38,7 +38,7 @@ import {
   CheckCircleOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { recommendService } from '@/services';
 import ReactECharts from 'echarts-for-react';
 
 const { Option } = Select;
@@ -74,56 +74,21 @@ export const RecommendConfig: React.FC = () => {
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
 
-  // ⚠️ BaSui 注意：后端暂无推荐配置管理API！
-  // 现有API：
-  //   - GET /api/recommend/hot - 热门榜单
-  //   - GET /api/recommend/personal - 个性化推荐
-  //   - POST /api/recommend/admin/hot/refresh - 刷新热门榜单（已实现）
-  //
-  // 🚧 需要后端提供以下API：
-  //   1. GET /api/admin/recommend/config - 获取推荐配置
-  //      返回：{ algorithm, enabled, weights, params }
-  //   2. PUT /api/admin/recommend/config - 更新推荐配置
-  //      参数：{ algorithm, enabled, weights, params }
-  //   3. GET /api/admin/recommend/statistics - 获取推荐统计
-  //      返回：{ totalRecommendations, clickRate, conversionRate, avgScore }
-  //
-  // 临时方案：前端显示固定配置，保存操作提示需要后端API
-  const defaultConfig = {
-    algorithm: 'HYBRID',
-    enabled: true,
-    weights: {
-      collaborative: 0.4,
-      content: 0.3,
-      hot: 0.2,
-      personalized: 0.1,
-    },
-    params: {
-      maxRecommendations: 20,
-      minScore: 0.3,
-      refreshInterval: 3600,
-    },
-  };
+  // 查询推荐配置
+  const { data: config, isLoading: configLoading } = useQuery({
+    queryKey: ['recommend', 'config'],
+    queryFn: () => recommendService.getConfig(),
+  });
 
-  const defaultStatistics = {
-    totalRecommendations: 0,
-    clickRate: 0,
-    conversionRate: 0,
-    avgScore: 0,
-  };
+  // 查询推荐统计
+  const { data: statistics } = useQuery({
+    queryKey: ['recommend', 'statistics'],
+    queryFn: () => recommendService.getStatistics(),
+  });
 
-  // ⚠️ BaSui 修复：保存配置 - 需要后端API支持
+  // 保存配置
   const saveMutation = useMutation({
-    mutationFn: async (values: any) => {
-      // TODO: 等待后端提供配置保存API
-      // const api = getApi();
-      // await api.updateRecommendConfig(values);
-
-      // 临时提示：告知用户需要后端API
-      console.warn('⚠️ 保存推荐配置失败：后端暂未提供配置管理API');
-      console.log('📋 配置内容:', values);
-      throw new Error('后端暂未提供配置管理API，请联系后端开发人员');
-    },
+    mutationFn: (values: any) => recommendService.updateConfig(values),
     onSuccess: () => {
       message.success('推荐配置已保存');
       queryClient.invalidateQueries({ queryKey: ['recommend', 'config'] });
@@ -135,8 +100,10 @@ export const RecommendConfig: React.FC = () => {
 
   // 重置配置
   const handleReset = () => {
-    form.setFieldsValue(defaultConfig);
-    message.info('配置已重置');
+    if (config) {
+      form.setFieldsValue(config);
+      message.info('配置已重置');
+    }
   };
 
   // 保存配置
@@ -189,9 +156,11 @@ export const RecommendConfig: React.FC = () => {
   };
 
   // 初始化表单值
-  useState(() => {
-    form.setFieldsValue(defaultConfig);
-  });
+  React.useEffect(() => {
+    if (config) {
+      form.setFieldsValue(config);
+    }
+  }, [config, form]);
 
   return (
     <div style={{ padding: '24px' }}>
@@ -201,7 +170,7 @@ export const RecommendConfig: React.FC = () => {
           <Card>
             <Statistic
               title="推荐总数"
-              value={defaultStatistics.totalRecommendations}
+              value={statistics?.totalRecommendations || 0}
               prefix={<ThunderboltOutlined />}
               suffix="次"
             />
@@ -211,7 +180,7 @@ export const RecommendConfig: React.FC = () => {
           <Card>
             <Statistic
               title="点击率"
-              value={defaultStatistics.clickRate * 100}
+              value={(statistics?.clickRate || 0) * 100}
               precision={2}
               suffix="%"
               valueStyle={{ color: '#1890ff' }}
@@ -222,7 +191,7 @@ export const RecommendConfig: React.FC = () => {
           <Card>
             <Statistic
               title="转化率"
-              value={defaultStatistics.conversionRate * 100}
+              value={(statistics?.conversionRate || 0) * 100}
               precision={2}
               suffix="%"
               valueStyle={{ color: '#3f8600' }}
@@ -233,7 +202,7 @@ export const RecommendConfig: React.FC = () => {
           <Card>
             <Statistic
               title="平均评分"
-              value={defaultStatistics.avgScore}
+              value={statistics?.avgScore || 0}
               precision={2}
               suffix="/ 1.0"
             />
@@ -268,7 +237,6 @@ export const RecommendConfig: React.FC = () => {
         <Form
           form={form}
           layout="vertical"
-          initialValues={defaultConfig}
         >
           <Row gutter={16}>
             <Col span={12}>

@@ -40,7 +40,7 @@ import {
   ShoppingOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { messageService } from '@campus/shared';
 import type { ConversationResponse } from '@campus/shared/api';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -86,13 +86,7 @@ export const MessageList: React.FC = () => {
   // 查询消息列表（使用会话列表API - 管理员视角需要看所有会话）
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['messages', 'admin', 'conversations', queryParams],
-    queryFn: async () => {
-      // TODO: 这里需要一个管理员查看所有会话的API
-      // 临时使用普通会话列表API
-      const api = getApi();
-      const response = await api.listConversations(page, size);
-      return response.data.data;
-    },
+    queryFn: () => messageService.getConversations({ page, size }),
     staleTime: 5 * 60 * 1000, // 缓存5分钟
   });
 

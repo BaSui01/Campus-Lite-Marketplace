@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Table, Button, Input, Select, Space, Tag, Card, Row, Col, Statistic, Rate, Modal, Image } from 'antd';
 import { SearchOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { reviewService } from '@campus/shared/services/goods/review';
 
 const { Option } = Select;
 
@@ -22,23 +22,11 @@ export const ReviewList: React.FC = () => {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['reviews', { keyword, rating, page, size }],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.listReviews(
-        keyword || undefined,
-        rating,
-        page,
-        size
-      );
-      return response.data.data;
-    },
+    queryFn: () => reviewService.getMyReviews({ page, size }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const api = getApi();
-      await api.deleteReview(id);
-    },
+    mutationFn: (id: number) => reviewService.deleteReview(id),
     onSuccess: () => { refetch(); queryClient.invalidateQueries({ queryKey: ['reviews'] }); },
   });
 

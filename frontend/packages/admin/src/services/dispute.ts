@@ -13,6 +13,17 @@ import type {
   BatchAssignRequest,
 } from '@campus/shared/api';
 
+/**
+ * 纠纷状态枚举 (对应后端 DisputeStatus)
+ */
+export enum DisputeStatus {
+  NEGOTIATING = 'NEGOTIATING', // 协商中
+  PENDING_ARBITRATION = 'PENDING_ARBITRATION', // 待仲裁
+  ARBITRATING = 'ARBITRATING', // 仲裁中
+  RESOLVED = 'RESOLVED', // 已解决
+  CLOSED = 'CLOSED', // 已关闭
+}
+
 export interface DisputeListParams {
   keyword?: string;
   type?: string;

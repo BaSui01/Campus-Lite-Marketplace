@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { Table, Button, Select, Space, Tag, Card, Progress, Modal, Form, Input, message } from 'antd';
 import { PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { batchService, BatchTaskStatus, BatchType } from '@campus/shared/services';
+import type { BatchTaskResponse } from '@campus/shared/api';
 
 const { Option } = Select;
 
@@ -34,18 +36,10 @@ export const BatchTaskList: React.FC = () => {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['batchTasks', { status, page, size }],
-    queryFn: async () => ({
-      content: Array.from({ length: 10 }, (_, i) => ({
-        id: page * 20 + i + 1,
-        taskType: Object.keys(TASK_TYPE_MAP)[i % 4],
-        taskName: `批量任务${i + 1}`,
-        status: Object.keys(STATUS_MAP)[i % 4],
-        totalCount: 100,
-        successCount: i % 4 === 2 ? 100 : (i % 4 === 1 ? 50 : 0),
-        failureCount: i % 4 === 3 ? 10 : 0,
-        createdAt: new Date(Date.now() - i * 3600000).toISOString(),
-      })),
-      totalElements: 30,
+    queryFn: () => batchService.listBatchTasks({
+      status: status as BatchTaskStatus,
+      page,
+      size
     }),
     refetchInterval: 5000,
   });
@@ -57,28 +51,28 @@ export const BatchTaskList: React.FC = () => {
 
   const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
-    { title: '任务名称', dataIndex: 'taskName', key: 'taskName', width: 200 },
-    { title: '类型', dataIndex: 'taskType', key: 'taskType', width: 120, render: (t: string) => TASK_TYPE_MAP[t] },
+    { title: '任务编码', dataIndex: 'taskCode', key: 'taskCode', width: 150 },
+    { title: '类型', dataIndex: 'batchType', key: 'batchType', width: 120, render: (t: string) => TASK_TYPE_MAP[t] || t },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (s: string) => <Tag color={STATUS_MAP[s].color}>{STATUS_MAP[s].text}</Tag>,
+      render: (s: string) => <Tag color={STATUS_MAP[s]?.color || 'default'}>{STATUS_MAP[s]?.text || s}</Tag>,
     },
     {
       title: '进度',
       key: 'progress',
       width: 200,
-      render: (_: any, record: any) => {
-        const percent = record.totalCount > 0 ? Math.round(((record.successCount + record.failureCount) / record.totalCount) * 100) : 0;
-        return <Progress percent={percent} size="small" />;
+      render: (_: any, record: BatchTaskResponse) => {
+        const percent = record.progressPercentage || 0;
+        return <Progress percent={Math.round(percent)} size="small" />;
       },
     },
     { title: '总数', dataIndex: 'totalCount', key: 'totalCount', width: 80 },
     { title: '成功', dataIndex: 'successCount', key: 'successCount', width: 80 },
-    { title: '失败', dataIndex: 'failureCount', key: 'failureCount', width: 80 },
-    { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 180, render: (d: string) => new Date(d).toLocaleString('zh-CN') },
+    { title: '失败', dataIndex: 'errorCount', key: 'errorCount', width: 80 },
+    { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 180, render: (d: string) => d ? new Date(d).toLocaleString('zh-CN') : '-' },
     {
       title: '操作',
       key: 'actions',

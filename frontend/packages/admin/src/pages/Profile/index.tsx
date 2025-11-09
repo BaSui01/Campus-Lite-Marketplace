@@ -66,9 +66,9 @@ const { TextArea } = Input;
 const { Text, Title, Paragraph } = Typography;
 const { Step } = Steps;
 
-// 模拟登录设备数据
+// 登录设备数据类型
 interface LoginDevice {
-  id: string;
+  id: number;
   deviceName: string;
   deviceType: 'mobile' | 'desktop' | 'tablet';
   os: string;
@@ -89,6 +89,7 @@ export const ProfilePage: React.FC = () => {
   const [passwordForm] = Form.useForm();
   const [emailForm] = Form.useForm();
   const [phoneForm] = Form.useForm();
+  const [twoFactorForm] = Form.useForm();
 
   // 状态管理
   const [avatarFileList, setAvatarFileList] = useState<UploadFile[]>([]);
@@ -119,16 +120,16 @@ export const ProfilePage: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // ⚠️ 登录设备功能暂未实现后端 API，暂时禁用
-  // TODO: 等待后端实现 GET /api/users/devices 接口
-  // const { data: loginDevices = [] } = useQuery<LoginDevice[]>({
-  //   queryKey: ['loginDevices'],
-  //   queryFn: async () => {
-  //     const response = await userService.getLoginDevices();
-  //     return response.data;
-  //   },
-  //   staleTime: 2 * 60 * 1000,
-  // });
+  // 查询登录设备列表
+  const { data: loginDevices = [] } = useQuery<LoginDevice[]>({
+    queryKey: ['loginDevices', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      return await userService.getLoginDevices(currentUser.id);
+    },
+    enabled: !!currentUser?.id,
+    staleTime: 2 * 60 * 1000,
+  });
 
   // 更新个人资料 Mutation
   const updateProfileMutation = useMutation({
@@ -182,20 +183,54 @@ export const ProfilePage: React.FC = () => {
     },
   });
 
+  // 发送邮箱验证码 Mutation
+  const sendEmailCodeMutation = useMutation({
+    mutationFn: async (email: string) => {
+      await userService.sendEmailCode(email);
+    },
+    onSuccess: () => {
+      message.success('验证码已发送！请查收邮件 📧');
+      setEmailCodeSent(true);
+      startCountdown();
+    },
+    onError: (error: any) => {
+      message.error(`发送失败：${error.message} 😰`);
+    },
+  });
+
   // 发送邮箱验证码
   const sendEmailCode = () => {
-    // ⚠️ TODO: 等待后端实现 POST /api/users/email/send-code 接口
-    message.warning('此功能暂未开放，敬请期待！🚧');
-    // setEmailCodeSent(true);
-    // startCountdown();
+    const email = emailForm.getFieldValue('email');
+    if (!email) {
+      message.error('请先输入邮箱地址！');
+      return;
+    }
+    sendEmailCodeMutation.mutate(email);
   };
+
+  // 发送手机验证码 Mutation
+  const sendPhoneCodeMutation = useMutation({
+    mutationFn: async (phone: string) => {
+      await userService.sendPhoneCode(phone);
+    },
+    onSuccess: () => {
+      message.success('验证码已发送！请查收短信 📱');
+      setPhoneCodeSent(true);
+      startCountdown();
+    },
+    onError: (error: any) => {
+      message.error(`发送失败：${error.message} 😰`);
+    },
+  });
 
   // 发送手机验证码
   const sendPhoneCode = () => {
-    // ⚠️ TODO: 等待后端实现 POST /api/users/phone/send-code 接口
-    message.warning('此功能暂未开放，敬请期待！🚧');
-    // setPhoneCodeSent(true);
-    // startCountdown();
+    const phone = phoneForm.getFieldValue('phone');
+    if (!phone) {
+      message.error('请先输入手机号！');
+      return;
+    }
+    sendPhoneCodeMutation.mutate(phone);
   };
 
   // 倒计时
@@ -212,80 +247,161 @@ export const ProfilePage: React.FC = () => {
     }, 1000);
   };
 
+  // 绑定邮箱 Mutation
+  const bindEmailMutation = useMutation({
+    mutationFn: async (data: { email: string; code: string }) => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      await userService.bindEmail(currentUser.id, data);
+    },
+    onSuccess: () => {
+      message.success('邮箱绑定成功！🎉');
+      setEmailVerified(true);
+      setEmailBindModalVisible(false);
+      emailForm.resetFields();
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+    onError: (error: any) => {
+      message.error(`绑定失败：${error.message} 😰`);
+    },
+  });
+
   // 绑定邮箱
   const handleBindEmail = () => {
     emailForm.validateFields().then((values) => {
-      // ⚠️ TODO: 等待后端实现 POST /api/users/email/bind 接口
-      message.warning('此功能暂未开放，敬请期待！🚧');
-      // setEmailVerified(true);
-      // setEmailBindModalVisible(false);
-      // emailForm.resetFields();
-      // queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      bindEmailMutation.mutate(values);
     });
   };
+
+  // 绑定手机号 Mutation
+  const bindPhoneMutation = useMutation({
+    mutationFn: async (data: { phone: string; code: string }) => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      await userService.bindPhone(currentUser.id, data);
+    },
+    onSuccess: () => {
+      message.success('手机号绑定成功！🎉');
+      setPhoneVerified(true);
+      setPhoneBindModalVisible(false);
+      phoneForm.resetFields();
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+    onError: (error: any) => {
+      message.error(`绑定失败：${error.message} 😰`);
+    },
+  });
 
   // 绑定手机号
   const handleBindPhone = () => {
     phoneForm.validateFields().then((values) => {
-      // ⚠️ TODO: 等待后端实现 POST /api/users/phone/bind 接口
-      message.warning('此功能暂未开放，敬请期待！🚧');
-      // setPhoneVerified(true);
-      // setPhoneBindModalVisible(false);
-      // phoneForm.resetFields();
-      // queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+      bindPhoneMutation.mutate(values);
     });
   };
 
+  // 启用两步验证 Mutation
+  const enableTwoFactorMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      return await userService.enableTwoFactor(currentUser.id);
+    },
+    onSuccess: (data) => {
+      setTwoFactorSecret(data.secret);
+      setTwoFactorModalVisible(true);
+      setTwoFactorStep(0);
+    },
+    onError: (error: any) => {
+      message.error(`启用失败：${error.message} 😰`);
+    },
+  });
+
   // 启用两步验证
   const handleEnableTwoFactor = () => {
-    // ⚠️ TODO: 等待后端实现 POST /api/users/2fa/enable 接口
-    message.warning('此功能暂未开放，敬请期待！🚧');
-    // setTwoFactorSecret('JBSWY3DPEHPK3PXP');
-    // setTwoFactorModalVisible(true);
-    // setTwoFactorStep(0);
+    enableTwoFactorMutation.mutate();
   };
 
+  // 验证两步验证 Mutation
+  const verifyTwoFactorMutation = useMutation({
+    mutationFn: async (code: string) => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      await userService.verifyTwoFactor(currentUser.id, code);
+    },
+    onSuccess: () => {
+      message.success('两步验证已启用！🎉');
+      setTwoFactorEnabled(true);
+      setTwoFactorModalVisible(false);
+      setTwoFactorStep(0);
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+    onError: (error: any) => {
+      message.error(`验证失败：${error.message} 😰`);
+    },
+  });
+
   // 确认两步验证
-  const handleConfirmTwoFactor = () => {
-    // ⚠️ TODO: 等待后端实现 POST /api/users/2fa/verify 接口
-    message.warning('此功能暂未开放，敬请期待！🚧');
-    // setTwoFactorEnabled(true);
-    // setTwoFactorModalVisible(false);
-    // setTwoFactorStep(0);
+  const handleConfirmTwoFactor = (code: string) => {
+    if (!code || code.length !== 6) {
+      message.error('请输入6位验证码！');
+      return;
+    }
+    verifyTwoFactorMutation.mutate(code);
   };
+
+  // 关闭两步验证 Mutation
+  const disableTwoFactorMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      await userService.disableTwoFactor(currentUser.id);
+    },
+    onSuccess: () => {
+      message.success('两步验证已关闭！');
+      setTwoFactorEnabled(false);
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+    onError: (error: any) => {
+      message.error(`关闭失败：${error.message} 😰`);
+    },
+  });
 
   // 关闭两步验证
   const handleDisableTwoFactor = () => {
-    // ⚠️ TODO: 等待后端实现 POST /api/users/2fa/disable 接口
-    message.warning('此功能暂未开放，敬请期待！🚧');
-    // Modal.confirm({
-    //   title: '关闭两步验证',
-    //   content: '关闭后您的账号安全性会降低，确定要关闭吗？',
-    //   okText: '确认关闭',
-    //   okType: 'danger',
-    //   cancelText: '取消',
-    //   onOk: () => {
-    //     message.success('两步验证已关闭');
-    //     setTwoFactorEnabled(false);
-    //   },
-    // });
+    Modal.confirm({
+      title: '关闭两步验证',
+      content: '关闭后您的账号安全性会降低，确定要关闭吗？',
+      okText: '确认关闭',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: () => {
+        disableTwoFactorMutation.mutate();
+      },
+    });
   };
+
+  // 踢出设备 Mutation
+  const kickDeviceMutation = useMutation({
+    mutationFn: async (deviceId: number) => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      await userService.kickDevice(currentUser.id, deviceId);
+    },
+    onSuccess: () => {
+      message.success('设备已踢出！🎉');
+      queryClient.invalidateQueries({ queryKey: ['loginDevices'] });
+    },
+    onError: (error: any) => {
+      message.error(`踢出失败：${error.message} 😰`);
+    },
+  });
 
   // 踢出设备
   const handleKickDevice = (deviceId: string) => {
-    // ⚠️ TODO: 等待后端实现 DELETE /api/users/devices/{deviceId} 接口
-    message.warning('此功能暂未开放，敬请期待！🚧');
-    // Modal.confirm({
-    //   title: '踢出设备',
-    //   content: '确定要踢出这个设备吗？该设备需要重新登录。',
-    //   okText: '确认踢出',
-    //   okType: 'danger',
-    //   cancelText: '取消',
-    //   onOk: () => {
-    //     message.success('设备已踢出');
-    //     queryClient.invalidateQueries({ queryKey: ['loginDevices'] });
-    //   },
-    // });
+    Modal.confirm({
+      title: '踢出设备',
+      content: '确定要踢出这个设备吗？该设备需要重新登录。',
+      okText: '确认踢出',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: () => {
+        kickDeviceMutation.mutate(Number(deviceId));
+      },
+    });
   };
 
   // 提交个人资料
@@ -686,33 +802,32 @@ export const ProfilePage: React.FC = () => {
         </Card>
       ),
     },
-    // ⚠️ 登录设备功能暂未实现后端 API，暂时隐藏
-    // TODO: 等待后端实现 GET /api/users/devices 接口后再启用
-    // {
-    //   key: 'devices',
-    //   label: (
-    //     <span>
-    //       <DesktopOutlined /> 登录设备
-    //     </span>
-    //   ),
-    //   children: (
-    //     <Card>
-    //       <Alert
-    //         message="安全提示"
-    //         description="如果发现陌生设备，请立即踢出并修改密码。"
-    //         type="warning"
-    //         showIcon
-    //         style={{ marginBottom: 16 }}
-    //       />
-    //       <Table
-    //         columns={deviceColumns}
-    //         dataSource={loginDevices}
-    //         rowKey="id"
-    //         pagination={false}
-    //       />
-    //     </Card>
-    //   ),
-    // },
+    {
+      key: 'devices',
+      label: (
+        <span>
+          <DesktopOutlined /> 登录设备
+        </span>
+      ),
+      children: (
+        <Card>
+          <Alert
+            message="安全提示"
+            description="如果发现陌生设备，请立即踢出并修改密码。"
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+          <Table
+            columns={deviceColumns}
+            dataSource={loginDevices}
+            rowKey="id"
+            pagination={false}
+            loading={kickDeviceMutation.isPending}
+          />
+        </Card>
+      ),
+    },
     {
       key: 'info',
       label: (
@@ -734,6 +849,26 @@ export const ProfilePage: React.FC = () => {
               <Col span={12}>
                 <Text type="secondary">用户ID：</Text>
                 <Text strong>{userProfile?.id}</Text>
+              </Col>
+              <Col span={12}>
+                <Text type="secondary">学号：</Text>
+                <Text strong>{userProfile?.studentId || '-'}</Text>
+              </Col>
+              <Col span={12}>
+                <Text type="secondary">所属校区：</Text>
+                <Text>{userProfile?.campus?.name || '-'}</Text>
+              </Col>
+              <Col span={12}>
+                <Text type="secondary">账号状态：</Text>
+                <Tag color={userProfile?.status === 'ACTIVE' ? 'green' : userProfile?.status === 'BANNED' ? 'red' : 'default'}>
+                  {userProfile?.status === 'ACTIVE' ? '正常' : userProfile?.status === 'BANNED' ? '封禁' : '已注销'}
+                </Tag>
+              </Col>
+              <Col span={12}>
+                <Text type="secondary">信誉分：</Text>
+                <Text strong style={{ color: (userProfile?.creditScore || 0) >= 100 ? '#52c41a' : '#ff4d4f' }}>
+                  {userProfile?.creditScore || 100} / 200
+                </Text>
               </Col>
               <Col span={12}>
                 <Text type="secondary">注册时间：</Text>
@@ -938,13 +1073,29 @@ export const ProfilePage: React.FC = () => {
             <Paragraph>
               请输入 Google Authenticator 中显示的 6 位数字验证码：
             </Paragraph>
-            <Form layout="vertical">
-              <Form.Item label="验证码" required>
+            <Form form={twoFactorForm} layout="vertical">
+              <Form.Item
+                label="验证码"
+                name="code"
+                rules={[
+                  { required: true, message: '请输入验证码！' },
+                  { len: 6, message: '验证码必须是6位数字！' },
+                  { pattern: /^\d{6}$/, message: '验证码必须是6位数字！' }
+                ]}
+              >
                 <Input placeholder="请输入6位验证码" maxLength={6} />
               </Form.Item>
               <Form.Item>
                 <Space>
-                  <Button type="primary" onClick={handleConfirmTwoFactor}>
+                  <Button
+                    type="primary"
+                    loading={verifyTwoFactorMutation.isPending}
+                    onClick={() => {
+                      twoFactorForm.validateFields().then((values) => {
+                        handleConfirmTwoFactor(values.code);
+                      });
+                    }}
+                  >
                     验证并启用
                   </Button>
                   <Button onClick={() => setTwoFactorStep(0)}>

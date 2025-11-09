@@ -33,7 +33,7 @@ import {
   ShoppingOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { messageService } from '@campus/shared';
 import type { MessageResponse } from '@campus/shared/api';
 import dayjs from 'dayjs';
 
@@ -65,15 +65,7 @@ export const MessageDetail: React.FC = () => {
   // 查询会话聊天记录
   const { data, isLoading, error } = useQuery({
     queryKey: ['messages', 'conversation', conversationId],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.listMessagesInConversation(
-        Number(conversationId),
-        0,
-        100 // 加载最近100条消息
-      );
-      return response.data.data;
-    },
+    queryFn: () => messageService.getMessages(Number(conversationId!), { page: 0, size: 100 }),
     enabled: !!conversationId,
   });
 
