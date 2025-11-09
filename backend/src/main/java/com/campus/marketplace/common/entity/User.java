@@ -79,6 +79,12 @@ public class User {
     private String nickname;
 
     /**
+     * 个人简介
+     */
+    @Column(length = 500)
+    private String bio;
+
+    /**
      * 用户积分（任务 32 遗漏字段 - 已补充！）
      */
     @Builder.Default

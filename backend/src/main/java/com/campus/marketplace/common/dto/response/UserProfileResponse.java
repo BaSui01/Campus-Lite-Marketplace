@@ -35,6 +35,12 @@ public class UserProfileResponse {
     private String username;
 
     /**
+     * 昵称
+     */
+    @Schema(description = "昵称", example = "小爱同学")
+    private String nickname;
+
+    /**
      * 邮箱（脱敏）
      */
     @Schema(description = "邮箱（脱敏后）", example = "a***@example.com")
@@ -69,6 +75,24 @@ public class UserProfileResponse {
      */
     @Schema(description = "当前积分", example = "1200")
     private Integer points;
+
+    /**
+     * 校区 ID
+     */
+    @Schema(description = "校区ID", example = "1")
+    private Long campusId;
+
+    /**
+     * 校区名称
+     */
+    @Schema(description = "校区名称", example = "北京校区")
+    private String campusName;
+
+    /**
+     * 封禁原因
+     */
+    @Schema(description = "封禁原因（仅封禁状态时有值）", example = "违规发布信息")
+    private String banReason;
 
     /**
      * 角色列表

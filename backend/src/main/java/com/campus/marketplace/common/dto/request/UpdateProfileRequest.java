@@ -13,6 +13,12 @@ import jakarta.validation.constraints.Pattern;
 @Schema(description = "更新用户资料请求体")
 public record UpdateProfileRequest(
 
+        @Schema(description = "昵称", example = "小明")
+        String nickname,
+
+        @Schema(description = "个人简介", example = "热爱生活，喜欢交友")
+        String bio,
+
         @Schema(description = "联系邮箱", example = "alice@example.com")
         @Email(message = "邮箱格式不正确")
         String email,
