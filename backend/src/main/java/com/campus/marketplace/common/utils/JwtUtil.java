@@ -33,14 +33,17 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Value("${jwt.refresh-expiration:604800000}") // 默认7天
+    private Long refreshExpiration;
+
     /**
-     * 生成 JWT Token
-     * 
+     * 生成访问令牌（Access Token）- 短期有效
+     *
      * @param userId 用户 ID
      * @param username 用户名
      * @param roles 角色列表
      * @param permissions 权限列表
-     * @return JWT Token
+     * @return Access Token
      */
     public String generateToken(Long userId, String username, List<String> roles, List<String> permissions) {
         Map<String, Object> claims = new HashMap<>();
@@ -48,19 +51,54 @@ public class JwtUtil {
         claims.put("username", username);
         claims.put("roles", roles);
         claims.put("permissions", permissions);
-        
-        return createToken(claims, username);
+
+        return createToken(claims, username, expiration);
     }
 
     /**
-     * 创建 Token
+     * 生成刷新令牌（Refresh Token）- 长期有效
+     *
+     * @param userId 用户 ID
+     * @param username 用户名
+     * @return Refresh Token
      */
-    private String createToken(Map<String, Object> claims, String subject) {
+    public String generateRefreshToken(Long userId, String username) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("username", username);
+        claims.put("type", "refresh"); // 标记为刷新令牌
+
+        return createToken(claims, username, refreshExpiration);
+    }
+
+    /**
+     * 生成临时令牌（Temp Token）- 用于 2FA 验证（5分钟有效）
+     *
+     * @param userId 用户 ID
+     * @return Temp Token
+     */
+    public String generateTempToken(Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("type", "temp"); // 标记为临时令牌
+
+        return createToken(claims, userId.toString(), 300000L); // 5分钟 = 300000ms
+    }
+
+    /**
+     * 创建 Token（支持自定义过期时间）
+     *
+     * @param claims 载荷数据
+     * @param subject 主题（通常是用户名）
+     * @param expirationTime 过期时间（毫秒）
+     * @return JWT Token
+     */
+    private String createToken(Map<String, Object> claims, String subject, Long expirationTime) {
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + expiration);
-        
+        Date expirationDate = new Date(now.getTime() + expirationTime);
+
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
@@ -152,7 +190,7 @@ public class JwtUtil {
 
     /**
      * 验证 Token 是否有效
-     * 
+     *
      * @param token JWT Token
      * @param username 用户名
      * @return 是否有效
@@ -163,6 +201,31 @@ public class JwtUtil {
             return (tokenUsername.equals(username) && !isTokenExpired(token));
         } catch (Exception e) {
             log.error("Token 验证失败", e);
+            return false;
+        }
+    }
+
+    /**
+     * 验证刷新令牌是否有效
+     *
+     * @param refreshToken Refresh Token
+     * @return 是否有效
+     */
+    public Boolean validateRefreshToken(String refreshToken) {
+        try {
+            Claims claims = getClaimsFromToken(refreshToken);
+            String type = claims.get("type", String.class);
+
+            // 检查是否是刷新令牌
+            if (!"refresh".equals(type)) {
+                log.warn("Token 类型不是 refresh");
+                return false;
+            }
+
+            // 检查是否过期
+            return !isTokenExpired(refreshToken);
+        } catch (Exception e) {
+            log.error("Refresh Token 验证失败", e);
             return false;
         }
     }

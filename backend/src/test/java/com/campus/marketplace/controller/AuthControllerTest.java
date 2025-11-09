@@ -163,7 +163,7 @@ class AuthControllerTest {
     @DisplayName("刷新Token返回新凭证")
     void refreshToken_success() throws Exception {
         LoginResponse response = LoginResponse.builder()
-                .token("new-token")
+                .accessToken("new-token")
                 .expiresIn(Instant.now().plusSeconds(3600).toEpochMilli())
                 .userInfo(LoginResponse.UserInfo.builder()
                         .id(1L)

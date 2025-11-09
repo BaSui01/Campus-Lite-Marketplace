@@ -79,8 +79,8 @@ class AuthServiceLoginTest {
         // 🎯 Mock CryptoUtil 行为：默认返回明文密码（兼容模式）
         when(cryptoUtil.isEncrypted(anyString())).thenReturn(false);
 
-        // 准备测试数据
-        validLoginRequest = new LoginRequest("testuser", "Password123");
+        // 准备测试数据（新增验证码字段，测试中传 null）
+        validLoginRequest = new LoginRequest("testuser", "Password123", null, null, null);
 
         // 创建权限
         viewPermission = Permission.builder()
@@ -128,7 +128,7 @@ class AuthServiceLoginTest {
 
         // Assert
         assertNotNull(response);
-        assertEquals("mock-jwt-token", response.getToken());
+        assertEquals("mock-jwt-token", response.getAccessToken());
         assertEquals("Bearer", response.getTokenType());
         assertEquals(7200000L, response.getExpiresIn());
         
@@ -157,7 +157,7 @@ class AuthServiceLoginTest {
         when(userRepository.findByUsernameWithRoles("nonexistent"))
                 .thenReturn(Optional.empty());
 
-        LoginRequest request = new LoginRequest("nonexistent", "Password123");
+        LoginRequest request = new LoginRequest("nonexistent", "Password123", null, null, null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
@@ -178,7 +178,7 @@ class AuthServiceLoginTest {
         when(passwordEncoder.matches("WrongPassword", "$2a$10$encodedPassword"))
                 .thenReturn(false);
 
-        LoginRequest request = new LoginRequest("testuser", "WrongPassword");
+        LoginRequest request = new LoginRequest("testuser", "WrongPassword", null, null, null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {

@@ -158,6 +158,18 @@ public class User {
     private String twoFactorSecret;
 
     /**
+     * 2FA 恢复码（JSON 数组，存储加密后的恢复码）
+     */
+    @Column(name = "two_factor_recovery_codes", columnDefinition = "TEXT")
+    private String twoFactorRecoveryCodes;
+
+    /**
+     * 2FA 启用时间
+     */
+    @Column(name = "two_factor_enabled_at")
+    private LocalDateTime twoFactorEnabledAt;
+
+    /**
      * 用户角色（任务 4 遗漏关联 - 已补充！）
      * Many-to-Many 关联
      */
