@@ -166,12 +166,19 @@ const Login: React.FC = () => {
   };
 
   /**
-   * 🎯 滑块验证成功
+   * 🎯 滑块验证成功（修改：接收验证码数据 - BaSui 2025-11-10）
    */
-  const handleCaptchaSuccess = () => {
-    console.log('[Login] ✅ 滑块验证通过！');
+  const handleCaptchaSuccess = (slideId: string, position: number) => {
+    console.log('[Login] ✅ 滑块验证通过！slideId:', slideId, 'position:', position);
     setIsVerified(true);
     setErrors(prev => ({ ...prev, captcha: '' }));
+
+    // ✅ 保存验证码数据到表单（用于登录请求）
+    setFormData(prev => ({
+      ...prev,
+      captchaId: slideId,
+      slidePosition: position,
+    }));
   };
 
   /**

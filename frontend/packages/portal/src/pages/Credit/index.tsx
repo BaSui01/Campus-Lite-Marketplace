@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton } from '@campus/shared/components';
 import { creditService, CREDIT_LEVEL_CONFIG } from '../../services';
-import { UserCreditInfo, CreditHistoryItem } from '@campus/shared/services';;
+import type { UserCreditInfo, CreditHistoryItem } from '../../services/credit';
 import { useNotificationStore } from '../../store';
 import './Credit.css';
 

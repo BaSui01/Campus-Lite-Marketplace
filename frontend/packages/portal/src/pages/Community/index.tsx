@@ -7,9 +7,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button, Skeleton, Modal, Tabs } from '@campus/shared/components';
-import { postService, tagService } from '@campus/shared/services';
+import { Input, Button, Skeleton, Modal, Tabs, TagSelector, TopicSelector } from '@campus/shared/components';
+import type { TagOption, TopicOption } from '@campus/shared/components';
+import { postService, tagService, topicService } from '@campus/shared/services';
 import type { Tag } from '@campus/shared/services/tag';
+import type { Topic } from '@campus/shared/services/topic';
 import { useAuthStore, useNotificationStore } from '../../store';
 import './Community.css';
 
@@ -59,6 +61,7 @@ const Community: React.FC = () => {
   const [publishContent, setPublishContent] = useState('');
   const [publishImages, setPublishImages] = useState<string[]>([]);
   const [publishTagIds, setPublishTagIds] = useState<number[]>([]);
+  const [publishTopicIds, setPublishTopicIds] = useState<number[]>([]); // 新增：话题ID列表
   const [publishing, setPublishing] = useState(false);
 
   // 评论弹窗
@@ -74,6 +77,11 @@ const Community: React.FC = () => {
   const [loadingTags, setLoadingTags] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
 
+  // 话题列表
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [hotTags, setHotTags] = useState<TagOption[]>([]);
+  const [hotTopics, setHotTopics] = useState<TopicOption[]>([]);
+
   // ==================== 数据加载 ====================
 
   /**
@@ -85,17 +93,63 @@ const Community: React.FC = () => {
       // 🚀 调用真实后端 API 获取标签列表
       const response = await tagService.list({
         status: 'ENABLED' as any,
-        size: 20,
+        size: 50,
       });
 
-      if (response && response.content) {
-        setTags(response.content);
+      if (Array.isArray(response)) {
+        setTags(response);
       }
     } catch (err: any) {
       console.error('加载标签失败：', err);
       // 静默失败，不影响主要功能
     } finally {
       setLoadingTags(false);
+    }
+  };
+
+  /**
+   * 加载热门标签
+   */
+  const loadHotTags = async () => {
+    try {
+      const hotTagsData = await tagService.getHotTags(10);
+      setHotTags(hotTagsData.map(tag => ({
+        id: tag.id,
+        name: tag.name,
+        usageCount: tag.usageCount,
+      })));
+    } catch (err: any) {
+      console.error('加载热门标签失败：', err);
+    }
+  };
+
+  /**
+   * 加载话题列表
+   */
+  const loadTopics = async () => {
+    try {
+      const allTopics = await topicService.getAll();
+      setTopics(allTopics);
+    } catch (err: any) {
+      console.error('加载话题失败：', err);
+    }
+  };
+
+  /**
+   * 加载热门话题
+   */
+  const loadHotTopics = async () => {
+    try {
+      const hotTopicsData = await topicService.getHotTopics();
+      setHotTopics(hotTopicsData.map(topic => ({
+        id: topic.id,
+        name: topic.name,
+        description: topic.description,
+        postCount: topic.postCount,
+        followerCount: topic.followerCount,
+      })));
+    } catch (err: any) {
+      console.error('加载热门话题失败：', err);
     }
   };
 
@@ -155,6 +209,9 @@ const Community: React.FC = () => {
 
   useEffect(() => {
     loadTags(); // 初始化加载标签
+    loadHotTags(); // 加载热门标签
+    loadTopics(); // 加载话题列表
+    loadHotTopics(); // 加载热门话题
   }, []);
 
   // ==================== 事件处理 ====================
@@ -182,6 +239,7 @@ const Community: React.FC = () => {
     setPublishContent('');
     setPublishImages([]);
     setPublishTagIds([]);
+    setPublishTopicIds([]);
   };
 
   /**

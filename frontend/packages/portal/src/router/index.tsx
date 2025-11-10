@@ -88,20 +88,62 @@ const TermsOfService = lazy(() => import('../pages/TermsOfService'));
 
 /**
  * 需要认证的路由守卫
+ * @description 检查用户是否已登录且 Token 有效，如果未登录则重定向到登录页
+ * @author BaSui 😎
  */
 const RequireAuth = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  
-  if (!isAuthenticated) {
-    // 未登录，保存当前路径并重定向到登录页
+  const [isChecking, setIsChecking] = useState(true);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      console.log('[RequireAuth] 🔍 开始检查认证状态...');
+
+      // 1. 检查 Token 是否存在且有效（优先检查 Token）
+      const token = getAccessToken();
+      if (!token) {
+        console.log('[RequireAuth] ⚠️ Token 不存在，需要登录');
+        setShouldRedirect(true);
+        setIsChecking(false);
+        return;
+      }
+
+      // 2. 检查 Token 是否过期
+      const isValid = isTokenValid(token);
+      if (!isValid) {
+        console.log('[RequireAuth] ⏰ Token 已过期，需要重新登录');
+        setShouldRedirect(true);
+        setIsChecking(false);
+        return;
+      }
+
+      // 3. Token 有效，允许访问
+      console.log('[RequireAuth] ✅ Token 有效，允许访问受保护页面');
+      setIsChecking(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  // 显示加载状态
+  if (isChecking) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loading size="large" />
+      </div>
+    );
+  }
+
+  // 重定向到登录页
+  if (shouldRedirect) {
     const currentPath = window.location.pathname + window.location.search;
     const loginPath = `/login?redirect=${encodeURIComponent(currentPath)}`;
-    
-    console.log('[RequireAuth] 未登录，重定向到登录页:', loginPath);
-    
+    console.log('[RequireAuth] 🚀 重定向到登录页:', loginPath);
     return <Navigate to={loginPath} replace />;
   }
 
+  // 允许访问受保护页面
   return <>{children}</>;
 };
 
