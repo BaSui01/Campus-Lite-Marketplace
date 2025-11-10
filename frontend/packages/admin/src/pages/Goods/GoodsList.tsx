@@ -42,6 +42,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { goodsService } from '@campus/shared/services/goods';
 import type { GoodsResponse } from '@campus/shared/api';
+import './GoodsList.css';
 
 const { Option } = Select;
 
@@ -231,7 +232,7 @@ export const GoodsList: React.FC = () => {
         <img
           src={images?.[0] || 'https://via.placeholder.com/60'}
           alt="商品"
-          style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }}
+          className="goods-image"
         />
       ),
     },
@@ -247,7 +248,7 @@ export const GoodsList: React.FC = () => {
       dataIndex: 'price',
       key: 'price',
       width: 100,
-      render: (price: number) => `¥${price.toFixed(2)}`,
+      render: (price: number) => <span className="goods-price">¥{price.toFixed(2)}</span>,
     },
     {
       title: '分类',
@@ -315,9 +316,11 @@ export const GoodsList: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className="goods-list-container">
+      <h2 className="page-title">📦 商品管理</h2>
+      
       {/* 统计卡片 */}
-      <Row gutter={16} style={{ marginBottom: 16 }}>
+      <Row gutter={16} style={{ marginBottom: 16 }} className="goods-stats-row">
         <Col span={6}>
           <Card>
             <Statistic title="总商品数" value={data?.totalElements || 0} />
@@ -357,7 +360,7 @@ export const GoodsList: React.FC = () => {
       </Row>
 
       {/* 搜索和筛选栏 */}
-      <Card style={{ marginBottom: 16 }}>
+      <Card style={{ marginBottom: 16 }} className="goods-filter-card filter-section">
         <Space wrap style={{ width: '100%' }}>
           <Input
             placeholder="搜索商品标题/描述"
@@ -415,7 +418,7 @@ export const GoodsList: React.FC = () => {
       </Card>
 
       {/* 批量操作按钮 */}
-      <Space style={{ marginBottom: 16 }}>
+      <Space style={{ marginBottom: 16 }} className="goods-batch-actions action-buttons">
         <Button
           type="primary"
           icon={<CheckOutlined />}
@@ -442,7 +445,8 @@ export const GoodsList: React.FC = () => {
       </Space>
 
       {/* 商品表格 */}
-      <Table
+      <div className="goods-table-wrapper">
+        <Table
         rowKey="id"
         columns={columns}
         dataSource={data?.content || []}
@@ -464,7 +468,8 @@ export const GoodsList: React.FC = () => {
           },
         }}
         scroll={{ x: 1500 }}
-      />
+        />
+      </div>
     </div>
   );
 };

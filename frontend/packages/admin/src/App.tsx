@@ -14,6 +14,9 @@ import zhCN from 'antd/locale/zh_CN';
 import { router } from './router';
 import { useAuthStore } from './stores/auth';
 import { setupInterceptors } from './utils/setupInterceptors';
+import { useTheme } from './hooks';
+import './styles/global.css';
+import './styles/theme.css';
 
 // ===== 创建 React Query 客户端 =====
 const queryClient = new QueryClient({
@@ -29,12 +32,36 @@ const queryClient = new QueryClient({
 const antdTheme = {
   token: {
     colorPrimary: '#667eea',
-    borderRadius: 6,
+    colorSuccess: '#52c41a',
+    colorWarning: '#faad14',
+    colorError: '#ff4d4f',
+    colorInfo: '#1890ff',
+    borderRadius: 8,
+    fontSize: 14,
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  },
+  components: {
+    Card: {
+      borderRadiusLG: 16,
+    },
+    Button: {
+      borderRadius: 8,
+    },
+    Input: {
+      borderRadius: 8,
+    },
+    Table: {
+      borderRadiusLG: 16,
+    },
   },
 };
 
 const App: React.FC = () => {
   const initFromStorage = useAuthStore((state: any) => state.initFromStorage);
+  
+  // ===== 🎨 主题切换 Hook =====
+  // 会自动应用主题到 DOM（data-theme 属性和 body 类名）
+  useTheme();
 
   // ===== 初始化：全局拦截器 + 登录状态恢复 =====
   useEffect(() => {

@@ -17,11 +17,18 @@ export class AdminGoodsService {
    * @returns 待审核商品列表
    */
   async listPendingGoods(params?: {
+    keyword?: string;
     page?: number;
     size?: number;
   }): Promise<PageGoodsResponse> {
     const api = getApi();
-    const response = await api.getPendingGoods(params?.page, params?.size);
+    // 注意：OpenAPI 生成的代码需要更新以支持 keyword 参数
+    // 临时使用 listPendingGoods 方法（需重新生成 OpenAPI 客户端）
+    const response = await api.listPendingGoods({
+      keyword: params?.keyword,
+      page: params?.page,
+      size: params?.size,
+    } as any);
     return response.data.data as PageGoodsResponse;
   }
 

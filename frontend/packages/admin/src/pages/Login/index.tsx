@@ -4,6 +4,7 @@
  * @author BaSui 😎
  * @date 2025-11-01
  * @updated 2025-11-06 - 添加密码加密传输
+ * @updated 2025-11-10 - 集成图形验证码人机验证
  */
 
 import React, { useState } from 'react';
@@ -12,6 +13,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { encryptPassword } from '@campus/shared/utils/crypto';
+import { ImageCaptcha } from '@campus/shared/components'; // ✅ 导入图形验证码组件
 import type { LoginRequest } from '@campus/shared';
 import './Login.css';
 
@@ -23,21 +25,33 @@ const Login: React.FC = () => {
   const { message } = App.useApp(); // ✅ 使用 App 提供的 message 实例
   const [loading, setLoading] = useState(false);
 
+  // 🎨 验证码状态（新增 - BaSui 2025-11-10）
+  const [captchaData, setCaptchaData] = useState<{ captchaId: string; code: string } | null>(null);
+  const [resetCaptcha, setResetCaptcha] = useState(false);
+
   // ===== 提交登录 =====
   const handleSubmit = async (values: LoginRequest) => {
+    // 1️⃣ 验证图形验证码
+    if (!captchaData) {
+      message.error('请先完成图形验证码！');
+      return;
+    }
+
     setLoading(true);
 
     try {
       // 🔐 加密密码
       const encryptedPassword = encryptPassword(values.password);
       console.log('✅ 密码已加密传输');
-      
-      // 发送加密后的密码
+
+      // ✅ 发送加密后的密码 + 验证码数据
       await login({
         username: values.username,
         password: encryptedPassword,
+        captchaId: captchaData.captchaId,   // ✅ 验证码ID
+        captchaCode: captchaData.code,       // ✅ 验证码输入
       });
-      
+
       message.success('欢迎回来，管理员！😎');
 
       // 跳转到仪表盘
@@ -45,9 +59,29 @@ const Login: React.FC = () => {
     } catch (error: any) {
       console.error('❌ 登录失败:', error);
       message.error(error?.message || '登录失败，请稍后再试');
+
+      // 🔄 重置验证码
+      setCaptchaData(null);
+      setResetCaptcha(prev => !prev);
     } finally {
       setLoading(false);
     }
+  };
+
+  /**
+   * 🎨 图形验证码成功回调
+   */
+  const handleCaptchaSuccess = (captchaId: string, code: string) => {
+    console.log('✅ [AdminLogin] 图形验证码验证成功:', { captchaId, code });
+    setCaptchaData({ captchaId, code });
+  };
+
+  /**
+   * 🎨 图形验证码失败回调
+   */
+  const handleCaptchaFail = () => {
+    console.warn('❌ [AdminLogin] 图形验证码验证失败');
+    setCaptchaData(null);
   };
 
   return (
@@ -123,6 +157,16 @@ const Login: React.FC = () => {
                 className="styled-input"
               />
             </div>
+          </Form.Item>
+
+          {/* 🎨 图形验证码（新增 - BaSui 2025-11-10） */}
+          <Form.Item>
+            <ImageCaptcha
+              onSuccess={handleCaptchaSuccess}
+              onFail={handleCaptchaFail}
+              reset={resetCaptcha}
+              className="admin-captcha"
+            />
           </Form.Item>
 
           <Form.Item>

@@ -88,11 +88,11 @@ export const useAuthStore = createAuthStore<AdminUser, LoginRequest>({
       throw new Error(response.message || '登录失败');
     }
 
-    // 后端返回的字段：token, tokenType, expiresIn, userInfo
+    // 后端返回的字段：accessToken, refreshToken, tokenType, expiresIn, userInfo
     // 需要映射为前端期望的格式：accessToken, refreshToken, user
-    const { token, userInfo } = response.data;
+    const { accessToken, refreshToken, userInfo } = response.data;
 
-    if (!token) {
+    if (!accessToken) {
       throw new Error('登录失败：未获取到访问令牌');
     }
 
@@ -105,12 +105,12 @@ export const useAuthStore = createAuthStore<AdminUser, LoginRequest>({
     // 广播登录事件到其他 Tab
     const tabSync = getTabSync();
     if (tabSync) {
-      tabSync.broadcastLogin(normalizedUser, token);
+      tabSync.broadcastLogin(normalizedUser, accessToken);
     }
 
     return {
-      accessToken: token,
-      refreshToken: undefined, // 后端暂未提供 refreshToken
+      accessToken,
+      refreshToken, // ✅ 后端已提供 refreshToken（7天有效）
       user: normalizedUser,
     };
   },

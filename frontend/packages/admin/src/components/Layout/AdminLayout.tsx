@@ -34,9 +34,11 @@ import {
   RocketOutlined,
   SearchOutlined,
   BellOutlined,
+  BulbOutlined,
+  BulbFilled,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { useAuth, usePermission, useBreakpoint } from '@/hooks';
+import { useAuth, usePermission, useBreakpoint, useTheme } from '@/hooks';
 import { UserAvatar, Badge } from '@campus/shared';
 import { MENU_ITEMS } from '@/config/menu';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
@@ -76,6 +78,7 @@ export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const { hasPermission } = usePermission();
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
+  const { actualTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -384,7 +387,21 @@ export const AdminLayout: React.FC = () => {
             }}
           />
           
-          <Space>
+          <Space size="middle">
+            {/* 🌙 主题切换按钮 */}
+            <Button
+              type="text"
+              icon={actualTheme === 'dark' ? <BulbFilled style={{ color: '#faad14' }} /> : <BulbOutlined />}
+              onClick={toggleTheme}
+              title={actualTheme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'}
+              style={{
+                fontSize: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            />
+            
             <Badge dot>
               <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenuClick }} placement="bottomRight">
                 <Space style={{ cursor: 'pointer' }}>

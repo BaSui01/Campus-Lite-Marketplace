@@ -13,7 +13,7 @@
  * @date 2025-11-07
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Form,
@@ -173,6 +173,20 @@ export const ProfilePage: React.FC = () => {
       message.success('头像上传成功！记得保存修改 ✅');
     }
   };
+
+  // ✅ 同步用户资料到表单（数据加载完成后）
+  useEffect(() => {
+    if (userProfile) {
+      profileForm.setFieldsValue({
+        nickname: userProfile.nickname,
+        bio: userProfile.bio,
+      });
+      // 同步头像
+      if (userProfile.avatar) {
+        setAvatarUrl(userProfile.avatar);
+      }
+    }
+  }, [userProfile, profileForm]);
 
   // 发送邮箱验证码 Mutation
   const sendEmailCodeMutation = useMutation({
@@ -397,9 +411,18 @@ export const ProfilePage: React.FC = () => {
 
   // 提交个人资料
   const handleProfileSubmit = () => {
-    profileForm.validateFields().then((values) => {
-      updateProfileMutation.mutate(values);
-    });
+    profileForm
+      .validateFields()
+      .then((values) => {
+        updateProfileMutation.mutate(values);
+      })
+      .catch((error) => {
+        console.error('表单验证失败:', error);
+        // 显示第一个错误字段的错误信息
+        if (error.errorFields && error.errorFields.length > 0) {
+          message.error(error.errorFields[0].errors[0]);
+        }
+      });
   };
 
   // 提交密码修改
@@ -514,7 +537,7 @@ export const ProfilePage: React.FC = () => {
               name="nickname"
               rules={[
                 { required: true, message: '请输入昵称！' },
-                { min: 2, max: 20, message: '昵称长度为 2-20 个字符！' },
+                { min: 1, max: 20, message: '昵称长度为 1-20 个字符！' },
               ]}
             >
               <Input placeholder="请输入昵称" maxLength={20} />

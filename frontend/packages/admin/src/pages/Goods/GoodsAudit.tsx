@@ -58,25 +58,17 @@ export const GoodsAudit: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchAuditModalVisible, setBatchAuditModalVisible] = useState(false);
 
-  // 查询待审核商品列表
+  // 查询待审核商品列表（支持后端关键词搜索）
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['goods', 'pending', { keyword, page, size }],
     queryFn: () =>
       goodsService.listPendingGoods({
+        keyword,  // ✅ 传递 keyword 给后端
         page,
         size,
       }),
     staleTime: 30000, // 缓存30秒
     refetchInterval: 30000, // 每30秒刷新
-  });
-
-  // 过滤关键词
-  const filteredData = data?.content?.filter((goods: GoodsResponse) => {
-    if (!keyword) return true;
-    return (
-      goods.title?.toLowerCase().includes(keyword.toLowerCase()) ||
-      goods.description?.toLowerCase().includes(keyword.toLowerCase())
-    );
   });
 
   // 单个审核
@@ -119,6 +111,13 @@ export const GoodsAudit: React.FC = () => {
 
   // 搜索处理
   const handleSearch = () => {
+    setPage(0); // 重置到第一页
+    // React Query 会因为 queryKey 变化自动重新请求
+  };
+
+  // 重置搜索
+  const handleReset = () => {
+    setKeyword('');
     setPage(0);
   };
 
@@ -282,7 +281,7 @@ export const GoodsAudit: React.FC = () => {
             <Statistic
               title="今日提交数"
               value={
-                filteredData?.filter((g: GoodsResponse) => {
+                data?.content?.filter((g: GoodsResponse) => {
                   const today = new Date();
                   const createdDate = new Date(g.createdAt);
                   return (
@@ -321,7 +320,7 @@ export const GoodsAudit: React.FC = () => {
           <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
             搜索
           </Button>
-          <Button onClick={() => setKeyword('')}>重置</Button>
+          <Button onClick={handleReset}>重置</Button>
         </Space>
       </Card>
 
@@ -349,7 +348,7 @@ export const GoodsAudit: React.FC = () => {
       <Table
         rowKey="id"
         columns={columns}
-        dataSource={filteredData || []}
+        dataSource={data?.content || []}
         loading={isLoading}
         rowSelection={{
           selectedRowKeys,
