@@ -92,7 +92,7 @@ class GoodsControllerMockMvcTest {
                 .coverImage("https://cdn/wh1000.png")
                 .createdAt(LocalDateTime.now())
                 .build();
-        when(goodsService.listGoods(eq("耳机"), eq(12L), any(), any(), eq(0), eq(10),
+        when(goodsService.listGoods(eq("耳机"), eq(12L), any(), any(), any(), eq(0), eq(10),
                 eq("createdAt"), eq("DESC"), eq(List.of(1L, 2L))))
                 .thenReturn(new PageImpl<>(List.of(response)));
 

@@ -218,7 +218,7 @@ class GoodsServiceTest {
 
         // When
         Page<GoodsResponse> result = goodsService.listGoods(
-                null, null, null, null, 0, 20, "createdAt", "DESC", null
+                null, null, null, null, null, 0, 20, "createdAt", "DESC", null
         );
 
         // Then

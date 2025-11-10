@@ -1,6 +1,7 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
+import com.campus.marketplace.common.dto.request.AuditLogFilterRequest;
 import com.campus.marketplace.common.dto.response.AuditLogResponse;
 import com.campus.marketplace.common.enums.AuditActionType;
 import com.campus.marketplace.service.AuditLogService;
@@ -21,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,9 +59,17 @@ class AuditLogControllerTest {
                 .ipAddress("127.0.0.1")
                 .createdAt(LocalDateTime.parse("2025-10-29T10:00:00"))
                 .build();
-        when(auditLogService.listAuditLogs(100L, AuditActionType.POST_DELETE,
-                LocalDateTime.parse("2025-10-01T00:00:00"),
-                LocalDateTime.parse("2025-10-31T23:59:59"), 1, 10))
+        
+        AuditLogFilterRequest filterRequest = AuditLogFilterRequest.builder()
+                .operatorId(100L)
+                .actionType(AuditActionType.POST_DELETE)
+                .startTime(LocalDateTime.parse("2025-10-01T00:00:00"))
+                .endTime(LocalDateTime.parse("2025-10-31T23:59:59"))
+                .page(1)
+                .size(10)
+                .build();
+        
+        when(auditLogService.listAuditLogs(filterRequest))
                 .thenReturn(new PageImpl<>(List.of(log)));
 
         mockMvc.perform(get("/audit-logs")
@@ -77,9 +85,7 @@ class AuditLogControllerTest {
                 .andExpect(jsonPath("$.data.content[0].operatorName").value("admin"))
                 .andExpect(jsonPath("$.data.content[0].actionType").value("POST_DELETE"));
 
-        verify(auditLogService).listAuditLogs(100L, AuditActionType.POST_DELETE,
-                LocalDateTime.parse("2025-10-01T00:00:00"),
-                LocalDateTime.parse("2025-10-31T23:59:59"), 1, 10);
+        verify(auditLogService).listAuditLogs(filterRequest);
     }
 
     @Test
@@ -89,6 +95,6 @@ class AuditLogControllerTest {
         mockMvc.perform(get("/audit-logs"))
                 .andExpect(status().isForbidden());
 
-        verify(auditLogService, never()).listAuditLogs(any(), any(), any(), any(), anyInt(), anyInt());
+        verify(auditLogService, never()).listAuditLogs(any(AuditLogFilterRequest.class));
     }
 }
