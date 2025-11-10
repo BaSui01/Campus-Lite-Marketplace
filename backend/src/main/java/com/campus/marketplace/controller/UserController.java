@@ -46,7 +46,7 @@ public class UserController {
      * GET /api/users
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('system:user:list')")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_USER_VIEW)")
     @Operation(summary = "获取用户列表", description = "管理端查询用户列表（分页）")
     public ApiResponse<org.springframework.data.domain.Page<UserProfileResponse>> listUsers(
             @org.springframework.web.bind.annotation.RequestParam(required = false) String keyword,

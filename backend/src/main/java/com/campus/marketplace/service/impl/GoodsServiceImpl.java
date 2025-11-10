@@ -361,16 +361,16 @@ public class GoodsServiceImpl implements GoodsService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<GoodsResponse> listPendingGoods(int page, int size) {
-        log.info("查询待审核物品列表: page={}, size={}", page, size);
+    public Page<GoodsResponse> listPendingGoods(String keyword, int page, int size) {
+        log.info("查询待审核物品列表: keyword={}, page={}, size={}", keyword, page, size);
 
         // 构建分页参数（按创建时间倒序）
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // 查询待审核物品
+        // 查询待审核物品（支持关键词搜索）
         Page<Goods> goodsPage = goodsRepository.findByConditions(
                 GoodsStatus.PENDING,
-                null, null, null, null,
+                null, null, null, keyword,
                 pageable
         );
 

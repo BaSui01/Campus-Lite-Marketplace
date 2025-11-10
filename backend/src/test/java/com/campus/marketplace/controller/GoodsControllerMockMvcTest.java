@@ -134,14 +134,14 @@ class GoodsControllerMockMvcTest {
     @DisplayName("GET /api/goods/pending -> 管理员查询待审核列表")
     @WithMockUser(authorities = PermissionCodes.SYSTEM_GOODS_APPROVE)
     void listPendingGoods_requiresPermission() throws Exception {
-        when(goodsService.listPendingGoods(1, 5))
+        when(goodsService.listPendingGoods(null, 1, 5))
                 .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(get("/goods/pending").param("page", "1").param("size", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
-        verify(goodsService).listPendingGoods(1, 5);
+        verify(goodsService).listPendingGoods(null, 1, 5);
     }
 
     @Test

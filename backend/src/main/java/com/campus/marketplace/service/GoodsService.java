@@ -60,11 +60,12 @@ public interface GoodsService {
     /**
      * 查询待审核物品列表
      * 
+     * @param keyword 关键词（可选）
      * @param page 页码（从 0 开始）
      * @param size 每页数量
      * @return 待审核物品列表（分页）
      */
-    Page<GoodsResponse> listPendingGoods(int page, int size);
+    Page<GoodsResponse> listPendingGoods(String keyword, int page, int size);
 
     /**
      * 审核物品

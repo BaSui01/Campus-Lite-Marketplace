@@ -9,6 +9,7 @@ import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.common.utils.EncryptUtil;
 import com.campus.marketplace.common.utils.IpLocationUtil;
+import com.campus.marketplace.common.utils.JwtUtil;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.UserService;
@@ -43,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final com.campus.marketplace.repository.LoginDeviceRepository loginDeviceRepository;
     private final com.campus.marketplace.service.VerificationCodeService verificationCodeService;
     private final IpLocationUtil ipLocationUtil;
+    private final JwtUtil jwtUtil;
 
     /**
      * 获取用户资料
@@ -79,7 +81,7 @@ public class UserServiceImpl implements UserService {
      * 更新用户资料
      */
     @Override
-    @CacheEvict(value = "user", key = "#result")
+    @CacheEvict(value = "user", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void updateProfile(UpdateProfileRequest request) {
         String username = SecurityUtil.getCurrentUsername();
@@ -248,6 +250,10 @@ public class UserServiceImpl implements UserService {
                 .banReason(banReason)
                 .roles(roles)
                 .createdAt(user.getCreatedAt())
+                // ✅ 新增：验证状态字段（解决前端显示未绑定的问题）
+                .emailVerified(user.getEmailVerified())
+                .phoneVerified(user.getPhoneVerified())
+                .twoFactorEnabled(user.getTwoFactorEnabled())
                 .build();
     }
 
@@ -707,7 +713,27 @@ public class UserServiceImpl implements UserService {
                     com.campus.marketplace.common.exception.ErrorCode.UNAUTHORIZED,
                     "未登录");
         }
-        return Long.parseLong(authentication.getName());
+        
+        // ❌ authentication.getName() 返回的是 username（字符串），不是 userId
+        // ✅ 应该从 JWT Token 中获取 userId
+        jakarta.servlet.http.HttpServletRequest request = 
+            ((org.springframework.web.context.request.ServletRequestAttributes) 
+                org.springframework.web.context.request.RequestContextHolder.getRequestAttributes()).getRequest();
+        
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+            return jwtUtil.getUserIdFromToken(token);
+        }
+        
+        // 兜底：尝试解析 username（如果 username 恰好是数字）
+        try {
+            return Long.parseLong(authentication.getName());
+        } catch (NumberFormatException e) {
+            throw new com.campus.marketplace.common.exception.BusinessException(
+                    com.campus.marketplace.common.exception.ErrorCode.UNAUTHORIZED,
+                    "无法获取用户ID");
+        }
     }
 
     /**
@@ -875,6 +901,10 @@ public class UserServiceImpl implements UserService {
                 .banReason(banReason)
                 .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                 .createdAt(user.getCreatedAt())
+                // ✅ 新增：验证状态字段
+                .emailVerified(user.getEmailVerified())
+                .phoneVerified(user.getPhoneVerified())
+                .twoFactorEnabled(user.getTwoFactorEnabled())
                 .build();
     }
 }

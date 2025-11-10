@@ -105,4 +105,22 @@ public class UserProfileResponse {
      */
     @Schema(description = "注册时间", example = "2024-03-01T12:00:00")
     private LocalDateTime createdAt;
+
+    /**
+     * 邮箱是否已验证
+     */
+    @Schema(description = "邮箱是否已验证", example = "true")
+    private Boolean emailVerified;
+
+    /**
+     * 手机号是否已验证
+     */
+    @Schema(description = "手机号是否已验证", example = "false")
+    private Boolean phoneVerified;
+
+    /**
+     * 是否启用两步验证（2FA）
+     */
+    @Schema(description = "是否启用两步验证", example = "false")
+    private Boolean twoFactorEnabled;
 }

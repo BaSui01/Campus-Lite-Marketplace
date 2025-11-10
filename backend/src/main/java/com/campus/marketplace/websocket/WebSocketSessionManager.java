@@ -214,7 +214,7 @@ public class WebSocketSessionManager {
     private void startHeartbeatChecker() {
         heartbeatExecutor.scheduleAtFixedRate(() -> {
             try {
-                log.debug("💓 开始心跳检测，当前在线人数={}", sessions.size());
+                // log.debug("💓 开始心跳检测，当前在线人数={}", sessions.size()); // 注释掉：减少日志输出，降低资源消耗
 
                 sessions.forEach((userId, session) -> {
                     if (!session.isOpen()) {
@@ -227,7 +227,7 @@ public class WebSocketSessionManager {
                     }
                 });
 
-                log.debug("✅ 心跳检测完成，当前在线人数={}", sessions.size());
+                // log.debug("✅ 心跳检测完成，当前在线人数={}", sessions.size()); // 注释掉：减少日志输出，降低资源消耗
             } catch (Exception e) {
                 log.error("❌ 心跳检测异常", e);
             }

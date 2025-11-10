@@ -98,12 +98,13 @@ public class GoodsController {
 
         @GetMapping("/pending")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_GOODS_APPROVE)")
-    @Operation(summary = "查询待审核物品列表", description = "管理员查询所有待审核的物品")
+    @Operation(summary = "查询待审核物品列表", description = "管理员查询所有待审核的物品，支持关键词搜索")
     public ApiResponse<Page<GoodsResponse>> listPendingGoods(
+            @Parameter(description = "搜索关键词", example = "苹果笔记本") @RequestParam(required = false) String keyword,
             @Parameter(description = "页码（从 0 开始）") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int size
     ) {
-        Page<GoodsResponse> result = goodsService.listPendingGoods(page, size);
+        Page<GoodsResponse> result = goodsService.listPendingGoods(keyword, page, size);
         return ApiResponse.success(result);
     }
 
