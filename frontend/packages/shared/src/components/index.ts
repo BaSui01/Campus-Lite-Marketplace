@@ -357,3 +357,39 @@ export { TagSelector, type TagSelectorProps, type TagOption } from './TagSelecto
  * ```
  */
 export { TopicSelector, type TopicSelectorProps, type TopicOption } from './TopicSelector';
+
+// ==================== 通用筛选组件（新增 2025-11-10）====================
+
+/**
+ * FilterPanel - 通用筛选面板组件
+ * @description 提供统一的筛选面板，支持多种筛选类型（input、select、numberRange、dateRange等）
+ * @example
+ * ```tsx
+ * const filters: FilterConfig[] = [
+ *   { type: 'input', field: 'keyword', label: '关键词', placeholder: '搜索...' },
+ *   { type: 'select', field: 'status', label: '状态', options: STATUS_OPTIONS },
+ *   { type: 'numberRange', field: 'price', label: '价格', prefix: '¥' },
+ * ];
+ *
+ * <FilterPanel
+ *   config={{ filters }}
+ *   values={filterValues}
+ *   onChange={setFilterValues}
+ *   onSearch={handleSearch}
+ *   onReset={handleReset}
+ * />
+ * ```
+ */
+export {
+  FilterPanel,
+  FilterField,
+  type FilterPanelProps,
+  type FilterFieldProps,
+  type FilterConfig,
+  type FilterPanelConfig,
+  type FilterValues,
+  type FilterOption,
+  type FilterFieldType,
+  type DateRangeValue,
+  type NumberRangeValue,
+} from './FilterPanel';

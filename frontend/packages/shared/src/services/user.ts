@@ -29,11 +29,11 @@ export class UserService {
    * 获取当前用户资料
    * @returns 当前用户信息
    */
-  async getProfile(): Promise<User> {
+  async getProfile(): Promise<UserProfileResponse> {
     const api = getApi();
     // ✅ 使用 OpenAPI 生成的正确方法名：getCurrentUserProfile
     const response = await api.getCurrentUserProfile();
-    return response.data.data as User;
+    return response.data.data as UserProfileResponse;
   }
 
   /**
