@@ -74,6 +74,14 @@ public class SecurityConfig {
                         .requestMatchers(matchersWithContext("/auth/**")).permitAll()
                         .requestMatchers(matchersWithContext("/actuator/health")).permitAll()
                         
+                        // 验证码接口（登录前需要访问，必须公开）
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/image")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/image/verify")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/slide")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/slide/image")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/slide/verify")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/slide/verify/track")).permitAll()
+                        
                         // 公共查询接口
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/search", "/search/**")).permitAll()
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/recommend/hot")).permitAll()

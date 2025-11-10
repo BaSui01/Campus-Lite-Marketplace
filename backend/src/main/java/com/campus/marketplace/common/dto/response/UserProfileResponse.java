@@ -107,6 +107,24 @@ public class UserProfileResponse {
     private LocalDateTime createdAt;
 
     /**
+     * 最后登录时间
+     */
+    @Schema(description = "最后登录时间", example = "2024-03-15T10:30:00")
+    private LocalDateTime lastLoginAt;
+
+    /**
+     * 个人简介
+     */
+    @Schema(description = "个人简介", example = "热爱分享的大学生 🎓")
+    private String bio;
+
+    /**
+     * 信誉分
+     */
+    @Schema(description = "信誉分（0-200）", example = "150")
+    private Integer creditScore;
+
+    /**
      * 邮箱是否已验证
      */
     @Schema(description = "邮箱是否已验证", example = "true")

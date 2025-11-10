@@ -64,6 +64,27 @@ public class RedisConfig {
     }
 
     /**
+     * 配置自定义 StringRedisTemplate（用于验证码等简单字符串存储）
+     * Value 也使用 String 序列化（不使用 JSON）
+     * 🔧 重命名为 customStringRedisTemplate 避免与 Spring Boot 自动配置冲突
+     */
+    @Bean(name = "customStringRedisTemplate")
+    public RedisTemplate<String, String> customStringRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        // Key 和 Value 都使用 String 序列化
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringSerializer);
+        template.setValueSerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
+        template.setHashValueSerializer(stringSerializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    /**
      * 配置缓存管理器
      * 设置默认缓存过期时间为 30 分钟
      */

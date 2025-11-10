@@ -112,6 +112,8 @@ public class RedisCacheConfig {
         mapper.addMixIn(org.springframework.data.domain.PageImpl.class, PageImplMixin.class);
         mapper.addMixIn(org.springframework.data.domain.PageRequest.class, PageRequestMixin.class);
         mapper.addMixIn(org.springframework.data.domain.Sort.class, SortMixin.class);
+        // 🎯 修复 Sort.Order 反序列化问题（关键修复！）
+        mapper.addMixIn(org.springframework.data.domain.Sort.Order.class, SortOrderMixin.class);
 
         return mapper;
     }
@@ -147,6 +149,20 @@ public class RedisCacheConfig {
         @JsonCreator
         SortMixin(
                 @JsonProperty("orders") java.util.List<org.springframework.data.domain.Sort.Order> orders) {
+        }
+    }
+
+    /**
+     * Sort.Order 的 Jackson MixIn 类
+     * 🎯 解决 "Cannot construct instance of Sort$Order (no Creators)" 错误
+     */
+    private abstract static class SortOrderMixin {
+        @JsonCreator
+        SortOrderMixin(
+                @JsonProperty("direction") org.springframework.data.domain.Sort.Direction direction,
+                @JsonProperty("property") String property,
+                @JsonProperty("ignoreCase") boolean ignoreCase,
+                @JsonProperty("nullHandling") org.springframework.data.domain.Sort.NullHandling nullHandling) {
         }
     }
 }

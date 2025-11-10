@@ -49,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
     private final com.campus.marketplace.service.CaptchaService captchaService; // 新增 - BaSui 2025-11-09
     private final com.campus.marketplace.service.TwoFactorAuthService twoFactorAuthService; // 新增 - BaSui 2025-11-09
     private final com.campus.marketplace.service.LoginNotificationService loginNotificationService; // 新增 - BaSui 2025-11-09
+    private final com.campus.marketplace.service.UserService userService; // 新增 - BaSui 2025-11-10
 
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
@@ -312,13 +313,23 @@ public class AuthServiceImpl implements AuthService {
         redisTemplate.opsForValue().set(refreshTokenKey, user.getId(), 604800000L, TimeUnit.MILLISECONDS); // 7天
 
         // 8. 记录登录日志
-        log.info("用户登录成功: userId=, username={}", user.getId(), user.getUsername());
+        log.info("用户登录成功: userId={}, username={}", user.getId(), user.getUsername());
 
-        // 9. 📧 发送登录通知（异步，新增 - BaSui 2025-11-09）
+        // 9. 📧 发送登录通知 - 先检测新设备再保存（异步，新增 - BaSui 2025-11-09）
+        // ⚠️ 重要：必须先调用 detectAndNotifyNewDevice（检查），再调用 recordLoginDevice（保存）
+        // 否则每次登录都会被判定为新设备！
         try {
             loginNotificationService.detectAndNotifyNewDevice(user.getId(), httpRequest);
         } catch (Exception e) {
             log.error("❌ 发送登录通知失败: userId={}, error={}", user.getId(), e.getMessage());
+            // 不影响登录流程
+        }
+
+        // 10. 💾 记录登录设备 - 在通知之后保存（新增 - BaSui 2025-11-10）
+        try {
+            userService.recordLoginDevice(user.getId(), httpRequest);
+        } catch (Exception e) {
+            log.error("❌ 记录登录设备失败: userId={}, error={}", user.getId(), e.getMessage());
             // 不影响登录流程
         }
 

@@ -26,11 +26,11 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "t_user_follow",
-        uniqueConstraints = @UniqueConstraint(name = "uk_user_follow_follower_seller", columnNames = {"follower_id", "seller_id"}),
+@Table(name = "t_seller_follow",
+        uniqueConstraints = @UniqueConstraint(name = "uk_seller_follow_follower_seller", columnNames = {"follower_id", "seller_id"}),
         indexes = {
-                @Index(name = "idx_user_follow_follower", columnList = "follower_id"),
-                @Index(name = "idx_user_follow_seller", columnList = "seller_id")
+                @Index(name = "idx_seller_follow_follower", columnList = "follower_id"),
+                @Index(name = "idx_seller_follow_seller", columnList = "seller_id")
         })
 @SQLRestriction("deleted = false")
 public class Follow extends BaseEntity {

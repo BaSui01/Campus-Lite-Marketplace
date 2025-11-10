@@ -250,7 +250,10 @@ public class UserServiceImpl implements UserService {
                 .banReason(banReason)
                 .roles(roles)
                 .createdAt(user.getCreatedAt())
-                // ✅ 新增：验证状态字段（解决前端显示未绑定的问题）
+                .lastLoginAt(user.getLastLoginTime()) // ✅ 新增：最后登录时间
+                .bio(user.getBio()) // ✅ 新增：个人简介
+                .creditScore(user.getCreditScore()) // ✅ 新增：信誉分
+                // ✅ 验证状态字段（解决前端显示未绑定的问题）
                 .emailVerified(user.getEmailVerified())
                 .phoneVerified(user.getPhoneVerified())
                 .twoFactorEnabled(user.getTwoFactorEnabled())

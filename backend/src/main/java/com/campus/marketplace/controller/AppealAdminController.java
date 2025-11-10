@@ -40,7 +40,7 @@ public class AppealAdminController {
 
         @Operation(summary = "审核申诉", description = "管理员审核申诉，可批准或拒绝")
     @PostMapping("/{appealId}/review")
-    @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
+    @PreAuthorize("hasAuthority('system:user:appeal:handle')")
     public ApiResponse<Appeal> reviewAppeal(
             @PathVariable Long appealId,
             @Valid @RequestBody ReviewRequest request) {
@@ -68,7 +68,7 @@ public class AppealAdminController {
 
         @Operation(summary = "批量审核申诉", description = "批量审核多个申诉")
     @PostMapping("/batch-review")
-    @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
+    @PreAuthorize("hasAuthority('system:user:appeal:handle')")
     public ApiResponse<BatchReviewResult> batchReviewAppeals(@Valid @RequestBody BatchReviewRequest request) {
         try {
             // 设置审核人信息
@@ -96,7 +96,7 @@ public class AppealAdminController {
 
         @Operation(summary = "查询待审核申诉", description = "获取所有待审核的申诉列表")
     @GetMapping("/pending")
-    @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
+    @PreAuthorize("hasAuthority('system:user:appeal:handle')")
     public ApiResponse<Page<Appeal>> getPendingAppeals(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -117,7 +117,7 @@ public class AppealAdminController {
 
         @Operation(summary = "标记过期申诉", description = "将超期未处理的申诉标记为过期")
     @PostMapping("/mark-expired")
-    @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
+    @PreAuthorize("hasAuthority('system:user:appeal:handle')")
     public ApiResponse<Integer> markExpiredAppeals() {
         try {
             int markedCount = appealService.markExpiredAppeals();
@@ -132,7 +132,7 @@ public class AppealAdminController {
 
         @Operation(summary = "申诉统计", description = "获取申诉系统的统计数据")
     @GetMapping("/statistics")
-    @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
+    @PreAuthorize("hasAuthority('system:user:appeal:handle')")
     public ApiResponse<AppealStatistics> getAppealStatistics() {
         try {
             AppealStatistics statistics = appealService.getAppealStatistics();
@@ -144,7 +144,7 @@ public class AppealAdminController {
 
         @Operation(summary = "按状态查询", description = "根据申诉状态查询申诉列表")
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
+    @PreAuthorize("hasAuthority('system:user:appeal:handle')")
     public ApiResponse<Page<Appeal>> getAppealsByStatus(
             @PathVariable AppealStatus status,
             @RequestParam(defaultValue = "0") int page,
@@ -164,7 +164,7 @@ public class AppealAdminController {
 
         @Operation(summary = "查询申诉详情", description = "管理员查看任意申诉的详细信息")
     @GetMapping("/{appealId}")
-    @PreAuthorize("hasAuthority('SYSTEM_USER_APPEAL_HANDLE')")
+    @PreAuthorize("hasAuthority('system:user:appeal:handle')")
     public ApiResponse<Appeal> getAppealDetail(@PathVariable Long appealId) {
         try {
             // 管理员可以查看任意申诉详情

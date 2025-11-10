@@ -4,6 +4,7 @@ import com.campus.marketplace.common.dto.response.CaptchaResponse;
 import com.campus.marketplace.service.CaptchaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class CaptchaServiceImpl implements CaptchaService {
 
     @Autowired
+    @Qualifier("customStringRedisTemplate")
     private RedisTemplate<String, String> redisTemplate;
 
     private static final int CAPTCHA_EXPIRE_SECONDS = 300; // 5分钟
