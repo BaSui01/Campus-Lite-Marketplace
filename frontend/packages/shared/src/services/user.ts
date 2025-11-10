@@ -177,35 +177,42 @@ export class UserService {
     await api.bindPhone({ userId, bindPhoneRequest: data });
   }
 
-  /**
-   * 启用两步验证
-   * @param userId 用户ID
-   * @returns 两步验证响应（包含密钥和二维码URL）
-   */
-  async enableTwoFactor(userId: number): Promise<any> {
-    const api = getApi();
-    const response = await api.enableTwoFactor({ userId });
-    return response.data.data;
-  }
+  // ==================== ⚠️ 两步验证功能已迁移到 authService ====================
+  //
+  // 两步验证相关方法应使用 authService.enable2FA()、verify2FA()、disable2FA()
+  // 这些方法在 Profile 页面中已正确使用 authService
+  //
+  // ==================== 旧方法已注释（保留供参考）====================
+  //
+  // /**
+  //  * 启用两步验证（已废弃 - 使用 authService.enable2FA()）
+  //  * @param userId 用户ID
+  //  * @returns 两步验证响应（包含密钥和二维码URL）
+  //  */
+  // async enableTwoFactor(userId: number): Promise<any> {
+  //   const api = getApi();
+  //   const response = await api.enableTwoFactor({ userId });
+  //   return response.data.data;
+  // }
 
-  /**
-   * 验证并确认两步验证
-   * @param userId 用户ID
-   * @param code 验证码
-   */
-  async verifyTwoFactor(userId: number, code: string): Promise<void> {
-    const api = getApi();
-    await api.verifyTwoFactor({ userId, twoFactorRequest: { code } });
-  }
+  // /**
+  //  * 验证并确认两步验证（已废弃 - 使用 authService.verify2FA()）
+  //  * @param userId 用户ID
+  //  * @param code 验证码
+  //  */
+  // async verifyTwoFactor(userId: number, code: string): Promise<void> {
+  //   const api = getApi();
+  //   await api.verifyTwoFactor({ userId, twoFactorRequest: { code } });
+  // }
 
-  /**
-   * 关闭两步验证
-   * @param userId 用户ID
-   */
-  async disableTwoFactor(userId: number): Promise<void> {
-    const api = getApi();
-    await api.disableTwoFactor({ userId });
-  }
+  // /**
+  //  * 关闭两步验证（已废弃 - 使用 authService.disable2FA()）
+  //  * @param userId 用户ID
+  //  */
+  // async disableTwoFactor(userId: number): Promise<void> {
+  //   const api = getApi();
+  //   await api.disableTwoFactor({ userId });
+  // }
 }
 
 export interface UserListQuery {

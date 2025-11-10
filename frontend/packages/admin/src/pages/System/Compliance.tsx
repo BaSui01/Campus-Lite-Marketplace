@@ -49,10 +49,7 @@ const Compliance: React.FC = () => {
   // ===== 白名单查询 =====
   const { data: whitelist, isLoading: whitelistLoading } = useQuery({
     queryKey: ['compliance-whitelist'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/compliance/whitelist');
-      return await res.json();
-    },
+    queryFn: () => complianceService.listWhitelist(),
   });
 
   // ===== 审计日志查询 =====

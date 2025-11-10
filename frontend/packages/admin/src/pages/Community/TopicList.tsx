@@ -26,6 +26,7 @@ import {
   Col,
   Statistic,
   Tooltip,
+  App,
 } from 'antd';
 import {
   PlusOutlined,
@@ -47,6 +48,7 @@ const { TextArea } = Input;
 
 export const TopicList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
 
   // 搜索关键词
   const [keyword, setKeyword] = useState<string>('');
@@ -158,7 +160,7 @@ export const TopicList: React.FC = () => {
    * 删除话题
    */
   const handleDelete = (topicId: number) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除',
       content: '删除话题后无法恢复，确定要删除吗？',
       onOk: () => deleteMutation.mutate(topicId),

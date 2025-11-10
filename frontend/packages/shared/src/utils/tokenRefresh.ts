@@ -122,6 +122,13 @@ export const installTokenRefreshInterceptor = (
         return Promise.reject(error);
       }
 
+      // ⚠️ 验证码接口白名单：不触发 Token 刷新
+      const requestUrl = originalRequest.url || '';
+      if (requestUrl.includes('/captcha/')) {
+        console.warn('[Token Refresh] ⚠️ 验证码接口返回 401，跳过 Token 刷新（需要后端配置匿名访问）');
+        return Promise.reject(error);
+      }
+
       // 已经重试过，不再重试
       if (originalRequest._retry) {
         console.warn('[Token Refresh] 已重试过，不再重试');

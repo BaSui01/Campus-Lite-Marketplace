@@ -53,16 +53,24 @@ export class TagService {
    */
   async list(params?: TagListParams): Promise<TagResponse[]> {
     const api = getApi();
-    const response = await api.listTags(
-      params?.keyword,
-      params?.status === TagStatus.ENABLED ? true : params?.status === TagStatus.DISABLED ? false : undefined,
-      params?.page,
-      params?.size
-    );
+    const response = await api.listTags();
 
-    // 如果返回的是分页数据，提取 content
-    const data = response.data.data as any;
-    return (data?.content || data) as TagResponse[];
+    // 获取数据并进行前端过滤
+    let tags = response.data.data as TagResponse[];
+
+    // 前端筛选（如果后端不支持）
+    if (params?.keyword) {
+      tags = tags.filter(t =>
+        t.name?.toLowerCase().includes(params.keyword!.toLowerCase())
+      );
+    }
+
+    if (params?.status !== undefined) {
+      const enabled = params.status === TagStatus.ENABLED;
+      tags = tags.filter(t => t.enabled === enabled);
+    }
+
+    return tags;
   }
 
   /**
@@ -154,11 +162,11 @@ export class TagService {
   }
 
   /**
-   * 更新标签状态
+   * 更新标签状态（切换启用/禁用）
    * @param id 标签ID
-   * @param status 标签状态
+   * @param _status 标签状态（保留参数以保持接口一致性，实际使用 toggleEnabled）
    */
-  async updateStatus(id: number, status: TagStatus): Promise<void> {
+  async updateStatus(id: number, _status: TagStatus): Promise<void> {
     const api = getApi();
     await api.toggleEnabled({ id });
   }

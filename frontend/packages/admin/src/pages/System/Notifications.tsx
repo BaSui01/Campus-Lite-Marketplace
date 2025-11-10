@@ -19,6 +19,7 @@ import {
   Tag,
   Tabs,
   Divider,
+  App,
 } from 'antd';
 import {
   PlusOutlined,
@@ -53,6 +54,7 @@ const channelColors: Record<string, string> = {
 
 const Notifications: React.FC = () => {
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
@@ -226,7 +228,7 @@ const Notifications: React.FC = () => {
 
   // ===== 删除模板 =====
   const handleDelete = (template: NotificationTemplate) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除模板？',
       content: `确定要删除模板 "${template.name}" 吗？此操作不可撤销。`,
       onOk: () => deleteTemplateMutation.mutate(template.id),

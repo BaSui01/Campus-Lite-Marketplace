@@ -33,7 +33,7 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { searchStatisticsService } from '@/services';
 import ReactECharts from 'echarts-for-react';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -48,25 +48,17 @@ export const SearchStatistics: React.FC = () => {
   // 查询搜索统计
   const { data: statistics, isLoading, refetch } = useQuery({
     queryKey: ['search', 'statistics', dateRange],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.getMessageSearchStatistics(
-        dateRange[0].format('YYYY-MM-DD'),
-        dateRange[1].format('YYYY-MM-DD')
-      );
-      return response.data.data;
-    },
+    queryFn: () => searchStatisticsService.getStatistics(
+      dateRange[0].format('YYYY-MM-DD'),
+      dateRange[1].format('YYYY-MM-DD')
+    ),
     staleTime: 5 * 60 * 1000,
   });
 
   // 查询热门关键词
   const { data: popularKeywords } = useQuery({
     queryKey: ['search', 'popular', dateRange],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.getPopularKeywords(10);
-      return response.data.data || [];
-    },
+    queryFn: () => searchStatisticsService.getPopularKeywords(10),
     staleTime: 5 * 60 * 1000,
   });
 

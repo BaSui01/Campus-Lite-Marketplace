@@ -37,7 +37,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { blacklistService } from '@/services';
 
 const { Text } = Typography;
 const { confirm } = Modal;
@@ -90,10 +90,7 @@ export const BlacklistManagement: React.FC = () => {
 
   // 批量解除黑名单 Mutation
   const batchUnblockMutation = useMutation({
-    mutationFn: async (ids: number[]) => {
-      const api = getApi();
-      await api.batchRemoveBlacklist({ ids });
-    },
+    mutationFn: (ids: number[]) => blacklistService.batchUnblock({ ids }),
     onSuccess: () => {
       message.success('批量解除黑名单成功！🎉');
       queryClient.invalidateQueries({ queryKey: ['blacklistRecords'] });

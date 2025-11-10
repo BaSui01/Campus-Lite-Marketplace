@@ -189,7 +189,7 @@ export const GoodsAudit: React.FC = () => {
       width: 100,
       render: (images: string[]) => (
         <img
-          src={images?.[0] || 'https://via.placeholder.com/60'}
+          src={images?.[0] || 'https://picsum.photos/60/60?random=2'}
           alt="商品"
           style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }}
         />

@@ -165,9 +165,20 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
     clearTokens,
     refreshEndpoint: joinWithBaseUrl(API_BASE_URL, '/api/auth/refresh'),
     onRefreshFailed: () => {
-      // 保存当前路径，登录后跳转回来
-      const currentPath = window.location.pathname + window.location.search;
-      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+      // 🎯 智能判断登录路径：管理端跳转到 /admin/login，门户端跳转到 /login
+      const currentPath = window.location.pathname;
+      const isAdminRoute = currentPath.startsWith('/admin');
+      const loginPath = isAdminRoute ? '/admin/login' : '/login';
+      
+      // ⚠️ 防止无限重定向：如果已经在登录页，不再跳转
+      if (currentPath === loginPath) {
+        console.warn('[API Client] ⚠️ 已在登录页，跳过重定向');
+        return;
+      }
+      
+      // 保存当前完整路径（包含 query 参数）用于登录后返回
+      const fullPath = window.location.pathname + window.location.search;
+      window.location.href = `${loginPath}?redirect=${encodeURIComponent(fullPath)}`;
     },
   });
 

@@ -97,13 +97,13 @@ export interface TopicService {
 class TopicServiceImpl implements TopicService {
   async create(request: CreateTopicRequest): Promise<number> {
     const api = getApi();
-    const response = await api.createTopic({ requestBody: request });
+    const response = await api.createTopic({ requestBody: request as any });
     return response.data.data as number;
   }
 
   async update(topicId: number, request: UpdateTopicRequest): Promise<void> {
     const api = getApi();
-    await api.updateTopic({ topicId, requestBody: request });
+    await api.updateTopic({ topicId, requestBody: request as any });
   }
 
   async delete(topicId: number): Promise<void> {
@@ -139,16 +139,25 @@ class TopicServiceImpl implements TopicService {
     await api.unfollowTopic({ topicId });
   }
 
+  /**
+   * 获取我关注的话题列表
+   * 使用当前登录用户的身份获取关注的话题
+   */
   async getMyFollowedTopics(): Promise<Topic[]> {
     const api = getApi();
-    const response = await api.getMyFollowedTopics();
+    const response = await api.getUserFollowedTopics();
     return response.data.data as Topic[];
   }
 
-  async checkFollowed(topicId: number): Promise<boolean> {
-    const api = getApi();
-    const response = await api.isTopicFollowed({ topicId });
-    return response.data.data as boolean;
+  /**
+   * 检查话题是否已关注
+   * TODO: 等待后端实现 isTopicFollowed API
+   */
+  async checkFollowed(_topicId: number): Promise<boolean> {
+    // const api = getApi();
+    // const response = await api.isTopicFollowed({ topicId });
+    // return response.data.data as boolean;
+    throw new Error('检查话题关注状态功能暂未实现');
   }
 
   async getFollowerCount(topicId: number): Promise<number> {

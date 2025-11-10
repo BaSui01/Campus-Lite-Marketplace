@@ -56,7 +56,7 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userService, uploadService, ImageUploadWithCrop } from '@campus/shared';
+import { userService, uploadService, ImageUploadWithCrop, authService } from '@campus/shared';
 import { useAuth } from '@/hooks';
 import type { UploadFile } from 'antd';
 import type { RcFile } from 'antd/es/upload';
@@ -80,7 +80,7 @@ interface LoginDevice {
 }
 
 export const ProfilePage: React.FC = () => {
-  const { message } = App.useApp(); // ✅ 使用 App 提供的 message 实例
+  const { message, modal } = App.useApp(); // ✅ 使用 App 提供的 message 和 modal 实例
   const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
 
@@ -110,12 +110,12 @@ export const ProfilePage: React.FC = () => {
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      const response = await userService.getProfile();
+      const userData = await userService.getProfile(); // ✅ 已经是 User 对象
       // 设置已验证状态
-      setEmailVerified(!!response.data.emailVerified);
-      setPhoneVerified(!!response.data.phoneVerified);
-      setTwoFactorEnabled(!!response.data.twoFactorEnabled);
-      return response.data;
+      setEmailVerified(!!userData.emailVerified);
+      setPhoneVerified(!!userData.phoneVerified);
+      setTwoFactorEnabled(!!userData.twoFactorEnabled);
+      return userData;
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -302,16 +302,21 @@ export const ProfilePage: React.FC = () => {
     });
   };
 
-  // 启用两步验证 Mutation
+  // 启用两步验证 Mutation（修复 - BaSui 2025-11-10）
   const enableTwoFactorMutation = useMutation({
     mutationFn: async () => {
-      if (!currentUser?.id) throw new Error('用户ID不存在');
-      return await userService.enableTwoFactor(currentUser.id);
+      // ✅ 修复：使用 authService.enable2FA() 而不是 userService
+      const response = await authService.enable2FA();
+      if (response.code !== 200 || !response.data) {
+        throw new Error(response.message || '启用失败');
+      }
+      return response.data;
     },
     onSuccess: (data) => {
       setTwoFactorSecret(data.secret);
       setTwoFactorModalVisible(true);
       setTwoFactorStep(0);
+      message.success('2FA 密钥生成成功！请扫描二维码 🎉');
     },
     onError: (error: any) => {
       message.error(`启用失败：${error.message} 😰`);
@@ -323,11 +328,15 @@ export const ProfilePage: React.FC = () => {
     enableTwoFactorMutation.mutate();
   };
 
-  // 验证两步验证 Mutation
+  // 验证两步验证 Mutation（修复 - BaSui 2025-11-10）
   const verifyTwoFactorMutation = useMutation({
     mutationFn: async (code: string) => {
-      if (!currentUser?.id) throw new Error('用户ID不存在');
-      await userService.verifyTwoFactor(currentUser.id, code);
+      // ✅ 修复：使用 authService.verify2FA() 而不是 userService
+      const response = await authService.verify2FA({ code });
+      if (response.code !== 200) {
+        throw new Error(response.message || '验证失败');
+      }
+      return response;
     },
     onSuccess: () => {
       message.success('两步验证已启用！🎉');
@@ -350,11 +359,15 @@ export const ProfilePage: React.FC = () => {
     verifyTwoFactorMutation.mutate(code);
   };
 
-  // 关闭两步验证 Mutation
+  // 关闭两步验证 Mutation（修复 - BaSui 2025-11-10）
   const disableTwoFactorMutation = useMutation({
-    mutationFn: async () => {
-      if (!currentUser?.id) throw new Error('用户ID不存在');
-      await userService.disableTwoFactor(currentUser.id);
+    mutationFn: async (password: string) => {
+      // ✅ 修复：使用 authService.disable2FA() 而不是 userService
+      const response = await authService.disable2FA({ password });
+      if (response.code !== 200) {
+        throw new Error(response.message || '关闭失败');
+      }
+      return response;
     },
     onSuccess: () => {
       message.success('两步验证已关闭！');
@@ -368,14 +381,38 @@ export const ProfilePage: React.FC = () => {
 
   // 关闭两步验证
   const handleDisableTwoFactor = () => {
-    Modal.confirm({
+    modal.confirm({
       title: '关闭两步验证',
-      content: '关闭后您的账号安全性会降低，确定要关闭吗？',
+      content: (
+        <Form layout="vertical">
+          <Alert
+            message="关闭后您的账号安全性会降低"
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+          <Form.Item
+            label="请输入密码以确认"
+            required
+          >
+            <Input.Password
+              id="disable-2fa-password"
+              placeholder="请输入登录密码"
+            />
+          </Form.Item>
+        </Form>
+      ),
       okText: '确认关闭',
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        disableTwoFactorMutation.mutate();
+        const passwordInput = document.getElementById('disable-2fa-password') as HTMLInputElement;
+        const password = passwordInput?.value;
+        if (!password) {
+          message.error('请输入密码！');
+          return Promise.reject();
+        }
+        return disableTwoFactorMutation.mutateAsync(password);
       },
     });
   };
@@ -397,7 +434,7 @@ export const ProfilePage: React.FC = () => {
 
   // 踢出设备
   const handleKickDevice = (deviceId: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: '踢出设备',
       content: '确定要踢出这个设备吗？该设备需要重新登录。',
       okText: '确认踢出',

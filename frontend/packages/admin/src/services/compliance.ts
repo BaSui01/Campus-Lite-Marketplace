@@ -12,6 +12,12 @@ import type {
 } from '@campus/shared/api';
 
 export class ComplianceService {
+  async listWhitelist(): Promise<ComplianceWhitelist[]> {
+    const api = getApi();
+    const response = await api.listWhitelist();
+    return response.data.data as ComplianceWhitelist[];
+  }
+
   async addWhitelist(type: string, targetId: number): Promise<ComplianceWhitelist> {
     const api = getApi();
     const response = await api.addWhitelist({ type, targetId });

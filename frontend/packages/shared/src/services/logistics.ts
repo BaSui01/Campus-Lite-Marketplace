@@ -13,7 +13,7 @@
  * @description 查询订单物流信息、追踪物流轨迹
  */
 
-import { getApi } from '../utils/apiClient';
+// import { getApi } from '../utils/apiClient'; // TODO: 等待后端实现物流API后取消注释
 
 // ==================== 类型定义 ====================
 

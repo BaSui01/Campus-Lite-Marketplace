@@ -67,6 +67,12 @@ export interface PageCouponUserRelation {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {number}
+     * @memberof PageCouponUserRelation
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
      * @type {boolean}
      * @memberof PageCouponUserRelation
      */
@@ -77,12 +83,6 @@ export interface PageCouponUserRelation {
      * @memberof PageCouponUserRelation
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageCouponUserRelation
-     */
-    'numberOfElements'?: number;
     /**
      * 
      * @type {PageableObject}

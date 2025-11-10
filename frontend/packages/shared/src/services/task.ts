@@ -6,7 +6,7 @@
  */
 
 import { getApi } from '../utils/apiClient';
-import type { ScheduledTask as ApiScheduledTask } from '../api/models';
+// import type { ScheduledTask as ApiScheduledTask } from '../api/models'; // TODO: 等待后端实现后使用
 
 // ==================== 类型定义 ====================
 
@@ -134,7 +134,7 @@ class TaskServiceImpl implements TaskService {
    * 获取任务执行日志
    * ⚠️ 扩展接口，假设后端会添加
    */
-  async getLogs(name: string, limit: number = 100): Promise<TaskExecutionLog[]> {
+  async getLogs(_name: string, _limit: number = 100): Promise<TaskExecutionLog[]> {
     // TODO: 等待后端实现后启用
     return [];
   }

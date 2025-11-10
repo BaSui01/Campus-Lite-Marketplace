@@ -22,3 +22,7 @@ export * from './bannedUser';
 export * from './operationLog';
 export * from './auditLog';
 export * from './recommend';
+export * from './behavior';
+export * from './searchStatistics';
+export * from './recycleBin';
+export * from './revertManagement';

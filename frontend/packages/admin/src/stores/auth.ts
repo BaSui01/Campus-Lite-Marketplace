@@ -88,9 +88,18 @@ export const useAuthStore = createAuthStore<AdminUser, LoginRequest>({
       throw new Error(response.message || '登录失败');
     }
 
-    // 后端返回的字段：accessToken, refreshToken, tokenType, expiresIn, userInfo
+    // 后端返回的字段：accessToken, refreshToken, tokenType, expiresIn, userInfo, requires2FA, tempToken
     // 需要映射为前端期望的格式：accessToken, refreshToken, user
-    const { accessToken, refreshToken, userInfo } = response.data;
+    const { accessToken, refreshToken, userInfo, requires2FA, tempToken } = response.data;
+
+    // 🔐 检查是否需要 2FA 验证（新增 - BaSui 2025-11-10）
+    if (requires2FA) {
+      // 返回 2FA 要求，不更新状态
+      return {
+        requires2FA: true,
+        tempToken,
+      } as any;
+    }
 
     if (!accessToken) {
       throw new Error('登录失败：未获取到访问令牌');

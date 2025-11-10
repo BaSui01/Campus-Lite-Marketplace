@@ -111,22 +111,52 @@
   width: 450px;
   position: relative;
   z-index: 10;
-  backdrop-filter: blur(30px) saturate(200%);
+  backdrop-filter: blur(40px) saturate(200%);
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.85) 100%
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(250, 250, 255, 0.96) 100%
   );
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 
-    0 20px 60px 0 rgba(31, 38, 135, 0.25),
-    0 0 100px 0 rgba(102, 126, 234, 0.1),
-    0 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-  border-radius: 24px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  box-shadow:
+    0 30px 80px 0 rgba(31, 38, 135, 0.3),
+    0 0 150px 0 rgba(102, 126, 234, 0.15),
+    0 0 2px 0 rgba(255, 255, 255, 0.9) inset,
+    0 8px 32px rgba(118, 75, 162, 0.1);
+  border-radius: 28px;
   padding: 48px 40px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   animation: card-entrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
+}
+
+/* 🌈 流动渐变边框 */
+.login-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  padding: 2px;
+  background: linear-gradient(135deg,
+    rgba(102, 126, 234, 0.6) 0%,
+    rgba(118, 75, 162, 0.6) 25%,
+    rgba(240, 147, 251, 0.6) 50%,
+    rgba(245, 87, 108, 0.6) 75%,
+    rgba(102, 126, 234, 0.6) 100%);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-flow 4s ease infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes border-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* 卡片入场动画 */
@@ -196,11 +226,12 @@
 
 /* 卡片悬停效果 */
 .login-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 
-    0 25px 70px 0 rgba(31, 38, 135, 0.35),
-    0 0 120px 0 rgba(102, 126, 234, 0.15),
-    0 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  transform: translateY(-10px) scale(1.02);
+  box-shadow:
+    0 40px 100px 0 rgba(31, 38, 135, 0.4),
+    0 0 180px 0 rgba(102, 126, 234, 0.25),
+    0 0 3px 0 rgba(255, 255, 255, 1) inset,
+    0 12px 48px rgba(118, 75, 162, 0.2);
 }
 
 /* ===== 登录头部 ===== */
@@ -223,16 +254,21 @@
 
 .login-header h2 {
   margin-bottom: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  background-size: 200% 100%;
+  background: linear-gradient(135deg,
+    #667eea 0%,
+    #764ba2 30%,
+    #f093fb 60%,
+    #f5576c 100%);
+  background-size: 300% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 700;
   font-size: 32px;
   letter-spacing: 2px;
-  text-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
-  animation: title-shimmer 3s ease-in-out infinite;
+  position: relative;
+  animation: title-shimmer 4s ease-in-out infinite;
+  filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.3));
 }
 
 @keyframes title-shimmer {
@@ -293,25 +329,27 @@
 /* 输入框优化 */
 .login-card .styled-input.ant-input,
 .login-card .styled-input.ant-input-password {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(252, 250, 255, 0.95) 100%);
   border: 2px solid rgba(102, 126, 234, 0.15);
   border-radius: 12px;
   padding: 14px 16px;
   font-size: 15px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.05),
-    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+    inset 0 1px 3px rgba(255, 255, 255, 0.9);
 }
 
 .login-card .styled-input.ant-input:hover,
 .login-card .styled-input.ant-input-password:hover {
-  border-color: #667eea;
+  border-color: rgba(102, 126, 234, 0.4);
   background: rgba(255, 255, 255, 1);
-  transform: translateY(-1px);
-  box-shadow: 
-    0 4px 12px rgba(102, 126, 234, 0.15),
-    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 16px rgba(102, 126, 234, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 1);
 }
 
 .login-card .styled-input.ant-input:focus,
@@ -319,11 +357,12 @@
 .login-card .styled-input.ant-input-focused,
 .login-card .styled-input.ant-input-password .ant-input-focused {
   border-color: #667eea;
-  box-shadow: 
-    0 0 0 4px rgba(102, 126, 234, 0.12),
-    0 4px 20px rgba(102, 126, 234, 0.2),
-    inset 0 1px 2px rgba(255, 255, 255, 1);
+  box-shadow:
+    0 0 0 4px rgba(102, 126, 234, 0.15),
+    0 8px 24px rgba(102, 126, 234, 0.25),
+    inset 0 1px 3px rgba(102, 126, 234, 0.1);
   background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
 }
 
 /* 输入框图标 */
@@ -342,9 +381,13 @@
 /* 登录按钮优化 */
 .login-card .login-button.ant-btn-primary {
   height: 52px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  background-size: 200% 100%;
+  border-radius: 14px;
+  background: linear-gradient(135deg,
+    #667eea 0%,
+    #764ba2 30%,
+    #f093fb 60%,
+    #f5576c 100%);
+  background-size: 300% 100%;
   background-position: 0% 50%;
   border: none;
   font-size: 16px;
@@ -352,9 +395,10 @@
   letter-spacing: 1.5px;
   position: relative;
   overflow: hidden;
-  box-shadow: 
-    0 8px 20px 0 rgba(102, 126, 234, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  box-shadow:
+    0 10px 28px 0 rgba(102, 126, 234, 0.4),
+    0 4px 12px rgba(118, 75, 162, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -372,10 +416,11 @@
 }
 
 .login-card .login-button.ant-btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 
-    0 12px 30px 0 rgba(102, 126, 234, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 14px 36px 0 rgba(102, 126, 234, 0.5),
+    0 6px 16px rgba(118, 75, 162, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.4) inset;
   background-position: 100% 50%;
 }
 
@@ -385,7 +430,7 @@
 }
 
 .login-card .login-button.ant-btn-primary:active {
-  transform: translateY(-1px);
+  transform: translateY(-1px) scale(1.01);
   box-shadow: 
     0 6px 15px 0 rgba(102, 126, 234, 0.35),
     0 0 0 1px rgba(255, 255, 255, 0.2) inset;

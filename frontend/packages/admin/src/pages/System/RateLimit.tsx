@@ -295,11 +295,11 @@ const RateLimit: React.FC = () => {
             >
               <Table
                 columns={userWhitelistColumns}
-                dataSource={rules?.userWhitelist?.map((userId, index) => ({
-                  key: index,
+                dataSource={rules?.userWhitelist?.map((userId) => ({
                   userId,
                   userIdFormatted: userId.toString(),
                 })) || []}
+                rowKey="userId"
                 pagination={false}
                 size="small"
                 locale={{ emptyText: '暂无白名单用户' }}
@@ -327,10 +327,10 @@ const RateLimit: React.FC = () => {
             >
               <Table
                 columns={ipWhitelistColumns}
-                dataSource={rules?.ipWhitelist?.map((ip, index) => ({
-                  key: index,
+                dataSource={rules?.ipWhitelist?.map((ip) => ({
                   ip,
                 })) || []}
+                rowKey="ip"
                 pagination={false}
                 size="small"
                 locale={{ emptyText: '暂无白名单IP' }}
@@ -356,10 +356,10 @@ const RateLimit: React.FC = () => {
             >
               <Table
                 columns={ipBlacklistColumns}
-                dataSource={rules?.ipBlacklist?.map((ip, index) => ({
-                  key: index,
+                dataSource={rules?.ipBlacklist?.map((ip) => ({
                   ip,
                 })) || []}
+                rowKey="ip"
                 pagination={false}
                 size="small"
                 locale={{ emptyText: '暂无黑名单IP' }}

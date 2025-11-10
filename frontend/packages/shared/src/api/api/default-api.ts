@@ -11427,14 +11427,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员查询所有待审核的物品
+         * 管理员查询所有待审核的物品，支持关键词搜索
          * @summary 查询待审核物品列表
+         * @param {string} [keyword] 搜索关键词
          * @param {number} [page] 页码（从 0 开始）
          * @param {number} [size] 每页数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPendingGoods: async (page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPendingGoods: async (keyword?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/goods/pending`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11450,6 +11451,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
+            }
 
             if (page !== undefined) {
                 localVarQueryParameter['page'] = page;
@@ -20376,15 +20381,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员查询所有待审核的物品
+         * 管理员查询所有待审核的物品，支持关键词搜索
          * @summary 查询待审核物品列表
+         * @param {string} [keyword] 搜索关键词
          * @param {number} [page] 页码（从 0 开始）
          * @param {number} [size] 每页数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listPendingGoods(page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageGoodsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listPendingGoods(page, size, options);
+        async listPendingGoods(keyword?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageGoodsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPendingGoods(keyword, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listPendingGoods']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -24786,14 +24792,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listPendingDisputes(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员查询所有待审核的物品
+         * 管理员查询所有待审核的物品，支持关键词搜索
          * @summary 查询待审核物品列表
          * @param {DefaultApiListPendingGoodsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         listPendingGoods(requestParameters: DefaultApiListPendingGoodsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse> {
-            return localVarFp.listPendingGoods(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+            return localVarFp.listPendingGoods(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 管理员查询所有待审核的帖子
@@ -28862,15 +28868,16 @@ export interface DefaultApiInterface {
     listPendingDisputes(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO>;
 
     /**
-     * 管理员查询所有待审核的物品
+     * 管理员查询所有待审核的物品，支持关键词搜索
      * @summary 查询待审核物品列表
+     * @param {string} [keyword] 搜索关键词
      * @param {number} [page] 页码（从 0 开始）
      * @param {number} [size] 每页数量
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listPendingGoods(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse>;
+    listPendingGoods(keyword?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse>;
 
     /**
      * 管理员查询所有待审核的帖子
@@ -34153,6 +34160,13 @@ export interface DefaultApiListPendingDisputesRequest {
  * @interface DefaultApiListPendingGoodsRequest
  */
 export interface DefaultApiListPendingGoodsRequest {
+    /**
+     * 搜索关键词
+     * @type {string}
+     * @memberof DefaultApiListPendingGoods
+     */
+    readonly keyword?: string
+
     /**
      * 页码（从 0 开始）
      * @type {number}
@@ -39500,7 +39514,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员查询所有待审核的物品
+     * 管理员查询所有待审核的物品，支持关键词搜索
      * @summary 查询待审核物品列表
      * @param {DefaultApiListPendingGoodsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -39508,7 +39522,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      * @memberof DefaultApi
      */
     public listPendingGoods(requestParameters: DefaultApiListPendingGoodsRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listPendingGoods(requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).listPendingGoods(requestParameters.keyword, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

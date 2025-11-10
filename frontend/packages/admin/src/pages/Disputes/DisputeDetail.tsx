@@ -27,6 +27,7 @@ import {
   Col,
   Divider,
   Tabs,
+  App,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -68,6 +69,7 @@ const TYPE_MAP: Record<string, string> = {
 export const DisputeDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { modal } = App.useApp();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [arbitrateModalVisible, setArbitrateModalVisible] = useState(false);
@@ -122,7 +124,7 @@ export const DisputeDetail: React.FC = () => {
 
   // 认领纠纷
   const handleClaim = () => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认认领纠纷',
       content: '认领后将由你负责仲裁此纠纷，确定要认领吗？',
       onOk: () => claimMutation.mutate(),
@@ -293,7 +295,7 @@ export const DisputeDetail: React.FC = () => {
         <Row gutter={16} align="middle">
           <Col span={4}>
             <Image
-              src={dispute.orderInfo.goodsImage || 'https://via.placeholder.com/150'}
+              src={dispute.orderInfo.goodsImage || 'https://picsum.photos/150/150?random=6'}
               alt={dispute.orderInfo.goodsTitle}
               width={150}
               height={150}

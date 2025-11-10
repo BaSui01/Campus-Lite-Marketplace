@@ -182,6 +182,28 @@ export { RichTextEditor, type RichTextEditorProps } from './RichTextEditor';
  */
 export { ImageCaptcha, type ImageCaptchaProps } from './ImageCaptcha/ImageCaptcha';
 
+/**
+ * TwoFactorVerify - 2FA 验证组件 🔐
+ * @description 双因素认证验证码输入组件，登录时输入 6 位 TOTP 验证码
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @example
+ * ```tsx
+ * <TwoFactorVerify
+ *   onVerify={(code) => {
+ *     // 提交 6 位验证码
+ *     console.log('验证码:', code);
+ *   }}
+ *   onCancel={() => {
+ *     // 取消验证
+ *   }}
+ *   loading={false}
+ *   error="验证码错误"
+ * />
+ * ```
+ */
+export { TwoFactorVerify } from './TwoFactorVerify';
+
 // ==================== P3 数据撤销组件（新增）====================
 
 /**

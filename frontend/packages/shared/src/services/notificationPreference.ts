@@ -13,7 +13,7 @@
  * @description 通知渠道开关、免打扰时段、通知类型订阅管理
  */
 
-import { getApi } from '../utils/apiClient';
+// import { getApi } from '../utils/apiClient'; // TODO: 等待重构为使用 OpenAPI
 
 /**
  * 通知渠道枚举
@@ -77,16 +77,15 @@ export interface NotificationTypeInfo {
  * 通知偏好 API 服务类
  */
 export class NotificationPreferenceService {
-  private BASE_PATH = '/api/notifications/preferences';
-
   /**
    * 开关通知渠道
    * 
    * @param channel 渠道类型
    * @param enabled 是否启用
    */
-  async toggleChannel(channel: NotificationChannel, enabled: boolean): Promise<void> {
-    await http.post(`${this.BASE_PATH}/channel/${channel}/enabled/${enabled}`);
+  async toggleChannel(_channel: NotificationChannel, _enabled: boolean): Promise<void> {
+    // await http.post(`${this.BASE_PATH}/channel/${channel}/enabled/${enabled}`);
+    throw new Error('开关通知渠道功能暂未实现');
   }
 
   /**
@@ -95,11 +94,12 @@ export class NotificationPreferenceService {
    * @param channel 渠道（通常为 EMAIL 或 IN_APP）
    * @param config 免打扰配置
    */
-  async setQuietHours(channel: NotificationChannel, config: QuietHoursConfig): Promise<void> {
-    await http.post(`${this.BASE_PATH}/channel/${channel}/quiet-hours`, {
-      startTime: config.startTime,
-      endTime: config.endTime,
-    });
+  async setQuietHours(_channel: NotificationChannel, _config: QuietHoursConfig): Promise<void> {
+    // await http.post(`${this.BASE_PATH}/channel/${channel}/quiet-hours`, {
+    //   startTime: config.startTime,
+    //   endTime: config.endTime,
+    // });
+    throw new Error('设置免打扰时段功能暂未实现');
   }
 
   /**
@@ -108,8 +108,9 @@ export class NotificationPreferenceService {
    * @param channel 渠道
    * @param type 通知类型
    */
-  async unsubscribe(channel: NotificationChannel, type: NotificationType): Promise<void> {
-    await http.post(`${this.BASE_PATH}/unsubscribe/${channel}/${type}`);
+  async unsubscribe(_channel: NotificationChannel, _type: NotificationType): Promise<void> {
+    // await http.post(`${this.BASE_PATH}/unsubscribe/${channel}/${type}`);
+    throw new Error('退订通知类型功能暂未实现');
   }
 
   /**
@@ -118,8 +119,9 @@ export class NotificationPreferenceService {
    * @param channel 渠道
    * @param type 通知类型
    */
-  async resubscribe(channel: NotificationChannel, type: NotificationType): Promise<void> {
-    await http.delete(`${this.BASE_PATH}/unsubscribe/${channel}/${type}`);
+  async resubscribe(_channel: NotificationChannel, _type: NotificationType): Promise<void> {
+    // await http.delete(`${this.BASE_PATH}/unsubscribe/${channel}/${type}`);
+    throw new Error('重新订阅通知类型功能暂未实现');
   }
 
   /**
@@ -128,8 +130,9 @@ export class NotificationPreferenceService {
    * @returns 通知偏好配置
    */
   async getStatus(): Promise<NotificationPreference> {
-    const response = await http.get(`${this.BASE_PATH}/status`);
-    return response.data.data;
+    // const response = await http.get(`${this.BASE_PATH}/status`);
+    // return response.data.data;
+    throw new Error('查询通知偏好状态功能暂未实现');
   }
 
   /**

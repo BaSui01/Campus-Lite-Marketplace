@@ -149,6 +149,15 @@ class GlobalErrorHandler {
     const statusCode = response.status;
     const errorMessage = this.getErrorMessage(statusCode, response.data);
 
+    // ⚠️ 验证码接口白名单：不显示错误消息，不触发 401 处理
+    const requestUrl = error.config?.url || '';
+    const isAuthWhitelistUrl = requestUrl.includes('/captcha/');
+    
+    if (isAuthWhitelistUrl && statusCode === 401) {
+      console.warn('[Error Handler] ⚠️ 验证码接口返回 401，跳过错误处理（需要后端配置匿名访问）');
+      return; // 不显示错误，不触发登出
+    }
+
     // 显示错误消息
     this.config.showError(errorMessage, 3);
 

@@ -248,7 +248,7 @@ export const RefundManagement: React.FC = () => {
       render: (_: any, record: Refund) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <img
-            src={record.goodsImage || 'https://via.placeholder.com/40'}
+            src={record.goodsImage || 'https://picsum.photos/40/40?random=4'}
             alt={record.goodsTitle}
             style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }}
           />

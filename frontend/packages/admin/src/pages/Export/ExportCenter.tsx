@@ -30,6 +30,7 @@ import {
   DatePicker,
   Input,
   Progress,
+  App,
 } from 'antd';
 import {
   DownloadOutlined,
@@ -93,6 +94,7 @@ const EXPORT_TYPE_CONFIG: Record<string, { text: string; icon: React.ReactNode }
 
 export const ExportCenter: React.FC = () => {
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -173,7 +175,7 @@ export const ExportCenter: React.FC = () => {
 
   // 取消任务
   const handleCancel = (id: number) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认取消',
       content: '确定要取消该导出任务吗？',
       onOk: () => cancelMutation.mutate(id),
@@ -309,7 +311,7 @@ export const ExportCenter: React.FC = () => {
               type="link"
               size="small"
               onClick={() => {
-                Modal.error({
+                modal.error({
                   title: '错误信息',
                   content: record.message || '导出失败',
                 });

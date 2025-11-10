@@ -36,7 +36,6 @@ import {
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { bannedUserService } from '@/services';
-import { getApi } from '@campus/shared/utils/apiClient'; // ✅ BaSui 添加：用于调用解封API
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -75,11 +74,8 @@ export const BannedUserList: React.FC = () => {
 
   // ✅ BaSui 修复：解封用户 - 调用真实API
   const unbanMutation = useMutation({
-    mutationFn: async ({ userId, reason }: { userId: number; reason: string }) => {
-      const api = getApi();
-      await api.unbanUser({ userId });
-      // 注意：后端API不需要reason参数，仅前端表单验证收集
-    },
+    mutationFn: ({ userId }: { userId: number; reason: string }) =>
+      bannedUserService.unbanUser(userId),
     onSuccess: () => {
       message.success('解封成功');
       setUnbanModalVisible(false);

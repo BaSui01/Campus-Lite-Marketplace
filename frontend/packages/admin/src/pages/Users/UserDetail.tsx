@@ -21,6 +21,7 @@ import {
   DatePicker,
   message,
   Tooltip,
+  App,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -37,6 +38,7 @@ const UserDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
   const [banModalVisible, setBanModalVisible] = useState(false);
   const [roleModalVisible, setRoleModalVisible] = useState(false);
   const [banForm] = Form.useForm();
@@ -122,7 +124,7 @@ const UserDetail: React.FC = () => {
   const handleUnbanUser = () => {
     if (!user) return;
     
-    Modal.confirm({
+    modal.confirm({
       title: '确认解封用户？',
       content: `确定要解封用户 "${user.nickname}" 吗？`,
       onOk: () => unbanMutation.mutate(user.id),

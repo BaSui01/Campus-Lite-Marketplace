@@ -139,16 +139,26 @@ class CommunityServiceImpl implements CommunityService {
     return response.data.data as number[];
   }
 
-  async checkPostLiked(postId: number): Promise<boolean> {
-    const api = getApi();
-    const response = await api.isPostLiked({ postId });
-    return response.data.data as boolean;
+  /**
+   * 检查帖子是否已点赞
+   * TODO: 等待后端实现 isPostLiked API
+   */
+  async checkPostLiked(_postId: number): Promise<boolean> {
+    // const api = getApi();
+    // const response = await api.isPostLiked({ postId });
+    // return response.data.data as boolean;
+    throw new Error('检查帖子点赞状态功能暂未实现');
   }
 
-  async checkPostCollected(postId: number): Promise<boolean> {
-    const api = getApi();
-    const response = await api.isPostCollected({ postId });
-    return response.data.data as boolean;
+  /**
+   * 检查帖子是否已收藏
+   * TODO: 等待后端实现 isPostCollected API
+   */
+  async checkPostCollected(_postId: number): Promise<boolean> {
+    // const api = getApi();
+    // const response = await api.isPostCollected({ postId });
+    // return response.data.data as boolean;
+    throw new Error('检查帖子收藏状态功能暂未实现');
   }
 
   async getPostLikeCount(postId: number): Promise<number> {

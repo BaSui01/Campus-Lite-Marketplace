@@ -29,7 +29,7 @@ export const imageCaptchaService = {
   generate: async (): Promise<CaptchaResponse> => {
     const response = await apiClient.get<ApiResponseCaptchaResponse>('/api/captcha/image');
 
-    if (response.data.code !== 0 || !response.data.data) {
+    if (response.data.code !== 200 || !response.data.data) {
       throw new Error(response.data.message || '❌ 生成图形验证码失败');
     }
 
@@ -72,7 +72,7 @@ export const slideCaptchaService = {
   generate: async (): Promise<CaptchaResponse> => {
     const response = await apiClient.get<ApiResponseCaptchaResponse>('/api/captcha/slide');
 
-    if (response.data.code !== 0 || !response.data.data) {
+    if (response.data.code !== 200 || !response.data.data) {
       throw new Error(response.data.message || '❌ 生成滑块验证码失败');
     }
 
@@ -90,7 +90,7 @@ export const slideCaptchaService = {
   generateWithImage: async (): Promise<SlideCaptchaResponse> => {
     const response = await apiClient.get<ApiResponseSlideCaptchaResponse>('/api/captcha/slide/image');
 
-    if (response.data.code !== 0 || !response.data.data) {
+    if (response.data.code !== 200 || !response.data.data) {
       throw new Error(response.data.message || '❌ 生成滑块验证码失败');
     }
 

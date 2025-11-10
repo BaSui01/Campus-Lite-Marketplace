@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Table, Button, Input, Select, Space, Tag, Card, Row, Col, Statistic, Rate, Modal, Image } from 'antd';
+import { Table, Button, Input, Select, Space, Tag, Card, Row, Col, Statistic, Rate, Modal, Image, App } from 'antd';
 import { SearchOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { reviewService } from '@campus/shared/services/goods/review';
@@ -13,6 +13,7 @@ const { Option } = Select;
 
 export const ReviewList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
   const [keyword, setKeyword] = useState('');
   const [rating, setRating] = useState<number | undefined>();
   const [page, setPage] = useState(0);
@@ -46,7 +47,7 @@ export const ReviewList: React.FC = () => {
       render: (_: any, record: any) => (
         <Space size="small">
           <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => { setCurrentReview(record); setDetailVisible(true); }}>查看</Button>
-          <Button type="link" danger size="small" icon={<DeleteOutlined />} onClick={() => Modal.confirm({ title: '确认删除？', onOk: () => deleteMutation.mutate(record.id) })}>删除</Button>
+          <Button type="link" danger size="small" icon={<DeleteOutlined />} onClick={() => modal.confirm({ title: '确认删除？', onOk: () => deleteMutation.mutate(record.id) })}>删除</Button>
         </Space>
       ),
     },

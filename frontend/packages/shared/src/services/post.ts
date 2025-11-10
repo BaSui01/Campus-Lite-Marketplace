@@ -13,13 +13,12 @@
 
 import { getApi } from '../utils/apiClient';
 import type {
-  Post,
-  PostReply,
+  PostResponse,
   CreatePostRequest,
   UpdatePostRequest,
   CreatePostReplyRequest,
   PagePostResponse,
-  PagePostReplyResponse,
+  PageReplyResponse,
 } from '../api';
 
 /**
@@ -63,10 +62,10 @@ export class PostService {
    * @param data 更新帖子请求参数
    * @returns 更新后的帖子信息
    */
-  async updatePost(id: number, data: UpdatePostRequest): Promise<Post> {
+  async updatePost(id: number, data: UpdatePostRequest): Promise<PostResponse> {
     const api = getApi();
     const response = await api.updatePost({ id, updatePostRequest: data });
-    return response.data.data as Post;
+    return response.data.data as PostResponse;
   }
 
   /**
@@ -83,10 +82,10 @@ export class PostService {
    * @param id 帖子ID
    * @returns 帖子详情
    */
-  async getPostById(id: number): Promise<Post> {
+  async getPostById(id: number): Promise<PostResponse> {
     const api = getApi();
     const response = await api.getPostDetail({ id });
-    return response.data.data as Post;
+    return response.data.data as PostResponse;
   }
 
   /**
@@ -189,24 +188,26 @@ export class PostService {
    * @param params 查询参数
    * @returns 回复列表(分页)
    */
-  async getReplies(postId: number, params?: ReplyListParams): Promise<PagePostReplyResponse> {
+  async getReplies(postId: number, params?: ReplyListParams): Promise<PageReplyResponse> {
     const api = getApi();
     const response = await api.listReplies({
       postId,
       page: params?.page,
       size: params?.size,
     });
-    return response.data.data as PagePostReplyResponse;
+    return response.data.data as PageReplyResponse;
   }
 
   /**
    * 审核帖子（管理员）
    * @param postId 帖子ID
    * @param data 审核数据
+   * TODO: 等待后端实现帖子审核API
    */
-  async auditPost(postId: number, data: { approved: boolean; reason?: string }): Promise<void> {
-    const api = getApi();
-    await api.auditPost({ postId, auditPostRequest: data });
+  async auditPost(_postId: number, _data: { approved: boolean; reason?: string }): Promise<void> {
+    // const api = getApi();
+    // await api.auditPost({ postId, auditPostRequest: data });
+    throw new Error('帖子审核功能暂未实现');
   }
 }
 

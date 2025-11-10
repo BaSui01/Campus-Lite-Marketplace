@@ -54,6 +54,15 @@ export class BannedUserService {
       totalPages: data?.totalPages || 0,
     };
   }
+
+  /**
+   * 解封用户
+   * @param userId 用户ID
+   */
+  async unbanUser(userId: number): Promise<void> {
+    const api = getApi();
+    await api.unbanUser({ userId });
+  }
 }
 
 // 导出单例

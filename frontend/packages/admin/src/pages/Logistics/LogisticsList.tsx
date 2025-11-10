@@ -29,6 +29,7 @@ import {
   message,
   Modal,
   Timeline,
+  App,
 } from 'antd';
 import {
   SearchOutlined,
@@ -79,6 +80,7 @@ const STATUS_MAP: Record<string, { text: string; color: string; icon: React.Reac
 
 export const LogisticsList: React.FC = () => {
   const navigate = useNavigate();
+  const { modal } = App.useApp();
 
   // 查询参数
   const [keyword, setKeyword] = useState<string>('');
@@ -107,7 +109,7 @@ export const LogisticsList: React.FC = () => {
     try {
       const logistics = await logisticsService.getOrderLogistics(orderId);
       
-      Modal.info({
+      modal.info({
         title: `物流轨迹 - ${logistics.expressName} (${logistics.trackingNumber})`,
         width: 600,
         content: (

@@ -61,19 +61,51 @@
   width: 100%;
   max-width: 920px;
   min-height: 580px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(20px) saturate(180%);
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(250, 250, 255, 0.96) 100%);
+  border-radius: 28px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  backdrop-filter: blur(30px) saturate(200%);
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.25),
-    0 0 100px rgba(102, 126, 234, 0.1),
-    0 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    0 30px 80px rgba(0, 0, 0, 0.3),
+    0 0 150px rgba(240, 147, 251, 0.15),
+    0 0 2px 0 rgba(255, 255, 255, 0.9) inset,
+    0 8px 32px rgba(245, 87, 108, 0.1);
   overflow: hidden;
   position: relative;
   z-index: 10;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   animation: card-entrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 🌈 渐变边框效果 */
+.login-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  padding: 2px;
+  background: linear-gradient(135deg,
+    rgba(240, 147, 251, 0.6) 0%,
+    rgba(245, 87, 108, 0.6) 25%,
+    rgba(102, 126, 234, 0.6) 50%,
+    rgba(118, 75, 162, 0.6) 75%,
+    rgba(240, 147, 251, 0.6) 100%);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-flow 4s ease infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes border-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 @keyframes card-entrance {
@@ -88,11 +120,12 @@
 }
 
 .login-container:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px) scale(1.01);
   box-shadow:
-    0 25px 70px rgba(0, 0, 0, 0.3),
-    0 0 120px rgba(102, 126, 234, 0.15),
-    0 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    0 35px 90px rgba(0, 0, 0, 0.35),
+    0 0 180px rgba(240, 147, 251, 0.25),
+    0 0 3px 0 rgba(255, 255, 255, 1) inset,
+    0 12px 48px rgba(245, 87, 108, 0.2);
 }
 
 /* ==================== 左侧欢迎区域 ==================== */
@@ -100,15 +133,19 @@
 .login-welcome {
   flex: 0 0 38%;
   padding: 60px 45px;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  background-size: 200% 200%;
+  background: linear-gradient(135deg,
+    #f093fb 0%,
+    #f5576c 50%,
+    #667eea 100%);
+  background-size: 300% 300%;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  animation: gradient-wave 8s ease infinite;
+  animation: gradient-wave 10s ease infinite;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes gradient-wave {
@@ -214,8 +251,32 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.98);
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(252, 250, 255, 0.97) 100%);
+  position: relative;
   animation: fade-in-right 0.8s ease-out 0.3s both;
+}
+
+/* ✨ 右侧表单区域光晕效果 */
+.login-form::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle,
+    rgba(240, 147, 251, 0.08) 0%,
+    transparent 50%);
+  animation: glow-rotate 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes glow-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @keyframes fade-in-right {
@@ -234,13 +295,20 @@
   font-weight: 700;
   color: #262626;
   margin: 0 0 10px 0;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  background-size: 200% 100%;
+  background: linear-gradient(135deg,
+    #f093fb 0%,
+    #f5576c 30%,
+    #667eea 60%,
+    #764ba2 100%);
+  background-size: 300% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: 1.5px;
-  animation: title-shimmer 3s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+  animation: title-shimmer 4s ease-in-out infinite;
+  filter: drop-shadow(0 2px 8px rgba(240, 147, 251, 0.3));
 }
 
 @keyframes title-shimmer {
@@ -411,36 +479,55 @@
 /* 输入框增强 */
 .login-form input {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 10px;
+  border-radius: 12px;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(252, 250, 255, 0.9) 100%);
+  border: 2px solid rgba(240, 147, 251, 0.1);
+  position: relative;
+  z-index: 1;
 }
 
 .login-form input:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(240, 147, 251, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(240, 147, 251, 0.2);
+  border-color: rgba(240, 147, 251, 0.3);
+  background: rgba(255, 255, 255, 1);
 }
 
 .login-form input:focus {
   border-color: #f093fb;
-  box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1), 0 4px 20px rgba(240, 147, 251, 0.2);
-  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 4px rgba(240, 147, 251, 0.15),
+    0 8px 24px rgba(240, 147, 251, 0.25),
+    inset 0 1px 3px rgba(240, 147, 251, 0.1);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 1);
 }
 
 /* 按钮增强 */
 .login-form button[type="submit"],
 .login-form .ant-btn-primary {
-  height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  background-size: 200% 100%;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg,
+    #f093fb 0%,
+    #f5576c 50%,
+    #667eea 100%);
+  background-size: 300% 100%;
   background-position: 0% 50%;
   border: none;
   font-size: 16px;
   font-weight: 600;
-  letter-spacing: 1px;
-  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.35);
+  letter-spacing: 1.5px;
+  box-shadow:
+    0 8px 24px rgba(240, 147, 251, 0.4),
+    0 4px 12px rgba(245, 87, 108, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 .login-form button[type="submit"]::before,
@@ -459,8 +546,11 @@
 
 .login-form button[type="submit"]:hover,
 .login-form .ant-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(240, 147, 251, 0.45);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 12px 32px rgba(240, 147, 251, 0.5),
+    0 6px 16px rgba(245, 87, 108, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   background-position: 100% 50%;
 }
 

@@ -67,6 +67,12 @@ export interface PageMessageSearchResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {number}
+     * @memberof PageMessageSearchResponse
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
      * @type {boolean}
      * @memberof PageMessageSearchResponse
      */
@@ -77,12 +83,6 @@ export interface PageMessageSearchResponse {
      * @memberof PageMessageSearchResponse
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageMessageSearchResponse
-     */
-    'numberOfElements'?: number;
     /**
      * 
      * @type {PageableObject}

@@ -22,6 +22,12 @@ export const setupInterceptors = (): void => {
       antdMessage.error(message, duration);
     },
     onUnauthorized: () => {
+      // ⚠️ 防止无限重定向：如果已经在登录页，不再处理
+      if (window.location.pathname === '/admin/login') {
+        console.warn('[Error Handler] ⚠️ 已在登录页，跳过 401 处理');
+        return;
+      }
+
       if (isHandlingUnauthorized) {
         return;
       }

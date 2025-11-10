@@ -23,7 +23,10 @@ export const useAuthGuard = (requirements?: PermissionRequirement | PermissionRe
   useEffect(() => {
     // 检查是否已登录
     if (!isAuthenticated) {
-      navigate('/admin/login', { state: { from: location.pathname } });
+      // ⚠️ 防止无限重定向：如果已经在登录页，不再跳转
+      if (location.pathname !== '/admin/login') {
+        navigate('/admin/login', { state: { from: location.pathname } });
+      }
       return;
     }
 

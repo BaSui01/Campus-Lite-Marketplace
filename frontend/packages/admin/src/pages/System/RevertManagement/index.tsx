@@ -22,7 +22,7 @@ import {
   type RevertExecutionResult
 } from '@campus/shared';
 import { revertService } from '@campus/shared';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { revertManagementService } from '@/services';
 import './index.css';
 
 /**
@@ -79,24 +79,22 @@ const RevertManagement: React.FC = () => {
     setLoading(true);
 
     try {
-      const api = getApi();
-
       if (activeTab === 'pending') {
-        const response = await api.listRevertRequests(
-          'PENDING' as any,
+        const response = await revertManagementService.listRequests(
+          'PENDING',
           currentPage - 1,
           pageSize
         );
-        setPendingData(response.data.data?.content || []);
-        setTotal(response.data.data?.totalElements || 0);
+        setPendingData(response.content || []);
+        setTotal(response.totalElements || 0);
       } else {
-        const response = await api.listRevertRequests(
+        const response = await revertManagementService.listRequests(
           undefined,
           currentPage - 1,
           pageSize
         );
-        setHistoryData(response.data.data?.content || []);
-        setTotal(response.data.data?.totalElements || 0);
+        setHistoryData(response.content || []);
+        setTotal(response.totalElements || 0);
       }
     } catch (error: any) {
       toast.error(error.message || '加载数据失败');
@@ -107,10 +105,7 @@ const RevertManagement: React.FC = () => {
 
   const loadStatistics = async () => {
     try {
-      const api = getApi();
-      const response = await api.getRevertStatistics();
-      const stats = response.data.data;
-
+      const stats = await revertManagementService.getStatistics();
       setStatistics({
         pendingCount: stats?.pendingCount || 0,
         todayRevertCount: stats?.todayRevertCount || 0,
@@ -135,8 +130,7 @@ const RevertManagement: React.FC = () => {
     setApproving(true);
 
     try {
-      const api = getApi();
-      await api.approveRevert(selectedRequest.id, { comment: approvalComment });
+      await revertManagementService.approve(selectedRequest.id, approvalComment);
 
       toast.success('撤销申请已批准并执行');
       setApprovalModalVisible(false);
@@ -161,8 +155,7 @@ const RevertManagement: React.FC = () => {
     setApproving(true);
 
     try {
-      const api = getApi();
-      await api.rejectRevert(selectedRequest.id, { reason: approvalComment });
+      await revertManagementService.reject(selectedRequest.id, approvalComment);
 
       toast.success('撤销申请已拒绝');
       setApprovalModalVisible(false);

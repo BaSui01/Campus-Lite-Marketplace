@@ -380,7 +380,7 @@ export class EmojiService {
         description: '最常用的经典表情符号',
         type: 'SYSTEM' as EmojiPackType,
         status: 'ACTIVE' as any,
-        coverImage: 'https://via.placeholder.com/100x100?text=😊',
+        coverImage: 'https://picsum.photos/100/100?random=7',
         author: 'System',
         emojis: [
           { id: 'emoji-1', name: '笑脸', content: '😊', contentType: 'text', category: 'SMILEYS' as any, packId: 'system-smileys', sortOrder: 1, isFavorite: false, useCount: 150, createdAt: '2025-01-01', updatedAt: '2025-01-01' },
@@ -403,7 +403,7 @@ export class EmojiService {
         description: '萌萌的小动物表情',
         type: 'SYSTEM' as EmojiPackType,
         status: 'ACTIVE' as any,
-        coverImage: 'https://via.placeholder.com/100x100?text=🐱',
+        coverImage: 'https://picsum.photos/100/100?random=8',
         author: 'System',
         emojis: [
           { id: 'emoji-7', name: '小猫', content: '🐱', contentType: 'text', category: 'ANIMALS' as any, packId: 'system-animals', sortOrder: 1, isFavorite: false, useCount: 80, createdAt: '2025-01-01', updatedAt: '2025-01-01' },

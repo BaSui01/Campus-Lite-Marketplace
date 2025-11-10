@@ -148,16 +148,16 @@ export interface AppealMaterial {
     'imageFile'?: boolean;
     /**
      * 
-     * @type {string}
-     * @memberof AppealMaterial
-     */
-    'formattedFileSize'?: string;
-    /**
-     * 
      * @type {boolean}
      * @memberof AppealMaterial
      */
     'documentFile'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppealMaterial
+     */
+    'formattedFileSize'?: string;
 }
 
 export const AppealMaterialStatusEnum = {

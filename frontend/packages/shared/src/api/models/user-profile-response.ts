@@ -104,5 +104,41 @@ export interface UserProfileResponse {
      * @memberof UserProfileResponse
      */
     'createdAt'?: string;
+    /**
+     * 最后登录时间
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'lastLoginAt'?: string;
+    /**
+     * 个人简介
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'bio'?: string;
+    /**
+     * 信誉分（0-200）
+     * @type {number}
+     * @memberof UserProfileResponse
+     */
+    'creditScore'?: number;
+    /**
+     * 邮箱是否已验证
+     * @type {boolean}
+     * @memberof UserProfileResponse
+     */
+    'emailVerified'?: boolean;
+    /**
+     * 手机号是否已验证
+     * @type {boolean}
+     * @memberof UserProfileResponse
+     */
+    'phoneVerified'?: boolean;
+    /**
+     * 是否启用两步验证
+     * @type {boolean}
+     * @memberof UserProfileResponse
+     */
+    'twoFactorEnabled'?: boolean;
 }
 

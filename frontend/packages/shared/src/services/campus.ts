@@ -122,7 +122,13 @@ export class CampusService {
    * @returns 更新后的校园信息
    */
   async updateStatus(id: number, status: CampusStatus): Promise<Campus> {
-    return this.update(id, { status } as CampusUpdateRequest);
+    // 先获取当前校园信息
+    const campus = await this.getDetail(id);
+    // 更新状态
+    return this.update(id, {
+      name: campus.name || '', // 处理可能的 undefined
+      status: status as any, // 类型转换：CampusStatus -> CampusUpdateRequestStatusEnum
+    });
   }
 
   /**

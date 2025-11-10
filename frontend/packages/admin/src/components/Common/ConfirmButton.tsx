@@ -12,7 +12,7 @@
  */
 
 import React, { useState } from 'react';
-import { Button, Modal } from 'antd';
+import { Button, App } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import type { ButtonProps } from 'antd';
 
@@ -60,12 +60,13 @@ export const ConfirmButton: React.FC<ConfirmButtonProps> = ({
   ...buttonProps
 }) => {
   const [loading, setLoading] = useState(false);
+  const { modal } = App.useApp();
 
   /**
    * 处理点击
    */
   const handleClick = () => {
-    Modal.confirm({
+    modal.confirm({
       title,
       content,
       icon: <ExclamationCircleOutlined />,

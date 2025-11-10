@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer, Modal } from 'antd';
+import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer, Modal, App } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -77,6 +77,7 @@ const getIcon = (iconName: string) => {
 export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const { hasPermission } = usePermission();
+  const { modal } = App.useApp();
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
   const { actualTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ export const AdminLayout: React.FC = () => {
   }, [isMobile, isTablet, isDesktop]);
 
   const handleLogout = async () => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认退出登录',
       icon: <ExclamationCircleOutlined />,
       content: (

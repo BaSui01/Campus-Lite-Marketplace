@@ -33,12 +33,18 @@ export function suppressEChartsResizeObserverError(): void {
   console.error = (...args: any[]) => {
     // 检查是否是 ResizeObserver 相关错误
     const errorMessage = args[0]?.toString() || '';
+    const stackTrace = args[0]?.stack?.toString() || '';
 
     if (
       errorMessage.includes('ResizeObserver') ||
       errorMessage.includes('disconnect') ||
       errorMessage.includes('resizeObserver.js') ||
-      errorMessage.includes('sensorPool.js')
+      errorMessage.includes('sensorPool.js') ||
+      errorMessage.includes('core.tsx') ||
+      errorMessage.includes('Cannot read properties of undefined') ||
+      stackTrace.includes('EChartsReactCore') ||
+      stackTrace.includes('resizeObserver') ||
+      stackTrace.includes('sensorPool')
     ) {
       // 抑制此错误，不输出到控制台
       return;

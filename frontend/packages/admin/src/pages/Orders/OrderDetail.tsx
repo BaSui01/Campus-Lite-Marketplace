@@ -31,6 +31,7 @@ import {
   Avatar,
   Image,
   Divider,
+  App,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -61,6 +62,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 export const OrderDetail: React.FC = () => {
   const { orderNo } = useParams<{ orderNo: string }>();
   const navigate = useNavigate();
+  const { modal } = App.useApp();
   const queryClient = useQueryClient();
 
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
@@ -127,7 +129,7 @@ export const OrderDetail: React.FC = () => {
 
   // 强制完成订单
   const handleForceComplete = () => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认强制完成订单',
       content: '确定要强制完成这个订单吗？此操作不可撤销！',
       okType: 'danger',
@@ -224,7 +226,7 @@ export const OrderDetail: React.FC = () => {
         <Row gutter={16} align="middle">
           <Col span={4}>
             <Image
-              src={order.goodsImage || 'https://via.placeholder.com/150'}
+              src={order.goodsImage || 'https://picsum.photos/150/150?random=5'}
               alt={order.goodsTitle}
               width={150}
               height={150}

@@ -34,7 +34,7 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/utils/apiClient';
+import { behaviorService } from '@/services';
 import type { UserBehaviorLogDTO } from '@campus/shared/api';
 import ReactECharts from 'echarts-for-react';
 import dayjs, { Dayjs } from 'dayjs';
@@ -64,37 +64,24 @@ export const BehaviorDashboard: React.FC = () => {
   // 查询行为日志列表
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['behavior', 'logs', dateRange],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.getUserBehaviors(
-        undefined, // userId
-        undefined, // behaviorType
-        dateRange[0].format('YYYY-MM-DD'),
-        dateRange[1].format('YYYY-MM-DD'),
-        0, // page
-        20 // size
-      );
-      return response.data.data;
-    },
+    queryFn: () => behaviorService.getUserBehaviors(
+      undefined,
+      undefined,
+      dateRange[0].format('YYYY-MM-DD'),
+      dateRange[1].format('YYYY-MM-DD'),
+      0,
+      20
+    ),
     staleTime: 5 * 60 * 1000,
   });
 
   // 查询统计数据
   const { data: statistics } = useQuery({
     queryKey: ['behavior', 'statistics', dateRange],
-    queryFn: async () => {
-      const api = getApi();
-      const response = await api.getBehaviorStatistics(
-        dateRange[0].format('YYYY-MM-DD'),
-        dateRange[1].format('YYYY-MM-DD')
-      );
-      return response.data.data || {
-        totalUsers: 0,
-        activeUsers: 0,
-        totalBehaviors: 0,
-        avgBehaviorsPerUser: 0,
-      };
-    },
+    queryFn: () => behaviorService.getStatistics(
+      dateRange[0].format('YYYY-MM-DD'),
+      dateRange[1].format('YYYY-MM-DD')
+    ),
     staleTime: 5 * 60 * 1000,
   });
 

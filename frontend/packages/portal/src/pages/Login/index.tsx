@@ -6,10 +6,9 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Input, Button } from '@campus/shared/components';
+import { Input, Button, TwoFactorVerify } from '@campus/shared/components'; // ✅ 从 shared 包导入
 import { SliderCaptcha } from '../../components/SliderCaptcha';
-import { TwoFactorVerify } from '../../components/TwoFactorVerify'; // ✅ 导入 2FA 验证组件
-import { useAuthStore } from '../../store'; // ✅ 导入 useAuthStore
+import { useAuthStore } from '../../store';
 import type { LoginRequest } from '@campus/shared/api/models';
 import './Login.css';
 

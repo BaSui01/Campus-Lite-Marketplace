@@ -29,6 +29,7 @@ import {
   Statistic,
   Row,
   Col,
+  App,
 } from 'antd';
 import {
   SearchOutlined,
@@ -59,6 +60,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 export const GoodsList: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
 
   // 查询参数
   const [keyword, setKeyword] = useState<string>('');
@@ -160,7 +162,7 @@ export const GoodsList: React.FC = () => {
       message.warning('请选择要上架的商品');
       return;
     }
-    Modal.confirm({
+    modal.confirm({
       title: '确认批量上架',
       content: `确定要上架选中的 ${selectedRowKeys.length} 个商品吗？`,
       onOk: () => {
@@ -178,7 +180,7 @@ export const GoodsList: React.FC = () => {
       message.warning('请选择要下架的商品');
       return;
     }
-    Modal.confirm({
+    modal.confirm({
       title: '确认批量下架',
       content: `确定要下架选中的 ${selectedRowKeys.length} 个商品吗？`,
       onOk: () => {
@@ -196,7 +198,7 @@ export const GoodsList: React.FC = () => {
       message.warning('请选择要删除的商品');
       return;
     }
-    Modal.confirm({
+    modal.confirm({
       title: '确认批量删除',
       content: `确定要删除选中的 ${selectedRowKeys.length} 个商品吗？此操作不可恢复！`,
       okType: 'danger',
@@ -230,7 +232,7 @@ export const GoodsList: React.FC = () => {
       width: 100,
       render: (images: string[]) => (
         <img
-          src={images?.[0] || 'https://via.placeholder.com/60'}
+          src={images?.[0] || 'https://picsum.photos/60/60?random=1'}
           alt="商品"
           className="goods-image"
         />

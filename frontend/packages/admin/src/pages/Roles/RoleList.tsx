@@ -18,6 +18,7 @@ import {
   Typography,
   Tag,
   Tooltip,
+  App,
 } from 'antd';
 import {
   PlusOutlined,
@@ -37,6 +38,7 @@ const { TextArea } = Input;
 
 const RoleList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleDetail | null>(null);
@@ -237,7 +239,7 @@ const RoleList: React.FC = () => {
 
   // ===== 删除角色 =====
   const handleDeleteRole = (role: RoleSummary) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除角色？',
       content: `确定要删除角色 "${role.name}" 吗？删除后使用该角色的用户将失去相应权限。`,
       okText: '确认删除',

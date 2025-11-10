@@ -25,6 +25,7 @@ import {
   DatePicker,
   message,
   Tooltip,
+  App,
 } from 'antd';
 import {
   SearchOutlined,
@@ -48,6 +49,7 @@ const { TextArea } = Input;
 const UserList: React.FC = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { modal } = App.useApp();
   const [searchParams, setSearchParams] = useState<UserListQuery>({
     page: 0,
     pageSize: 20,
@@ -134,7 +136,7 @@ const UserList: React.FC = () => {
 
   // ===== 确认解封 =====
   const handleUnbanUser = (user: User) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认解封用户？',
       content: `确定要解封用户 "${user.nickname}" 吗？`,
       onOk: () => unbanMutation.mutate(user.id),
@@ -273,6 +275,7 @@ const UserList: React.FC = () => {
           <Table
             columns={columns}
             dataSource={data?.content || []}
+            rowKey="id"
             loading={isLoading}
             pagination={{
               current: (searchParams.page || 0) + 1,

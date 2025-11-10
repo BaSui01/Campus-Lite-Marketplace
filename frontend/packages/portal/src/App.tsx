@@ -7,6 +7,8 @@
 import { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ConfigProvider, App as AntdApp } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
 import { useWebSocketService } from '@campus/shared';
 import { useAuthStore } from './store';
 import { router } from './router';
@@ -55,24 +57,28 @@ function App() {
   });
 
   return (
-    <ErrorBoundary
-      onError={(error, errorInfo) => {
-        // 可选:将错误发送到错误监控服务（如 Sentry）
-        console.error('🚨 全局错误捕获:', error);
-        console.error('📍 错误详情:', errorInfo);
-        // TODO: 集成 Sentry 或其他错误追踪服务
-        // 示例: Sentry.captureException(error, { extra: errorInfo });
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider
-          router={router}
-          future={{
-            v7_startTransition: true
+    <ConfigProvider locale={zhCN}>
+      <AntdApp>
+        <ErrorBoundary
+          onError={(error, errorInfo) => {
+            // 可选:将错误发送到错误监控服务（如 Sentry）
+            console.error('🚨 全局错误捕获:', error);
+            console.error('📍 错误详情:', errorInfo);
+            // TODO: 集成 Sentry 或其他错误追踪服务
+            // 示例: Sentry.captureException(error, { extra: errorInfo });
           }}
-        />
-      </QueryClientProvider>
-    </ErrorBoundary>
+        >
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider
+              router={router}
+              future={{
+                v7_startTransition: true
+              }}
+            />
+          </QueryClientProvider>
+        </ErrorBoundary>
+      </AntdApp>
+    </ConfigProvider>
   );
 }
 

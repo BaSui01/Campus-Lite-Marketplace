@@ -22,11 +22,13 @@ export class SoftDeleteService {
    * 查询支持软删除的实体列表
    * GET /api/admin/soft-delete/targets
    * @returns 实体标识列表（如：["post", "goods", "user"]）
+   * TODO: 等待后端实现 listSoftDeleteTargets API
    */
   async listTargets(): Promise<string[]> {
-    const api = getApi();
-    const response = await api.listSoftDeleteTargets();
-    return response.data.data as string[];
+    // const api = getApi();
+    // const response = await api.listSoftDeleteTargets();
+    // return response.data.data as string[];
+    throw new Error('查询软删除实体列表功能暂未实现');
   }
 
   /**

@@ -8,8 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { imageCaptchaService } from '../../services/captcha';
 import type { CaptchaResponse } from '../../api/models';
-// ❌ CSS 文件不存在，已注释
-// import './ImageCaptcha.css';
+import './ImageCaptcha.css';
 
 export interface ImageCaptchaProps {
   /** 验证成功回调（传递 captchaId 和用户输入） */

@@ -4,7 +4,7 @@
  * @description 轻量级消息提示组件，支持成功、错误、警告、信息四种类型
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './Toast.css';
 

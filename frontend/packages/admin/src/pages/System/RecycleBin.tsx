@@ -16,6 +16,7 @@ import {
   Typography,
   Tag,
   Tooltip,
+  App,
 } from 'antd';
 import {
   UndoOutlined,
@@ -42,6 +43,7 @@ interface SoftDeleteRecord {
 
 const RecycleBin: React.FC = () => {
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
   const [selectedEntity, setSelectedEntity] = useState<string>();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -57,10 +59,7 @@ const RecycleBin: React.FC = () => {
     queryKey: ['soft-delete-records', selectedEntity, currentPage, pageSize],
     queryFn: async () => {
       if (!selectedEntity) return { content: [], totalElements: 0 };
-      
-      const res = await fetch(`/api/admin/soft-delete/records?entity=${selectedEntity}&page=${currentPage - 1}&size=${pageSize}`);
-      const data = await res.json();
-      return data;
+      return softDeleteService.getRecords(selectedEntity, currentPage - 1, pageSize);
     },
     enabled: !!selectedEntity,
   });
@@ -168,7 +167,7 @@ const RecycleBin: React.FC = () => {
   const handleRestore = (record: SoftDeleteRecord) => {
     if (!selectedEntity) return;
     
-    Modal.confirm({
+    modal.confirm({
       title: '恢复数据？',
       content: `确定要恢复 "${record.entityName}" 吗？数据将恢复到删除前的状态。`,
       onOk: () => restoreMutation.mutate({
@@ -182,7 +181,7 @@ const RecycleBin: React.FC = () => {
   const handlePurge = (record: SoftDeleteRecord) => {
     if (!selectedEntity) return;
     
-    Modal.confirm({
+    modal.confirm({
       title: '彻底删除？',
       content: `确定要彻底删除 "${record.entityName}" 吗？此操作不可撤销！`,
       okText: '确认删除',
