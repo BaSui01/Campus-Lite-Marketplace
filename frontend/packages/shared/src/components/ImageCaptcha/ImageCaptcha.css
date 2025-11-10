@@ -16,15 +16,16 @@
 .campus-image-captcha__container {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 0;
 }
 
-/* 验证码图片包装器 */
+/* 验证码图片包装器 - 更紧凑的尺寸 */
 .campus-image-captcha__image-wrapper {
-  flex: 1;
-  height: 44px;
-  border-radius: 10px;
+  flex: 0 0 120px; /* 固定宽度120px，更紧凑 */
+  width: 120px;
+  height: 40px; /* 降低高度到40px */
+  border-radius: 8px;
   overflow: hidden;
   background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
   display: flex;
@@ -78,13 +79,13 @@
 /* ==================== 刷新按钮 ==================== */
 .campus-image-captcha__refresh {
   flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
+  width: 40px; /* 与图片高度一致 */
+  height: 40px;
   border: none;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
-  font-size: 20px;
-  border-radius: 10px;
+  font-size: 18px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -144,14 +145,14 @@
 
 /* ==================== 输入框 ==================== */
 .campus-image-captcha__input {
-  width: 100%;
-  height: 48px;
-  padding: 0 18px;
-  font-size: 15px;
+  flex: 1; /* 占据剩余空间 */
+  height: 40px; /* 与图片高度一致 */
+  padding: 0 14px;
+  font-size: 14px;
   color: #262626;
   background: #fff;
   border: 1.5px solid rgba(240, 147, 251, 0.15);
-  border-radius: 10px;
+  border-radius: 8px;
   outline: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 400;
@@ -230,49 +231,53 @@
 /* 平板设备 */
 @media (max-width: 768px) {
   .campus-image-captcha__container {
-    gap: 10px;
+    gap: 6px;
   }
 
   .campus-image-captcha__image-wrapper {
-    height: 40px;
-  }
-
-  .campus-image-captcha__refresh {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .campus-image-captcha__input {
-    height: 44px;
-    font-size: 14px;
-    padding: 0 16px;
-  }
-}
-
-/* 移动设备 */
-@media (max-width: 480px) {
-  .campus-image-captcha__container {
-    gap: 8px;
-  }
-
-  .campus-image-captcha__image-wrapper {
+    flex: 0 0 100px;
+    width: 100px;
     height: 36px;
-    border-radius: 8px;
   }
 
   .campus-image-captcha__refresh {
     width: 36px;
     height: 36px;
     font-size: 16px;
-    border-radius: 8px;
   }
 
   .campus-image-captcha__input {
-    height: 42px;
+    height: 36px;
+    font-size: 13px;
+    padding: 0 12px;
+  }
+}
+
+/* 移动设备 */
+@media (max-width: 480px) {
+  .campus-image-captcha__container {
+    gap: 6px;
+  }
+
+  .campus-image-captcha__image-wrapper {
+    flex: 0 0 90px;
+    width: 90px;
+    height: 34px;
+    border-radius: 6px;
+  }
+
+  .campus-image-captcha__refresh {
+    width: 34px;
+    height: 34px;
     font-size: 14px;
-    padding: 0 14px;
-    border-radius: 8px;
+    border-radius: 6px;
+  }
+
+  .campus-image-captcha__input {
+    height: 34px;
+    font-size: 13px;
+    padding: 0 10px;
+    border-radius: 6px;
   }
 }
 
@@ -305,9 +310,18 @@
 
 .admin-captcha .campus-image-captcha__container {
   margin-bottom: 0;
+  gap: 8px;
+}
+
+/* Admin端保持紧凑布局 */
+.admin-captcha .campus-image-captcha__image-wrapper {
+  flex: 0 0 120px;
+  width: 120px;
+  height: 40px;
 }
 
 .admin-captcha .campus-image-captcha__input {
+  flex: 1;
   height: 40px;
   font-size: 14px;
 }
@@ -315,10 +329,7 @@
 .admin-captcha .campus-image-captcha__refresh {
   width: 40px;
   height: 40px;
-}
-
-.admin-captcha .campus-image-captcha__image-wrapper {
-  height: 40px;
+  font-size: 18px;
 }
 
 /* ==================== 🌙 暗色主题支持 ==================== */

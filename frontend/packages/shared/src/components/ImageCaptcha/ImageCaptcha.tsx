@@ -83,6 +83,7 @@ export const ImageCaptcha: React.FC<ImageCaptchaProps> = ({
 
   return (
     <div className={`campus-image-captcha ${className}`}>
+      {/* 紧凑的单行布局：验证码图片 + 输入框 + 刷新按钮 */}
       <div className="campus-image-captcha__container">
         {/* 验证码图片 */}
         <div className="campus-image-captcha__image-wrapper">
@@ -99,6 +100,17 @@ export const ImageCaptcha: React.FC<ImageCaptchaProps> = ({
           )}
         </div>
 
+        {/* 输入框 */}
+        <input
+          type="text"
+          className="campus-image-captcha__input"
+          placeholder="请输入验证码"
+          value={inputValue}
+          onChange={handleInputChange}
+          maxLength={4}
+          disabled={loading}
+        />
+
         {/* 刷新按钮 */}
         <button
           type="button"
@@ -110,17 +122,6 @@ export const ImageCaptcha: React.FC<ImageCaptchaProps> = ({
           🔄
         </button>
       </div>
-
-      {/* 输入框 */}
-      <input
-        type="text"
-        className="campus-image-captcha__input"
-        placeholder="请输入验证码"
-        value={inputValue}
-        onChange={handleInputChange}
-        maxLength={4}
-        disabled={loading}
-      />
 
       {/* 错误提示 */}
       {error && <div className="campus-image-captcha__error-text">{error}</div>}
