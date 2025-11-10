@@ -27,7 +27,7 @@ export const formatDate = (
     ss: pad(d.getSeconds()),
   };
 
-  return format.replace(/YYYY|MM|DD|HH|mm|ss/g, match => replacements[match]);
+  return format.replace(/YYYY|MM|DD|HH|mm|ss/g, (match) => replacements[match] || match);
 };
 
 /**
@@ -64,7 +64,7 @@ export const formatRelativeTime = (date: Date | number | string): string => {
 export const formatMoney = (amount: number, decimals = 2, prefix = '¥'): string => {
   const fixed = amount.toFixed(decimals);
   const [integer, decimal] = fixed.split('.');
-  const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const formattedInteger = (integer || '0').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return `${prefix}${formattedInteger}${decimal ? '.' + decimal : ''}`;
 };
 

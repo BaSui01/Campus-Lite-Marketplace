@@ -16,9 +16,10 @@ import { getApi } from '../utils/apiClient';
 import type {
   User,
   UpdateProfileRequest,
-  ChangePasswordRequest,
-  PageInfo,
+  UpdatePasswordRequest,
 } from '../api/models';
+
+// 注意：PageInfo 已废弃，改用 API 生成的分页类型
 
 /**
  * 用户 API 服务类
@@ -60,7 +61,7 @@ export class UserService {
    */
   async updateProfile(data: UpdateProfileRequest): Promise<User> {
     const api = getApi();
-    const response = await api.updateUserProfile({ updateProfileRequest: data });
+    const response = await api.updateProfile({ updateProfileRequest: data });
     return response.data.data as User;
   }
 
@@ -68,34 +69,38 @@ export class UserService {
    * 修改密码
    * @param data 修改密码请求参数
    */
-  async changePassword(data: ChangePasswordRequest): Promise<void> {
+  async changePassword(data: UpdatePasswordRequest): Promise<void> {
     const api = getApi();
-    await api.changePassword({ changePasswordRequest: data });
+    await api.updatePassword({ updatePasswordRequest: data });
   }
 
-  /**
-   * 获取用户积分记录
-   * @param params 查询参数
-   * @returns 积分记录列表
-   */
-  async getPointsLogs(params?: { page?: number; pageSize?: number }): Promise<PageInfo<any>> {
-    const api = getApi();
-    const response = await api.getUserPointsLogs({
-      page: params?.page,
-      size: params?.pageSize,
-    });
-    return response.data.data as PageInfo<any>;
-  }
+  // ==================== ❌ 以下方法后端暂未实现，已注释 ====================
+  //
+  // /**
+  //  * 获取用户积分记录（待后端实现）
+  //  * @param params 查询参数
+  //  * @returns 积分记录列表（分页）
+  //  */
+  // async getPointsLogs(params?: { page?: number; pageSize?: number }): Promise<any> {
+  //   const api = getApi();
+  //   // ❌ 后端 UserController 中暂无此接口
+  //   const response = await api.getPointsHistory({
+  //     page: params?.page,
+  //     size: params?.pageSize,
+  //   });
+  //   return response.data.data;
+  // }
 
-  /**
-   * 签到
-   * @returns 签到结果（包含获得的积分）
-   */
-  async signIn(): Promise<{ points: number }> {
-    const api = getApi();
-    const response = await api.userSignIn();
-    return response.data.data as { points: number };
-  }
+  // /**
+  //  * 签到（待后端实现）
+  //  * @returns 签到结果（包含获得的积分）
+  //  */
+  // async signIn(): Promise<{ points: number }> {
+  //   const api = getApi();
+  //   // ❌ 后端 UserController 中暂无此接口
+  //   const response = await api.userSignIn();
+  //   return response.data.data as { points: number };
+  // }
 
   /**
    * 获取用户列表（管理端）

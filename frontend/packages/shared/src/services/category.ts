@@ -184,9 +184,16 @@ export class CategoryService {
 
   /**
    * 更新分类状态
+   * TODO: 后端API不支持单独更新状态，需要先获取完整数据再更新
+   * 暂时抛出错误提示
    */
-  async updateStatus(id: number, status: CategoryStatus): Promise<void> {
-    return this.update(id, { status } as UpdateCategoryRequest);
+  async updateStatus(_id: number, _status: CategoryStatus): Promise<void> {
+    // 正确的做法是：
+    // 1. 先调用 getDetail(id) 获取完整的分类信息
+    // 2. 然后调用 update(id, { ...category, status })
+    //
+    // 但这需要在调用方处理，因为需要完整的 name 等字段
+    throw new Error('请使用 update() 方法更新分类状态，需要提供完整的分类信息');
   }
 
   /**

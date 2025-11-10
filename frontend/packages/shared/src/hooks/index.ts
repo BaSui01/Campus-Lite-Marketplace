@@ -9,10 +9,10 @@
 /**
  * useAuth - 认证状态管理 Hook
  * @description 管理用户登录状态、Token 刷新、权限检查
+ * @note User 类型已从 API 导入并扩展，不再从此处导出，避免冲突
  */
 export {
   useAuth,
-  type User,
   type LoginParams,
   type UseAuthResult,
 } from './useAuth';
@@ -78,6 +78,7 @@ export { useLocalStorage } from './useLocalStorage';
 /**
  * useWebSocket - WebSocket 连接 Hook
  * @description 封装 WebSocket，支持自动重连、心跳检测
+ * @note WebSocketReadyState 从 utils/websocket 导入并重新导出
  */
 export { useWebSocket, WebSocketReadyState, type UseWebSocketOptions, type UseWebSocketResult } from './useWebSocket';
 

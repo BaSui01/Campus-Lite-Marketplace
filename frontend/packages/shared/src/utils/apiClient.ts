@@ -9,7 +9,7 @@ import { DefaultApi, Configuration } from '../api';
 import { BASE_PATH as DEFAULT_BASE_PATH } from '../api/base';
 import { TOKEN_KEY, REFRESH_TOKEN_KEY } from '../constants';
 import { installTokenRefreshInterceptor } from './tokenRefresh';
-import { installErrorHandler } from './errorHandler';
+// import { installErrorHandler } from './errorHandler'; // ⚠️ 暂未使用，避免编译警告
 
 // ==================== 常量配置 ====================
 
@@ -159,8 +159,8 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
 
   // ==================== 安装 Token 自动刷新拦截器 ====================
   installTokenRefreshInterceptor(instance, {
-    getAccessToken,
-    getRefreshToken,
+    getAccessToken: getAccessTokenInternal,
+    getRefreshToken: getRefreshTokenInternal,
     setTokens,
     clearTokens,
     refreshEndpoint: joinWithBaseUrl(API_BASE_URL, '/api/auth/refresh'),

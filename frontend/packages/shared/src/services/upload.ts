@@ -135,10 +135,13 @@ export class UploadService {
     base64Data: string,
     options?: UploadOptions
   ): Promise<UploadResponse> {
+    // ✅ 使用 OpenAPI 生成的方法（uploadBase64Image）
     const api = getApi();
-    const response = await api.post('/files/upload-base64', {
-      base64Data,
-      category: options?.category || 'general',
+    const response = await api.uploadBase64Image({
+      requestBody: {
+        base64Data,
+        category: options?.category || 'general',
+      },
     });
 
     const data = response.data.data as Record<string, string>;

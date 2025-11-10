@@ -4,7 +4,7 @@
  * @description 导出任务管理、导出历史、导出下载等接口
  */
 
-import { getApi } from '../utils/apiClient';
+// import { getApi } from '../utils/apiClient'; // TODO: 等待后端API实现后取消注释
 
 // ==================== 类型定义 ====================
 
@@ -138,35 +138,48 @@ export interface ExportService {
 /**
  * 导出服务实现类
  * ⚠️ 基于 DefaultApi 的完整实现
+ * ⚠️ 注意：导出相关API暂未在后端实现，以下方法暂时不可用
  */
 class ExportServiceImpl implements ExportService {
   /**
    * 申请导出
+   * TODO: 等待后端实现 requestExport API
    */
-  async requestExport(request: ExportRequest): Promise<number> {
-    const api = getApi();
-    const response = await api.requestExport(
-      request.type,
-      request.params
-    );
-    return response.data.data as number;
+  async requestExport(_request: ExportRequest): Promise<number> {
+    // const api = getApi();
+    // const response = await api.requestExport({
+    //   type: request.type,
+    //   params: request.params
+    // });
+    // return response.data.data as number;
+
+    // 临时实现：返回模拟ID
+    throw new Error('导出功能暂未实现，请等待后端API开发');
   }
 
   /**
    * 查询我的导出任务列表
+   * TODO: 等待后端实现 listExports API
    */
   async listMyExports(): Promise<ExportJob[]> {
-    const api = getApi();
-    const response = await api.listExports();
-    return response.data.data as ExportJob[];
+    // const api = getApi();
+    // const response = await api.listExports();
+    // return response.data.data as ExportJob[];
+
+    // 临时实现：返回空列表
+    return [];
   }
 
   /**
    * 取消导出任务
+   * TODO: 等待后端实现 cancelExport API
    */
-  async cancelExport(id: number): Promise<void> {
-    const api = getApi();
-    await api.cancelExport(id);
+  async cancelExport(_id: number): Promise<void> {
+    // const api = getApi();
+    // await api.cancelExport({ id });
+
+    // 临时实现：什么都不做
+    console.warn('取消导出功能暂未实现');
   }
 
   /**

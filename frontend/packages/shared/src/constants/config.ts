@@ -29,8 +29,11 @@ export const API_RETRY_DELAY = 1000;
 
 /**
  * WebSocket 连接URL（从环境变量读取）
+ * 💡 BaSui：后端有两个 WebSocket 端点：
+ * - /ws/message: 私信消息（默认）
+ * - /ws/dispute: 纠纷系统
  */
-export const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8200/ws';
+export const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8200/ws/message';
 
 /**
  * WebSocket 心跳间隔（毫秒）

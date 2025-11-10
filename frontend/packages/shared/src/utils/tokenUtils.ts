@@ -33,6 +33,10 @@ export function decodeJwtToken(token: string): JwtPayload | null {
 
     // 解码 payload（Base64URL 编码）
     const payload = parts[1];
+    if (!payload) {
+      console.warn('[Token Utils] ⚠️ Token payload 部分缺失');
+      return null;
+    }
     const decodedPayload = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
     const parsedPayload = JSON.parse(decodedPayload);
 

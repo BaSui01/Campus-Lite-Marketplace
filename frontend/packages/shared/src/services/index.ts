@@ -59,6 +59,10 @@ export type { LogisticsService, LogisticsTrack, LogisticsStatistics } from './lo
 export { uploadService } from './upload';
 export type { UploadService } from './upload';
 
+// 人机验证服务（验证码、滑块等）
+export { captchaService, imageCaptchaService, slideCaptchaService } from './captcha';
+export type { CaptchaHookResult, SlideCaptchaHookResult } from './captcha';
+
 // 退款服务
 export { refundService, RefundStatus } from './refund';
 export type { RefundService, RefundListParams, RefundReviewRequest } from './refund';
@@ -75,8 +79,8 @@ export type { CampusService, CampusListParams, CampusStatistics, CampusRequest }
 
 // 标签服务
 export { tagService, TagType, TagStatus } from './tag';
-export type { TagService, TagListParams, TagRequest, TagMergeRequest, HotTag } from './tag';
-// 注意：Tag 应从 '@campus/shared/api' 导入，避免冲突
+export type { TagService, TagListParams, TagRequest, HotTag } from './tag';
+// 注意：Tag, MergeTagRequest 应从 '@campus/shared/api' 导入，避免冲突
 
 // 社区服务
 export { communityService } from './community';

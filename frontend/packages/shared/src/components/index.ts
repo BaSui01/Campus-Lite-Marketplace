@@ -39,8 +39,9 @@ export { Loading, type LoadingProps, type LoadingType, type LoadingSize } from '
 /**
  * Skeleton - 骨架屏组件
  * @description 更专业的骨架屏组件，支持多种预设布局（文本、头像、图片、卡片、列表、表单等）
+ * @note AvatarShape 从 Avatar 组件导出，此处不重复导出
  */
-export { Skeleton, type SkeletonProps, type SkeletonType, type AvatarShape, type AnimationType } from './Skeleton';
+export { Skeleton, type SkeletonProps, type SkeletonType, type AnimationType } from './Skeleton';
 
 /**
  * Toast - 消息提示组件
@@ -111,8 +112,10 @@ export { Avatar, type AvatarProps, type AvatarSize, type AvatarShape } from './A
 /**
  * Tag - 标签组件
  * @description 支持多种颜色、尺寸、可关闭、带图标
+ * @note ✅ 导出为 TagComponent 以避免与 API Tag 类型冲突
+ * @note 📝 使用方式：import { TagComponent } from '@campus/shared/components';
  */
-export { Tag, type TagProps, type TagColor, type TagSize } from './Tag';
+export { Tag as TagComponent, type TagProps, type TagColor, type TagSize } from './Tag';
 
 // ==================== P2 业务组件（已完成）====================
 
@@ -157,6 +160,27 @@ export { ImageUploadWithCrop, type ImageUploadWithCropProps } from './ImageUploa
  * @description 基于 contentEditable 实现，支持基础格式化功能（粗体、斜体、对齐、列表等）
  */
 export { RichTextEditor, type RichTextEditorProps } from './RichTextEditor';
+
+/**
+ * ImageCaptcha - 图形验证码组件 🤖🚫
+ * @description 用于人机验证，支持图形验证码生成、刷新、自动验证（4位数字字母）
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @example
+ * ```tsx
+ * <ImageCaptcha
+ *   onSuccess={(captchaId, code) => {
+ *     // 验证成功，提交表单
+ *     console.log('验证码:', captchaId, code);
+ *   }}
+ *   onFail={() => {
+ *     // 验证失败
+ *     message.error('验证码错误！');
+ *   }}
+ * />
+ * ```
+ */
+export { ImageCaptcha, type ImageCaptchaProps } from './ImageCaptcha/ImageCaptcha';
 
 // ==================== P3 数据撤销组件（新增）====================
 
@@ -270,3 +294,44 @@ export { StatCard, type StatCardProps } from './StatCard';
  * ```
  */
 export { LineChart, BarChart, type ChartData, type ChartProps } from './Charts';
+
+// ==================== 社区组件（新增 2025-11-09）====================
+
+/**
+ * TagSelector - 标签选择器组件
+ * @description 支持多选、搜索、热门标签推荐的标签选择器
+ * @example
+ * ```tsx
+ * <TagSelector
+ *   options={tags}
+ *   hotTags={hotTags}
+ *   value={selectedTagIds}
+ *   maxCount={10}
+ *   onChange={(ids) => setSelectedTagIds(ids)}
+ * />
+ * ```
+ */
+export { TagSelector, type TagSelectorProps, type TagOption } from './TagSelector';
+
+/**
+ * TopicSelector - 话题选择器组件
+ * @description 支持单选/多选、搜索、热门话题推荐的话题选择器
+ * @example
+ * ```tsx
+ * // 单选模式
+ * <TopicSelector
+ *   options={topics}
+ *   value={selectedTopicId}
+ *   onChange={(id) => setSelectedTopicId(id as number)}
+ * />
+ * 
+ * // 多选模式
+ * <TopicSelector
+ *   multiple
+ *   options={topics}
+ *   value={selectedTopicIds}
+ *   onChange={(ids) => setSelectedTopicIds(ids as number[])}
+ * />
+ * ```
+ */
+export { TopicSelector, type TopicSelectorProps, type TopicOption } from './TopicSelector';

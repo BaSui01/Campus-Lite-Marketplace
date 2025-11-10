@@ -11,7 +11,6 @@ import type {
   CreateOrderRequest,
   PayOrderRequest,
   Order,
-  OrderResponse,
   PageOrderResponse,
 } from '../api/models';
 
@@ -49,7 +48,7 @@ export class OrderService {
    */
   async getOrderDetail(orderNo: string): Promise<Order> {
     const api = getApi();
-    const response = await api.getOrderDetail(orderNo);
+    const response = await api.getOrderDetail({ orderNo });
     return response.data.data as Order;
   }
 
@@ -60,11 +59,11 @@ export class OrderService {
    */
   async listBuyerOrders(params?: OrderListParams): Promise<PageOrderResponse> {
     const api = getApi();
-    const response = await api.listBuyerOrders(
-      params?.status,
-      params?.page,
-      params?.size
-    );
+    const response = await api.listBuyerOrders({
+      status: params?.status,
+      page: params?.page,
+      size: params?.size
+    });
     return response.data.data as PageOrderResponse;
   }
 
@@ -75,11 +74,11 @@ export class OrderService {
    */
   async listSellerOrders(params?: OrderListParams): Promise<PageOrderResponse> {
     const api = getApi();
-    const response = await api.listSellerOrders(
-      params?.status,
-      params?.page,
-      params?.size
-    );
+    const response = await api.listSellerOrders({
+      status: params?.status,
+      page: params?.page,
+      size: params?.size
+    });
     return response.data.data as PageOrderResponse;
   }
 
@@ -90,17 +89,7 @@ export class OrderService {
    */
   async cancelOrder(orderNo: string): Promise<void> {
     const api = getApi();
-    await api.cancelOrder(orderNo);
-  }
-
-  /**
-   * 获取订单统计数据
-   * @returns 订单统计信息
-   */
-  async getOrderStatistics(): Promise<Record<string, any>> {
-    const api = getApi();
-    const response = await api.getOrderStatistics();
-    return response.data.data as Record<string, any>;
+    await api.cancelOrder({ orderNo });
   }
 
   // ==================== 支付相关接口 ====================
@@ -123,7 +112,7 @@ export class OrderService {
    */
   async queryPaymentStatus(orderNo: string): Promise<string> {
     const api = getApi();
-    const response = await api.queryPaymentStatus(orderNo);
+    const response = await api.queryPaymentStatus({ orderNo });
     return response.data.data as string;
   }
 
@@ -142,7 +131,7 @@ export class OrderService {
     company: 'SF' | 'YTO' | 'STO' | 'ZTO' | 'YD' | 'JTEXPRESS' | 'EMS' | 'OTHER'
   ): Promise<any> {
     const api = getApi();
-    const response = await api.createLogistics(orderId, trackingNumber, company);
+    const response = await api.createLogistics({ orderId, trackingNumber, company: company as any });
     return response.data.data;
   }
 
@@ -153,7 +142,7 @@ export class OrderService {
    */
   async getLogisticsByOrderId(orderId: number): Promise<any> {
     const api = getApi();
-    const response = await api.getLogisticsByOrderId(orderId);
+    const response = await api.getLogisticsByOrderId({ orderId });
     return response.data.data;
   }
 
@@ -164,7 +153,7 @@ export class OrderService {
    */
   async syncLogistics(orderId: number): Promise<any> {
     const api = getApi();
-    const response = await api.syncLogistics(orderId);
+    const response = await api.syncLogistics({ orderId });
     return response.data.data;
   }
 

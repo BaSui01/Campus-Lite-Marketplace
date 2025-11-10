@@ -84,65 +84,69 @@ export interface RefundReviewRequest {
  */
 export class RefundService {
   /**
+   * 获取我的退款列表（用户视角）
+   * 💡 BaSui：调用后端 GET /refunds 接口（用户查询自己的退款列表）
+   * @param params 查询参数
+   * @returns 退款列表（分页）
+   */
+  async listMyRefunds(params?: RefundListParams): Promise<ApiResponse<PageInfo<Refund>>> {
+    const api = getApi();
+    const response = await api.listMyRefunds({
+      page: params?.page,
+      size: params?.size,
+      status: params?.status as any,
+    });
+    return response.data as ApiResponse<PageInfo<Refund>>;
+  }
+
+  /**
    * 获取退款列表（管理员视角）
    * @param params 查询参数
    * @returns 退款列表
    */
   async listRefunds(params?: RefundListParams): Promise<ApiResponse<PageInfo<Refund>>> {
-    return http.get('/refunds', { params });
+    const api = getApi();
+    const response = await api.listAllRefunds({
+      page: params?.page,
+      size: params?.size,
+      status: params?.status as any,
+      keyword: params?.keyword,
+    });
+    return response.data as ApiResponse<PageInfo<Refund>>;
   }
 
   /**
-   * 获取退款详情
-   * @param refundId 退款ID
+   * 获取我的退款详情（用户视角）
+   * @param refundNo 退款单号
    * @returns 退款详情
    */
-  async getRefundDetail(refundId: number): Promise<ApiResponse<Refund>> {
-    return http.get(`/refunds/${refundId}`);
+  async getMyRefundDetail(refundNo: string): Promise<ApiResponse<Refund>> {
+    const api = getApi();
+    const response = await api.getMyRefund({ refundNo });
+    return response.data as ApiResponse<Refund>;
   }
 
   /**
-   * 审核退款（管理员）
-   * @param request 审核请求
+   * 审批通过退款（管理员）
+   * @param refundNo 退款单号
    * @returns 操作结果
    */
-  async reviewRefund(request: RefundReviewRequest): Promise<ApiResponse<void>> {
-    return http.post(`/refunds/${request.refundId}/review`, {
-      approved: request.approved,
-      reason: request.reason,
-    });
+  async approveRefund(refundNo: string): Promise<ApiResponse<void>> {
+    const api = getApi();
+    const response = await api.approve({ refundNo });
+    return response.data as ApiResponse<void>;
   }
 
   /**
-   * 批量审核退款（管理员）
-   * @param refundIds 退款ID列表
-   * @param approved 是否批准
-   * @param reason 审核原因
+   * 驳回退款（管理员）
+   * @param refundNo 退款单号
+   * @param reason 驳回原因
    * @returns 操作结果
    */
-  async batchReviewRefunds(
-    refundIds: number[],
-    approved: boolean,
-    reason?: string
-  ): Promise<ApiResponse<{ successCount: number; failureCount: number }>> {
-    return http.post('/refunds/batch-review', {
-      refundIds,
-      approved,
-      reason,
-    });
-  }
-
-  /**
-   * 获取退款统计（管理员）
-   * @returns 统计数据
-   */
-  async getRefundStatistics(): Promise<ApiResponse<{
-    total: number;
-    pending: number;
-    approved: number;
-    rejected: number;
-  }>> {
-    return http.get('/refunds/statistics');
+  async rejectRefund(refundNo: string, reason: string): Promise<ApiResponse<void>> {
+    const api = getApi();
+    const response = await api.reject({ refundNo, reason });
+    return response.data as ApiResponse<void>;
   }
 }
 

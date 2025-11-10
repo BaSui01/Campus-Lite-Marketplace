@@ -5,18 +5,16 @@
  */
 
 import { axiosInstance } from '../../utils/apiClient';
-import type { AxiosResponse } from 'axios';
+// ✅ 移除未使用的 AxiosResponse 导入
 import type {
-  Review,
   ReviewReplyDTO,
   ReviewMediaDTO,
 } from '../../api/models';
+// ✅ 移除未使用的 Review、ReviewDetail、ReviewStatistics 导入
 import type {
   CreateReviewRequest,
   ReviewListQuery,
   ReviewListResponse,
-  ReviewDetail,
-  ReviewStatistics,
 } from './types';
 
 // 导出类型供外部使用

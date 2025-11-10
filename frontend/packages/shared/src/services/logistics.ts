@@ -169,35 +169,53 @@ export interface LogisticsService {
 
 /**
  * 物流服务实现类
+ * TODO: 需要重构为使用 OpenAPI 生成的 DefaultApi
  */
 class LogisticsServiceImpl implements LogisticsService {
   /**
    * 查询订单物流信息
+   * TODO: 等待后端实现物流查询API
    */
-  async getOrderLogistics(orderId: number): Promise<Logistics> {
-    const response = await http.get<{ data: Logistics }>(`/api/orders/${orderId}/logistics`);
-    return response.data.data;
+  async getOrderLogistics(_orderId: number): Promise<Logistics> {
+    // const api = getApi();
+    // const response = await api.getLogisticsByOrderId({ orderId });
+    // return response.data.data as Logistics;
+
+    // 临时实现：返回空物流信息
+    throw new Error('物流查询功能暂未实现');
   }
 
   /**
    * 追踪物流轨迹
+   * TODO: 等待后端实现物流追踪API
    */
-  async trackLogistics(expressCode: string, trackingNumber: string): Promise<Logistics> {
-    const response = await http.get<{ data: Logistics }>('/api/logistics/track', {
-      params: {
-        expressCode,
-        trackingNumber,
-      },
-    });
-    return response.data.data;
+  async trackLogistics(_expressCode: string, _trackingNumber: string): Promise<Logistics> {
+    // const api = getApi();
+    // const response = await api.trackLogistics({ expressCode, trackingNumber });
+    // return response.data.data as Logistics;
+
+    // 临时实现：返回空物流信息
+    throw new Error('物流追踪功能暂未实现');
   }
 
   /**
    * 获取物流统计
+   * TODO: 等待后端实现物流统计API
    */
   async getLogisticsStatistics(): Promise<LogisticsStatistics> {
-    const response = await http.get<{ data: LogisticsStatistics }>('/api/logistics/statistics');
-    return response.data.data;
+    // const api = getApi();
+    // const response = await api.getLogisticsStatistics(...);
+    // return response.data.data as LogisticsStatistics;
+
+    // 临时实现：返回空统计
+    return {
+      totalOrders: 0,
+      pendingShipment: 0,
+      inTransit: 0,
+      delivered: 0,
+      exception: 0,
+      avgDeliveryTime: 0,
+    };
   }
 }
 

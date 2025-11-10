@@ -6,7 +6,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { websocketService, type ChatMessageData } from '../utils/websocket';
-import type { Message } from '../types';
+// ✅ 使用 API 生成的类型
+import type { MessageResponse } from '../api/models/message-response';
+
+// 🔄 类型别名，方便使用
+type Message = MessageResponse;
 
 /**
  * useChatMessage 配置选项

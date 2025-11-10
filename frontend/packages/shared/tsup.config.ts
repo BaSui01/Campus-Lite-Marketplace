@@ -25,7 +25,7 @@ export default defineConfig({
   clean: true,
 
   // 外部依赖（不打包）
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', 'react-router-dom'],
 
   // Tree Shaking
   treeshake: true,

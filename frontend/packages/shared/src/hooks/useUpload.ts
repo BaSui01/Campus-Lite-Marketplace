@@ -343,7 +343,11 @@ export const useUpload = (options: UseUploadOptions): UseUploadResult => {
 
         // 设置请求头
         Object.keys(headers).forEach((key) => {
-          xhr.setRequestHeader(key, headers[key]);
+          const value = headers[key];
+          // 🛡️ 严格检查：只有 value 存在时才设置请求头
+          if (value !== undefined) {
+            xhr.setRequestHeader(key, value);
+          }
         });
 
         xhr.send(formData);

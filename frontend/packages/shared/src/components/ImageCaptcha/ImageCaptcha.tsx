@@ -1,28 +1,30 @@
 /**
- * 图形验证码组件
+ * 图形验证码组件 - 让机器人靠边站！🎨🚫
  * @author BaSui 😎
  * @date 2025-11-09
+ * @updated 2025-11-10 - 重构：使用 captchaService 替代 DefaultApi（遵循规范）
  */
 
 import React, { useState, useEffect } from 'react';
-import { DefaultApi } from '../../api';
+import { imageCaptchaService } from '../../services/captcha';
 import type { CaptchaResponse } from '../../api/models';
-import './ImageCaptcha.css';
+// ❌ CSS 文件不存在，已注释
+// import './ImageCaptcha.css';
 
 export interface ImageCaptchaProps {
-  /** 验证成功回调 */
+  /** 验证成功回调（传递 captchaId 和用户输入） */
   onSuccess?: (captchaId: string, code: string) => void;
   /** 验证失败回调 */
   onFail?: () => void;
   /** 自定义类名 */
   className?: string;
-  /** 重置标志 */
+  /** 重置标志（触发刷新验证码） */
   reset?: boolean;
 }
 
 export const ImageCaptcha: React.FC<ImageCaptchaProps> = ({
   onSuccess,
-  onFail,
+  onFail: _onFail,  // ⚠️ 使用下划线前缀表示故意未使用
   className = '',
   reset = false,
 }) => {
@@ -31,22 +33,21 @@ export const ImageCaptcha: React.FC<ImageCaptchaProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const api = new DefaultApi();
-
-  // 生成验证码
+  // 🎨 生成验证码
   const generateCaptcha = async () => {
     try {
       setLoading(true);
       setError('');
       setInputValue('');
 
-      const response = await api.generateImageCaptcha();
-      if (response.data.data) {
-        setCaptchaData(response.data.data);
-      }
+      // ✅ 使用 Service 层（符合规范！）
+      const data = await imageCaptchaService.generate();
+      setCaptchaData(data);
+
+      console.log('✅ [ImageCaptcha] 验证码生成成功:', data.captchaId);
     } catch (err: any) {
-      setError('验证码加载失败，请重试');
-      console.error('[ImageCaptcha] 生成验证码失败:', err);
+      setError('验证码加载失败，请重试 😰');
+      console.error('❌ [ImageCaptcha] 生成验证码失败:', err);
     } finally {
       setLoading(false);
     }

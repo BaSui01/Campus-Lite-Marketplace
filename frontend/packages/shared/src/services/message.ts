@@ -16,8 +16,7 @@
 import { getApi } from '../utils/apiClient';
 import type {
   SendMessageRequest,
-  ConversationResponse,
-  MessageResponse,
+  // ✅ ConversationResponse 未使用（相关方法已注释），已移除
 } from '../api/models';
 
 /**
@@ -58,39 +57,44 @@ export class MessageService {
     return response.data.data;
   }
 
-  /**
-   * 获取会话详情
-   * GET /api/messages/conversations/{conversationId}
-   * @param conversationId 会话ID
-   * @returns 会话详情
-   */
-  async getConversationById(conversationId: number): Promise<ConversationResponse> {
-    const api = getApi();
-    const response = await api.getConversation({ conversationId });
-    return response.data.data as ConversationResponse;
-  }
+  // ==================== ❌ 以下会话方法后端暂未实现，已注释 ====================
+  //
+  // /**
+  //  * 获取会话详情（待后端实现）
+  //  * GET /api/messages/conversations/{conversationId}
+  //  * @param conversationId 会话ID
+  //  * @returns 会话详情
+  //  */
+  // async getConversationById(conversationId: number): Promise<ConversationResponse> {
+  //   const api = getApi();
+  //   // ❌ 后端 DefaultApi 中暂无 getConversation 方法
+  //   const response = await api.getConversation({ conversationId });
+  //   return response.data.data as ConversationResponse;
+  // }
 
-  /**
-   * 创建或获取会话
-   * POST /api/messages/conversations
-   * @param userId 对方用户ID
-   * @returns 会话信息
-   */
-  async getOrCreateConversation(userId: number): Promise<ConversationResponse> {
-    const api = getApi();
-    const response = await api.createConversation({ createConversationRequest: { userId } });
-    return response.data.data as ConversationResponse;
-  }
+  // /**
+  //  * 创建或获取会话（待后端实现）
+  //  * POST /api/messages/conversations
+  //  * @param userId 对方用户ID
+  //  * @returns 会话信息
+  //  */
+  // async getOrCreateConversation(userId: number): Promise<ConversationResponse> {
+  //   const api = getApi();
+  //   // ❌ 后端 DefaultApi 中暂无 createConversation 方法
+  //   const response = await api.createConversation({ createConversationRequest: { userId } });
+  //   return response.data.data as ConversationResponse;
+  // }
 
-  /**
-   * 删除会话
-   * DELETE /api/messages/conversations/{conversationId}
-   * @param conversationId 会话ID
-   */
-  async deleteConversation(conversationId: number): Promise<void> {
-    const api = getApi();
-    await api.deleteConversation({ conversationId });
-  }
+  // /**
+  //  * 删除会话（待后端实现）
+  //  * DELETE /api/messages/conversations/{conversationId}
+  //  * @param conversationId 会话ID
+  //  */
+  // async deleteConversation(conversationId: number): Promise<void> {
+  //   const api = getApi();
+  //   // ❌ 后端 DefaultApi 中暂无 deleteConversation 方法
+  //   await api.deleteConversation({ conversationId });
+  // }
 
   // ==================== 消息相关接口 ====================
 

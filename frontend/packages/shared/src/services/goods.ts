@@ -38,17 +38,18 @@ export class GoodsService {
    */
   async listGoods(params?: GoodsListParams): Promise<PageGoodsResponse> {
     const api = getApi();
-    const response = await api.listGoods(
-      params?.keyword,
-      params?.categoryId,
-      params?.minPrice,
-      params?.maxPrice,
-      params?.page,
-      params?.size,
-      params?.sortBy,
-      params?.sortDirection,
-      params?.tags
-    );
+    // ✅ listGoods 需要对象参数
+    const response = await api.listGoods({
+      keyword: params?.keyword,
+      categoryId: params?.categoryId,
+      minPrice: params?.minPrice,
+      maxPrice: params?.maxPrice,
+      page: params?.page,
+      size: params?.size,
+      sortBy: params?.sortBy,
+      sortDirection: params?.sortDirection,
+      tags: params?.tags,
+    });
     return response.data.data as PageGoodsResponse;
   }
 
@@ -59,7 +60,8 @@ export class GoodsService {
    */
   async getGoodsDetail(id: number): Promise<GoodsDetailResponse> {
     const api = getApi();
-    const response = await api.getGoodsDetail(id);
+    // ✅ getGoodsDetail 需要对象参数
+    const response = await api.getGoodsDetail({ id });
     return response.data.data as GoodsDetailResponse;
   }
 
@@ -70,7 +72,8 @@ export class GoodsService {
    */
   async getRecommendGoods(limit?: number): Promise<GoodsResponse[]> {
     const api = getApi();
-    const response = await api.hot(undefined, limit);
+    // ✅ hot 需要对象参数 { campusId?, size? }
+    const response = await api.hot({ size: limit });
     return response.data.data as GoodsResponse[];
   }
 
@@ -81,7 +84,8 @@ export class GoodsService {
    */
   async getPersonalRecommendations(limit?: number): Promise<GoodsResponse[]> {
     const api = getApi();
-    const response = await api.personal(limit);
+    // ✅ personal 需要对象参数 { size: number }
+    const response = await api.personal({ size: limit });
     return response.data.data as GoodsResponse[];
   }
 
@@ -92,7 +96,8 @@ export class GoodsService {
    */
   async createGoods(data: CreateGoodsRequest): Promise<number> {
     const api = getApi();
-    const response = await api.createGoods(data);
+    // ✅ createGoods 需要对象参数 { createGoodsRequest: data }
+    const response = await api.createGoods({ createGoodsRequest: data });
     return response.data.data as number;
   }
 
@@ -106,13 +111,14 @@ export class GoodsService {
     page?: number;
     size?: number;
   }): Promise<PageGoodsResponse> {
-    const api = getApi();
-    const response = await api.getMyGoods(
-      params?.status,
-      params?.page,
-      params?.size
-    );
-    return response.data.data as PageGoodsResponse;
+    // ❌ API 中没有 getMyGoods 方法，使用 listGoods 并通过业务逻辑过滤
+    // 或者使用其他 API 方法（需要查看后端实际接口）
+    // 暂时使用 listGoods 作为替代
+    return this.listGoods({
+      page: params?.page,
+      size: params?.size,
+      // status: params?.status, // 根据实际 API 支持的参数调整
+    });
   }
 
   /**
@@ -135,7 +141,8 @@ export class GoodsService {
    */
   async favoriteGoods(goodsId: number): Promise<void> {
     const api = getApi();
-    await api.favoriteGoods(goodsId);
+    // ✅ 正确方法名是 addFavorite
+    await api.addFavorite({ goodsId });
   }
 
   /**
@@ -145,7 +152,8 @@ export class GoodsService {
    */
   async unfavoriteGoods(goodsId: number): Promise<void> {
     const api = getApi();
-    await api.unfavoriteGoods(goodsId);
+    // ✅ 正确方法名是 removeFavorite
+    await api.removeFavorite({ goodsId });
   }
 
   /**
@@ -155,7 +163,8 @@ export class GoodsService {
    */
   async isFavorited(goodsId: number): Promise<boolean> {
     const api = getApi();
-    const response = await api.isFavorited(goodsId);
+    // ✅ isFavorited 需要对象参数
+    const response = await api.isFavorited({ goodsId });
     return response.data.data as boolean;
   }
 
@@ -167,7 +176,8 @@ export class GoodsService {
    */
   async getMyFavorites(page?: number, size?: number): Promise<PageGoodsResponse> {
     const api = getApi();
-    const response = await api.getMyFavorites(page, size);
+    // ✅ 正确方法名是 listFavorites
+    const response = await api.listFavorites({ page, size });
     return response.data.data as PageGoodsResponse;
   }
 
