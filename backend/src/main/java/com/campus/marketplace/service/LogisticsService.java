@@ -106,10 +106,23 @@ public interface LogisticsService {
      * 管理员查看所有物流信息时调用，支持搜索和状态筛选。
      * </p>
      *
+     * @param filterRequest 筛选参数
+     * @return 物流信息分页结果
+     */
+    Page<LogisticsDTO> listLogistics(com.campus.marketplace.common.dto.request.LogisticsFilterRequest filterRequest);
+
+    /**
+     * 分页查询物流列表（传统方式 - 保留向后兼容）
+     * <p>
+     * 管理员查看所有物流信息时调用，支持搜索和状态筛选。
+     * </p>
+     *
      * @param keyword  关键词（可选，搜索订单ID或快递单号）
      * @param status   物流状态（可选）
      * @param pageable 分页参数
      * @return 物流信息分页结果
+     * @deprecated 建议使用 {@link #listLogistics(com.campus.marketplace.common.dto.request.LogisticsFilterRequest)}
      */
+    @Deprecated
     Page<LogisticsDTO> listLogistics(String keyword, LogisticsStatus status, Pageable pageable);
 }

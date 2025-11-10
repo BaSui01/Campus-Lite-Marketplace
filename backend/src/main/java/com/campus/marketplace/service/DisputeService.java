@@ -51,7 +51,15 @@ public interface DisputeService {
     Page<DisputeDTO> getArbitratorDisputes(Long arbitratorId, DisputeStatus status, Pageable pageable);
 
     /**
-     * 多条件搜索纠纷列表（管理员）
+     * 多条件搜索纠纷列表（统一筛选架构）
+     *
+     * @param filterRequest 筛选参数
+     * @return 纠纷列表（分页）
+     */
+    Page<DisputeDTO> searchDisputes(com.campus.marketplace.common.dto.request.DisputeFilterRequest filterRequest);
+
+    /**
+     * 多条件搜索纠纷列表（传统方式 - 保留向后兼容）
      *
      * @param keyword 搜索关键字（纠纷编号、订单号）
      * @param disputeType 纠纷类型
@@ -63,7 +71,9 @@ public interface DisputeService {
      * @param maxAmount 最大金额
      * @param pageable 分页参数
      * @return 纠纷列表（分页）
+     * @deprecated 建议使用 {@link #searchDisputes(com.campus.marketplace.common.dto.request.DisputeFilterRequest)}
      */
+    @Deprecated
     Page<DisputeDTO> searchDisputes(
             String keyword,
             DisputeType disputeType,

@@ -1,7 +1,8 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.dto.request.RefundFilterRequest;
+import com.campus.marketplace.common.dto.response.RefundResponseDTO;
 import com.campus.marketplace.common.entity.RefundRequest;
-import com.campus.marketplace.common.enums.RefundStatus;
 import org.springframework.data.domain.Page;
 
 /**
@@ -29,19 +30,22 @@ public interface RefundService {
     void reject(String refundNo, String reason);
 
     /**
-     * 查询退款详情（管理员）
+     * 查询退款详情（管理员）- 返回包含关联信息的 DTO
+     */
+    RefundResponseDTO getRefundDetail(String refundNo);
+
+    /**
+     * 查询退款详情（管理员）- 原方法保留兼容
      */
     RefundRequest getByRefundNo(String refundNo);
 
     /**
-     * 用户查询自己的退款列表（分页 + 可选状态筛选）
+     * 用户查询自己的退款列表（使用统一筛选参数）
      *
-     * @param page 页码（从0开始）
-     * @param size 每页大小
-     * @param status 退款状态（可选）
+     * @param filterRequest 筛选请求参数（包含分页、状态、时间范围等）
      * @return 分页退款列表
      */
-    Page<RefundRequest> listMyRefunds(int page, int size, RefundStatus status);
+    Page<RefundRequest> listMyRefunds(RefundFilterRequest filterRequest);
 
     /**
      * 用户查询自己的退款详情
@@ -53,15 +57,12 @@ public interface RefundService {
     RefundRequest getMyRefund(String refundNo);
 
     /**
-     * 管理员查询所有退款列表（分页 + 筛选）
+     * 管理员查询所有退款列表（使用统一筛选参数）
      *
-     * @param page 页码（从0开始）
-     * @param size 每页大小
-     * @param status 退款状态（可选）
-     * @param keyword 搜索关键词（可选，匹配退款单号或订单号）
+     * @param filterRequest 筛选请求参数（包含分页、状态、关键词、时间范围等）
      * @return 分页退款列表
      */
-    Page<RefundRequest> listAllRefunds(int page, int size, RefundStatus status, String keyword);
+    Page<RefundRequest> listAllRefunds(RefundFilterRequest filterRequest);
 
     /**
      * 渠道退款回调处理（幂等）

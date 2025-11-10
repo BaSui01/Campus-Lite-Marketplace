@@ -15,7 +15,9 @@ import com.campus.marketplace.websocket.DisputeWebSocketHandler;
 import com.campus.marketplace.common.dto.websocket.WebSocketMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,7 @@ public class DisputeServiceImpl implements DisputeService {
 
     private final DisputeRepository disputeRepository;
     private final com.campus.marketplace.repository.OrderRepository orderRepository;
+    private final com.campus.marketplace.repository.UserRepository userRepository;
     private final DisputeWebSocketHandler disputeWebSocketHandler;
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
@@ -162,6 +165,45 @@ public class DisputeServiceImpl implements DisputeService {
         // 调用 Repository 的按仲裁员ID查询方法 🎯
         Page<Dispute> disputes = disputeRepository.findByArbitratorIdWithStatus(arbitratorId, status, pageable);
         return disputes.map(DisputeDTO::from);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<DisputeDTO> searchDisputes(com.campus.marketplace.common.dto.request.DisputeFilterRequest filterRequest) {
+        log.debug("多条件搜索纠纷（统一筛选）: keyword={}, disputeType={}, status={}, arbitratorId={}",
+                filterRequest.getKeyword(), filterRequest.getDisputeType(), filterRequest.getStatus(), filterRequest.getArbitratorId());
+
+        // 构建分页和排序参数
+        Sort.Direction direction = "ASC".equalsIgnoreCase(filterRequest.getSortDirection())
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+        
+        Pageable pageable = PageRequest.of(
+                filterRequest.getPageOrDefault(),
+                filterRequest.getSizeOrDefault(),
+                Sort.by(direction, filterRequest.getSortBy() != null ? filterRequest.getSortBy() : "createdAt")
+        );
+
+        // 转换日期格式（如果需要）
+        String startDate = filterRequest.getStartTime() != null 
+                ? filterRequest.getStartTime().toLocalDate().toString() 
+                : null;
+        String endDate = filterRequest.getEndTime() != null 
+                ? filterRequest.getEndTime().toLocalDate().toString() 
+                : null;
+
+        // 调用传统方法（复用现有逻辑）
+        return searchDisputes(
+                filterRequest.getKeyword(),
+                filterRequest.getDisputeType(),
+                filterRequest.getStatus(),
+                filterRequest.getArbitratorId(),
+                startDate,
+                endDate,
+                filterRequest.getMinAmount(),
+                filterRequest.getMaxAmount(),
+                pageable
+        );
     }
 
     @Override

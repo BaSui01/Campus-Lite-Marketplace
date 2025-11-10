@@ -346,7 +346,10 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     /**
      * 创建滑块背景图片（带缺口） - 真实拼图形状！🧩
+     * 
+     * 注：此方法保留以备将来滑块验证码功能扩展使用
      */
+    @SuppressWarnings("unused")
     private BufferedImage createSlideBackgroundImage(int width, int height, int targetX, int yPosition) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();

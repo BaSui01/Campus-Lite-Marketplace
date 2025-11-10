@@ -21,7 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -261,6 +263,26 @@ public class LogisticsServiceImpl implements LogisticsService {
                 .totalOrders(totalOrders)
                 .overtimeOrders(overtimeOrders)
                 .build();
+    }
+
+    @Override
+    public Page<LogisticsDTO> listLogistics(com.campus.marketplace.common.dto.request.LogisticsFilterRequest filterRequest) {
+        log.info("🎯 BaSui：分页查询物流列表（统一筛选） - keyword={}, status={}, page={}, size={}",
+                filterRequest.getKeyword(), filterRequest.getStatus(), filterRequest.getPage(), filterRequest.getSize());
+
+        // 构建分页和排序参数
+        Sort.Direction direction = "ASC".equalsIgnoreCase(filterRequest.getSortDirection())
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+        
+        Pageable pageable = PageRequest.of(
+                filterRequest.getPageOrDefault(),
+                filterRequest.getSizeOrDefault(),
+                Sort.by(direction, filterRequest.getSortBy() != null ? filterRequest.getSortBy() : "createdAt")
+        );
+
+        // 调用传统方法（复用现有逻辑）
+        return listLogistics(filterRequest.getKeyword(), filterRequest.getStatus(), pageable);
     }
 
     @Override

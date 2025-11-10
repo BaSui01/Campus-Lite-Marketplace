@@ -1,5 +1,6 @@
 package com.campus.marketplace.service.impl;
 
+import com.campus.marketplace.common.dto.request.AuditLogFilterRequest;
 import com.campus.marketplace.common.dto.response.AuditLogResponse;
 import com.campus.marketplace.common.entity.AuditLog;
 import com.campus.marketplace.common.enums.AuditActionType;
@@ -70,6 +71,24 @@ public class AuditLogServiceImpl implements AuditLogService {
                                 String ipAddress, String userAgent) {
         logAction(operatorId, operatorName, actionType, targetType, targetId, 
                  details, result, ipAddress, userAgent);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AuditLogResponse> listAuditLogs(AuditLogFilterRequest filterRequest) {
+        log.info("查询审计日志（统一筛选）: operatorId={}, actionType={}, page={}, size={}", 
+                filterRequest.getOperatorId(), filterRequest.getActionType(), 
+                filterRequest.getPage(), filterRequest.getSize());
+
+        // 调用传统方法（复用现有逻辑）
+        return listAuditLogs(
+                filterRequest.getOperatorId(),
+                filterRequest.getActionType(),
+                filterRequest.getStartTime(),
+                filterRequest.getEndTime(),
+                filterRequest.getPageOrDefault(),
+                filterRequest.getSizeOrDefault()
+        );
     }
 
     @Override

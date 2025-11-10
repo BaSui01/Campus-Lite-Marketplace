@@ -158,7 +158,7 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
             String method = order.getPaymentMethod();
             if (method != null) {
                 amountByMethod.merge(method, order.getActualAmount(), BigDecimal::add);
-                countByMethod.merge(method, 1L, Long::sum);
+                countByMethod.merge(method, 1L, (a, b) -> a + b);
             }
         }
 

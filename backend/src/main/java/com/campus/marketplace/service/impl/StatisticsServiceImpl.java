@@ -486,7 +486,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .forEach(o -> {
                         String method = o.getPaymentMethod();
                         amountByPaymentMethod.merge(method, o.getActualAmount(), BigDecimal::add);
-                        countByPaymentMethod.merge(method, 1L, Long::sum);
+                        countByPaymentMethod.merge(method, 1L, (a, b) -> a + b);
                     });
 
             // ==================== 今日统计 ====================
@@ -590,7 +590,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .forEach(r -> {
                         String channel = r.getChannel();
                         amountByChannel.merge(channel, r.getAmount(), BigDecimal::add);
-                        countByChannel.merge(channel, 1L, Long::sum);
+                        countByChannel.merge(channel, 1L, (a, b) -> a + b);
                     });
 
             // ==================== 今日统计 ====================

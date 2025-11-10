@@ -1,5 +1,6 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.dto.request.AuditLogFilterRequest;
 import com.campus.marketplace.common.dto.response.AuditLogResponse;
 import com.campus.marketplace.common.enums.AuditActionType;
 import org.springframework.data.domain.Page;
@@ -40,7 +41,15 @@ public interface AuditLogService {
                         String ipAddress, String userAgent);
 
     /**
-     * 查询审计日志列表
+     * 查询审计日志列表（统一筛选架构）
+     * 
+     * @param filterRequest 筛选参数
+     * @return 审计日志分页结果
+     */
+    Page<AuditLogResponse> listAuditLogs(AuditLogFilterRequest filterRequest);
+
+    /**
+     * 查询审计日志列表（传统方式 - 保留向后兼容）
      * 
      * @param operatorId 操作人ID（可选）
      * @param actionType 操作类型（可选）
@@ -49,7 +58,9 @@ public interface AuditLogService {
      * @param page 页码
      * @param size 每页大小
      * @return 审计日志分页结果
+     * @deprecated 建议使用 {@link #listAuditLogs(AuditLogFilterRequest)}
      */
+    @Deprecated
     Page<AuditLogResponse> listAuditLogs(Long operatorId, AuditActionType actionType, 
                                          LocalDateTime startTime, LocalDateTime endTime,
                                          int page, int size);
