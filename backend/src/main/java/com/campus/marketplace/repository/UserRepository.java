@@ -125,6 +125,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countByRoles_Name(String roleName);
 
     /**
+     * 根据角色名称查询用户列表（用于查询仲裁员等）
+     *
+     * @param roleName 角色名称（如：ROLE_ADMIN）
+     * @return 具有该角色的用户列表
+     */
+    @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.name = :roleName")
+    java.util.List<User> findByRolesName(@Param("roleName") String roleName);
+
+    /**
      * 统计校区下活跃用户数量（指定时间后登录过的用户）
      *
      * @param campusId 校区ID
