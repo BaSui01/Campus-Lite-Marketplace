@@ -1,5 +1,7 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.dto.response.OrderStatisticsDTO;
+import com.campus.marketplace.common.dto.response.RefundStatisticsDTO;
 import com.campus.marketplace.common.dto.response.SystemOverviewDTO;
 
 import java.util.List;
@@ -94,4 +96,22 @@ public interface StatisticsService {
      * @return 收入统计数据
      */
     Map<String, Object> getRevenueByMonth(int months);
+
+    /**
+     * 获取订单统计数据（增强版）
+     * 
+     * @param startDate 开始日期（可选，格式：yyyy-MM-dd）
+     * @param endDate 结束日期（可选，格式：yyyy-MM-dd）
+     * @return 订单统计数据
+     */
+    OrderStatisticsDTO getOrderStatisticsEnhanced(String startDate, String endDate);
+
+    /**
+     * 获取退款统计数据
+     * 
+     * @param startDate 开始日期（可选，格式：yyyy-MM-dd）
+     * @param endDate 结束日期（可选，格式：yyyy-MM-dd）
+     * @return 退款统计数据
+     */
+    RefundStatisticsDTO getRefundStatistics(String startDate, String endDate);
 }

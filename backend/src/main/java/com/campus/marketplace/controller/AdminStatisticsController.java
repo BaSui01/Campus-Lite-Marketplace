@@ -1,6 +1,9 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.response.ApiResponse;
+import com.campus.marketplace.common.dto.response.OrderStatisticsDTO;
+import com.campus.marketplace.common.dto.response.RefundStatisticsDTO;
+import com.campus.marketplace.common.dto.response.SystemOverviewDTO;
 import com.campus.marketplace.service.StatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,26 +56,17 @@ public class AdminStatisticsController {
      * - activeUsers: 活跃用户数
      * - pendingGoods: 待审核物品数
      *
-     * @return 系统概览统计数据
+     * @return 系统概览统计数据（强类型 DTO）
+     * @updated 2025-11-10 - 使用强类型 DTO 替代 Map<String, Object> 😎
      */
     @GetMapping("/overview")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "获取系统概览统计", description = "获取系统核心数据概览（仅管理员）")
-    public ApiResponse<Map<String, Object>> getSystemOverview() {
+    public ApiResponse<SystemOverviewDTO> getSystemOverview() {
         log.info("📊 [管理端统计] 获取系统概览统计");
 
-        // 合并多个统计数据
-        Map<String, Object> overview = statisticsService.getSystemOverview();
-        Map<String, Object> todayStats = statisticsService.getTodayStatistics();
-        Map<String, Object> userStats = statisticsService.getUserStatistics();
-        Map<String, Object> goodsStats = statisticsService.getGoodsStatistics();
-
-        // 整合数据
-        overview.put("todayNewUsers", todayStats.get("newUsers"));
-        overview.put("todayNewGoods", todayStats.get("newGoods"));
-        overview.put("todayNewOrders", todayStats.get("newOrders"));
-        overview.put("activeUsers", userStats.get("activeUsers"));
-        overview.put("pendingGoods", goodsStats.get("pendingApprovalGoods"));
+        // 获取系统概览统计（强类型 DTO）
+        SystemOverviewDTO overview = statisticsService.getSystemOverview();
 
         log.info("✅ [管理端统计] 系统概览统计成功");
         return ApiResponse.success(overview);
@@ -233,5 +227,70 @@ public class AdminStatisticsController {
 
         log.info("✅ [管理端统计] 今日统计获取成功");
         return ApiResponse.success(todayStats);
+    }
+
+    /**
+     * 📊 获取订单统计（增强版）
+     *
+     * GET /api/admin/statistics/orders
+     *
+     * 返回数据：
+     * - 总体统计（总订单数、各状态订单数）
+     * - 金额统计（总金额、已完成金额、平均金额）
+     * - 比率统计（完成率、取消率、退款率）
+     * - 按状态统计、按支付方式统计
+     * - 今日统计
+     *
+     * @param startDate 开始日期（可选，格式：yyyy-MM-dd）
+     * @param endDate 结束日期（可选，格式：yyyy-MM-dd）
+     * @return 订单统计数据
+     */
+    @GetMapping("/orders")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "获取订单统计", description = "获取订单详细统计数据（总数、金额、比率、今日统计等）")
+    public ApiResponse<OrderStatisticsDTO> getOrderStatistics(
+            @Parameter(description = "开始日期（格式：yyyy-MM-dd）", example = "2025-01-01")
+            @RequestParam(required = false) String startDate,
+            @Parameter(description = "结束日期（格式：yyyy-MM-dd）", example = "2025-12-31")
+            @RequestParam(required = false) String endDate) {
+        log.info("📊 [管理端统计] 获取订单统计, startDate={}, endDate={}", startDate, endDate);
+
+        OrderStatisticsDTO statistics = statisticsService.getOrderStatisticsEnhanced(startDate, endDate);
+
+        log.info("✅ [管理端统计] 订单统计获取成功");
+        return ApiResponse.success(statistics);
+    }
+
+    /**
+     * 💰 获取退款统计
+     *
+     * GET /api/admin/statistics/refunds
+     *
+     * 返回数据：
+     * - 总体统计（总退款数、各状态退款数）
+     * - 金额统计（总金额、已完成金额、处理中金额）
+     * - 比率统计（批准率、成功率、失败率）
+     * - 按状态统计、按渠道统计
+     * - 今日统计
+     * - 平均处理时间
+     *
+     * @param startDate 开始日期（可选，格式：yyyy-MM-dd）
+     * @param endDate 结束日期（可选，格式：yyyy-MM-dd）
+     * @return 退款统计数据
+     */
+    @GetMapping("/refunds")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "获取退款统计", description = "获取退款详细统计数据（总数、金额、比率、平均处理时间等）")
+    public ApiResponse<RefundStatisticsDTO> getRefundStatistics(
+            @Parameter(description = "开始日期（格式：yyyy-MM-dd）", example = "2025-01-01")
+            @RequestParam(required = false) String startDate,
+            @Parameter(description = "结束日期（格式：yyyy-MM-dd）", example = "2025-12-31")
+            @RequestParam(required = false) String endDate) {
+        log.info("💰 [管理端统计] 获取退款统计, startDate={}, endDate={}", startDate, endDate);
+
+        RefundStatisticsDTO statistics = statisticsService.getRefundStatistics(startDate, endDate);
+
+        log.info("✅ [管理端统计] 退款统计获取成功");
+        return ApiResponse.success(statistics);
     }
 }

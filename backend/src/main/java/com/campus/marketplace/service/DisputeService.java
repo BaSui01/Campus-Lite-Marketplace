@@ -4,8 +4,11 @@ import com.campus.marketplace.common.dto.DisputeDTO;
 import com.campus.marketplace.common.dto.DisputeDetailDTO;
 import com.campus.marketplace.common.dto.request.CreateDisputeRequest;
 import com.campus.marketplace.common.enums.DisputeStatus;
+import com.campus.marketplace.common.enums.DisputeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
 
 /**
  * 纠纷核心业务服务接口
@@ -48,6 +51,32 @@ public interface DisputeService {
     Page<DisputeDTO> getArbitratorDisputes(Long arbitratorId, DisputeStatus status, Pageable pageable);
 
     /**
+     * 多条件搜索纠纷列表（管理员）
+     *
+     * @param keyword 搜索关键字（纠纷编号、订单号）
+     * @param disputeType 纠纷类型
+     * @param status 纠纷状态
+     * @param arbitratorId 仲裁员ID
+     * @param startDate 开始日期（格式：yyyy-MM-dd）
+     * @param endDate 结束日期（格式：yyyy-MM-dd）
+     * @param minAmount 最小金额
+     * @param maxAmount 最大金额
+     * @param pageable 分页参数
+     * @return 纠纷列表（分页）
+     */
+    Page<DisputeDTO> searchDisputes(
+            String keyword,
+            DisputeType disputeType,
+            DisputeStatus status,
+            Long arbitratorId,
+            String startDate,
+            String endDate,
+            BigDecimal minAmount,
+            BigDecimal maxAmount,
+            Pageable pageable
+    );
+
+    /**
      * 查询纠纷详情
      *
      * @param disputeId 纠纷ID
@@ -66,6 +95,21 @@ public interface DisputeService {
      * @throws com.campus.marketplace.common.exception.BusinessException 纠纷不存在、状态不允许升级等
      */
     boolean escalateToArbitration(Long disputeId);
+
+    /**
+     * 获取仲裁员列表
+     *
+     * @return 所有具有ADMIN角色的用户列表
+     */
+    java.util.List<com.campus.marketplace.common.entity.User> listArbitrators();
+
+    /**
+     * 删除纠纷（软删除）
+     *
+     * @param disputeId 纠纷ID
+     * @throws com.campus.marketplace.common.exception.BusinessException 纠纷不存在
+     */
+    void deleteDispute(Long disputeId);
 
     /**
      * 关闭纠纷

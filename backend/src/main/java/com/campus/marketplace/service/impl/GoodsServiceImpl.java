@@ -148,13 +148,14 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "goods:list",
-            key = "T(java.util.Objects).hash(#keyword,#categoryId,#minPrice,#maxPrice,#page,#size,#sortBy,#sortDirection,#tagIds)",
+            key = "T(java.util.Objects).hash(#keyword,#categoryId,#minPrice,#maxPrice,#status,#page,#size,#sortBy,#sortDirection,#tagIds)",
             unless = "#result == null")
     public Page<GoodsResponse> listGoods(
             String keyword,
             Long categoryId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
+            GoodsStatus status,
             int page,
             int size,
             String sortBy,
@@ -168,8 +169,8 @@ public class GoodsServiceImpl implements GoodsService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        log.info("查询物品列表: keyword={}, categoryId={}, minPrice={}, maxPrice={}, page={}, size={}, tags={}",
-                keyword, categoryId, minPrice, maxPrice, page, size, sanitizedTagIds);
+        log.info("查询物品列表: keyword={}, categoryId={}, minPrice=, maxPrice={}, status={}, page={}, size={}, tags={}",
+                keyword, categoryId, minPrice, maxPrice, status, page, size, sanitizedTagIds);
 
         if (sanitizedTagIds.size() > 10) {
             throw new BusinessException(ErrorCode.INVALID_PARAMETER, "最多选择 10 个标签");
@@ -210,9 +211,12 @@ public class GoodsServiceImpl implements GoodsService {
             goodsIdsFilter = goodsIds.stream().distinct().toList();
         }
 
+        // ✅ 使用传入的 status 参数，如果为 null 则默认查询 APPROVED 状态
+        GoodsStatus queryStatus = status != null ? status : GoodsStatus.APPROVED;
+
         Page<Goods> goodsPage = goodsIdsFilter == null
                 ? goodsRepository.findByConditionsWithCampus(
-                GoodsStatus.APPROVED,
+                queryStatus,
                 categoryId,
                 minPrice,
                 maxPrice,
@@ -221,7 +225,7 @@ public class GoodsServiceImpl implements GoodsService {
                 pageable
         )
                 : goodsRepository.findByConditionsWithCampusAndIds(
-                GoodsStatus.APPROVED,
+                queryStatus,
                 categoryId,
                 minPrice,
                 maxPrice,

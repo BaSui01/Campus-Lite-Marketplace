@@ -5,6 +5,7 @@ import com.campus.marketplace.common.dto.request.CreateGoodsRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.GoodsDetailResponse;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
+import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.service.GoodsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -69,12 +70,13 @@ public class GoodsController {
     }
 
         @GetMapping
-    @Operation(summary = "查询物品列表", description = "分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选和排序")
+    @Operation(summary = "查询物品列表", description = "分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选、状态筛选和排序")
     public ApiResponse<Page<GoodsResponse>> listGoods(
             @Parameter(description = "搜索关键词", example = "苹果笔记本") @RequestParam(required = false) String keyword,
             @Parameter(description = "分类 ID", example = "101") @RequestParam(required = false) Long categoryId,
             @Parameter(description = "最低价格", example = "1000") @RequestParam(required = false) BigDecimal minPrice,
             @Parameter(description = "最高价格", example = "5000") @RequestParam(required = false) BigDecimal maxPrice,
+            @Parameter(description = "物品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）", example = "APPROVED") @RequestParam(required = false) GoodsStatus status,
             @Parameter(description = "页码（从 0 开始）", example = "0") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页数量", example = "20") @RequestParam(defaultValue = "20") int size,
             @Parameter(description = "排序字段（createdAt/price/viewCount）", example = "createdAt") @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -82,7 +84,7 @@ public class GoodsController {
             @Parameter(description = "标签 ID 列表（全部匹配）", example = "1,3,5") @RequestParam(name = "tags", required = false) java.util.List<Long> tagIds
     ) {
         Page<GoodsResponse> result = goodsService.listGoods(
-                keyword, categoryId, minPrice, maxPrice, page, size, sortBy, sortDirection, tagIds
+                keyword, categoryId, minPrice, maxPrice, status, page, size, sortBy, sortDirection, tagIds
         );
         return ApiResponse.success(result);
     }

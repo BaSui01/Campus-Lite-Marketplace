@@ -170,31 +170,21 @@ export interface PaymentService {
 class PaymentServiceImpl implements PaymentService {
   /**
    * 查询支付记录列表（管理员视角）
-   * TODO: 等待后端实现管理员订单列表 API
+   * ✅ 已集成真实API
    */
-  async listPayments(_params?: PaymentListParams): Promise<PageOrderResponse> {
-    // const api = getApi();
-    // const response = await api.listOrdersAdmin({
-    //   keyword: params?.keyword,
-    //   status: params?.status || 'PAID,SHIPPED,COMPLETED,REFUNDED',
-    //   campusId: undefined,
-    //   sellerId: undefined,
-    //   buyerId: undefined,
-    //   startDate: params?.startDate,
-    //   endDate: params?.endDate,
-    //   page: params?.page,
-    //   size: params?.size
-    // });
-    // return response.data.data as PageOrderResponse;
-
-    // 临时实现：返回空列表
-    return {
-      content: [],
-      totalElements: 0,
-      totalPages: 0,
-      size: 20,
-      number: 0,
-    };
+  async listPayments(params?: PaymentListParams): Promise<PageOrderResponse> {
+    const api = getApi();
+    // 调用 PaymentAdminController 的 listPayments 接口
+    const response = await api.listPaymentsAdmin({
+      keyword: params?.keyword,
+      status: params?.status,
+      paymentMethod: params?.paymentMethod,
+      startDate: params?.startDate,
+      endDate: params?.endDate,
+      page: params?.page || 0,
+      size: params?.size || 20
+    });
+    return response.data.data as PageOrderResponse;
   }
 
   /**
@@ -224,21 +214,28 @@ class PaymentServiceImpl implements PaymentService {
 
   /**
    * 查询支付统计
-   * TODO: 等待后端统计API实现后接入
+   * ✅ 已集成真实API
    */
-  async getPaymentStatistics(_startDate?: string, _endDate?: string): Promise<PaymentStatistics> {
-    // 临时返回模拟数据，等待后端实现
-    // 参数前加 _ 表示暂时未使用，避免编译警告
+  async getPaymentStatistics(startDate?: string, endDate?: string): Promise<PaymentStatistics> {
+    const api = getApi();
+    // 调用 PaymentAdminController 的 getStatistics 接口
+    const response = await api.getPaymentStatistics({
+      startDate,
+      endDate
+    });
+    const data = response.data.data as any;
+    
+    // 转换后端返回的数据格式
     return {
-      totalAmount: 0,
-      totalCount: 0,
-      successAmount: 0,
-      successCount: 0,
-      refundAmount: 0,
-      refundCount: 0,
-      wechatAmount: 0,
-      alipayAmount: 0,
-      balanceAmount: 0,
+      totalAmount: data.totalAmount || 0,
+      totalCount: data.totalPayments || 0,
+      successAmount: data.totalAmount || 0, // 使用总金额作为成功金额
+      successCount: data.successPayments || 0,
+      refundAmount: 0, // 后端暂无此字段
+      refundCount: data.refundedPayments || 0,
+      wechatAmount: data.amountByMethod?.WECHAT || 0,
+      alipayAmount: data.amountByMethod?.ALIPAY || 0,
+      balanceAmount: data.amountByMethod?.POINTS || 0,
     };
   }
 }

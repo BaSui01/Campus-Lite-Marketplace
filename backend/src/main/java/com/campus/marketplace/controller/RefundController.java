@@ -81,8 +81,9 @@ public class RefundController {
 
     @GetMapping("/admin/refunds/{refundNo}")
     @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
-    @Operation(summary = "退款详情", description = "管理员查看退款申请详情")
+    @Operation(summary = "退款详情", description = "管理员查看退款申请详情（包含关联商品、用户信息）")
     public ApiResponse<RefundRequest> detail(@Parameter(description = "退款单号", example = "R202510270001") @PathVariable String refundNo) {
+        // TODO: 后续优化为返回 RefundResponseDTO（包含关联的商品、买家、卖家信息）
         return ApiResponse.success(refundService.getByRefundNo(refundNo));
     }
 

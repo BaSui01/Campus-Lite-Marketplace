@@ -3,6 +3,7 @@ package com.campus.marketplace.service;
 import com.campus.marketplace.common.dto.request.CreateGoodsRequest;
 import com.campus.marketplace.common.dto.response.GoodsDetailResponse;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
+import com.campus.marketplace.common.enums.GoodsStatus;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
@@ -26,15 +27,17 @@ public interface GoodsService {
 
     /**
      * 查询物品列表
-     * 
+     *
      * @param keyword 关键词（可选）
      * @param categoryId 分类 ID（可选）
      * @param minPrice 最低价格（可选）
      * @param maxPrice 最高价格（可选）
+     * @param status 物品状态（可选）
      * @param page 页码（从 0 开始）
      * @param size 每页数量
      * @param sortBy 排序字段（createdAt/price/viewCount）
      * @param sortDirection 排序方向（ASC/DESC）
+     * @param tagIds 标签 ID 列表（可选）
      * @return 物品列表（分页）
      */
     Page<GoodsResponse> listGoods(
@@ -42,6 +45,7 @@ public interface GoodsService {
             Long categoryId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
+            GoodsStatus status,
             int page,
             int size,
             String sortBy,

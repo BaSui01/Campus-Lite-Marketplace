@@ -47,31 +47,50 @@ public class AdminDisputeController {
     /**
      * 查询纠纷列表（管理员）
      *
-     * GET /api/admin/disputes?keyword=&type=&status=&page=0&size=20
+     * GET /api/admin/disputes?keyword=&type=&status=&arbitratorId=&startDate=&endDate=&minAmount=&maxAmount=&page=0&size=20
      *
      * @param keyword 搜索关键字（纠纷编号、订单号）
+     * @param disputeType 纠纷类型（可选）
      * @param status 纠纷状态（可选）
+     * @param arbitratorId 仲裁员ID（可选）
+     * @param startDate 开始日期（可选，格式：yyyy-MM-dd）
+     * @param endDate 结束日期（可选，格式：yyyy-MM-dd）
+     * @param minAmount 最小金额（可选）
+     * @param maxAmount 最大金额（可选）
      * @param page 页码
      * @param size 每页大小
      * @return 纠纷列表
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "查询纠纷列表", description = "管理员查询所有纠纷（支持筛选）")
+    @Operation(summary = "查询纠纷列表", description = "管理员查询所有纠纷（支持多条件筛选）")
     public ApiResponse<Page<DisputeDTO>> listDisputes(
-            @Parameter(description = "搜索关键字", example = "DSP-20251106-001")
+            @Parameter(description = "搜索关键字（纠纷编号、订单号）", example = "DSP-20251106-001")
             @RequestParam(required = false) String keyword,
+            @Parameter(description = "纠纷类型", example = "GOODS_MISMATCH")
+            @RequestParam(required = false) com.campus.marketplace.common.enums.DisputeType disputeType,
             @Parameter(description = "纠纷状态", example = "ARBITRATING")
             @RequestParam(required = false) DisputeStatus status,
+            @Parameter(description = "仲裁员ID", example = "1")
+            @RequestParam(required = false) Long arbitratorId,
+            @Parameter(description = "开始日期（格式：yyyy-MM-dd）", example = "2025-01-01")
+            @RequestParam(required = false) String startDate,
+            @Parameter(description = "结束日期（格式：yyyy-MM-dd）", example = "2025-12-31")
+            @RequestParam(required = false) String endDate,
+            @Parameter(description = "最小金额", example = "0")
+            @RequestParam(required = false) java.math.BigDecimal minAmount,
+            @Parameter(description = "最大金额", example = "10000")
+            @RequestParam(required = false) java.math.BigDecimal maxAmount,
             @Parameter(description = "页码", example = "0")
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页大小", example = "20")
             @RequestParam(defaultValue = "20") int size
     ) {
-        log.info("管理员查询纠纷列表: keyword={}, status={}, page={}, size={}",
-                keyword, status, page, size);
+        log.info("管理员查询纠纷列表: keyword={}, disputeType={}, status={}, arbitratorId={}, startDate={}, endDate={}, minAmount={}, maxAmount={}, page={}, size={}",
+                keyword, disputeType, status, arbitratorId, startDate, endDate, minAmount, maxAmount, page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<DisputeDTO> disputes = disputeService.getUserDisputes(null, status, pageable);
+        Page<DisputeDTO> disputes = disputeService.searchDisputes(
+                keyword, disputeType, status, arbitratorId, startDate, endDate, minAmount, maxAmount, pageable);
         return ApiResponse.success(disputes);
     }
 
@@ -311,6 +330,57 @@ public class AdminDisputeController {
             arbitrationService.assignArbitrator(disputeId, arbitratorId);
         }
 
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 获取仲裁员列表
+     *
+     * GET /api/admin/disputes/arbitrators
+     *
+     * @return 仲裁员列表（简化信息：ID、昵称）
+     */
+    @GetMapping("/arbitrators")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "获取仲裁员列表", description = "获取所有具有ADMIN角色的用户作为仲裁员候选")
+    public ApiResponse<List<java.util.Map<String, Object>>> listArbitrators() {
+        log.info("查询仲裁员列表");
+
+        // 查询所有ADMIN角色的用户
+        List<com.campus.marketplace.common.entity.User> arbitrators =
+            disputeService.listArbitrators();
+
+        // 转换为简化的Map格式（只返回ID和昵称）
+        List<java.util.Map<String, Object>> result = arbitrators.stream()
+            .map(user -> {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("id", user.getId());
+                map.put("nickname", user.getNickname());
+                map.put("username", user.getUsername());
+                return map;
+            })
+            .collect(java.util.stream.Collectors.toList());
+
+        return ApiResponse.success(result);
+    }
+
+    /**
+     * 删除纠纷（软删除）
+     *
+     * DELETE /api/admin/disputes/{id}
+     *
+     * @param id 纠纷ID
+     * @return 是否成功
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "删除纠纷", description = "软删除指定纠纷（仅管理员）")
+    public ApiResponse<Void> deleteDispute(
+            @Parameter(description = "纠纷ID", example = "1")
+            @PathVariable Long id
+    ) {
+        log.info("删除纠纷: disputeId={}", id);
+        disputeService.deleteDispute(id);
         return ApiResponse.success(null);
     }
 }

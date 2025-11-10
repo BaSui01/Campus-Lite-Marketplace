@@ -166,6 +166,88 @@ public class DisputeServiceImpl implements DisputeService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<DisputeDTO> searchDisputes(
+            String keyword,
+            com.campus.marketplace.common.enums.DisputeType disputeType,
+            DisputeStatus status,
+            Long arbitratorId,
+            String startDate,
+            String endDate,
+            java.math.BigDecimal minAmount,
+            java.math.BigDecimal maxAmount,
+            Pageable pageable
+    ) {
+        log.debug("多条件搜索纠纷: keyword={}, disputeType={}, status={}, arbitratorId={}, startDate={}, endDate={}, minAmount={}, maxAmount={}",
+                keyword, disputeType, status, arbitratorId, startDate, endDate, minAmount, maxAmount);
+
+        // 使用 JPA Specification 构建动态查询
+        org.springframework.data.jpa.domain.Specification<Dispute> spec = (root, query, cb) -> {
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+
+            // 1. 关键词搜索（纠纷编号或订单号）
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                jakarta.persistence.criteria.Join<Dispute, com.campus.marketplace.common.entity.Order> orderJoin = root.join("order", jakarta.persistence.criteria.JoinType.LEFT);
+                predicates.add(cb.or(
+                        cb.like(root.get("disputeCode"), "%" + keyword + "%"),
+                        cb.like(orderJoin.get("orderNo"), "%" + keyword + "%")
+                ));
+            }
+
+            // 2. 纠纷类型筛选
+            if (disputeType != null) {
+                predicates.add(cb.equal(root.get("disputeType"), disputeType));
+            }
+
+            // 3. 状态筛选
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+
+            // 4. 仲裁员筛选
+            if (arbitratorId != null) {
+                predicates.add(cb.equal(root.get("arbitratorId"), arbitratorId));
+            }
+
+            // 5. 日期范围筛选
+            if (startDate != null && !startDate.trim().isEmpty()) {
+                try {
+                    java.time.LocalDateTime startDateTime = java.time.LocalDate.parse(startDate).atStartOfDay();
+                    predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), startDateTime));
+                } catch (Exception e) {
+                    log.warn("开始日期格式错误: {}", startDate, e);
+                }
+            }
+            if (endDate != null && !endDate.trim().isEmpty()) {
+                try {
+                    java.time.LocalDateTime endDateTime = java.time.LocalDate.parse(endDate).atTime(23, 59, 59);
+                    predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), endDateTime));
+                } catch (Exception e) {
+                    log.warn("结束日期格式错误: ", endDate, e);
+                }
+            }
+
+            // 6. 金额范围筛选（需要关联订单表）
+            if (minAmount != null || maxAmount != null) {
+                jakarta.persistence.criteria.Join<Dispute, com.campus.marketplace.common.entity.Order> orderJoin = root.join("order", jakarta.persistence.criteria.JoinType.LEFT);
+                if (minAmount != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(orderJoin.get("amount"), minAmount));
+                }
+                if (maxAmount != null) {
+                    predicates.add(cb.lessThanOrEqualTo(orderJoin.get("amount"), maxAmount));
+                }
+            }
+
+            // 组合所有条件
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        // 执行查询并转换为DTO
+        Page<Dispute> disputes = disputeRepository.findAll(spec, pageable);
+        return disputes.map(DisputeDTO::from);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public DisputeDetailDTO getDisputeDetail(Long disputeId) {
         log.debug("查询纠纷详情: disputeId={}", disputeId);
 
@@ -395,5 +477,30 @@ public class DisputeServiceImpl implements DisputeService {
         String datePart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         long sequence = DISPUTE_SEQUENCE.getAndIncrement();
         return String.format("DSP-%s-%06d", datePart, sequence % 1000000);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.List<com.campus.marketplace.common.entity.User> listArbitrators() {
+        log.debug("查询仲裁员列表");
+
+        // 查询所有具有ADMIN角色的用户
+        return userRepository.findByRolesName("ROLE_ADMIN");
+    }
+
+    @Override
+    @Transactional
+    public void deleteDispute(Long disputeId) {
+        log.info("删除纠纷: disputeId={}", disputeId);
+
+        // 查询纠纷
+        Dispute dispute = disputeRepository.findById(disputeId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "纠纷不存在"));
+
+        // 软删除（设置deletedAt字段）
+        dispute.setDeletedAt(LocalDateTime.now());
+        disputeRepository.save(dispute);
+
+        log.info("纠纷已删除: disputeId={}, disputeCode={}", disputeId, dispute.getDisputeCode());
     }
 }
