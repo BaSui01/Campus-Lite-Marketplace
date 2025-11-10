@@ -18,8 +18,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Table,
   Button,
-  Input,
-  Select,
   Space,
   Tag,
   Card,
@@ -27,12 +25,10 @@ import {
   Col,
   Statistic,
   message,
-  Modal,
   Timeline,
   App,
 } from 'antd';
 import {
-  SearchOutlined,
   EyeOutlined,
   CarOutlined,
   CheckCircleOutlined,
@@ -43,9 +39,9 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { logisticsService } from '@campus/shared';
 import type { Logistics, LogisticsTrack } from '@campus/shared';
+import { FilterPanel } from '@campus/shared/components';
+import type { FilterConfig, FilterValues } from '@campus/shared/types/filter';
 import dayjs from 'dayjs';
-
-const { Option } = Select;
 
 /**
  * 物流状态映射
@@ -78,13 +74,39 @@ const STATUS_MAP: Record<string, { text: string; color: string; icon: React.Reac
   },
 };
 
+// 物流筛选配置
+const logisticsFilters: FilterConfig[] = [
+  {
+    type: 'input',
+    field: 'keyword',
+    label: '关键词',
+    placeholder: '搜索订单ID/快递单号',
+    width: 250,
+  },
+  {
+    type: 'select',
+    field: 'status',
+    label: '物流状态',
+    placeholder: '选择物流状态',
+    options: [
+      { label: '待揽件', value: 'PENDING' },
+      { label: '运输中', value: 'IN_TRANSIT' },
+      { label: '派送中', value: 'OUT_FOR_DELIVERY' },
+      { label: '已签收', value: 'DELIVERED' },
+      { label: '异常', value: 'EXCEPTION' },
+    ],
+    width: 150,
+  },
+];
+
 export const LogisticsList: React.FC = () => {
   const navigate = useNavigate();
   const { modal } = App.useApp();
 
-  // 查询参数
-  const [keyword, setKeyword] = useState<string>('');
-  const [status, setStatus] = useState<string | undefined>();
+  // 筛选参数（使用 FilterPanel 统一管理）
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
+  const [page, setPage] = useState<number>(0);
+  const [size, setSize] = useState<number>(20);
 
   // 查询物流统计
   const { data: statistics } = useQuery({
@@ -92,17 +114,6 @@ export const LogisticsList: React.FC = () => {
     queryFn: () => logisticsService.getLogisticsStatistics(),
     staleTime: 5 * 60 * 1000,
   });
-
-  // 搜索处理
-  const handleSearch = () => {
-    message.info('搜索功能开发中...');
-  };
-
-  // 重置筛选
-  const handleReset = () => {
-    setKeyword('');
-    setStatus(undefined);
-  };
 
   // 查看物流轨迹
   const handleViewTrack = async (orderId: number) => {
@@ -139,20 +150,31 @@ export const LogisticsList: React.FC = () => {
     }
   };
 
-  // ⚠️ BaSui 注意：后端暂无物流列表API！
+  // ✅ 后端物流API已完全实现，前端Service已完成集成（2025-11-10）
   // 现有API：
   //   - GET /api/logistics/order/{orderId} - 根据订单ID查询物流
   //   - GET /api/logistics/tracking/{trackingNumber} - 根据快递单号查询物流
   //   - GET /api/logistics/statistics - 物流统计（已使用✅）
-  //
-  // 🚧 需要后端提供：GET /api/admin/logistics（管理端物流列表）
-  //    参数：keyword, status, page, size
-  //    返回：{ content: Logistics[], totalElements: number }
-  //
-  // 临时方案：显示空列表，等待后端API
-  const mockData = {
-    content: [],
-    totalElements: 0,
+  //   - GET /api/admin/logistics - 管理员物流列表（已集成✅）
+
+  // 查询物流列表（调用真实API）✅
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['logistics', 'admin', 'list', filterValues, page, size],
+    queryFn: () => logisticsService.listLogistics({
+      keyword: filterValues.keyword,
+      status: filterValues.status,
+      page,
+      size,
+      sortBy: 'createdAt',
+      sortDirection: 'DESC',
+    }),
+    staleTime: 5 * 60 * 1000, // 缓存5分钟
+  });
+
+  // 搜索处理
+  const handleSearch = () => {
+    setPage(0);
+    refetch();
   };
 
   // 表格列定义
@@ -306,54 +328,38 @@ export const LogisticsList: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 搜索筛选区域 */}
-      <Card style={{ marginBottom: 24 }}>
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
-          <Space wrap>
-            <Input
-              placeholder="搜索订单ID/快递单号"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onPressEnter={handleSearch}
-              style={{ width: 250 }}
-              prefix={<SearchOutlined />}
-            />
-
-            <Select
-              placeholder="物流状态"
-              value={status}
-              onChange={setStatus}
-              allowClear
-              style={{ width: 150 }}
-            >
-              <Option value="PENDING">待揽件</Option>
-              <Option value="IN_TRANSIT">运输中</Option>
-              <Option value="OUT_FOR_DELIVERY">派送中</Option>
-              <Option value="DELIVERED">已签收</Option>
-              <Option value="EXCEPTION">异常</Option>
-            </Select>
-
-            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-              搜索
-            </Button>
-
-            <Button onClick={handleReset}>重置</Button>
-          </Space>
-        </Space>
-      </Card>
+      {/* 筛选面板 */}
+      <FilterPanel
+        config={{ filters: logisticsFilters }}
+        values={filterValues}
+        onChange={setFilterValues}
+        onSearch={handleSearch}
+        onReset={() => {
+          setFilterValues({});
+          setPage(0);
+        }}
+        style={{ marginBottom: 24 }}
+      />
 
       {/* 数据表格 */}
       <Card>
         <Table
           columns={columns}
-          dataSource={mockData.content}
-          loading={false}
+          dataSource={data?.content || []}
+          loading={isLoading}
           rowKey="orderId"
           scroll={{ x: 1300 }}
           pagination={{
+            current: page + 1,
+            pageSize: size,
+            total: data?.totalElements || 0,
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total) => `共 ${total} 条记录`,
+            onChange: (p, s) => {
+              setPage(p - 1);
+              setSize(s);
+            },
           }}
           locale={{
             emptyText: (

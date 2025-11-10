@@ -12,19 +12,15 @@
  * @date 2025-11-05
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Table,
   Button,
-  Input,
-  Select,
   Space,
   Tag,
   message,
-  Modal,
   Popconfirm,
-  InputNumber,
   Card,
   Statistic,
   Row,
@@ -32,20 +28,18 @@ import {
   App,
 } from 'antd';
 import {
-  SearchOutlined,
-  PlusOutlined,
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
   EyeOutlined,
-  EditOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { goodsService } from '@campus/shared/services/goods';
 import type { GoodsResponse } from '@campus/shared/api';
+import { FilterPanel } from '@campus/shared/components';
+import type { FilterConfig, FilterValues } from '@campus/shared/types/filter';
+import { GOODS_STATUS_OPTIONS } from '@campus/shared/constants';
 import './GoodsList.css';
-
-const { Option } = Select;
 
 /**
  * 商品状态映射
@@ -57,17 +51,53 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
   DELETED: { text: '已删除', color: 'gray' },
 };
 
+// 商品筛选配置
+const goodsFilters: FilterConfig[] = [
+  {
+    type: 'input',
+    field: 'keyword',
+    label: '关键词',
+    placeholder: '搜索商品标题/描述',
+    width: 200,
+  },
+  {
+    type: 'select',
+    field: 'categoryId',
+    label: '分类',
+    placeholder: '选择分类',
+    options: [
+      { label: '电子产品', value: 101 },
+      { label: '图书教材', value: 102 },
+      { label: '服装鞋帽', value: 103 },
+      { label: '生活用品', value: 104 },
+      { label: '其他', value: 105 },
+    ],
+    width: 150,
+  },
+  {
+    type: 'numberRange',
+    field: 'price',
+    label: '价格区间',
+    prefix: '¥',
+    min: 0,
+  },
+  {
+    type: 'select',
+    field: 'status',
+    label: '状态',
+    placeholder: '选择状态',
+    options: GOODS_STATUS_OPTIONS,
+    width: 120,
+  },
+];
+
 export const GoodsList: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { modal } = App.useApp();
 
-  // 查询参数
-  const [keyword, setKeyword] = useState<string>('');
-  const [categoryId, setCategoryId] = useState<number | undefined>();
-  const [minPrice, setMinPrice] = useState<number | undefined>();
-  const [maxPrice, setMaxPrice] = useState<number | undefined>();
-  const [status, setStatus] = useState<string | undefined>();
+  // 筛选参数（使用 FilterPanel 统一管理）
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [page, setPage] = useState<number>(0);
   const [size, setSize] = useState<number>(20);
 
@@ -75,15 +105,16 @@ export const GoodsList: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // 查询商品列表
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['goods', 'list', { keyword, categoryId, minPrice, maxPrice, status, page, size }],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['goods', 'list', filterValues, page, size],
     queryFn: () =>
       goodsService.listGoods({
-        keyword,
-        categoryId,
-        minPrice,
-        maxPrice,
-        status,
+        keyword: filterValues.keyword,
+        categoryId: filterValues.categoryId,
+        minPrice: filterValues.price?.min,
+        maxPrice: filterValues.price?.max,
+        // ❌ 移除 status 参数 - 后端 listGoods 接口不支持此参数
+        // 如需按状态筛选，应使用 listPendingGoods 或其他专门接口
         page,
         size,
         sortBy: 'createdAt',
@@ -134,16 +165,6 @@ export const GoodsList: React.FC = () => {
   const handleSearch = () => {
     setPage(0); // 重置到第一页
     refetch();
-  };
-
-  // 重置筛选
-  const handleReset = () => {
-    setKeyword('');
-    setCategoryId(undefined);
-    setMinPrice(undefined);
-    setMaxPrice(undefined);
-    setStatus(undefined);
-    setPage(0);
   };
 
   // 查看详情
@@ -361,63 +382,18 @@ export const GoodsList: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 搜索和筛选栏 */}
-      <Card style={{ marginBottom: 16 }} className="goods-filter-card filter-section">
-        <Space wrap style={{ width: '100%' }}>
-          <Input
-            placeholder="搜索商品标题/描述"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            onPressEnter={handleSearch}
-            style={{ width: 200 }}
-            prefix={<SearchOutlined />}
-          />
-          <Select
-            placeholder="选择分类"
-            value={categoryId}
-            onChange={setCategoryId}
-            allowClear
-            style={{ width: 150 }}
-          >
-            <Option value={101}>电子产品</Option>
-            <Option value={102}>图书教材</Option>
-            <Option value={103}>服装鞋帽</Option>
-            <Option value={104}>生活用品</Option>
-            <Option value={105}>其他</Option>
-          </Select>
-          <InputNumber
-            placeholder="最低价格"
-            value={minPrice}
-            onChange={(value) => setMinPrice(value || undefined)}
-            min={0}
-            style={{ width: 120 }}
-            prefix="¥"
-          />
-          <InputNumber
-            placeholder="最高价格"
-            value={maxPrice}
-            onChange={(value) => setMaxPrice(value || undefined)}
-            min={0}
-            style={{ width: 120 }}
-            prefix="¥"
-          />
-          <Select
-            placeholder="选择状态"
-            value={status}
-            onChange={setStatus}
-            allowClear
-            style={{ width: 120 }}
-          >
-            <Option value="PENDING">待审核</Option>
-            <Option value="APPROVED">已上架</Option>
-            <Option value="REJECTED">已下架</Option>
-          </Select>
-          <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-            搜索
-          </Button>
-          <Button onClick={handleReset}>重置</Button>
-        </Space>
-      </Card>
+      {/* 筛选面板 */}
+      <FilterPanel
+        config={{ filters: goodsFilters }}
+        values={filterValues}
+        onChange={setFilterValues}
+        onSearch={handleSearch}
+        onReset={() => {
+          setFilterValues({});
+          setPage(0);
+        }}
+        style={{ marginBottom: 16 }}
+      />
 
       {/* 批量操作按钮 */}
       <Space style={{ marginBottom: 16 }} className="goods-batch-actions action-buttons">

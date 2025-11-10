@@ -61,6 +61,7 @@ import { useAuth } from '@/hooks';
 import type { UploadFile } from 'antd';
 import type { RcFile } from 'antd/es/upload';
 import type { ColumnsType } from 'antd/es/table';
+import './Profile.css';
 
 const { TextArea } = Input;
 const { Text, Title, Paragraph } = Typography;
@@ -477,11 +478,17 @@ export const ProfilePage: React.FC = () => {
       key: 'device',
       render: (_, record) => (
         <Space>
-          {record.deviceType === 'mobile' ? <MobileOutlined style={{ fontSize: 18 }} /> : <DesktopOutlined style={{ fontSize: 18 }} />}
+          <div className="profile-device-icon">
+            {record.deviceType === 'mobile' ? <MobileOutlined /> : <DesktopOutlined />}
+          </div>
           <div>
             <div>
               <Text strong>{record.deviceName}</Text>
-              {record.isCurrent && <Tag color="green" style={{ marginLeft: 8 }}>当前设备</Tag>}
+              {record.isCurrent && (
+                <span className="profile-device-current-badge" style={{ marginLeft: 8 }}>
+                  <CheckCircleOutlined /> 当前设备
+                </span>
+              )}
             </div>
             <Text type="secondary" style={{ fontSize: 12 }}>
               {record.os} · {record.browser}
@@ -535,10 +542,11 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Form
             form={profileForm}
             layout="vertical"
+            className="profile-form"
             initialValues={{
               nickname: userProfile?.nickname,
               bio: userProfile?.bio,
@@ -546,12 +554,17 @@ export const ProfilePage: React.FC = () => {
           >
             {/* 头像上传（带裁剪功能）✂️ */}
             <Form.Item label="头像">
-              <Space direction="vertical" align="center" style={{ width: '100%' }}>
-                <Avatar
-                  size={120}
-                  src={avatarUrl || userProfile?.avatar}
-                  icon={<UserOutlined />}
-                />
+              <div className="profile-avatar-section">
+                <div className="profile-avatar-wrapper">
+                  <Avatar
+                    size={120}
+                    src={avatarUrl || userProfile?.avatar}
+                    icon={<UserOutlined />}
+                  />
+                  <div className="profile-avatar-badge">
+                    <CameraOutlined />
+                  </div>
+                </div>
                 <ImageUploadWithCrop
                   value={avatarUrl ? [avatarUrl] : []}
                   onChange={handleAvatarChange}
@@ -563,10 +576,10 @@ export const ProfilePage: React.FC = () => {
                   maxSize={2}  // 2MB
                   tip="支持 JPG、PNG 格式，大小不超过 2MB。支持裁剪和粘贴板上传（Ctrl+V）"
                 />
-              </Space>
+              </div>
             </Form.Item>
 
-            <Divider />
+            <Divider className="profile-divider" />
 
             {/* 昵称 */}
             <Form.Item
@@ -598,6 +611,7 @@ export const ProfilePage: React.FC = () => {
             <Form.Item>
               <Button
                 type="primary"
+                className="profile-btn-primary"
                 icon={<SaveOutlined />}
                 onClick={handleProfileSubmit}
                 loading={updateProfileMutation.isPending}
@@ -617,15 +631,16 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Alert
+            className="profile-alert"
             message="密码安全提示"
             description="为了您的账号安全，建议定期更换密码，并使用包含大小写字母、数字和特殊字符的强密码。"
             type="info"
             showIcon
             style={{ marginBottom: 24 }}
           />
-          <Form form={passwordForm} layout="vertical">
+          <Form form={passwordForm} layout="vertical" className="profile-form">
             <Form.Item
               label="当前密码"
               name="oldPassword"
@@ -671,6 +686,7 @@ export const ProfilePage: React.FC = () => {
             <Form.Item>
               <Button
                 type="primary"
+                className="profile-btn-primary"
                 icon={<SaveOutlined />}
                 onClick={handlePasswordSubmit}
                 loading={changePasswordMutation.isPending}
@@ -690,30 +706,35 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {/* 邮箱绑定 */}
-            <div>
+            <div className="profile-contact-item">
               <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
                 <Col>
                   <Space>
-                    <MailOutlined style={{ fontSize: 18 }} />
-                    <div>
-                      <div>
-                        <Text strong>邮箱</Text>
+                    <div className="profile-contact-icon">
+                      <MailOutlined />
+                    </div>
+                    <div className="profile-contact-info">
+                      <div className="profile-contact-title">
+                        邮箱
                         {emailVerified && (
-                          <Badge status="success" text="已验证" style={{ marginLeft: 8 }} />
+                          <span className="profile-contact-badge" style={{ marginLeft: 8 }}>
+                            <CheckCircleOutlined /> 已验证
+                          </span>
                         )}
                       </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <div className="profile-contact-value">
                         {userProfile?.email || '未绑定邮箱'}
-                      </Text>
+                      </div>
                     </div>
                   </Space>
                 </Col>
                 <Col>
                   <Button
                     type={emailVerified ? 'default' : 'primary'}
+                    className={emailVerified ? 'profile-btn-default' : 'profile-btn-primary'}
                     onClick={() => setEmailBindModalVisible(true)}
                   >
                     {emailVerified ? '更换邮箱' : '绑定邮箱'}
@@ -725,30 +746,35 @@ export const ProfilePage: React.FC = () => {
               </Paragraph>
             </div>
 
-            <Divider />
+            <Divider className="profile-divider" />
 
             {/* 手机号绑定 */}
-            <div>
+            <div className="profile-contact-item">
               <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
                 <Col>
                   <Space>
-                    <PhoneOutlined style={{ fontSize: 18 }} />
-                    <div>
-                      <div>
-                        <Text strong>手机号</Text>
+                    <div className="profile-contact-icon">
+                      <PhoneOutlined />
+                    </div>
+                    <div className="profile-contact-info">
+                      <div className="profile-contact-title">
+                        手机号
                         {phoneVerified && (
-                          <Badge status="success" text="已验证" style={{ marginLeft: 8 }} />
+                          <span className="profile-contact-badge" style={{ marginLeft: 8 }}>
+                            <CheckCircleOutlined /> 已验证
+                          </span>
                         )}
                       </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <div className="profile-contact-value">
                         {userProfile?.phone || '未绑定手机号'}
-                      </Text>
+                      </div>
                     </div>
                   </Space>
                 </Col>
                 <Col>
                   <Button
                     type={phoneVerified ? 'default' : 'primary'}
+                    className={phoneVerified ? 'profile-btn-default' : 'profile-btn-primary'}
                     onClick={() => setPhoneBindModalVisible(true)}
                   >
                     {phoneVerified ? '更换手机号' : '绑定手机号'}
@@ -771,34 +797,46 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {/* 两步验证 */}
-            <div>
+            <div className="profile-security-item">
               <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
                 <Col>
                   <Space>
-                    <QrcodeOutlined style={{ fontSize: 18 }} />
-                    <div>
-                      <div>
-                        <Text strong>两步验证（2FA）</Text>
+                    <div className="profile-security-icon">
+                      <QrcodeOutlined />
+                    </div>
+                    <div className="profile-contact-info">
+                      <div className="profile-contact-title">
+                        两步验证（2FA）
                         {twoFactorEnabled && (
-                          <Badge status="success" text="已启用" style={{ marginLeft: 8 }} />
+                          <span className="profile-contact-badge" style={{ marginLeft: 8 }}>
+                            <CheckCircleOutlined /> 已启用
+                          </span>
                         )}
                       </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <div className="profile-contact-value">
                         {twoFactorEnabled ? '使用 Google Authenticator 保护您的账号' : '未启用两步验证'}
-                      </Text>
+                      </div>
                     </div>
                   </Space>
                 </Col>
                 <Col>
                   {twoFactorEnabled ? (
-                    <Button danger onClick={handleDisableTwoFactor}>
+                    <Button
+                      danger
+                      className="profile-btn-danger"
+                      onClick={handleDisableTwoFactor}
+                    >
                       关闭
                     </Button>
                   ) : (
-                    <Button type="primary" onClick={handleEnableTwoFactor}>
+                    <Button
+                      type="primary"
+                      className="profile-btn-primary"
+                      onClick={handleEnableTwoFactor}
+                    >
                       启用
                     </Button>
                   )}
@@ -809,21 +847,21 @@ export const ProfilePage: React.FC = () => {
               </Paragraph>
             </div>
 
-            <Divider />
+            <Divider className="profile-divider" />
 
             {/* 登录通知 */}
-            <div>
+            <div className="profile-security-item">
               <Row justify="space-between" align="middle">
                 <Col>
                   <Space>
-                    <SafetyOutlined style={{ fontSize: 18 }} />
-                    <div>
-                      <div>
-                        <Text strong>登录通知</Text>
-                      </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                    <div className="profile-security-icon">
+                      <SafetyOutlined />
+                    </div>
+                    <div className="profile-contact-info">
+                      <div className="profile-contact-title">登录通知</div>
+                      <div className="profile-contact-value">
                         有新设备登录时发送通知
-                      </Text>
+                      </div>
                     </div>
                   </Space>
                 </Col>
@@ -844,21 +882,24 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Alert
+            className="profile-alert"
             message="安全提示"
             description="如果发现陌生设备，请立即踢出并修改密码。"
             type="warning"
             showIcon
             style={{ marginBottom: 16 }}
           />
-          <Table
-            columns={deviceColumns}
-            dataSource={loginDevices}
-            rowKey="id"
-            pagination={false}
-            loading={kickDeviceMutation.isPending}
-          />
+          <div className="profile-device-table">
+            <Table
+              columns={deviceColumns}
+              dataSource={loginDevices}
+              rowKey="id"
+              pagination={false}
+              loading={kickDeviceMutation.isPending}
+            />
+          </div>
         </Card>
       ),
     },
@@ -870,73 +911,73 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <Title level={5}>基本信息</Title>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">用户名：</Text>
-                <Text strong>{userProfile?.username}</Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">用户ID：</Text>
-                <Text strong>{userProfile?.id}</Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">学号：</Text>
-                <Text strong>{userProfile?.studentId || '-'}</Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">所属校区：</Text>
-                <Text>{userProfile?.campus?.name || '-'}</Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">账号状态：</Text>
-                <Tag color={userProfile?.status === 'ACTIVE' ? 'green' : userProfile?.status === 'BANNED' ? 'red' : 'default'}>
+            {/* 基本信息 */}
+            <div className="profile-info-section">
+              <div className="profile-info-title">基本信息</div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">用户名：</span>
+                <span className="profile-info-value">{userProfile?.username}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">用户ID：</span>
+                <span className="profile-info-value">{userProfile?.id}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">学号：</span>
+                <span className="profile-info-value">{userProfile?.studentId || '-'}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">所属校区：</span>
+                <span className="profile-info-value">{userProfile?.campus?.name || '-'}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">账号状态：</span>
+                <span className={`profile-info-tag ${
+                  userProfile?.status === 'ACTIVE' ? 'status-active' :
+                  userProfile?.status === 'BANNED' ? 'status-banned' :
+                  'status-deleted'
+                }`}>
                   {userProfile?.status === 'ACTIVE' ? '正常' : userProfile?.status === 'BANNED' ? '封禁' : '已注销'}
-                </Tag>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">信誉分：</Text>
-                <Text strong style={{ color: (userProfile?.creditScore || 0) >= 100 ? '#52c41a' : '#ff4d4f' }}>
+                </span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">信誉分：</span>
+                <span className="profile-info-value" style={{ color: (userProfile?.creditScore || 0) >= 100 ? '#52c41a' : '#ff4d4f' }}>
                   {userProfile?.creditScore || 100} / 200
-                </Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">注册时间：</Text>
-                <Text>{userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleString() : '-'}</Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">最后登录：</Text>
-                <Text>{userProfile?.lastLoginAt ? new Date(userProfile.lastLoginAt).toLocaleString() : '-'}</Text>
-              </Col>
-            </Row>
+                </span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">注册时间：</span>
+                <span className="profile-info-value">{userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleString() : '-'}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">最后登录：</span>
+                <span className="profile-info-value">{userProfile?.lastLoginAt ? new Date(userProfile.lastLoginAt).toLocaleString() : '-'}</span>
+              </div>
+            </div>
 
-            <Divider />
-
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <Title level={5}>角色权限</Title>
-              </Col>
-              <Col span={24}>
-                <Text type="secondary">角色：</Text>
-                <Space wrap style={{ marginLeft: 8 }}>
+            {/* 角色权限 */}
+            <div className="profile-info-section">
+              <div className="profile-info-title">角色权限</div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">角色：</span>
+                <Space wrap>
                   {currentUser?.roles?.map((role) => (
                     <Tag color="blue" key={role}>
                       {role}
                     </Tag>
                   ))}
                 </Space>
-              </Col>
-              <Col span={24}>
-                <Text type="secondary">权限数量：</Text>
-                <Text strong style={{ marginLeft: 8 }}>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">权限数量：</span>
+                <span className="profile-info-value">
                   {currentUser?.permissions?.length || 0} 个
-                </Text>
-              </Col>
-            </Row>
+                </span>
+              </div>
+            </div>
           </Space>
         </Card>
       ),
@@ -944,8 +985,9 @@ export const ProfilePage: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="profile-page-container">
       <Card
+        className="profile-main-card"
         title={
           <Space>
             <UserOutlined />
@@ -959,6 +1001,7 @@ export const ProfilePage: React.FC = () => {
 
       {/* 邮箱绑定弹窗 */}
       <Modal
+        className="profile-modal"
         title="绑定邮箱"
         open={emailBindModalVisible}
         onCancel={() => {
@@ -1001,10 +1044,17 @@ export const ProfilePage: React.FC = () => {
 
           <Form.Item>
             <Space>
-              <Button type="primary" onClick={handleBindEmail}>
+              <Button
+                type="primary"
+                className="profile-btn-primary"
+                onClick={handleBindEmail}
+              >
                 确认绑定
               </Button>
-              <Button onClick={() => setEmailBindModalVisible(false)}>
+              <Button
+                className="profile-btn-default"
+                onClick={() => setEmailBindModalVisible(false)}
+              >
                 取消
               </Button>
             </Space>
@@ -1014,6 +1064,7 @@ export const ProfilePage: React.FC = () => {
 
       {/* 手机号绑定弹窗 */}
       <Modal
+        className="profile-modal"
         title="绑定手机号"
         open={phoneBindModalVisible}
         onCancel={() => {
@@ -1056,10 +1107,17 @@ export const ProfilePage: React.FC = () => {
 
           <Form.Item>
             <Space>
-              <Button type="primary" onClick={handleBindPhone}>
+              <Button
+                type="primary"
+                className="profile-btn-primary"
+                onClick={handleBindPhone}
+              >
                 确认绑定
               </Button>
-              <Button onClick={() => setPhoneBindModalVisible(false)}>
+              <Button
+                className="profile-btn-default"
+                onClick={() => setPhoneBindModalVisible(false)}
+              >
                 取消
               </Button>
             </Space>
@@ -1069,6 +1127,7 @@ export const ProfilePage: React.FC = () => {
 
       {/* 两步验证设置弹窗 */}
       <Modal
+        className="profile-modal"
         title="启用两步验证"
         open={twoFactorModalVisible}
         onCancel={() => {
@@ -1078,7 +1137,7 @@ export const ProfilePage: React.FC = () => {
         footer={null}
         width={600}
       >
-        <Steps current={twoFactorStep} style={{ marginBottom: 24 }}>
+        <Steps className="profile-steps" current={twoFactorStep} style={{ marginBottom: 24 }}>
           <Step title="扫描二维码" />
           <Step title="输入验证码" />
           <Step title="完成设置" />
@@ -1089,14 +1148,20 @@ export const ProfilePage: React.FC = () => {
             <Paragraph>
               请使用 Google Authenticator 或其他 TOTP 应用扫描下方二维码：
             </Paragraph>
-            <QRCode
-              value={`otpauth://totp/CampusMarketplace:${userProfile?.username}?secret=${twoFactorSecret}&issuer=CampusMarketplace`}
-              size={200}
-            />
+            <div className="profile-qrcode-wrapper">
+              <QRCode
+                value={`otpauth://totp/CampusMarketplace:${userProfile?.username}?secret=${twoFactorSecret}&issuer=CampusMarketplace`}
+                size={200}
+              />
+            </div>
             <Paragraph type="secondary">
               密钥（手动输入）：<Text code copyable>{twoFactorSecret}</Text>
             </Paragraph>
-            <Button type="primary" onClick={() => setTwoFactorStep(1)}>
+            <Button
+              type="primary"
+              className="profile-btn-primary"
+              onClick={() => setTwoFactorStep(1)}
+            >
               下一步
             </Button>
           </Space>
@@ -1123,6 +1188,7 @@ export const ProfilePage: React.FC = () => {
                 <Space>
                   <Button
                     type="primary"
+                    className="profile-btn-primary"
                     loading={verifyTwoFactorMutation.isPending}
                     onClick={() => {
                       twoFactorForm.validateFields().then((values) => {
@@ -1132,7 +1198,10 @@ export const ProfilePage: React.FC = () => {
                   >
                     验证并启用
                   </Button>
-                  <Button onClick={() => setTwoFactorStep(0)}>
+                  <Button
+                    className="profile-btn-default"
+                    onClick={() => setTwoFactorStep(0)}
+                  >
                     上一步
                   </Button>
                 </Space>
