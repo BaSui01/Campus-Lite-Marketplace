@@ -192,6 +192,8 @@ import type { ApiResponseOptionalNegotiationMessageDTO } from '../models';
 // @ts-ignore
 import type { ApiResponseOrder } from '../models';
 // @ts-ignore
+import type { ApiResponseOrderStatisticsDTO } from '../models';
+// @ts-ignore
 import type { ApiResponsePageAppeal } from '../models';
 // @ts-ignore
 import type { ApiResponsePageAppealMaterial } from '../models';
@@ -228,6 +230,8 @@ import type { ApiResponsePageObject } from '../models';
 // @ts-ignore
 import type { ApiResponsePageOrderResponse } from '../models';
 // @ts-ignore
+import type { ApiResponsePagePaymentRecordDTO } from '../models';
+// @ts-ignore
 import type { ApiResponsePagePostResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageRefundRequest } from '../models';
@@ -244,6 +248,10 @@ import type { ApiResponsePageTagResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePageUserProfileResponse } from '../models';
 // @ts-ignore
+import type { ApiResponsePaymentRecordDTO } from '../models';
+// @ts-ignore
+import type { ApiResponsePaymentStatisticsDTO } from '../models';
+// @ts-ignore
 import type { ApiResponsePerformanceReportResponse } from '../models';
 // @ts-ignore
 import type { ApiResponsePostResponse } from '../models';
@@ -255,6 +263,10 @@ import type { ApiResponseRecommendConfigDTO } from '../models';
 import type { ApiResponseRecommendStatisticsDTO } from '../models';
 // @ts-ignore
 import type { ApiResponseRefundRequest } from '../models';
+// @ts-ignore
+import type { ApiResponseRefundResponseDTO } from '../models';
+// @ts-ignore
+import type { ApiResponseRefundStatisticsDTO } from '../models';
 // @ts-ignore
 import type { ApiResponseRevertExecutionResult } from '../models';
 // @ts-ignore
@@ -274,6 +286,8 @@ import type { ApiResponseString } from '../models';
 // @ts-ignore
 import type { ApiResponseSystemMetricsResponse } from '../models';
 // @ts-ignore
+import type { ApiResponseSystemOverviewDTO } from '../models';
+// @ts-ignore
 import type { ApiResponseTag } from '../models';
 // @ts-ignore
 import type { ApiResponseTagStatisticsResponse } from '../models';
@@ -291,6 +305,8 @@ import type { ApiResponseVoid } from '../models';
 import type { ApproveGoodsRequest } from '../models';
 // @ts-ignore
 import type { ArbitrateDisputeRequest } from '../models';
+// @ts-ignore
+import type { AuditLogFilterRequest } from '../models';
 // @ts-ignore
 import type { BanUserRequest } from '../models';
 // @ts-ignore
@@ -352,6 +368,8 @@ import type { CreateTagRequest } from '../models';
 // @ts-ignore
 import type { Disable2FARequest } from '../models';
 // @ts-ignore
+import type { DisputeFilterRequest } from '../models';
+// @ts-ignore
 import type { FeatureFlagCreateRequest } from '../models';
 // @ts-ignore
 import type { FeatureFlagUpdateRequest } from '../models';
@@ -361,6 +379,8 @@ import type { GoodsBatchRequest } from '../models';
 import type { InventoryBatchRequest } from '../models';
 // @ts-ignore
 import type { LoginRequest } from '../models';
+// @ts-ignore
+import type { LogisticsFilterRequest } from '../models';
 // @ts-ignore
 import type { MergeTagRequest } from '../models';
 // @ts-ignore
@@ -377,6 +397,8 @@ import type { PriceBatchRequest } from '../models';
 import type { ProposeDisputeRequest } from '../models';
 // @ts-ignore
 import type { RecommendConfigDTO } from '../models';
+// @ts-ignore
+import type { RefundFilterRequest } from '../models';
 // @ts-ignore
 import type { RegisterRequest } from '../models';
 // @ts-ignore
@@ -3818,6 +3840,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 软删除指定纠纷（仅管理员）
+         * @summary 删除纠纷
+         * @param {number} id 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteDispute: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteDispute', 'id', id)
+            const localVarPath = `/admin/disputes/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 上传者删除自己上传的未评估证据
          * @summary 删除证据
          * @param {number} evidenceId 证据ID
@@ -4317,7 +4377,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员查看退款申请详情
+         * 管理员查看退款申请详情（包含关联商品、用户信息）
          * @summary 退款详情
          * @param {string} refundNo 退款单号
          * @param {*} [options] Override http request option.
@@ -7674,6 +7734,88 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 获取订单详细统计数据（总数、金额、比率、今日统计等）
+         * @summary 获取订单统计
+         * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+         * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOrderStatistics: async (startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/statistics/orders`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = endDate;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 根据订单号查询支付详情
+         * @summary 查询支付详情
+         * @param {string} orderNo 订单号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPaymentDetail: async (orderNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orderNo' is not null or undefined
+            assertParamExists('getPaymentDetail', 'orderNo', orderNo)
+            const localVarPath = `/api/admin/payments/{orderNo}`
+                .replace(`{${"orderNo"}}`, encodeURIComponent(String(orderNo)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 获取所有待审核的申诉列表
          * @summary 查询待审核申诉
          * @param {number} [page] 
@@ -8118,6 +8260,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取退款详细统计数据（总数、金额、比率、平均处理时间等）
+         * @summary 获取退款统计
+         * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+         * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRefundStatistics: async (startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/statistics/refunds`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = endDate;
+            }
 
 
     
@@ -8662,12 +8848,56 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 查询支付统计数据（总金额、总次数、成功率、按支付方式统计等）
+         * @summary 查询支付统计
+         * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+         * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStatistics1: async (startDate?: string, endDate?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/admin/payments/statistics`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = endDate;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
          * @summary 统计黑名单数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatistics1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getStatistics2: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/admin/blacklist/statistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10150,16 +10380,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员查询所有退款，支持分页、状态筛选和关键词搜索
+         * 管理员查询所有退款，支持分页、状态筛选、关键词搜索、时间范围筛选、排序
          * @summary 管理员查询所有退款列表
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页大小
-         * @param {ListAllRefundsStatusEnum} [status] 退款状态（可选）
-         * @param {string} [keyword] 搜索关键词（可选，匹配退款单号或订单号）
+         * @param {RefundFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listAllRefunds: async (page?: number, size?: number, status?: ListAllRefundsStatusEnum, keyword?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listAllRefunds: async (filterRequest: RefundFilterRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'filterRequest' is not null or undefined
+            assertParamExists('listAllRefunds', 'filterRequest', filterRequest)
             const localVarPath = `/admin/refunds`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10176,21 +10405,45 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
+            if (filterRequest !== undefined) {
+                for (const [key, value] of Object.entries(filterRequest)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 获取所有具有ADMIN角色的用户作为仲裁员候选
+         * @summary 获取仲裁员列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listArbitrators: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/disputes/arbitrators`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
             }
 
-            if (status !== undefined) {
-                localVarQueryParameter['status'] = status;
-            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
 
-            if (keyword !== undefined) {
-                localVarQueryParameter['keyword'] = keyword;
-            }
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
@@ -10262,18 +10515,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员查询系统审计日志
+         * 管理员查询系统审计日志，支持分页、筛选、排序
          * @summary 查询审计日志列表
-         * @param {number} [operatorId] 操作人ID
-         * @param {ListAuditLogsActionTypeEnum} [actionType] 操作类型
-         * @param {string} [startTime] 开始时间
-         * @param {string} [endTime] 结束时间
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页数量
+         * @param {AuditLogFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listAuditLogs: async (operatorId?: number, actionType?: ListAuditLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listAuditLogs: async (filterRequest: AuditLogFilterRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'filterRequest' is not null or undefined
+            assertParamExists('listAuditLogs', 'filterRequest', filterRequest)
             const localVarPath = `/audit-logs`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10290,32 +10540,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (operatorId !== undefined) {
-                localVarQueryParameter['operatorId'] = operatorId;
-            }
-
-            if (actionType !== undefined) {
-                localVarQueryParameter['actionType'] = actionType;
-            }
-
-            if (startTime !== undefined) {
-                localVarQueryParameter['startTime'] = (startTime as any instanceof Date) ?
-                    (startTime as any).toISOString() :
-                    startTime;
-            }
-
-            if (endTime !== undefined) {
-                localVarQueryParameter['endTime'] = (endTime as any instanceof Date) ?
-                    (endTime as any).toISOString() :
-                    endTime;
-            }
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
+            if (filterRequest !== undefined) {
+                for (const [key, value] of Object.entries(filterRequest)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
 
@@ -10633,16 +10861,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员查询所有纠纷（支持筛选）
+         * 管理员查询所有纠纷（支持分页、筛选、排序）
          * @summary 查询纠纷列表
-         * @param {string} [keyword] 搜索关键字
-         * @param {ListDisputesStatusEnum} [status] 纠纷状态
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页大小
+         * @param {DisputeFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listDisputes: async (keyword?: string, status?: ListDisputesStatusEnum, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listDisputes: async (filterRequest: DisputeFilterRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'filterRequest' is not null or undefined
+            assertParamExists('listDisputes', 'filterRequest', filterRequest)
             const localVarPath = `/admin/disputes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10659,20 +10886,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (keyword !== undefined) {
-                localVarQueryParameter['keyword'] = keyword;
-            }
-
-            if (status !== undefined) {
-                localVarQueryParameter['status'] = status;
-            }
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
+            if (filterRequest !== undefined) {
+                for (const [key, value] of Object.entries(filterRequest)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
 
@@ -10799,12 +11016,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选和排序
+         * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选、状态筛选和排序
          * @summary 查询物品列表
          * @param {string} [keyword] 搜索关键词
          * @param {number} [categoryId] 分类 ID
          * @param {number} [minPrice] 最低价格
          * @param {number} [maxPrice] 最高价格
+         * @param {ListGoodsStatusEnum} [status] 物品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）
          * @param {number} [page] 页码（从 0 开始）
          * @param {number} [size] 每页数量
          * @param {string} [sortBy] 排序字段（createdAt/price/viewCount）
@@ -10813,7 +11031,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listGoods: async (keyword?: string, categoryId?: number, minPrice?: number, maxPrice?: number, page?: number, size?: number, sortBy?: string, sortDirection?: string, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listGoods: async (keyword?: string, categoryId?: number, minPrice?: number, maxPrice?: number, status?: ListGoodsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, tags?: Array<number>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/goods`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10844,6 +11062,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (maxPrice !== undefined) {
                 localVarQueryParameter['maxPrice'] = maxPrice;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
             }
 
             if (page !== undefined) {
@@ -10922,18 +11144,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+         * 管理员查看所有物流信息，支持分页、筛选、排序
          * @summary 分页查询物流列表
-         * @param {string} [keyword] 关键词（订单ID/快递单号）
-         * @param {ListLogisticsStatusEnum} [status] 物流状态
-         * @param {number} [page] 页码（从0开始）
-         * @param {number} [size] 每页大小
-         * @param {string} [sortBy] 排序字段
-         * @param {string} [sortDirection] 排序方向
+         * @param {LogisticsFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listLogistics: async (keyword?: string, status?: ListLogisticsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listLogistics: async (filterRequest: LogisticsFilterRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'filterRequest' is not null or undefined
+            assertParamExists('listLogistics', 'filterRequest', filterRequest)
             const localVarPath = `/admin/logistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10950,28 +11169,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (keyword !== undefined) {
-                localVarQueryParameter['keyword'] = keyword;
-            }
-
-            if (status !== undefined) {
-                localVarQueryParameter['status'] = status;
-            }
-
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            if (sortBy !== undefined) {
-                localVarQueryParameter['sortBy'] = sortBy;
-            }
-
-            if (sortDirection !== undefined) {
-                localVarQueryParameter['sortDirection'] = sortDirection;
+            if (filterRequest !== undefined) {
+                for (const [key, value] of Object.entries(filterRequest)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
 
@@ -11215,15 +11416,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 用户查询自己的退款列表，支持分页和状态筛选
+         * 用户查询自己的退款列表，支持分页、状态筛选、时间范围筛选、排序
          * @summary 查询我的退款列表
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页大小
-         * @param {ListMyRefundsStatusEnum} [status] 退款状态（可选）
+         * @param {RefundFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listMyRefunds: async (page?: number, size?: number, status?: ListMyRefundsStatusEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listMyRefunds: async (filterRequest: RefundFilterRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'filterRequest' is not null or undefined
+            assertParamExists('listMyRefunds', 'filterRequest', filterRequest)
             const localVarPath = `/refunds`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11240,16 +11441,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
-            }
-
-            if (status !== undefined) {
-                localVarQueryParameter['status'] = status;
+            if (filterRequest !== undefined) {
+                for (const [key, value] of Object.entries(filterRequest)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
 
@@ -11391,18 +11586,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 管理员查询系统操作日志（支持分页和筛选）
+         * 管理员查询系统操作日志（支持分页、筛选、排序）
          * @summary 查询操作日志列表
-         * @param {number} [operatorId] 操作人ID
-         * @param {ListOperationLogsActionTypeEnum} [actionType] 操作类型
-         * @param {string} [startTime] 开始时间
-         * @param {string} [endTime] 结束时间
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页大小
+         * @param {AuditLogFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listOperationLogs: async (operatorId?: number, actionType?: ListOperationLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listOperationLogs: async (filterRequest: AuditLogFilterRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'filterRequest' is not null or undefined
+            assertParamExists('listOperationLogs', 'filterRequest', filterRequest)
             const localVarPath = `/admin/logs/operations`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11419,24 +11611,71 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-            if (operatorId !== undefined) {
-                localVarQueryParameter['operatorId'] = operatorId;
+            if (filterRequest !== undefined) {
+                for (const [key, value] of Object.entries(filterRequest)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
-            if (actionType !== undefined) {
-                localVarQueryParameter['actionType'] = actionType;
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 管理员查询支付记录列表，支持关键词搜索、状态筛选、支付方式筛选、时间范围筛选
+         * @summary 查询支付记录列表
+         * @param {string} [keyword] 关键词（订单号/用户名/商品名）
+         * @param {string} [status] 订单状态（逗号分隔，如：PAID,COMPLETED,REFUNDED）
+         * @param {string} [paymentMethod] 支付方式（WECHAT/ALIPAY）
+         * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+         * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+         * @param {number} [page] 页码（从0开始）
+         * @param {number} [size] 每页大小
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPayments: async (keyword?: string, status?: string, paymentMethod?: string, startDate?: string, endDate?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/admin/payments`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
             }
 
-            if (startTime !== undefined) {
-                localVarQueryParameter['startTime'] = (startTime as any instanceof Date) ?
-                    (startTime as any).toISOString() :
-                    startTime;
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (keyword !== undefined) {
+                localVarQueryParameter['keyword'] = keyword;
             }
 
-            if (endTime !== undefined) {
-                localVarQueryParameter['endTime'] = (endTime as any instanceof Date) ?
-                    (endTime as any).toISOString() :
-                    endTime;
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (paymentMethod !== undefined) {
+                localVarQueryParameter['paymentMethod'] = paymentMethod;
+            }
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = endDate;
             }
 
             if (page !== undefined) {
@@ -14827,15 +15066,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             if (start !== undefined) {
-                localVarQueryParameter['start'] = (start as any instanceof Date) ?
-                    (start as any).toISOString() :
-                    start;
+                localVarQueryParameter['start'] = start;
             }
 
             if (end !== undefined) {
-                localVarQueryParameter['end'] = (end as any instanceof Date) ?
-                    (end as any).toISOString() :
-                    end;
+                localVarQueryParameter['end'] = end;
             }
 
 
@@ -18016,6 +18251,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 软删除指定纠纷（仅管理员）
+         * @summary 删除纠纷
+         * @param {number} id 纠纷ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteDispute(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDispute(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteDispute']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 上传者删除自己上传的未评估证据
          * @summary 删除证据
          * @param {number} evidenceId 证据ID
@@ -18185,13 +18433,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员查看退款申请详情
+         * 管理员查看退款申请详情（包含关联商品、用户信息）
          * @summary 退款详情
          * @param {string} refundNo 退款单号
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async detail(refundNo: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseRefundRequest>> {
+        async detail(refundNo: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseRefundResponseDTO>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.detail(refundNo, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.detail']?.[localVarOperationServerIndex]?.url;
@@ -19316,6 +19564,33 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 获取订单详细统计数据（总数、金额、比率、今日统计等）
+         * @summary 获取订单统计
+         * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+         * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getOrderStatistics(startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseOrderStatisticsDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getOrderStatistics(startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getOrderStatistics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 根据订单号查询支付详情
+         * @summary 查询支付详情
+         * @param {string} orderNo 订单号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPaymentDetail(orderNo: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePaymentRecordDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPaymentDetail(orderNo, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getPaymentDetail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 获取所有待审核的申诉列表
          * @summary 查询待审核申诉
          * @param {number} [page] 
@@ -19468,6 +19743,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRecommendStatistics(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getRecommendStatistics']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取退款详细统计数据（总数、金额、比率、平均处理时间等）
+         * @summary 获取退款统计
+         * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+         * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRefundStatistics(startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseRefundStatisticsDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRefundStatistics(startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getRefundStatistics']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -19645,15 +19934,29 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 查询支付统计数据（总金额、总次数、成功率、按支付方式统计等）
+         * @summary 查询支付统计
+         * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+         * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStatistics1(startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePaymentStatisticsDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStatistics1(startDate, endDate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatistics1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
          * @summary 统计黑名单数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getStatistics1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBlacklistStatsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getStatistics1(options);
+        async getStatistics2(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBlacklistStatsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStatistics2(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatistics1']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatistics2']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -19662,7 +19965,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSystemOverview(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
+        async getSystemOverview(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseSystemOverviewDTO>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSystemOverview(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getSystemOverview']?.[localVarOperationServerIndex]?.url;
@@ -20147,19 +20450,28 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员查询所有退款，支持分页、状态筛选和关键词搜索
+         * 管理员查询所有退款，支持分页、状态筛选、关键词搜索、时间范围筛选、排序
          * @summary 管理员查询所有退款列表
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页大小
-         * @param {ListAllRefundsStatusEnum} [status] 退款状态（可选）
-         * @param {string} [keyword] 搜索关键词（可选，匹配退款单号或订单号）
+         * @param {RefundFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listAllRefunds(page?: number, size?: number, status?: ListAllRefundsStatusEnum, keyword?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageRefundRequest>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listAllRefunds(page, size, status, keyword, options);
+        async listAllRefunds(filterRequest: RefundFilterRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageRefundRequest>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAllRefunds(filterRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listAllRefunds']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 获取所有具有ADMIN角色的用户作为仲裁员候选
+         * @summary 获取仲裁员列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listArbitrators(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listArbitrators(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listArbitrators']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -20179,19 +20491,14 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员查询系统审计日志
+         * 管理员查询系统审计日志，支持分页、筛选、排序
          * @summary 查询审计日志列表
-         * @param {number} [operatorId] 操作人ID
-         * @param {ListAuditLogsActionTypeEnum} [actionType] 操作类型
-         * @param {string} [startTime] 开始时间
-         * @param {string} [endTime] 结束时间
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页数量
+         * @param {AuditLogFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listAuditLogs(operatorId?: number, actionType?: ListAuditLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageAuditLogResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listAuditLogs(operatorId, actionType, startTime, endTime, page, size, options);
+        async listAuditLogs(filterRequest: AuditLogFilterRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageAuditLogResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAuditLogs(filterRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listAuditLogs']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -20294,17 +20601,14 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员查询所有纠纷（支持筛选）
+         * 管理员查询所有纠纷（支持分页、筛选、排序）
          * @summary 查询纠纷列表
-         * @param {string} [keyword] 搜索关键字
-         * @param {ListDisputesStatusEnum} [status] 纠纷状态
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页大小
+         * @param {DisputeFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listDisputes(keyword?: string, status?: ListDisputesStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageDisputeDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listDisputes(keyword, status, page, size, options);
+        async listDisputes(filterRequest: DisputeFilterRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageDisputeDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listDisputes(filterRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listDisputes']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -20348,12 +20652,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选和排序
+         * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选、状态筛选和排序
          * @summary 查询物品列表
          * @param {string} [keyword] 搜索关键词
          * @param {number} [categoryId] 分类 ID
          * @param {number} [minPrice] 最低价格
          * @param {number} [maxPrice] 最高价格
+         * @param {ListGoodsStatusEnum} [status] 物品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）
          * @param {number} [page] 页码（从 0 开始）
          * @param {number} [size] 每页数量
          * @param {string} [sortBy] 排序字段（createdAt/price/viewCount）
@@ -20362,8 +20667,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listGoods(keyword?: string, categoryId?: number, minPrice?: number, maxPrice?: number, page?: number, size?: number, sortBy?: string, sortDirection?: string, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageGoodsResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listGoods(keyword, categoryId, minPrice, maxPrice, page, size, sortBy, sortDirection, tags, options);
+        async listGoods(keyword?: string, categoryId?: number, minPrice?: number, maxPrice?: number, status?: ListGoodsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, tags?: Array<number>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageGoodsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listGoods(keyword, categoryId, minPrice, maxPrice, status, page, size, sortBy, sortDirection, tags, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listGoods']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -20383,19 +20688,14 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+         * 管理员查看所有物流信息，支持分页、筛选、排序
          * @summary 分页查询物流列表
-         * @param {string} [keyword] 关键词（订单ID/快递单号）
-         * @param {ListLogisticsStatusEnum} [status] 物流状态
-         * @param {number} [page] 页码（从0开始）
-         * @param {number} [size] 每页大小
-         * @param {string} [sortBy] 排序字段
-         * @param {string} [sortDirection] 排序方向
+         * @param {LogisticsFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listLogistics(keyword?: string, status?: ListLogisticsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageLogisticsDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listLogistics(keyword, status, page, size, sortBy, sortDirection, options);
+        async listLogistics(filterRequest: LogisticsFilterRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageLogisticsDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listLogistics(filterRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listLogistics']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -20473,16 +20773,14 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 用户查询自己的退款列表，支持分页和状态筛选
+         * 用户查询自己的退款列表，支持分页、状态筛选、时间范围筛选、排序
          * @summary 查询我的退款列表
-         * @param {number} [page] 页码
-         * @param {number} [size] 每页大小
-         * @param {ListMyRefundsStatusEnum} [status] 退款状态（可选）
+         * @param {RefundFilterRequest} filterRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listMyRefunds(page?: number, size?: number, status?: ListMyRefundsStatusEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageRefundRequest>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listMyRefunds(page, size, status, options);
+        async listMyRefunds(filterRequest: RefundFilterRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageRefundRequest>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listMyRefunds(filterRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listMyRefunds']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -20529,21 +20827,35 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 管理员查询系统操作日志（支持分页和筛选）
+         * 管理员查询系统操作日志（支持分页、筛选、排序）
          * @summary 查询操作日志列表
-         * @param {number} [operatorId] 操作人ID
-         * @param {ListOperationLogsActionTypeEnum} [actionType] 操作类型
-         * @param {string} [startTime] 开始时间
-         * @param {string} [endTime] 结束时间
-         * @param {number} [page] 页码
+         * @param {AuditLogFilterRequest} filterRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listOperationLogs(filterRequest: AuditLogFilterRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listOperationLogs(filterRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listOperationLogs']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 管理员查询支付记录列表，支持关键词搜索、状态筛选、支付方式筛选、时间范围筛选
+         * @summary 查询支付记录列表
+         * @param {string} [keyword] 关键词（订单号/用户名/商品名）
+         * @param {string} [status] 订单状态（逗号分隔，如：PAID,COMPLETED,REFUNDED）
+         * @param {string} [paymentMethod] 支付方式（WECHAT/ALIPAY）
+         * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+         * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+         * @param {number} [page] 页码（从0开始）
          * @param {number} [size] 每页大小
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listOperationLogs(operatorId?: number, actionType?: ListOperationLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseMapStringObject>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listOperationLogs(operatorId, actionType, startTime, endTime, page, size, options);
+        async listPayments(keyword?: string, status?: string, paymentMethod?: string, startDate?: string, endDate?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePagePaymentRecordDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPayments(keyword, status, paymentMethod, startDate, endDate, page, size, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listOperationLogs']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listPayments']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -23141,6 +23453,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.deleteCategory(requestParameters.id, options).then((request) => request(axios, basePath));
         },
         /**
+         * 软删除指定纠纷（仅管理员）
+         * @summary 删除纠纷
+         * @param {DefaultApiDeleteDisputeRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteDispute(requestParameters: DefaultApiDeleteDisputeRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.deleteDispute(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 上传者删除自己上传的未评估证据
          * @summary 删除证据
          * @param {DefaultApiDeleteEvidenceRequest} requestParameters Request parameters.
@@ -23271,13 +23593,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.deleteTopic(requestParameters.topicId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员查看退款申请详情
+         * 管理员查看退款申请详情（包含关联商品、用户信息）
          * @summary 退款详情
          * @param {DefaultApiDetailRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        detail(requestParameters: DefaultApiDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundRequest> {
+        detail(requestParameters: DefaultApiDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundResponseDTO> {
             return localVarFp.detail(requestParameters.refundNo, options).then((request) => request(axios, basePath));
         },
         /**
@@ -24120,6 +24442,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getOrderDetail(requestParameters.orderNo, options).then((request) => request(axios, basePath));
         },
         /**
+         * 获取订单详细统计数据（总数、金额、比率、今日统计等）
+         * @summary 获取订单统计
+         * @param {DefaultApiGetOrderStatisticsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOrderStatistics(requestParameters: DefaultApiGetOrderStatisticsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseOrderStatisticsDTO> {
+            return localVarFp.getOrderStatistics(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 根据订单号查询支付详情
+         * @summary 查询支付详情
+         * @param {DefaultApiGetPaymentDetailRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPaymentDetail(requestParameters: DefaultApiGetPaymentDetailRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePaymentRecordDTO> {
+            return localVarFp.getPaymentDetail(requestParameters.orderNo, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 获取所有待审核的申诉列表
          * @summary 查询待审核申诉
          * @param {DefaultApiGetPendingAppealsRequest} requestParameters Request parameters.
@@ -24235,6 +24577,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getRecommendStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRecommendStatisticsDTO> {
             return localVarFp.getRecommendStatistics(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取退款详细统计数据（总数、金额、比率、平均处理时间等）
+         * @summary 获取退款统计
+         * @param {DefaultApiGetRefundStatisticsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRefundStatistics(requestParameters: DefaultApiGetRefundStatisticsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundStatisticsDTO> {
+            return localVarFp.getRefundStatistics(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
         },
         /**
          * 获取按月统计的收入趋势（仅管理员）
@@ -24366,13 +24718,23 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getSlowQueries(requestParameters.hours, options).then((request) => request(axios, basePath));
         },
         /**
+         * 查询支付统计数据（总金额、总次数、成功率、按支付方式统计等）
+         * @summary 查询支付统计
+         * @param {DefaultApiGetStatistics1Request} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStatistics1(requestParameters: DefaultApiGetStatistics1Request = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePaymentStatisticsDTO> {
+            return localVarFp.getStatistics1(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
          * @summary 统计黑名单数量
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatistics1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBlacklistStatsResponse> {
-            return localVarFp.getStatistics1(options).then((request) => request(axios, basePath));
+        getStatistics2(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBlacklistStatsResponse> {
+            return localVarFp.getStatistics2(options).then((request) => request(axios, basePath));
         },
         /**
          * 获取系统核心数据概览（仅管理员）
@@ -24380,7 +24742,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSystemOverview(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
+        getSystemOverview(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseSystemOverviewDTO> {
             return localVarFp.getSystemOverview(options).then((request) => request(axios, basePath));
         },
         /**
@@ -24741,14 +25103,23 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listAllBlacklist(requestParameters.userId, requestParameters.blockedUserId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员查询所有退款，支持分页、状态筛选和关键词搜索
+         * 管理员查询所有退款，支持分页、状态筛选、关键词搜索、时间范围筛选、排序
          * @summary 管理员查询所有退款列表
          * @param {DefaultApiListAllRefundsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listAllRefunds(requestParameters: DefaultApiListAllRefundsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageRefundRequest> {
-            return localVarFp.listAllRefunds(requestParameters.page, requestParameters.size, requestParameters.status, requestParameters.keyword, options).then((request) => request(axios, basePath));
+        listAllRefunds(requestParameters: DefaultApiListAllRefundsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageRefundRequest> {
+            return localVarFp.listAllRefunds(requestParameters.filterRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 获取所有具有ADMIN角色的用户作为仲裁员候选
+         * @summary 获取仲裁员列表
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listArbitrators(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListMapStringObject> {
+            return localVarFp.listArbitrators(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -24761,14 +25132,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listAudit(requestParameters.targetType, requestParameters.targetId, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员查询系统审计日志
+         * 管理员查询系统审计日志，支持分页、筛选、排序
          * @summary 查询审计日志列表
          * @param {DefaultApiListAuditLogsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listAuditLogs(requestParameters: DefaultApiListAuditLogsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageAuditLogResponse> {
-            return localVarFp.listAuditLogs(requestParameters.operatorId, requestParameters.actionType, requestParameters.startTime, requestParameters.endTime, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        listAuditLogs(requestParameters: DefaultApiListAuditLogsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageAuditLogResponse> {
+            return localVarFp.listAuditLogs(requestParameters.filterRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 查询当前可领取的优惠券列表，支持分页
@@ -24839,14 +25210,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listConversations(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员查询所有纠纷（支持筛选）
+         * 管理员查询所有纠纷（支持分页、筛选、排序）
          * @summary 查询纠纷列表
          * @param {DefaultApiListDisputesRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listDisputes(requestParameters: DefaultApiListDisputesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO> {
-            return localVarFp.listDisputes(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        listDisputes(requestParameters: DefaultApiListDisputesRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO> {
+            return localVarFp.listDisputes(requestParameters.filterRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 查询当前用户的收藏列表
@@ -24877,14 +25248,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listFollowings(options).then((request) => request(axios, basePath));
         },
         /**
-         * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选和排序
+         * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选、状态筛选和排序
          * @summary 查询物品列表
          * @param {DefaultApiListGoodsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         listGoods(requestParameters: DefaultApiListGoodsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse> {
-            return localVarFp.listGoods(requestParameters.keyword, requestParameters.categoryId, requestParameters.minPrice, requestParameters.maxPrice, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.tags, options).then((request) => request(axios, basePath));
+            return localVarFp.listGoods(requestParameters.keyword, requestParameters.categoryId, requestParameters.minPrice, requestParameters.maxPrice, requestParameters.status, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.tags, options).then((request) => request(axios, basePath));
         },
         /**
          * 根据热度算法（点赞数*2 + 浏览量 + 回复数*3）排序
@@ -24897,14 +25268,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listHotPosts(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+         * 管理员查看所有物流信息，支持分页、筛选、排序
          * @summary 分页查询物流列表
          * @param {DefaultApiListLogisticsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listLogistics(requestParameters: DefaultApiListLogisticsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageLogisticsDTO> {
-            return localVarFp.listLogistics(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, options).then((request) => request(axios, basePath));
+        listLogistics(requestParameters: DefaultApiListLogisticsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageLogisticsDTO> {
+            return localVarFp.listLogistics(requestParameters.filterRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 获取指定会话的消息历史，按时间倒序
@@ -24957,14 +25328,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listMyLikes(requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 用户查询自己的退款列表，支持分页和状态筛选
+         * 用户查询自己的退款列表，支持分页、状态筛选、时间范围筛选、排序
          * @summary 查询我的退款列表
          * @param {DefaultApiListMyRefundsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listMyRefunds(requestParameters: DefaultApiListMyRefundsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageRefundRequest> {
-            return localVarFp.listMyRefunds(requestParameters.page, requestParameters.size, requestParameters.status, options).then((request) => request(axios, basePath));
+        listMyRefunds(requestParameters: DefaultApiListMyRefundsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageRefundRequest> {
+            return localVarFp.listMyRefunds(requestParameters.filterRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 用户查询自己的举报记录
@@ -24996,14 +25367,24 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.listNotifications(requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
-         * 管理员查询系统操作日志（支持分页和筛选）
+         * 管理员查询系统操作日志（支持分页、筛选、排序）
          * @summary 查询操作日志列表
          * @param {DefaultApiListOperationLogsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listOperationLogs(requestParameters: DefaultApiListOperationLogsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
-            return localVarFp.listOperationLogs(requestParameters.operatorId, requestParameters.actionType, requestParameters.startTime, requestParameters.endTime, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
+        listOperationLogs(requestParameters: DefaultApiListOperationLogsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject> {
+            return localVarFp.listOperationLogs(requestParameters.filterRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 管理员查询支付记录列表，支持关键词搜索、状态筛选、支付方式筛选、时间范围筛选
+         * @summary 查询支付记录列表
+         * @param {DefaultApiListPaymentsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listPayments(requestParameters: DefaultApiListPaymentsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePagePaymentRecordDTO> {
+            return localVarFp.listPayments(requestParameters.keyword, requestParameters.status, requestParameters.paymentMethod, requestParameters.startDate, requestParameters.endDate, requestParameters.page, requestParameters.size, options).then((request) => request(axios, basePath));
         },
         /**
          * 查询待仲裁状态的纠纷列表
@@ -27161,6 +27542,16 @@ export interface DefaultApiInterface {
     deleteCategory(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 软删除指定纠纷（仅管理员）
+     * @summary 删除纠纷
+     * @param {number} id 纠纷ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    deleteDispute(id: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 上传者删除自己上传的未评估证据
      * @summary 删除证据
      * @param {number} evidenceId 证据ID
@@ -27291,14 +27682,14 @@ export interface DefaultApiInterface {
     deleteTopic(topicId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
-     * 管理员查看退款申请详情
+     * 管理员查看退款申请详情（包含关联商品、用户信息）
      * @summary 退款详情
      * @param {string} refundNo 退款单号
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    detail(refundNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundRequest>;
+    detail(refundNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundResponseDTO>;
 
     /**
      * 禁用双因素认证，需要验证用户密码
@@ -28161,6 +28552,27 @@ export interface DefaultApiInterface {
     getOrderDetail(orderNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseOrder>;
 
     /**
+     * 获取订单详细统计数据（总数、金额、比率、今日统计等）
+     * @summary 获取订单统计
+     * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+     * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getOrderStatistics(startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseOrderStatisticsDTO>;
+
+    /**
+     * 根据订单号查询支付详情
+     * @summary 查询支付详情
+     * @param {string} orderNo 订单号
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getPaymentDetail(orderNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePaymentRecordDTO>;
+
+    /**
      * 获取所有待审核的申诉列表
      * @summary 查询待审核申诉
      * @param {number} [page] 
@@ -28278,6 +28690,17 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     getRecommendStatistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRecommendStatisticsDTO>;
+
+    /**
+     * 获取退款详细统计数据（总数、金额、比率、平均处理时间等）
+     * @summary 获取退款统计
+     * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+     * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getRefundStatistics(startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRefundStatisticsDTO>;
 
     /**
      * 获取按月统计的收入趋势（仅管理员）
@@ -28415,13 +28838,24 @@ export interface DefaultApiInterface {
     getSlowQueries(hours?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListApiPerformanceLog>;
 
     /**
+     * 查询支付统计数据（总金额、总次数、成功率、按支付方式统计等）
+     * @summary 查询支付统计
+     * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+     * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getStatistics1(startDate?: string, endDate?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePaymentStatisticsDTO>;
+
+    /**
      * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
      * @summary 统计黑名单数量
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    getStatistics1(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBlacklistStatsResponse>;
+    getStatistics2(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBlacklistStatsResponse>;
 
     /**
      * 获取系统核心数据概览（仅管理员）
@@ -28430,7 +28864,7 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    getSystemOverview(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
+    getSystemOverview(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseSystemOverviewDTO>;
 
     /**
      * 根据ID获取标签详细信息
@@ -28800,17 +29234,23 @@ export interface DefaultApiInterface {
     listAllBlacklist(userId?: number, blockedUserId?: number, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageBlacklist>;
 
     /**
-     * 管理员查询所有退款，支持分页、状态筛选和关键词搜索
+     * 管理员查询所有退款，支持分页、状态筛选、关键词搜索、时间范围筛选、排序
      * @summary 管理员查询所有退款列表
-     * @param {number} [page] 页码
-     * @param {number} [size] 每页大小
-     * @param {ListAllRefundsStatusEnum} [status] 退款状态（可选）
-     * @param {string} [keyword] 搜索关键词（可选，匹配退款单号或订单号）
+     * @param {RefundFilterRequest} filterRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listAllRefunds(page?: number, size?: number, status?: ListAllRefundsStatusEnum, keyword?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageRefundRequest>;
+    listAllRefunds(filterRequest: RefundFilterRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageRefundRequest>;
+
+    /**
+     * 获取所有具有ADMIN角色的用户作为仲裁员候选
+     * @summary 获取仲裁员列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listArbitrators(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListMapStringObject>;
 
     /**
      * 
@@ -28826,19 +29266,14 @@ export interface DefaultApiInterface {
     listAudit(targetType: string, targetId: number, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageComplianceAuditLog>;
 
     /**
-     * 管理员查询系统审计日志
+     * 管理员查询系统审计日志，支持分页、筛选、排序
      * @summary 查询审计日志列表
-     * @param {number} [operatorId] 操作人ID
-     * @param {ListAuditLogsActionTypeEnum} [actionType] 操作类型
-     * @param {string} [startTime] 开始时间
-     * @param {string} [endTime] 结束时间
-     * @param {number} [page] 页码
-     * @param {number} [size] 每页数量
+     * @param {AuditLogFilterRequest} filterRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listAuditLogs(operatorId?: number, actionType?: ListAuditLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageAuditLogResponse>;
+    listAuditLogs(filterRequest: AuditLogFilterRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageAuditLogResponse>;
 
     /**
      * 查询当前可领取的优惠券列表，支持分页
@@ -28917,17 +29352,14 @@ export interface DefaultApiInterface {
     listConversations(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageConversationResponse>;
 
     /**
-     * 管理员查询所有纠纷（支持筛选）
+     * 管理员查询所有纠纷（支持分页、筛选、排序）
      * @summary 查询纠纷列表
-     * @param {string} [keyword] 搜索关键字
-     * @param {ListDisputesStatusEnum} [status] 纠纷状态
-     * @param {number} [page] 页码
-     * @param {number} [size] 每页大小
+     * @param {DisputeFilterRequest} filterRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listDisputes(keyword?: string, status?: ListDisputesStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO>;
+    listDisputes(filterRequest: DisputeFilterRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageDisputeDTO>;
 
     /**
      * 查询当前用户的收藏列表
@@ -28959,12 +29391,13 @@ export interface DefaultApiInterface {
     listFollowings(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListFollowResponse>;
 
     /**
-     * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选和排序
+     * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选、状态筛选和排序
      * @summary 查询物品列表
      * @param {string} [keyword] 搜索关键词
      * @param {number} [categoryId] 分类 ID
      * @param {number} [minPrice] 最低价格
      * @param {number} [maxPrice] 最高价格
+     * @param {ListGoodsStatusEnum} [status] 物品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）
      * @param {number} [page] 页码（从 0 开始）
      * @param {number} [size] 每页数量
      * @param {string} [sortBy] 排序字段（createdAt/price/viewCount）
@@ -28974,7 +29407,7 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listGoods(keyword?: string, categoryId?: number, minPrice?: number, maxPrice?: number, page?: number, size?: number, sortBy?: string, sortDirection?: string, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse>;
+    listGoods(keyword?: string, categoryId?: number, minPrice?: number, maxPrice?: number, status?: ListGoodsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, tags?: Array<number>, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageGoodsResponse>;
 
     /**
      * 根据热度算法（点赞数*2 + 浏览量 + 回复数*3）排序
@@ -28988,19 +29421,14 @@ export interface DefaultApiInterface {
     listHotPosts(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePagePostResponse>;
 
     /**
-     * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+     * 管理员查看所有物流信息，支持分页、筛选、排序
      * @summary 分页查询物流列表
-     * @param {string} [keyword] 关键词（订单ID/快递单号）
-     * @param {ListLogisticsStatusEnum} [status] 物流状态
-     * @param {number} [page] 页码（从0开始）
-     * @param {number} [size] 每页大小
-     * @param {string} [sortBy] 排序字段
-     * @param {string} [sortDirection] 排序方向
+     * @param {LogisticsFilterRequest} filterRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listLogistics(keyword?: string, status?: ListLogisticsStatusEnum, page?: number, size?: number, sortBy?: string, sortDirection?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageLogisticsDTO>;
+    listLogistics(filterRequest: LogisticsFilterRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageLogisticsDTO>;
 
     /**
      * 获取指定会话的消息历史，按时间倒序
@@ -29060,16 +29488,14 @@ export interface DefaultApiInterface {
     listMyLikes(page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePagePostResponse>;
 
     /**
-     * 用户查询自己的退款列表，支持分页和状态筛选
+     * 用户查询自己的退款列表，支持分页、状态筛选、时间范围筛选、排序
      * @summary 查询我的退款列表
-     * @param {number} [page] 页码
-     * @param {number} [size] 每页大小
-     * @param {ListMyRefundsStatusEnum} [status] 退款状态（可选）
+     * @param {RefundFilterRequest} filterRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listMyRefunds(page?: number, size?: number, status?: ListMyRefundsStatusEnum, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageRefundRequest>;
+    listMyRefunds(filterRequest: RefundFilterRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageRefundRequest>;
 
     /**
      * 用户查询自己的举报记录
@@ -29104,19 +29530,30 @@ export interface DefaultApiInterface {
     listNotifications(status?: ListNotificationsStatusEnum, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageNotificationResponse>;
 
     /**
-     * 管理员查询系统操作日志（支持分页和筛选）
+     * 管理员查询系统操作日志（支持分页、筛选、排序）
      * @summary 查询操作日志列表
-     * @param {number} [operatorId] 操作人ID
-     * @param {ListOperationLogsActionTypeEnum} [actionType] 操作类型
-     * @param {string} [startTime] 开始时间
-     * @param {string} [endTime] 结束时间
-     * @param {number} [page] 页码
+     * @param {AuditLogFilterRequest} filterRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    listOperationLogs(filterRequest: AuditLogFilterRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
+
+    /**
+     * 管理员查询支付记录列表，支持关键词搜索、状态筛选、支付方式筛选、时间范围筛选
+     * @summary 查询支付记录列表
+     * @param {string} [keyword] 关键词（订单号/用户名/商品名）
+     * @param {string} [status] 订单状态（逗号分隔，如：PAID,COMPLETED,REFUNDED）
+     * @param {string} [paymentMethod] 支付方式（WECHAT/ALIPAY）
+     * @param {string} [startDate] 开始日期（格式：yyyy-MM-dd）
+     * @param {string} [endDate] 结束日期（格式：yyyy-MM-dd）
+     * @param {number} [page] 页码（从0开始）
      * @param {number} [size] 每页大小
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    listOperationLogs(operatorId?: number, actionType?: ListOperationLogsActionTypeEnum, startTime?: string, endTime?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseMapStringObject>;
+    listPayments(keyword?: string, status?: string, paymentMethod?: string, startDate?: string, endDate?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePagePaymentRecordDTO>;
 
     /**
      * 查询待仲裁状态的纠纷列表
@@ -31721,6 +32158,20 @@ export interface DefaultApiDeleteCategoryRequest {
 }
 
 /**
+ * Request parameters for deleteDispute operation in DefaultApi.
+ * @export
+ * @interface DefaultApiDeleteDisputeRequest
+ */
+export interface DefaultApiDeleteDisputeRequest {
+    /**
+     * 纠纷ID
+     * @type {number}
+     * @memberof DefaultApiDeleteDispute
+     */
+    readonly id: number
+}
+
+/**
  * Request parameters for deleteEvidence operation in DefaultApi.
  * @export
  * @interface DefaultApiDeleteEvidenceRequest
@@ -32974,6 +33425,41 @@ export interface DefaultApiGetOrderDetailRequest {
 }
 
 /**
+ * Request parameters for getOrderStatistics operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetOrderStatisticsRequest
+ */
+export interface DefaultApiGetOrderStatisticsRequest {
+    /**
+     * 开始日期（格式：yyyy-MM-dd）
+     * @type {string}
+     * @memberof DefaultApiGetOrderStatistics
+     */
+    readonly startDate?: string
+
+    /**
+     * 结束日期（格式：yyyy-MM-dd）
+     * @type {string}
+     * @memberof DefaultApiGetOrderStatistics
+     */
+    readonly endDate?: string
+}
+
+/**
+ * Request parameters for getPaymentDetail operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetPaymentDetailRequest
+ */
+export interface DefaultApiGetPaymentDetailRequest {
+    /**
+     * 订单号
+     * @type {string}
+     * @memberof DefaultApiGetPaymentDetail
+     */
+    readonly orderNo: string
+}
+
+/**
  * Request parameters for getPendingAppeals operation in DefaultApi.
  * @export
  * @interface DefaultApiGetPendingAppealsRequest
@@ -33111,6 +33597,27 @@ export interface DefaultApiGetQpsStatisticsRequest {
      * @memberof DefaultApiGetQpsStatistics
      */
     readonly hours?: number
+}
+
+/**
+ * Request parameters for getRefundStatistics operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetRefundStatisticsRequest
+ */
+export interface DefaultApiGetRefundStatisticsRequest {
+    /**
+     * 开始日期（格式：yyyy-MM-dd）
+     * @type {string}
+     * @memberof DefaultApiGetRefundStatistics
+     */
+    readonly startDate?: string
+
+    /**
+     * 结束日期（格式：yyyy-MM-dd）
+     * @type {string}
+     * @memberof DefaultApiGetRefundStatistics
+     */
+    readonly endDate?: string
 }
 
 /**
@@ -33321,6 +33828,27 @@ export interface DefaultApiGetSlowQueriesRequest {
      * @memberof DefaultApiGetSlowQueries
      */
     readonly hours?: number
+}
+
+/**
+ * Request parameters for getStatistics1 operation in DefaultApi.
+ * @export
+ * @interface DefaultApiGetStatistics1Request
+ */
+export interface DefaultApiGetStatistics1Request {
+    /**
+     * 开始日期（格式：yyyy-MM-dd）
+     * @type {string}
+     * @memberof DefaultApiGetStatistics1
+     */
+    readonly startDate?: string
+
+    /**
+     * 结束日期（格式：yyyy-MM-dd）
+     * @type {string}
+     * @memberof DefaultApiGetStatistics1
+     */
+    readonly endDate?: string
 }
 
 /**
@@ -33736,32 +34264,11 @@ export interface DefaultApiListAllBlacklistRequest {
  */
 export interface DefaultApiListAllRefundsRequest {
     /**
-     * 页码
-     * @type {number}
+     * 
+     * @type {RefundFilterRequest}
      * @memberof DefaultApiListAllRefunds
      */
-    readonly page?: number
-
-    /**
-     * 每页大小
-     * @type {number}
-     * @memberof DefaultApiListAllRefunds
-     */
-    readonly size?: number
-
-    /**
-     * 退款状态（可选）
-     * @type {'APPLIED' | 'APPROVED' | 'REJECTED' | 'PROCESSING' | 'REFUNDED' | 'FAILED'}
-     * @memberof DefaultApiListAllRefunds
-     */
-    readonly status?: ListAllRefundsStatusEnum
-
-    /**
-     * 搜索关键词（可选，匹配退款单号或订单号）
-     * @type {string}
-     * @memberof DefaultApiListAllRefunds
-     */
-    readonly keyword?: string
+    readonly filterRequest: RefundFilterRequest
 }
 
 /**
@@ -33806,46 +34313,11 @@ export interface DefaultApiListAuditRequest {
  */
 export interface DefaultApiListAuditLogsRequest {
     /**
-     * 操作人ID
-     * @type {number}
+     * 
+     * @type {AuditLogFilterRequest}
      * @memberof DefaultApiListAuditLogs
      */
-    readonly operatorId?: number
-
-    /**
-     * 操作类型
-     * @type {'USER_LOGIN' | 'USER_REGISTER' | 'USER_BAN' | 'USER_UNBAN' | 'GOODS_CREATE' | 'GOODS_APPROVE' | 'GOODS_DELETE' | 'POST_CREATE' | 'POST_APPROVE' | 'POST_DELETE' | 'REPLY_CREATE' | 'REPLY_DELETE' | 'ORDER_CREATE' | 'ORDER_PAY' | 'ORDER_CANCEL' | 'DISPUTE_CREATE' | 'DISPUTE_UPDATE' | 'DISPUTE_CLOSE' | 'REPORT_CREATE' | 'REPORT_HANDLE' | 'USER_APPEAL' | 'APPEAL_APPROVE' | 'APPEAL_REJECT' | 'APPEAL_CANCEL' | 'COMPLIANCE_CHECK' | 'NOTIFICATION_FAIL' | 'UPDATE' | 'DELETE'}
-     * @memberof DefaultApiListAuditLogs
-     */
-    readonly actionType?: ListAuditLogsActionTypeEnum
-
-    /**
-     * 开始时间
-     * @type {string}
-     * @memberof DefaultApiListAuditLogs
-     */
-    readonly startTime?: string
-
-    /**
-     * 结束时间
-     * @type {string}
-     * @memberof DefaultApiListAuditLogs
-     */
-    readonly endTime?: string
-
-    /**
-     * 页码
-     * @type {number}
-     * @memberof DefaultApiListAuditLogs
-     */
-    readonly page?: number
-
-    /**
-     * 每页数量
-     * @type {number}
-     * @memberof DefaultApiListAuditLogs
-     */
-    readonly size?: number
+    readonly filterRequest: AuditLogFilterRequest
 }
 
 /**
@@ -33981,32 +34453,11 @@ export interface DefaultApiListConversationsRequest {
  */
 export interface DefaultApiListDisputesRequest {
     /**
-     * 搜索关键字
-     * @type {string}
+     * 
+     * @type {DisputeFilterRequest}
      * @memberof DefaultApiListDisputes
      */
-    readonly keyword?: string
-
-    /**
-     * 纠纷状态
-     * @type {'SUBMITTED' | 'NEGOTIATING' | 'PENDING_ARBITRATION' | 'ARBITRATING' | 'COMPLETED' | 'CLOSED'}
-     * @memberof DefaultApiListDisputes
-     */
-    readonly status?: ListDisputesStatusEnum
-
-    /**
-     * 页码
-     * @type {number}
-     * @memberof DefaultApiListDisputes
-     */
-    readonly page?: number
-
-    /**
-     * 每页大小
-     * @type {number}
-     * @memberof DefaultApiListDisputes
-     */
-    readonly size?: number
+    readonly filterRequest: DisputeFilterRequest
 }
 
 /**
@@ -34063,6 +34514,13 @@ export interface DefaultApiListGoodsRequest {
      * @memberof DefaultApiListGoods
      */
     readonly maxPrice?: number
+
+    /**
+     * 物品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）
+     * @type {'PENDING' | 'APPROVED' | 'REJECTED' | 'SOLD' | 'OFFLINE'}
+     * @memberof DefaultApiListGoods
+     */
+    readonly status?: ListGoodsStatusEnum
 
     /**
      * 页码（从 0 开始）
@@ -34128,46 +34586,11 @@ export interface DefaultApiListHotPostsRequest {
  */
 export interface DefaultApiListLogisticsRequest {
     /**
-     * 关键词（订单ID/快递单号）
-     * @type {string}
+     * 
+     * @type {LogisticsFilterRequest}
      * @memberof DefaultApiListLogistics
      */
-    readonly keyword?: string
-
-    /**
-     * 物流状态
-     * @type {'PENDING' | 'PICKED_UP' | 'IN_TRANSIT' | 'DELIVERING' | 'DELIVERED' | 'REJECTED' | 'LOST'}
-     * @memberof DefaultApiListLogistics
-     */
-    readonly status?: ListLogisticsStatusEnum
-
-    /**
-     * 页码（从0开始）
-     * @type {number}
-     * @memberof DefaultApiListLogistics
-     */
-    readonly page?: number
-
-    /**
-     * 每页大小
-     * @type {number}
-     * @memberof DefaultApiListLogistics
-     */
-    readonly size?: number
-
-    /**
-     * 排序字段
-     * @type {string}
-     * @memberof DefaultApiListLogistics
-     */
-    readonly sortBy?: string
-
-    /**
-     * 排序方向
-     * @type {string}
-     * @memberof DefaultApiListLogistics
-     */
-    readonly sortDirection?: string
+    readonly filterRequest: LogisticsFilterRequest
 }
 
 /**
@@ -34296,25 +34719,11 @@ export interface DefaultApiListMyLikesRequest {
  */
 export interface DefaultApiListMyRefundsRequest {
     /**
-     * 页码
-     * @type {number}
+     * 
+     * @type {RefundFilterRequest}
      * @memberof DefaultApiListMyRefunds
      */
-    readonly page?: number
-
-    /**
-     * 每页大小
-     * @type {number}
-     * @memberof DefaultApiListMyRefunds
-     */
-    readonly size?: number
-
-    /**
-     * 退款状态（可选）
-     * @type {'APPLIED' | 'APPROVED' | 'REJECTED' | 'PROCESSING' | 'REFUNDED' | 'FAILED'}
-     * @memberof DefaultApiListMyRefunds
-     */
-    readonly status?: ListMyRefundsStatusEnum
+    readonly filterRequest: RefundFilterRequest
 }
 
 /**
@@ -34373,44 +34782,65 @@ export interface DefaultApiListNotificationsRequest {
  */
 export interface DefaultApiListOperationLogsRequest {
     /**
-     * 操作人ID
-     * @type {number}
+     * 
+     * @type {AuditLogFilterRequest}
      * @memberof DefaultApiListOperationLogs
      */
-    readonly operatorId?: number
+    readonly filterRequest: AuditLogFilterRequest
+}
 
+/**
+ * Request parameters for listPayments operation in DefaultApi.
+ * @export
+ * @interface DefaultApiListPaymentsRequest
+ */
+export interface DefaultApiListPaymentsRequest {
     /**
-     * 操作类型
-     * @type {'USER_LOGIN' | 'USER_REGISTER' | 'USER_BAN' | 'USER_UNBAN' | 'GOODS_CREATE' | 'GOODS_APPROVE' | 'GOODS_DELETE' | 'POST_CREATE' | 'POST_APPROVE' | 'POST_DELETE' | 'REPLY_CREATE' | 'REPLY_DELETE' | 'ORDER_CREATE' | 'ORDER_PAY' | 'ORDER_CANCEL' | 'DISPUTE_CREATE' | 'DISPUTE_UPDATE' | 'DISPUTE_CLOSE' | 'REPORT_CREATE' | 'REPORT_HANDLE' | 'USER_APPEAL' | 'APPEAL_APPROVE' | 'APPEAL_REJECT' | 'APPEAL_CANCEL' | 'COMPLIANCE_CHECK' | 'NOTIFICATION_FAIL' | 'UPDATE' | 'DELETE'}
-     * @memberof DefaultApiListOperationLogs
-     */
-    readonly actionType?: ListOperationLogsActionTypeEnum
-
-    /**
-     * 开始时间
+     * 关键词（订单号/用户名/商品名）
      * @type {string}
-     * @memberof DefaultApiListOperationLogs
+     * @memberof DefaultApiListPayments
      */
-    readonly startTime?: string
+    readonly keyword?: string
 
     /**
-     * 结束时间
+     * 订单状态（逗号分隔，如：PAID,COMPLETED,REFUNDED）
      * @type {string}
-     * @memberof DefaultApiListOperationLogs
+     * @memberof DefaultApiListPayments
      */
-    readonly endTime?: string
+    readonly status?: string
 
     /**
-     * 页码
+     * 支付方式（WECHAT/ALIPAY）
+     * @type {string}
+     * @memberof DefaultApiListPayments
+     */
+    readonly paymentMethod?: string
+
+    /**
+     * 开始日期（格式：yyyy-MM-dd）
+     * @type {string}
+     * @memberof DefaultApiListPayments
+     */
+    readonly startDate?: string
+
+    /**
+     * 结束日期（格式：yyyy-MM-dd）
+     * @type {string}
+     * @memberof DefaultApiListPayments
+     */
+    readonly endDate?: string
+
+    /**
+     * 页码（从0开始）
      * @type {number}
-     * @memberof DefaultApiListOperationLogs
+     * @memberof DefaultApiListPayments
      */
     readonly page?: number
 
     /**
      * 每页大小
      * @type {number}
-     * @memberof DefaultApiListOperationLogs
+     * @memberof DefaultApiListPayments
      */
     readonly size?: number
 }
@@ -37587,6 +38017,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 软删除指定纠纷（仅管理员）
+     * @summary 删除纠纷
+     * @param {DefaultApiDeleteDisputeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public deleteDispute(requestParameters: DefaultApiDeleteDisputeRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deleteDispute(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 上传者删除自己上传的未评估证据
      * @summary 删除证据
      * @param {DefaultApiDeleteEvidenceRequest} requestParameters Request parameters.
@@ -37743,7 +38185,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员查看退款申请详情
+     * 管理员查看退款申请详情（包含关联商品、用户信息）
      * @summary 退款详情
      * @param {DefaultApiDetailRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -38766,6 +39208,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 获取订单详细统计数据（总数、金额、比率、今日统计等）
+     * @summary 获取订单统计
+     * @param {DefaultApiGetOrderStatisticsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getOrderStatistics(requestParameters: DefaultApiGetOrderStatisticsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getOrderStatistics(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 根据订单号查询支付详情
+     * @summary 查询支付详情
+     * @param {DefaultApiGetPaymentDetailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getPaymentDetail(requestParameters: DefaultApiGetPaymentDetailRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getPaymentDetail(requestParameters.orderNo, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 获取所有待审核的申诉列表
      * @summary 查询待审核申诉
      * @param {DefaultApiGetPendingAppealsRequest} requestParameters Request parameters.
@@ -38904,6 +39370,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public getRecommendStatistics(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getRecommendStatistics(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取退款详细统计数据（总数、金额、比率、平均处理时间等）
+     * @summary 获取退款统计
+     * @param {DefaultApiGetRefundStatisticsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getRefundStatistics(requestParameters: DefaultApiGetRefundStatisticsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getRefundStatistics(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39062,14 +39540,26 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 查询支付统计数据（总金额、总次数、成功率、按支付方式统计等）
+     * @summary 查询支付统计
+     * @param {DefaultApiGetStatistics1Request} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getStatistics1(requestParameters: DefaultApiGetStatistics1Request = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStatistics1(requestParameters.startDate, requestParameters.endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 统计系统中的黑名单总数、活跃拉黑者、被拉黑最多的用户等
      * @summary 统计黑名单数量
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getStatistics1(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getStatistics1(options).then((request) => request(this.axios, this.basePath));
+    public getStatistics2(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getStatistics2(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39515,15 +40005,26 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员查询所有退款，支持分页、状态筛选和关键词搜索
+     * 管理员查询所有退款，支持分页、状态筛选、关键词搜索、时间范围筛选、排序
      * @summary 管理员查询所有退款列表
      * @param {DefaultApiListAllRefundsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listAllRefunds(requestParameters: DefaultApiListAllRefundsRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listAllRefunds(requestParameters.page, requestParameters.size, requestParameters.status, requestParameters.keyword, options).then((request) => request(this.axios, this.basePath));
+    public listAllRefunds(requestParameters: DefaultApiListAllRefundsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listAllRefunds(requestParameters.filterRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 获取所有具有ADMIN角色的用户作为仲裁员候选
+     * @summary 获取仲裁员列表
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listArbitrators(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listArbitrators(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39539,15 +40040,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员查询系统审计日志
+     * 管理员查询系统审计日志，支持分页、筛选、排序
      * @summary 查询审计日志列表
      * @param {DefaultApiListAuditLogsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listAuditLogs(requestParameters: DefaultApiListAuditLogsRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listAuditLogs(requestParameters.operatorId, requestParameters.actionType, requestParameters.startTime, requestParameters.endTime, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    public listAuditLogs(requestParameters: DefaultApiListAuditLogsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listAuditLogs(requestParameters.filterRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39633,15 +40134,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员查询所有纠纷（支持筛选）
+     * 管理员查询所有纠纷（支持分页、筛选、排序）
      * @summary 查询纠纷列表
      * @param {DefaultApiListDisputesRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listDisputes(requestParameters: DefaultApiListDisputesRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listDisputes(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    public listDisputes(requestParameters: DefaultApiListDisputesRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listDisputes(requestParameters.filterRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39679,7 +40180,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选和排序
+     * 分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选、状态筛选和排序
      * @summary 查询物品列表
      * @param {DefaultApiListGoodsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -39687,7 +40188,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      * @memberof DefaultApi
      */
     public listGoods(requestParameters: DefaultApiListGoodsRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listGoods(requestParameters.keyword, requestParameters.categoryId, requestParameters.minPrice, requestParameters.maxPrice, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.tags, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).listGoods(requestParameters.keyword, requestParameters.categoryId, requestParameters.minPrice, requestParameters.maxPrice, requestParameters.status, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, requestParameters.tags, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39703,15 +40204,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员查看所有物流信息，支持关键词搜索和状态筛选
+     * 管理员查看所有物流信息，支持分页、筛选、排序
      * @summary 分页查询物流列表
      * @param {DefaultApiListLogisticsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listLogistics(requestParameters: DefaultApiListLogisticsRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listLogistics(requestParameters.keyword, requestParameters.status, requestParameters.page, requestParameters.size, requestParameters.sortBy, requestParameters.sortDirection, options).then((request) => request(this.axios, this.basePath));
+    public listLogistics(requestParameters: DefaultApiListLogisticsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listLogistics(requestParameters.filterRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39775,15 +40276,15 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 用户查询自己的退款列表，支持分页和状态筛选
+     * 用户查询自己的退款列表，支持分页、状态筛选、时间范围筛选、排序
      * @summary 查询我的退款列表
      * @param {DefaultApiListMyRefundsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listMyRefunds(requestParameters: DefaultApiListMyRefundsRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listMyRefunds(requestParameters.page, requestParameters.size, requestParameters.status, options).then((request) => request(this.axios, this.basePath));
+    public listMyRefunds(requestParameters: DefaultApiListMyRefundsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listMyRefunds(requestParameters.filterRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -39822,15 +40323,27 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 管理员查询系统操作日志（支持分页和筛选）
+     * 管理员查询系统操作日志（支持分页、筛选、排序）
      * @summary 查询操作日志列表
      * @param {DefaultApiListOperationLogsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listOperationLogs(requestParameters: DefaultApiListOperationLogsRequest = {}, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listOperationLogs(requestParameters.operatorId, requestParameters.actionType, requestParameters.startTime, requestParameters.endTime, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
+    public listOperationLogs(requestParameters: DefaultApiListOperationLogsRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listOperationLogs(requestParameters.filterRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 管理员查询支付记录列表，支持关键词搜索、状态筛选、支付方式筛选、时间范围筛选
+     * @summary 查询支付记录列表
+     * @param {DefaultApiListPaymentsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public listPayments(requestParameters: DefaultApiListPaymentsRequest = {}, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).listPayments(requestParameters.keyword, requestParameters.status, requestParameters.paymentMethod, requestParameters.startDate, requestParameters.endDate, requestParameters.page, requestParameters.size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -41474,74 +41987,14 @@ export type GetUserDisputesStatusEnum = typeof GetUserDisputesStatusEnum[keyof t
 /**
  * @export
  */
-export const ListAllRefundsStatusEnum = {
-    Applied: 'APPLIED',
+export const ListGoodsStatusEnum = {
+    Pending: 'PENDING',
     Approved: 'APPROVED',
     Rejected: 'REJECTED',
-    Processing: 'PROCESSING',
-    Refunded: 'REFUNDED',
-    Failed: 'FAILED'
+    Sold: 'SOLD',
+    Offline: 'OFFLINE'
 } as const;
-export type ListAllRefundsStatusEnum = typeof ListAllRefundsStatusEnum[keyof typeof ListAllRefundsStatusEnum];
-/**
- * @export
- */
-export const ListAuditLogsActionTypeEnum = {
-    UserLogin: 'USER_LOGIN',
-    UserRegister: 'USER_REGISTER',
-    UserBan: 'USER_BAN',
-    UserUnban: 'USER_UNBAN',
-    GoodsCreate: 'GOODS_CREATE',
-    GoodsApprove: 'GOODS_APPROVE',
-    GoodsDelete: 'GOODS_DELETE',
-    PostCreate: 'POST_CREATE',
-    PostApprove: 'POST_APPROVE',
-    PostDelete: 'POST_DELETE',
-    ReplyCreate: 'REPLY_CREATE',
-    ReplyDelete: 'REPLY_DELETE',
-    OrderCreate: 'ORDER_CREATE',
-    OrderPay: 'ORDER_PAY',
-    OrderCancel: 'ORDER_CANCEL',
-    DisputeCreate: 'DISPUTE_CREATE',
-    DisputeUpdate: 'DISPUTE_UPDATE',
-    DisputeClose: 'DISPUTE_CLOSE',
-    ReportCreate: 'REPORT_CREATE',
-    ReportHandle: 'REPORT_HANDLE',
-    UserAppeal: 'USER_APPEAL',
-    AppealApprove: 'APPEAL_APPROVE',
-    AppealReject: 'APPEAL_REJECT',
-    AppealCancel: 'APPEAL_CANCEL',
-    ComplianceCheck: 'COMPLIANCE_CHECK',
-    NotificationFail: 'NOTIFICATION_FAIL',
-    Update: 'UPDATE',
-    Delete: 'DELETE'
-} as const;
-export type ListAuditLogsActionTypeEnum = typeof ListAuditLogsActionTypeEnum[keyof typeof ListAuditLogsActionTypeEnum];
-/**
- * @export
- */
-export const ListDisputesStatusEnum = {
-    Submitted: 'SUBMITTED',
-    Negotiating: 'NEGOTIATING',
-    PendingArbitration: 'PENDING_ARBITRATION',
-    Arbitrating: 'ARBITRATING',
-    Completed: 'COMPLETED',
-    Closed: 'CLOSED'
-} as const;
-export type ListDisputesStatusEnum = typeof ListDisputesStatusEnum[keyof typeof ListDisputesStatusEnum];
-/**
- * @export
- */
-export const ListLogisticsStatusEnum = {
-    Pending: 'PENDING',
-    PickedUp: 'PICKED_UP',
-    InTransit: 'IN_TRANSIT',
-    Delivering: 'DELIVERING',
-    Delivered: 'DELIVERED',
-    Rejected: 'REJECTED',
-    Lost: 'LOST'
-} as const;
-export type ListLogisticsStatusEnum = typeof ListLogisticsStatusEnum[keyof typeof ListLogisticsStatusEnum];
+export type ListGoodsStatusEnum = typeof ListGoodsStatusEnum[keyof typeof ListGoodsStatusEnum];
 /**
  * @export
  */
@@ -41557,58 +42010,12 @@ export type ListMyDisputesStatusEnum = typeof ListMyDisputesStatusEnum[keyof typ
 /**
  * @export
  */
-export const ListMyRefundsStatusEnum = {
-    Applied: 'APPLIED',
-    Approved: 'APPROVED',
-    Rejected: 'REJECTED',
-    Processing: 'PROCESSING',
-    Refunded: 'REFUNDED',
-    Failed: 'FAILED'
-} as const;
-export type ListMyRefundsStatusEnum = typeof ListMyRefundsStatusEnum[keyof typeof ListMyRefundsStatusEnum];
-/**
- * @export
- */
 export const ListNotificationsStatusEnum = {
     Unread: 'UNREAD',
     Read: 'READ',
     Deleted: 'DELETED'
 } as const;
 export type ListNotificationsStatusEnum = typeof ListNotificationsStatusEnum[keyof typeof ListNotificationsStatusEnum];
-/**
- * @export
- */
-export const ListOperationLogsActionTypeEnum = {
-    UserLogin: 'USER_LOGIN',
-    UserRegister: 'USER_REGISTER',
-    UserBan: 'USER_BAN',
-    UserUnban: 'USER_UNBAN',
-    GoodsCreate: 'GOODS_CREATE',
-    GoodsApprove: 'GOODS_APPROVE',
-    GoodsDelete: 'GOODS_DELETE',
-    PostCreate: 'POST_CREATE',
-    PostApprove: 'POST_APPROVE',
-    PostDelete: 'POST_DELETE',
-    ReplyCreate: 'REPLY_CREATE',
-    ReplyDelete: 'REPLY_DELETE',
-    OrderCreate: 'ORDER_CREATE',
-    OrderPay: 'ORDER_PAY',
-    OrderCancel: 'ORDER_CANCEL',
-    DisputeCreate: 'DISPUTE_CREATE',
-    DisputeUpdate: 'DISPUTE_UPDATE',
-    DisputeClose: 'DISPUTE_CLOSE',
-    ReportCreate: 'REPORT_CREATE',
-    ReportHandle: 'REPORT_HANDLE',
-    UserAppeal: 'USER_APPEAL',
-    AppealApprove: 'APPEAL_APPROVE',
-    AppealReject: 'APPEAL_REJECT',
-    AppealCancel: 'APPEAL_CANCEL',
-    ComplianceCheck: 'COMPLIANCE_CHECK',
-    NotificationFail: 'NOTIFICATION_FAIL',
-    Update: 'UPDATE',
-    Delete: 'DELETE'
-} as const;
-export type ListOperationLogsActionTypeEnum = typeof ListOperationLogsActionTypeEnum[keyof typeof ListOperationLogsActionTypeEnum];
 /**
  * @export
  */

@@ -13,84 +13,66 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
- * 业务数据载荷
+ * 系统概览统计数据
  * @export
- * @interface PageObject
+ * @interface SystemOverviewDTO
  */
-export interface PageObject {
+export interface SystemOverviewDTO {
     /**
-     * 
+     * 总用户数
      * @type {number}
-     * @memberof PageObject
+     * @memberof SystemOverviewDTO
      */
-    'totalElements'?: number;
+    'totalUsers'?: number;
     /**
-     * 
+     * 总商品数
      * @type {number}
-     * @memberof PageObject
+     * @memberof SystemOverviewDTO
      */
-    'totalPages'?: number;
+    'totalGoods'?: number;
     /**
-     * 
+     * 总订单数
      * @type {number}
-     * @memberof PageObject
+     * @memberof SystemOverviewDTO
      */
-    'size'?: number;
+    'totalOrders'?: number;
     /**
-     * 
-     * @type {Array<object>}
-     * @memberof PageObject
-     */
-    'content'?: Array<object>;
-    /**
-     * 
+     * 总收入（元）
      * @type {number}
-     * @memberof PageObject
+     * @memberof SystemOverviewDTO
      */
-    'number'?: number;
+    'totalRevenue'?: number;
     /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageObject
-     */
-    'sort'?: Array<SortObject>;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'last'?: boolean;
-    /**
-     * 
+     * 今日新增用户
      * @type {number}
-     * @memberof PageObject
+     * @memberof SystemOverviewDTO
      */
-    'numberOfElements'?: number;
+    'todayNewUsers'?: number;
     /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageObject
+     * 今日新增商品
+     * @type {number}
+     * @memberof SystemOverviewDTO
      */
-    'pageable'?: PageableObject;
+    'todayNewGoods'?: number;
     /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
+     * 今日新增订单
+     * @type {number}
+     * @memberof SystemOverviewDTO
      */
-    'empty'?: boolean;
+    'todayNewOrders'?: number;
+    /**
+     * 活跃用户数（30天内）
+     * @type {number}
+     * @memberof SystemOverviewDTO
+     */
+    'activeUsers'?: number;
+    /**
+     * 待审核商品数
+     * @type {number}
+     * @memberof SystemOverviewDTO
+     */
+    'pendingGoods'?: number;
 }
 

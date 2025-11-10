@@ -18,78 +18,81 @@
 import type { PageableObject } from './pageable-object';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { PaymentRecordDTO } from './payment-record-dto';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { SortObject } from './sort-object';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageObject
+ * @interface PagePaymentRecordDTO
  */
-export interface PageObject {
+export interface PagePaymentRecordDTO {
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'totalElements'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'totalPages'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'size'?: number;
     /**
      * 
-     * @type {Array<object>}
-     * @memberof PageObject
+     * @type {Array<PaymentRecordDTO>}
+     * @memberof PagePaymentRecordDTO
      */
-    'content'?: Array<object>;
+    'content'?: Array<PaymentRecordDTO>;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'number'?: number;
     /**
      * 
      * @type {Array<SortObject>}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'sort'?: Array<SortObject>;
     /**
      * 
      * @type {boolean}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'first'?: boolean;
     /**
      * 
      * @type {boolean}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'last'?: boolean;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'numberOfElements'?: number;
     /**
      * 
      * @type {PageableObject}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}
-     * @memberof PageObject
+     * @memberof PagePaymentRecordDTO
      */
     'empty'?: boolean;
 }

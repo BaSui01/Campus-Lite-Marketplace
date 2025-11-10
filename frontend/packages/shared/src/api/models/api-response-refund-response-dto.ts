@@ -15,49 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { SortObject } from './sort-object';
+import type { RefundResponseDTO } from './refund-response-dto';
 
 /**
- * 
+ * 统一响应包装结构
  * @export
- * @interface PageableObject
+ * @interface ApiResponseRefundResponseDTO
  */
-export interface PageableObject {
+export interface ApiResponseRefundResponseDTO {
     /**
-     * 
+     * 业务状态码，0 表示成功
      * @type {number}
-     * @memberof PageableObject
+     * @memberof ApiResponseRefundResponseDTO
      */
-    'offset'?: number;
+    'code'?: number;
+    /**
+     * 人类可读的响应消息
+     * @type {string}
+     * @memberof ApiResponseRefundResponseDTO
+     */
+    'message'?: string;
     /**
      * 
-     * @type {Array<SortObject>}
-     * @memberof PageableObject
+     * @type {RefundResponseDTO}
+     * @memberof ApiResponseRefundResponseDTO
      */
-    'sort'?: Array<SortObject>;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'paged'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'unpaged'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageSize'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageNumber'?: number;
+    'data'?: RefundResponseDTO | null;
 }
 

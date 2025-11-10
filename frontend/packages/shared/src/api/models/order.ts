@@ -188,7 +188,9 @@ export const OrderStatusEnum = {
     Delivered: 'DELIVERED',
     Completed: 'COMPLETED',
     Cancelled: 'CANCELLED',
-    Reviewed: 'REVIEWED'
+    Reviewed: 'REVIEWED',
+    Refunding: 'REFUNDING',
+    Refunded: 'REFUNDED'
 } as const;
 
 export type OrderStatusEnum = typeof OrderStatusEnum[keyof typeof OrderStatusEnum];

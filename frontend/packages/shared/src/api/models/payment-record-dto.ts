@@ -13,84 +13,78 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
- * 业务数据载荷
+ * 
  * @export
- * @interface PageObject
+ * @interface PaymentRecordDTO
  */
-export interface PageObject {
+export interface PaymentRecordDTO {
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PaymentRecordDTO
      */
-    'totalElements'?: number;
+    'id'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaymentRecordDTO
+     */
+    'orderNo'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaymentRecordDTO
+     */
+    'transactionId'?: string;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PaymentRecordDTO
      */
-    'totalPages'?: number;
+    'amount'?: number;
     /**
      * 
-     * @type {number}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof PaymentRecordDTO
      */
-    'size'?: number;
+    'paymentMethod'?: string;
     /**
      * 
-     * @type {Array<object>}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof PaymentRecordDTO
      */
-    'content'?: Array<object>;
+    'status'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof PaymentRecordDTO
      */
-    'number'?: number;
+    'paidAt'?: string;
     /**
      * 
-     * @type {Array<SortObject>}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof PaymentRecordDTO
      */
-    'sort'?: Array<SortObject>;
+    'createdAt'?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof PaymentRecordDTO
      */
-    'first'?: boolean;
+    'goodsTitle'?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof PaymentRecordDTO
      */
-    'last'?: boolean;
+    'buyerUsername'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof PaymentRecordDTO
      */
-    'numberOfElements'?: number;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageObject
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'empty'?: boolean;
+    'sellerUsername'?: string;
 }
 

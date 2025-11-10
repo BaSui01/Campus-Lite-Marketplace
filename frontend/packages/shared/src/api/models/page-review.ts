@@ -67,12 +67,6 @@ export interface PageReview {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {number}
-     * @memberof PageReview
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageReview
      */
@@ -83,6 +77,12 @@ export interface PageReview {
      * @memberof PageReview
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageReview
+     */
+    'numberOfElements'?: number;
     /**
      * 
      * @type {PageableObject}

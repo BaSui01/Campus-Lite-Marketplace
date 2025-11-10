@@ -109,13 +109,13 @@ export interface NegotiationMessageDTO {
      * @type {boolean}
      * @memberof NegotiationMessageDTO
      */
-    'accepted'?: boolean;
+    'proposal'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof NegotiationMessageDTO
      */
-    'proposal'?: boolean;
+    'accepted'?: boolean;
 }
 
 export const NegotiationMessageDTOSenderRoleEnum = {

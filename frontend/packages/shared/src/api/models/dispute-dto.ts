@@ -49,6 +49,12 @@ export interface DisputeDTO {
      * @type {number}
      * @memberof DisputeDTO
      */
+    'amount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DisputeDTO
+     */
     'initiatorId'?: number;
     /**
      * 

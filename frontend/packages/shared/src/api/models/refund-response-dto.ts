@@ -15,121 +15,136 @@
 
 
 /**
- * 
+ * 业务数据载荷
  * @export
- * @interface OrderResponse
+ * @interface RefundResponseDTO
  */
-export interface OrderResponse {
+export interface RefundResponseDTO {
     /**
      * 
      * @type {number}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
      */
     'id'?: number;
     /**
      * 
      * @type {string}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
+     */
+    'refundNo'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RefundResponseDTO
      */
     'orderNo'?: string;
     /**
      * 
      * @type {number}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
+     */
+    'amount'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RefundResponseDTO
+     */
+    'reason'?: string;
+    /**
+     * 
+     * @type {{ [key: string]: object; }}
+     * @memberof RefundResponseDTO
+     */
+    'evidence'?: { [key: string]: object; };
+    /**
+     * 
+     * @type {string}
+     * @memberof RefundResponseDTO
+     */
+    'status'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RefundResponseDTO
+     */
+    'channel'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RefundResponseDTO
+     */
+    'retryCount'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RefundResponseDTO
+     */
+    'lastError'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RefundResponseDTO
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RefundResponseDTO
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RefundResponseDTO
      */
     'goodsId'?: number;
     /**
      * 
      * @type {string}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
      */
     'goodsTitle'?: string;
     /**
      * 
      * @type {string}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
      */
     'goodsImage'?: string;
     /**
      * 
      * @type {number}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
      */
     'buyerId'?: number;
     /**
      * 
      * @type {string}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
      */
     'buyerUsername'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof RefundResponseDTO
+     */
+    'buyerAvatar'?: string;
+    /**
+     * 
      * @type {number}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
      */
     'sellerId'?: number;
     /**
      * 
      * @type {string}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
      */
     'sellerUsername'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof OrderResponse
-     */
-    'amount'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof OrderResponse
-     */
-    'discountAmount'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof OrderResponse
-     */
-    'actualAmount'?: number;
-    /**
-     * 
      * @type {string}
-     * @memberof OrderResponse
+     * @memberof RefundResponseDTO
      */
-    'status'?: OrderResponseStatusEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof OrderResponse
-     */
-    'paymentMethod'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OrderResponse
-     */
-    'paymentTime'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OrderResponse
-     */
-    'createdAt'?: string;
+    'sellerAvatar'?: string;
 }
-
-export const OrderResponseStatusEnum = {
-    PendingPayment: 'PENDING_PAYMENT',
-    Paid: 'PAID',
-    Shipped: 'SHIPPED',
-    Delivered: 'DELIVERED',
-    Completed: 'COMPLETED',
-    Cancelled: 'CANCELLED',
-    Reviewed: 'REVIEWED',
-    Refunding: 'REFUNDING',
-    Refunded: 'REFUNDED'
-} as const;
-
-export type OrderResponseStatusEnum = typeof OrderResponseStatusEnum[keyof typeof OrderResponseStatusEnum];
-
 

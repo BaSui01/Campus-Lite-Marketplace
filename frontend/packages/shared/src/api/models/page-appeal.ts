@@ -67,12 +67,6 @@ export interface PageAppeal {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {number}
-     * @memberof PageAppeal
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageAppeal
      */
@@ -83,6 +77,12 @@ export interface PageAppeal {
      * @memberof PageAppeal
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageAppeal
+     */
+    'numberOfElements'?: number;
     /**
      * 
      * @type {PageableObject}

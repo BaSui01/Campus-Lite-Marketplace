@@ -13,84 +13,60 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageObject
+ * @interface PaymentStatisticsDTO
  */
-export interface PageObject {
+export interface PaymentStatisticsDTO {
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PaymentStatisticsDTO
      */
-    'totalElements'?: number;
+    'totalAmount'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PaymentStatisticsDTO
      */
-    'totalPages'?: number;
+    'totalPayments'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PaymentStatisticsDTO
      */
-    'size'?: number;
-    /**
-     * 
-     * @type {Array<object>}
-     * @memberof PageObject
-     */
-    'content'?: Array<object>;
+    'successPayments'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PaymentStatisticsDTO
      */
-    'number'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageObject
-     */
-    'sort'?: Array<SortObject>;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'last'?: boolean;
+    'failedPayments'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof PaymentStatisticsDTO
      */
-    'numberOfElements'?: number;
+    'refundedPayments'?: number;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageObject
+     * @type {{ [key: string]: number; }}
+     * @memberof PaymentStatisticsDTO
      */
-    'pageable'?: PageableObject;
+    'amountByMethod'?: { [key: string]: number; };
     /**
      * 
-     * @type {boolean}
-     * @memberof PageObject
+     * @type {{ [key: string]: number; }}
+     * @memberof PaymentStatisticsDTO
      */
-    'empty'?: boolean;
+    'countByMethod'?: { [key: string]: number; };
+    /**
+     * 
+     * @type {number}
+     * @memberof PaymentStatisticsDTO
+     */
+    'averageAmount'?: number;
 }
 
