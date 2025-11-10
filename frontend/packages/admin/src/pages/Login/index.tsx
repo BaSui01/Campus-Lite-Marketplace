@@ -44,30 +44,20 @@ const Login: React.FC = () => {
 
     setLoading(true);
 
+    // 🔐 加密密码
+    const encryptedPassword = encryptPassword(values.password);
+    console.log('✅ 密码已加密传输');
+
+    // ✅ 发送加密后的密码 + 验证码数据
+    const loginParams = {
+      username: values.username,
+      password: encryptedPassword,
+      captchaId: captchaData.captchaId,   // ✅ 验证码ID
+      captchaCode: captchaData.code,       // ✅ 验证码输入
+    };
+
     try {
-      // 🔐 加密密码
-      const encryptedPassword = encryptPassword(values.password);
-      console.log('✅ 密码已加密传输');
-
-      // ✅ 发送加密后的密码 + 验证码数据
-      const loginParams = {
-        username: values.username,
-        password: encryptedPassword,
-        captchaId: captchaData.captchaId,   // ✅ 验证码ID
-        captchaCode: captchaData.code,       // ✅ 验证码输入
-      };
-
-      const response = await login(loginParams);
-
-      // 🔐 检查是否需要 2FA 验证（新增 - BaSui 2025-11-10）
-      if (response?.requires2FA) {
-        console.log('[AdminLogin] 🔐 需要 2FA 验证');
-        setShow2FAVerify(true);
-        setTempToken(response.tempToken || '');
-        setFormValues(loginParams);
-        setLoading(false);
-        return;
-      }
+      await login(loginParams);
 
       message.success('欢迎回来，管理员！😎');
 
@@ -75,6 +65,17 @@ const Login: React.FC = () => {
       navigate('/admin/dashboard');
     } catch (error: any) {
       console.error('❌ 登录失败:', error);
+
+      // 🔐 检查是否需要 2FA 验证（新增 - BaSui 2025-11-10）
+      if (error?.message === 'REQUIRES_2FA' && error?.requires2FA) {
+        console.log('[AdminLogin] 🔐 需要 2FA 验证');
+        setShow2FAVerify(true);
+        setTempToken(error.tempToken || '');
+        setFormValues(loginParams);
+        setLoading(false);
+        return;
+      }
+
       message.error(error?.message || '登录失败，请稍后再试');
 
       // 🔄 重置验证码

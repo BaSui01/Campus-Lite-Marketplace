@@ -127,9 +127,17 @@ export const SliderCaptcha: React.FC<SliderCaptchaProps> = ({
 
     setIsSliding(true);
     setIsFailed(false);
-    setStartX(event.clientX);
+    
+    // ✅ 修复：使用 getBoundingClientRect() 获取轨道精确位置
+    const trackRect = trackRef.current?.getBoundingClientRect();
+    if (!trackRect) return;
+    
+    // 记录鼠标在轨道内的相对位置（而非视口位置）
+    setStartX(event.clientX - trackRect.left);
     setStartTime(Date.now());
     setTrack([{ x: 0, y: 0, t: 0 }]); // 初始化轨迹
+    
+    console.log('🎯 [SliderCaptcha] 开始滑动 - startX:', event.clientX - trackRect.left);
   };
 
   /**
@@ -138,11 +146,17 @@ export const SliderCaptcha: React.FC<SliderCaptchaProps> = ({
   const handleMouseMove = (event: MouseEvent) => {
     if (!isSliding || isSuccess || !slideData) return;
 
+    // ✅ 修复：每次移动时重新获取轨道位置（防止页面滚动导致偏移）
+    const trackRect = trackRef.current?.getBoundingClientRect();
+    if (!trackRect) return;
+
     const trackWidth = trackRef.current?.offsetWidth || 0;
     const sliderWidth = sliderRef.current?.offsetWidth || 0;
     const maxLeft = trackWidth - sliderWidth;
 
-    const distance = event.clientX - startX;
+    // ✅ 修复：计算鼠标在轨道内的实际位置
+    const currentX = event.clientX - trackRect.left;
+    const distance = currentX - startX;
     const newLeft = Math.max(0, Math.min(distance, maxLeft));
 
     setSliderLeft(newLeft);
@@ -167,14 +181,15 @@ export const SliderCaptcha: React.FC<SliderCaptchaProps> = ({
     try {
       console.log('🔍 [SliderCaptcha] 正在验证滑块位置...');
       console.log('📊 滑动轨迹点数:', track.length);
+      console.log('📍 最终滑块位置:', Math.round(sliderLeft), 'px');
 
       // ✅ 调用后端API验证（带轨迹分析）
       const request: SlideVerifyRequest = {
         slideId: slideData.slideId!,
         xposition: Math.round(sliderLeft), // 修正字段名（后端是 xposition 而不是 xPosition）
         track: track.map((p) => ({
-          x: p.x,
-          y: p.y,
+          x: Math.round(p.x), // ✅ 四舍五入，避免浮点数误差
+          y: Math.round(p.y),
           t: p.t,
         })),
       };
@@ -219,19 +234,32 @@ export const SliderCaptcha: React.FC<SliderCaptchaProps> = ({
 
     setIsSliding(true);
     setIsFailed(false);
-    setStartX(event.touches[0].clientX);
+    
+    // ✅ 修复：使用 getBoundingClientRect() 获取轨道精确位置
+    const trackRect = trackRef.current?.getBoundingClientRect();
+    if (!trackRect) return;
+    
+    setStartX(event.touches[0].clientX - trackRect.left);
     setStartTime(Date.now());
     setTrack([{ x: 0, y: 0, t: 0 }]);
+    
+    console.log('📱 [SliderCaptcha] 触摸开始 - startX:', event.touches[0].clientX - trackRect.left);
   };
 
   const handleTouchMove = (event: TouchEvent) => {
     if (!isSliding || isSuccess || !slideData) return;
 
+    // ✅ 修复：每次移动时重新获取轨道位置
+    const trackRect = trackRef.current?.getBoundingClientRect();
+    if (!trackRect) return;
+
     const trackWidth = trackRef.current?.offsetWidth || 0;
     const sliderWidth = sliderRef.current?.offsetWidth || 0;
     const maxLeft = trackWidth - sliderWidth;
 
-    const distance = event.touches[0].clientX - startX;
+    // ✅ 修复：计算触摸点在轨道内的实际位置
+    const currentX = event.touches[0].clientX - trackRect.left;
+    const distance = currentX - startX;
     const newLeft = Math.max(0, Math.min(distance, maxLeft));
 
     setSliderLeft(newLeft);

@@ -1,5 +1,6 @@
 package com.campus.marketplace.service.impl;
 
+import com.campus.marketplace.common.dto.response.SystemOverviewDTO;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.enums.OrderStatus;
 import com.campus.marketplace.repository.*;
@@ -17,11 +18,12 @@ import java.util.stream.Collectors;
 
 /**
  * 数据统计服务实现类
- * 
+ *
  * 功能：系统数据统计和分析
- * 
+ *
  * @author BaSui
  * @date 2025-10-27
+ * @updated 2025-11-10 - 使用强类型 DTO 替代 Map<String, Object> 😎
  */
 @Slf4j
 @Service
@@ -34,32 +36,75 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public Map<String, Object> getSystemOverview() {
-        Map<String, Object> overview = new HashMap<>();
-        
+    public SystemOverviewDTO getSystemOverview() {
         try {
+            // ==================== 总体统计 ====================
             long totalUsers = userRepository.count();
             long totalGoods = goodsRepository.count();
             long totalOrders = orderRepository.count();
-            
+
             // 计算总收入（已完成订单）
             BigDecimal totalRevenue = orderRepository.findAll().stream()
                     .filter(order -> order.getStatus() == OrderStatus.COMPLETED)
                     .map(order -> order.getActualAmount())
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            
-            overview.put("totalUsers", totalUsers);
-            overview.put("totalGoods", totalGoods);
-            overview.put("totalOrders", totalOrders);
-            overview.put("totalRevenue", totalRevenue);
-            
-            log.debug("✅ 系统概览统计成功: users={}, goods={}, orders={}, revenue={}", 
+
+            // ==================== 今日统计 ====================
+            LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+
+            long todayNewUsers = userRepository.findAll().stream()
+                    .filter(user -> user.getCreatedAt().isAfter(todayStart))
+                    .count();
+
+            long todayNewGoods = goodsRepository.findAll().stream()
+                    .filter(goods -> goods.getCreatedAt().isAfter(todayStart))
+                    .count();
+
+            long todayNewOrders = orderRepository.findAll().stream()
+                    .filter(order -> order.getCreatedAt().isAfter(todayStart))
+                    .count();
+
+            // ==================== 活跃统计 ====================
+            long activeUsers = userRepository.findAll().stream()
+                    .filter(user -> user.isActive())
+                    .count();
+
+            long pendingGoods = goodsRepository.findAll().stream()
+                    .filter(goods -> goods.getStatus() == GoodsStatus.PENDING)
+                    .count();
+
+            // ==================== 构建 DTO ====================
+            SystemOverviewDTO overview = SystemOverviewDTO.builder()
+                    .totalUsers(totalUsers)
+                    .totalGoods(totalGoods)
+                    .totalOrders(totalOrders)
+                    .totalRevenue(totalRevenue)
+                    .todayNewUsers(todayNewUsers)
+                    .todayNewGoods(todayNewGoods)
+                    .todayNewOrders(todayNewOrders)
+                    .activeUsers(activeUsers)
+                    .pendingGoods(pendingGoods)
+                    .build();
+
+            log.debug("✅ 系统概览统计成功: users={}, goods={}, orders={}, revenue={}",
                     totalUsers, totalGoods, totalOrders, totalRevenue);
+
+            return overview;
         } catch (Exception e) {
             log.error("❌ 系统概览统计失败: {}", e.getMessage());
+            // 返回空数据的 DTO
+            return SystemOverviewDTO.builder()
+                    .totalUsers(0L)
+                    .totalGoods(0L)
+                    .totalOrders(0L)
+                    .totalRevenue(BigDecimal.ZERO)
+                    .todayNewUsers(0L)
+                    .todayNewGoods(0L)
+                    .todayNewOrders(0L)
+                    .activeUsers(0L)
+                    .pendingGoods(0L)
+                    .build();
         }
-        
-        return overview;
     }
 
     @Override

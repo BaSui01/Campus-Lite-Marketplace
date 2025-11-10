@@ -417,6 +417,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
     public void recordLoginDevice(Long userId, jakarta.servlet.http.HttpServletRequest request) {
         log.info("记录登录设备: userId={}", userId);
 

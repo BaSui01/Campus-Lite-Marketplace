@@ -165,11 +165,13 @@ export const GoodsDetail: React.FC = () => {
             />
 
             {/* 卖家信息卡片 */}
-            {goods.sellerId && (
+            {goods.seller && (
               <SellerCard
-                sellerId={goods.sellerId}
-                sellerName={goods.sellerUsername || '匿名用户'}
-                sellerAvatar={goods.sellerAvatar}
+                sellerId={goods.seller.id!}
+                sellerName={goods.seller.username || '匿名用户'}
+                sellerAvatar={goods.seller.avatar}
+                sellerRating={goods.seller.rating}  // 🆕 卖家评分
+                sellerGoodsCount={goods.seller.goodsCount}  // 🆕 在售商品数量
                 onContact={handleContact}
               />
             )}

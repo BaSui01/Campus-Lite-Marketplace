@@ -110,6 +110,30 @@ export interface GoodsDetailResponse {
      * @memberof GoodsDetailResponse
      */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof GoodsDetailResponse
+     */
+    'isFavorited'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof GoodsDetailResponse
+     */
+    'condition'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GoodsDetailResponse
+     */
+    'deliveryMethod'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GoodsDetailResponse
+     */
+    'originalPrice'?: number;
 }
 
 export const GoodsDetailResponseStatusEnum = {

@@ -110,4 +110,72 @@ public class CaptchaController {
         boolean isValid = captchaService.verifySlideCaptchaWithTrack(request);
         return ApiResponse.success("验证完成", isValid);
     }
+
+    /**
+     * 生成旋转验证码
+     *
+     * GET /api/captcha/rotate
+     */
+    @GetMapping("/rotate")
+    @Operation(
+            summary = "生成旋转验证码",
+            description = "生成旋转验证码，返回原始图片和旋转后的图片"
+    )
+    public ApiResponse<com.campus.marketplace.common.dto.response.RotateCaptchaResponse> generateRotateCaptcha() {
+        log.info("收到生成旋转验证码请求");
+        com.campus.marketplace.common.dto.response.RotateCaptchaResponse response = captchaService.generateRotateCaptcha();
+        return ApiResponse.success("旋转验证码生成成功", response);
+    }
+
+    /**
+     * 验证旋转验证码
+     *
+     * POST /api/captcha/rotate/verify
+     */
+    @PostMapping("/rotate/verify")
+    @Operation(
+            summary = "验证旋转验证码",
+            description = "验证用户旋转的角度是否正确（允许±10度误差）"
+    )
+    public ApiResponse<Boolean> verifyRotateCaptcha(
+            @RequestBody @org.springframework.validation.annotation.Validated com.campus.marketplace.common.dto.request.RotateVerifyRequest request
+    ) {
+        log.info("收到验证旋转请求: rotateId={}, angle={}", request.getRotateId(), request.getAngle());
+        boolean isValid = captchaService.verifyRotateCaptcha(request);
+        return ApiResponse.success("验证完成", isValid);
+    }
+
+    /**
+     * 生成点选验证码
+     *
+     * GET /api/captcha/click
+     */
+    @GetMapping("/click")
+    @Operation(
+            summary = "生成点选验证码",
+            description = "生成点选验证码，返回背景图片和需要点击的文字"
+    )
+    public ApiResponse<com.campus.marketplace.common.dto.response.ClickCaptchaResponse> generateClickCaptcha() {
+        log.info("收到生成点选验证码请求");
+        com.campus.marketplace.common.dto.response.ClickCaptchaResponse response = captchaService.generateClickCaptcha();
+        return ApiResponse.success("点选验证码生成成功", response);
+    }
+
+    /**
+     * 验证点选验证码
+     *
+     * POST /api/captcha/click/verify
+     */
+    @PostMapping("/click/verify")
+    @Operation(
+            summary = "验证点选验证码",
+            description = "验证用户点击的位置是否正确（允许±20px误差）"
+    )
+    public ApiResponse<Boolean> verifyClickCaptcha(
+            @RequestBody @org.springframework.validation.annotation.Validated com.campus.marketplace.common.dto.request.ClickVerifyRequest request
+    ) {
+        log.info("收到验证点选请求: clickId={}, points={}", request.getClickId(), request.getClickPoints().size());
+        boolean isValid = captchaService.verifyClickCaptcha(request);
+        return ApiResponse.success("验证完成", isValid);
+    }
 }

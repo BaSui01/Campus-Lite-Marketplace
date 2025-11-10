@@ -81,6 +81,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/slide/image")).permitAll()
                         .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/slide/verify")).permitAll()
                         .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/slide/verify/track")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/rotate")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/rotate/verify")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/click")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/click/verify")).permitAll()
                         
                         // 公共查询接口
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/search", "/search/**")).permitAll()

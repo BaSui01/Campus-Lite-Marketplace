@@ -211,4 +211,12 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
      * 🎯 BaSui 新增：按分类和状态统计商品数量
      */
     long countByCategoryIdAndStatus(Long categoryId, com.campus.marketplace.common.enums.GoodsStatus status);
+
+    /**
+     * 统计卖家的在售商品数量（前端需要）
+     * @param sellerId 卖家ID
+     * @param status 商品状态
+     * @return 商品数量
+     */
+    long countBySellerIdAndStatus(Long sellerId, GoodsStatus status);
 }

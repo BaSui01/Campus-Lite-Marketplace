@@ -199,28 +199,33 @@ public class AuthServiceImpl implements AuthService {
      * - 用户名登录：其他格式 → findByUsernameWithRoles
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(rollbackFor = Exception.class)
     public LoginResponse login(LoginRequest request, jakarta.servlet.http.HttpServletRequest httpRequest) {
         String credential = request.username();
         log.info("用户登录: credential={}", credential);
 
         // 0. 🔐 验证验证码（新增 - BaSui 2025-11-09）
-        if (request.captchaId() != null && request.captchaCode() != null) {
-            // 图形验证码验证
-            boolean isValid = captchaService.verifyImageCaptcha(request.captchaId(), request.captchaCode());
-            if (!isValid) {
-                log.warn("❌ 图形验证码验证失败: captchaId={}, code={}", request.captchaId(), request.captchaCode());
-                throw new BusinessException(ErrorCode.CAPTCHA_ERROR);
+        // ⚠️ 如果是2FA验证阶段，跳过图形验证码检查（修复 - BaSui 2025-11-10）
+        if (request.twoFactorCode() == null || request.twoFactorCode().isEmpty()) {
+            if (request.captchaId() != null && request.captchaCode() != null) {
+                // 图形验证码验证
+                boolean isValid = captchaService.verifyImageCaptcha(request.captchaId(), request.captchaCode());
+                if (!isValid) {
+                    log.warn("❌ 图形验证码验证失败: captchaId={}, code={}", request.captchaId(), request.captchaCode());
+                    throw new BusinessException(ErrorCode.CAPTCHA_ERROR);
+                }
+                log.info("✅ 图形验证码验证通过");
+            } else if (request.captchaId() != null && request.slidePosition() != null) {
+                // 滑块验证码验证
+                boolean isValid = captchaService.verifySlideCaptcha(request.captchaId(), request.slidePosition());
+                if (!isValid) {
+                    log.warn("❌ 滑块验证码验证失败: slideId={}, position={}", request.captchaId(), request.slidePosition());
+                    throw new BusinessException(ErrorCode.SLIDE_VERIFY_FAILED);
+                }
+                log.info("✅ 滑块验证码验证通过");
             }
-            log.info("✅ 图形验证码验证通过");
-        } else if (request.captchaId() != null && request.slidePosition() != null) {
-            // 滑块验证码验证
-            boolean isValid = captchaService.verifySlideCaptcha(request.captchaId(), request.slidePosition());
-            if (!isValid) {
-                log.warn("❌ 滑块验证码验证失败: slideId={}, position={}", request.captchaId(), request.slidePosition());
-                throw new BusinessException(ErrorCode.SLIDE_VERIFY_FAILED);
-            }
-            log.info("✅ 滑块验证码验证通过");
+        } else {
+            log.info("🔐 2FA验证阶段，跳过图形验证码检查");
         }
 
         // 1. 🔐 解密密码（如果是加密密码）

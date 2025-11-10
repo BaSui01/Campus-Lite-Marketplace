@@ -1,0 +1,188 @@
+/**
+ * 点选验证码组件样式 👆✨
+ * @author BaSui 😎
+ * @date 2025-11-10
+ */
+
+/* ==================== 容器 ==================== */
+.click-captcha {
+  width: 100%;
+  user-select: none;
+}
+
+/* ==================== 提示文字 ==================== */
+.click-captcha__hint {
+  text-align: center;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+  border: 1.5px solid rgba(240, 147, 251, 0.15);
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+}
+
+.click-captcha__hint--success {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-color: rgba(40, 167, 69, 0.3);
+  color: #28a745;
+}
+
+.click-captcha__hint--failed {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border-color: rgba(220, 53, 69, 0.3);
+  color: #dc3545;
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+/* ==================== 图片区域 ==================== */
+.click-captcha__image-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: crosshair;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.click-captcha__image-container:hover {
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+}
+
+.click-captcha__image-container--success {
+  border: 2px solid #28a745;
+}
+
+.click-captcha__image-container--failed {
+  border: 2px solid #dc3545;
+}
+
+.click-captcha__image-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ==================== 点击标记 ==================== */
+.click-captcha__marker {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  margin-top: -16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 12px rgba(102, 126, 234, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.9);
+  animation: marker-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+}
+
+@keyframes marker-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ==================== 加载和错误状态 ==================== */
+.click-captcha__loading,
+.click-captcha__error {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #999;
+  background: #f5f5f5;
+}
+
+/* ==================== 操作按钮 ==================== */
+.click-captcha__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  gap: 12px;
+}
+
+.click-captcha__button {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 4px 12px rgba(102, 126, 234, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+.click-captcha__button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 16px rgba(102, 126, 234, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+}
+
+.click-captcha__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.click-captcha__button--undo {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow:
+    0 4px 12px rgba(245, 158, 11, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+.click-captcha__button--undo:hover:not(:disabled) {
+  box-shadow:
+    0 6px 16px rgba(245, 158, 11, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+}
+
+/* ==================== 进度显示 ==================== */
+.click-captcha__progress {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #667eea;
+}

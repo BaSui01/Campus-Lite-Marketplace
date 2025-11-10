@@ -488,16 +488,32 @@ public class DatabaseSeeder {
     private int createGoodsForUser(String username, Long categoryId, Long campusId,
                                    String title, String description, BigDecimal price, GoodsStatus status) {
         return userRepository.findByUsername(username).map(seller -> {
+            // 🎯 计算原价（如果有折扣）
+            BigDecimal originalPrice = null;
+            if (price.compareTo(new BigDecimal("1000")) > 0) {
+                // 大于1000的商品，设置原价为当前价格的1.2倍（8折优惠）
+                originalPrice = price.multiply(new BigDecimal("1.2")).setScale(2, java.math.RoundingMode.HALF_UP);
+            }
+
+            // 🎯 根据价格设置库存（模拟真实场景）
+            int stock = price.compareTo(new BigDecimal("500")) > 0 ? 1 : (int)(Math.random() * 5) + 1;
+
+            // 🎯 根据状态设置销量（已审核的商品可能有销量）
+            int soldCount = status == GoodsStatus.APPROVED ? (int)(Math.random() * 10) : 0;
+
             Goods goods = Goods.builder()
                     .title(title)
                     .description(description)
                     .price(price)
+                    .originalPrice(originalPrice)  // ✅ 新增：原价
                     .categoryId(categoryId)
                     .sellerId(seller.getId())
                     .campusId(campusId)
                     .status(status)
                     .viewCount(0)
                     .favoriteCount(0)
+                    .stock(stock)  // ✅ 新增：库存
+                    .soldCount(soldCount)  // ✅ 新增：销量
                     .build();
             goodsRepository.save(goods);
             return 1;

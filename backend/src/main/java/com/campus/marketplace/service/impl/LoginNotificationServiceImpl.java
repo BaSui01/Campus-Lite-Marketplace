@@ -7,13 +7,11 @@ import com.campus.marketplace.common.utils.IpLocationUtil;
 import com.campus.marketplace.entity.LoginDevice;
 import com.campus.marketplace.repository.LoginDeviceRepository;
 import com.campus.marketplace.repository.UserRepository;
+import com.campus.marketplace.service.EmailTemplateService;
 import com.campus.marketplace.service.LoginNotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +32,8 @@ public class LoginNotificationServiceImpl implements LoginNotificationService {
 
     private final UserRepository userRepository;
     private final LoginDeviceRepository loginDeviceRepository;
-    private final JavaMailSender mailSender;
+    private final EmailTemplateService emailTemplateService;
     private final IpLocationUtil ipLocationUtil;
-
-    @Value("${spring.mail.from:${spring.mail.username:}}")
-    private String mailFrom;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -107,22 +102,18 @@ public class LoginNotificationServiceImpl implements LoginNotificationService {
                 return;
             }
 
-            // 3. 构建邮件内容
-            String subject = isNewDevice ? "【校园轻享集市】新设备登录通知" : "【校园轻享集市】登录通知";
-            String text = buildEmailContent(user.getUsername(), deviceName, ip, location, loginTime, isNewDevice);
+            // 3. 发送HTML邮件通知
+            emailTemplateService.sendLoginNotification(
+                    user.getEmail(),
+                    user.getUsername(),
+                    deviceName,
+                    ip,
+                    location,
+                    loginTime,
+                    isNewDevice
+            );
 
-            // 4. 发送邮件
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(user.getEmail());
-            message.setSubject(subject);
-            message.setText(text);
-            if (mailFrom != null && !mailFrom.isBlank()) {
-                message.setFrom(mailFrom);
-            }
-
-            mailSender.send(message);
-
-            log.info("✅ 登录通知邮件发送成功: userId={}, email={}", userId, user.getEmail());
+            log.info("✅ HTML登录通知邮件发送成功: userId={}, email={}", userId, user.getEmail());
         } catch (Exception e) {
             log.error("❌ 登录通知邮件发送失败: userId={}, error={}", userId, e.getMessage(), e);
             // 不抛出异常，避免影响登录流程
@@ -130,46 +121,6 @@ public class LoginNotificationServiceImpl implements LoginNotificationService {
     }
 
     // ==================== 私有方法 ====================
-
-    /**
-     * 构建邮件内容
-     */
-    private String buildEmailContent(
-            String username,
-            String deviceName,
-            String ip,
-            String location,
-            String loginTime,
-            boolean isNewDevice
-    ) {
-        StringBuilder content = new StringBuilder();
-        content.append("尊敬的 ").append(username).append("：\n\n");
-
-        if (isNewDevice) {
-            content.append("我们检测到您的账号在一个新设备上登录，详情如下：\n\n");
-        } else {
-            content.append("您的账号刚刚登录，详情如下：\n\n");
-        }
-
-        content.append("登录时间：").append(loginTime).append("\n");
-        content.append("登录设备：").append(deviceName).append("\n");
-        content.append("IP 地址：").append(ip).append("\n");
-        content.append("地理位置：").append(location).append("\n\n");
-
-        if (isNewDevice) {
-            content.append("如果这不是您本人的操作，请立即：\n");
-            content.append("1. 修改您的账号密码\n");
-            content.append("2. 启用双因素认证（2FA）\n");
-            content.append("3. 检查您的账号安全设置\n\n");
-        }
-
-        content.append("如有疑问，请联系客服。\n\n");
-        content.append("此邮件由系统自动发送，请勿回复。\n\n");
-        content.append("校园轻享集市团队\n");
-        content.append(loginTime);
-
-        return content.toString();
-    }
 
     /**
      * 获取客户端 IP 地址

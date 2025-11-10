@@ -94,11 +94,11 @@ export const useAuthStore = createAuthStore<AdminUser, LoginRequest>({
 
     // 🔐 检查是否需要 2FA 验证（新增 - BaSui 2025-11-10）
     if (requires2FA) {
-      // 返回 2FA 要求，不更新状态
-      return {
-        requires2FA: true,
-        tempToken,
-      } as any;
+      // 抛出自定义错误，携带 2FA 信息
+      const error = new Error('REQUIRES_2FA') as any;
+      error.requires2FA = true;
+      error.tempToken = tempToken;
+      throw error;
     }
 
     if (!accessToken) {

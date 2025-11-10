@@ -56,6 +56,8 @@ import type { ApiResponseCategoryStatisticsResponse } from '../models';
 // @ts-ignore
 import type { ApiResponseCheckBlacklistRelationResponse } from '../models';
 // @ts-ignore
+import type { ApiResponseClickCaptchaResponse } from '../models';
+// @ts-ignore
 import type { ApiResponseComplianceWhitelist } from '../models';
 // @ts-ignore
 import type { ApiResponseCoupon } from '../models';
@@ -262,6 +264,8 @@ import type { ApiResponseReviewReplyDTO } from '../models';
 // @ts-ignore
 import type { ApiResponseRoleDetailResponse } from '../models';
 // @ts-ignore
+import type { ApiResponseRotateCaptchaResponse } from '../models';
+// @ts-ignore
 import type { ApiResponseSearchSuggestionDTO } from '../models';
 // @ts-ignore
 import type { ApiResponseSlideCaptchaResponse } from '../models';
@@ -305,6 +309,8 @@ import type { CampusMigrationRequest } from '../models';
 import type { CampusUpdateRequest } from '../models';
 // @ts-ignore
 import type { CategoryBatchSortRequest } from '../models';
+// @ts-ignore
+import type { ClickVerifyRequest } from '../models';
 // @ts-ignore
 import type { CompletePrivacyRequest } from '../models';
 // @ts-ignore
@@ -381,6 +387,8 @@ import type { ResetPasswordBySmsRequest } from '../models';
 import type { RespondProposalRequest } from '../models';
 // @ts-ignore
 import type { ReviewRequest } from '../models';
+// @ts-ignore
+import type { RotateVerifyRequest } from '../models';
 // @ts-ignore
 import type { SendMessageRequest } from '../models';
 // @ts-ignore
@@ -4859,6 +4867,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 生成点选验证码，返回背景图片和需要点击的文字
+         * @summary 生成点选验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateClickCaptcha: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/captcha/click`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
          * @summary 生成图形验证码
          * @param {*} [options] Override http request option.
@@ -4919,6 +4961,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             if (hours !== undefined) {
                 localVarQueryParameter['hours'] = hours;
             }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 生成旋转验证码，返回原始图片和旋转后的图片
+         * @summary 生成旋转验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateRotateCaptcha: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/captcha/rotate`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
@@ -16574,6 +16650,86 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 验证用户点击的位置是否正确（允许±20px误差）
+         * @summary 验证点选验证码
+         * @param {ClickVerifyRequest} clickVerifyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyClickCaptcha: async (clickVerifyRequest: ClickVerifyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'clickVerifyRequest' is not null or undefined
+            assertParamExists('verifyClickCaptcha', 'clickVerifyRequest', clickVerifyRequest)
+            const localVarPath = `/api/captcha/click/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(clickVerifyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 验证用户旋转的角度是否正确（允许±10度误差）
+         * @summary 验证旋转验证码
+         * @param {RotateVerifyRequest} rotateVerifyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyRotateCaptcha: async (rotateVerifyRequest: RotateVerifyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rotateVerifyRequest' is not null or undefined
+            assertParamExists('verifyRotateCaptcha', 'rotateVerifyRequest', rotateVerifyRequest)
+            const localVarPath = `/api/captcha/rotate/verify`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(rotateVerifyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 验证用户滑动的位置是否正确（允许±5px误差）
          * @summary 验证滑块验证码（简单版本）
          * @param {string} slideId 
@@ -18213,6 +18369,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 生成点选验证码，返回背景图片和需要点击的文字
+         * @summary 生成点选验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async generateClickCaptcha(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseClickCaptchaResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.generateClickCaptcha(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.generateClickCaptcha']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
          * @summary 生成图形验证码
          * @param {*} [options] Override http request option.
@@ -18235,6 +18403,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.generatePerformanceReport(hours, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.generatePerformanceReport']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 生成旋转验证码，返回原始图片和旋转后的图片
+         * @summary 生成旋转验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async generateRotateCaptcha(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseRotateCaptchaResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.generateRotateCaptcha(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.generateRotateCaptcha']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -22039,6 +22219,32 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 验证用户点击的位置是否正确（允许±20px误差）
+         * @summary 验证点选验证码
+         * @param {ClickVerifyRequest} clickVerifyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verifyClickCaptcha(clickVerifyRequest: ClickVerifyRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBoolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verifyClickCaptcha(clickVerifyRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.verifyClickCaptcha']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 验证用户旋转的角度是否正确（允许±10度误差）
+         * @summary 验证旋转验证码
+         * @param {RotateVerifyRequest} rotateVerifyRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async verifyRotateCaptcha(rotateVerifyRequest: RotateVerifyRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBoolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.verifyRotateCaptcha(rotateVerifyRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.verifyRotateCaptcha']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 验证用户滑动的位置是否正确（允许±5px误差）
          * @summary 验证滑块验证码（简单版本）
          * @param {string} slideId 
@@ -23204,6 +23410,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.followUser(requestParameters.userId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 生成点选验证码，返回背景图片和需要点击的文字
+         * @summary 生成点选验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateClickCaptcha(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseClickCaptchaResponse> {
+            return localVarFp.generateClickCaptcha(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
          * @summary 生成图形验证码
          * @param {*} [options] Override http request option.
@@ -23221,6 +23436,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         generatePerformanceReport(requestParameters: DefaultApiGeneratePerformanceReportRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePerformanceReportResponse> {
             return localVarFp.generatePerformanceReport(requestParameters.hours, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 生成旋转验证码，返回原始图片和旋转后的图片
+         * @summary 生成旋转验证码
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateRotateCaptcha(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRotateCaptchaResponse> {
+            return localVarFp.generateRotateCaptcha(options).then((request) => request(axios, basePath));
         },
         /**
          * 生成滑块验证码，返回滑块ID和目标位置
@@ -26011,6 +26235,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.verify2FA(requestParameters.verify2FARequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 验证用户点击的位置是否正确（允许±20px误差）
+         * @summary 验证点选验证码
+         * @param {DefaultApiVerifyClickCaptchaRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyClickCaptcha(requestParameters: DefaultApiVerifyClickCaptchaRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
+            return localVarFp.verifyClickCaptcha(requestParameters.clickVerifyRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 验证用户旋转的角度是否正确（允许±10度误差）
+         * @summary 验证旋转验证码
+         * @param {DefaultApiVerifyRotateCaptchaRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        verifyRotateCaptcha(requestParameters: DefaultApiVerifyRotateCaptchaRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean> {
+            return localVarFp.verifyRotateCaptcha(requestParameters.rotateVerifyRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 验证用户滑动的位置是否正确（允许±5px误差）
          * @summary 验证滑块验证码（简单版本）
          * @param {DefaultApiVerifySlideCaptchaRequest} requestParameters Request parameters.
@@ -27189,6 +27433,15 @@ export interface DefaultApiInterface {
     followUser(userId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
+     * 生成点选验证码，返回背景图片和需要点击的文字
+     * @summary 生成点选验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    generateClickCaptcha(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseClickCaptchaResponse>;
+
+    /**
      * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
      * @summary 生成图形验证码
      * @param {*} [options] Override http request option.
@@ -27206,6 +27459,15 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     generatePerformanceReport(hours?: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePerformanceReportResponse>;
+
+    /**
+     * 生成旋转验证码，返回原始图片和旋转后的图片
+     * @summary 生成旋转验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    generateRotateCaptcha(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseRotateCaptchaResponse>;
 
     /**
      * 生成滑块验证码，返回滑块ID和目标位置
@@ -30155,6 +30417,26 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     verify2FA(verify2FARequest: Verify2FARequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponse>;
+
+    /**
+     * 验证用户点击的位置是否正确（允许±20px误差）
+     * @summary 验证点选验证码
+     * @param {ClickVerifyRequest} clickVerifyRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    verifyClickCaptcha(clickVerifyRequest: ClickVerifyRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
+
+    /**
+     * 验证用户旋转的角度是否正确（允许±10度误差）
+     * @summary 验证旋转验证码
+     * @param {RotateVerifyRequest} rotateVerifyRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    verifyRotateCaptcha(rotateVerifyRequest: RotateVerifyRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBoolean>;
 
     /**
      * 验证用户滑动的位置是否正确（允许±5px误差）
@@ -36213,6 +36495,34 @@ export interface DefaultApiVerify2FARequest {
 }
 
 /**
+ * Request parameters for verifyClickCaptcha operation in DefaultApi.
+ * @export
+ * @interface DefaultApiVerifyClickCaptchaRequest
+ */
+export interface DefaultApiVerifyClickCaptchaRequest {
+    /**
+     * 
+     * @type {ClickVerifyRequest}
+     * @memberof DefaultApiVerifyClickCaptcha
+     */
+    readonly clickVerifyRequest: ClickVerifyRequest
+}
+
+/**
+ * Request parameters for verifyRotateCaptcha operation in DefaultApi.
+ * @export
+ * @interface DefaultApiVerifyRotateCaptchaRequest
+ */
+export interface DefaultApiVerifyRotateCaptchaRequest {
+    /**
+     * 
+     * @type {RotateVerifyRequest}
+     * @memberof DefaultApiVerifyRotateCaptcha
+     */
+    readonly rotateVerifyRequest: RotateVerifyRequest
+}
+
+/**
  * Request parameters for verifySlideCaptcha operation in DefaultApi.
  * @export
  * @interface DefaultApiVerifySlideCaptchaRequest
@@ -37600,6 +37910,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 生成点选验证码，返回背景图片和需要点击的文字
+     * @summary 生成点选验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public generateClickCaptcha(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).generateClickCaptcha(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 生成4位数字+字母的图形验证码，返回验证码ID和Base64图片
      * @summary 生成图形验证码
      * @param {*} [options] Override http request option.
@@ -37620,6 +37941,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public generatePerformanceReport(requestParameters: DefaultApiGeneratePerformanceReportRequest = {}, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).generatePerformanceReport(requestParameters.hours, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 生成旋转验证码，返回原始图片和旋转后的图片
+     * @summary 生成旋转验证码
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public generateRotateCaptcha(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).generateRotateCaptcha(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -40976,6 +41308,30 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public verify2FA(requestParameters: DefaultApiVerify2FARequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).verify2FA(requestParameters.verify2FARequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 验证用户点击的位置是否正确（允许±20px误差）
+     * @summary 验证点选验证码
+     * @param {DefaultApiVerifyClickCaptchaRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public verifyClickCaptcha(requestParameters: DefaultApiVerifyClickCaptchaRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).verifyClickCaptcha(requestParameters.clickVerifyRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 验证用户旋转的角度是否正确（允许±10度误差）
+     * @summary 验证旋转验证码
+     * @param {DefaultApiVerifyRotateCaptchaRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public verifyRotateCaptcha(requestParameters: DefaultApiVerifyRotateCaptchaRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).verifyRotateCaptcha(requestParameters.rotateVerifyRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

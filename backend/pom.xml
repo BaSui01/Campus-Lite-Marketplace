@@ -138,6 +138,12 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- 🎨 Thymeleaf (HTML邮件模板引擎) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
         <!-- 🔥 Spring Boot DevTools (热重载神器) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

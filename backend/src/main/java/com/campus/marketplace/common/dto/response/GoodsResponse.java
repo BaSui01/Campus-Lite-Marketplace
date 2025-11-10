@@ -65,6 +65,11 @@ public class GoodsResponse {
     private String sellerUsername;
 
     /**
+     * 卖家头像（前端需要）
+     */
+    private String sellerAvatar;
+
+    /**
      * 物品状态
      */
     private GoodsStatus status;
@@ -78,6 +83,21 @@ public class GoodsResponse {
      * 收藏量
      */
     private Integer favoriteCount;
+
+    /**
+     * 库存数量（前端需要）
+     */
+    private Integer stock;
+
+    /**
+     * 已售数量（前端需要）
+     */
+    private Integer soldCount;
+
+    /**
+     * 原价（用于显示折扣，前端需要）
+     */
+    private BigDecimal originalPrice;
 
     /**
      * 封面图片（第一张图片）

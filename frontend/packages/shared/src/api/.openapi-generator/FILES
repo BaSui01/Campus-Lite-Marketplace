@@ -26,6 +26,7 @@ models/api-response-captcha-response.ts
 models/api-response-category-statistics-response.ts
 models/api-response-category.ts
 models/api-response-check-blacklist-relation-response.ts
+models/api-response-click-captcha-response.ts
 models/api-response-compliance-whitelist.ts
 models/api-response-coupon-statistics-response.ts
 models/api-response-coupon-trend-statistics-response.ts
@@ -130,6 +131,7 @@ models/api-response-revert-execution-result.ts
 models/api-response-review-media-dto.ts
 models/api-response-review-reply-dto.ts
 models/api-response-role-detail-response.ts
+models/api-response-rotate-captcha-response.ts
 models/api-response-search-suggestion-dto.ts
 models/api-response-slide-captcha-response.ts
 models/api-response-string.ts
@@ -177,6 +179,9 @@ models/category-node-response.ts
 models/category-statistics-response.ts
 models/category.ts
 models/check-blacklist-relation-response.ts
+models/click-captcha-response.ts
+models/click-point.ts
+models/click-verify-request.ts
 models/complete-privacy-request.ts
 models/compliance-audit-log.ts
 models/compliance-whitelist.ts
@@ -307,6 +312,8 @@ models/review.ts
 models/role-detail-response.ts
 models/role-summary-response.ts
 models/role.ts
+models/rotate-captcha-response.ts
+models/rotate-verify-request.ts
 models/scheduled-task.ts
 models/search-result-item.ts
 models/search-suggestion-dto.ts

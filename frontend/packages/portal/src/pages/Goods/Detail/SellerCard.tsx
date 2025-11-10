@@ -12,6 +12,8 @@ interface SellerCardProps {
   sellerId: number;
   sellerName: string;
   sellerAvatar?: string;
+  sellerRating?: number;  // 🆕 卖家评分（0-5分）
+  sellerGoodsCount?: number;  // 🆕 在售商品数量
   onContact: () => void;
 }
 
@@ -19,6 +21,8 @@ export const SellerCard: React.FC<SellerCardProps> = ({
   sellerId,
   sellerName,
   sellerAvatar,
+  sellerRating,  // 🆕 卖家评分
+  sellerGoodsCount,  // 🆕 在售商品数量
   onContact,
 }) => {
   const navigate = useNavigate();
@@ -53,16 +57,24 @@ export const SellerCard: React.FC<SellerCardProps> = ({
             {sellerName}
           </div>
           
-          {/* TODO: 从API获取卖家评分和商品数量 */}
+          {/* ✅ 使用真实的API数据 */}
           <div className="seller-card__stats">
-            <span className="seller-card__stat">
-              <span className="seller-card__stat-icon">⭐</span>
-              <span className="seller-card__stat-value">4.8</span>
-            </span>
-            <span className="seller-card__stat">
-              <span className="seller-card__stat-icon">📦</span>
-              <span className="seller-card__stat-value">12件在售</span>
-            </span>
+            {sellerRating !== undefined && sellerRating !== null && (
+              <span className="seller-card__stat">
+                <span className="seller-card__stat-icon">⭐</span>
+                <span className="seller-card__stat-value">
+                  {sellerRating.toFixed(1)}
+                </span>
+              </span>
+            )}
+            {sellerGoodsCount !== undefined && sellerGoodsCount !== null && (
+              <span className="seller-card__stat">
+                <span className="seller-card__stat-icon">📦</span>
+                <span className="seller-card__stat-value">
+                  {sellerGoodsCount}件在售
+                </span>
+              </span>
+            )}
           </div>
         </div>
 

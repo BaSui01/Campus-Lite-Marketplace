@@ -205,9 +205,12 @@ public class RecommendServiceImpl implements RecommendService {
         String categoryName = categoryRepository.findById(goods.getCategoryId())
                 .map(Category::getName)
                 .orElse("未知分类");
-        String sellerUsername = userRepository.findById(goods.getSellerId())
-                .map(User::getUsername)
-                .orElse("未知用户");
+
+        // 获取卖家信息（包括头像）
+        User seller = userRepository.findById(goods.getSellerId()).orElse(null);
+        String sellerUsername = seller != null ? seller.getUsername() : "未知用户";
+        String sellerAvatar = seller != null ? seller.getAvatar() : null;
+
         String coverImage = goods.getImages() != null && goods.getImages().length > 0 ? goods.getImages()[0] : null;
 
         return GoodsResponse.builder()
@@ -219,9 +222,13 @@ public class RecommendServiceImpl implements RecommendService {
                 .categoryName(categoryName)
                 .sellerId(goods.getSellerId())
                 .sellerUsername(sellerUsername)
+                .sellerAvatar(sellerAvatar)  // ✅ 新增
                 .status(goods.getStatus())
                 .viewCount(goods.getViewCount())
                 .favoriteCount(goods.getFavoriteCount())
+                .stock(goods.getStock())  // ✅ 新增
+                .soldCount(goods.getSoldCount())  // ✅ 新增
+                .originalPrice(goods.getOriginalPrice())  // ✅ 新增
                 .coverImage(coverImage)
                 .createdAt(goods.getCreatedAt())
                 .build();

@@ -118,6 +118,46 @@ public class Goods extends BaseEntity {
     private Integer favoriteCount = 0;
 
     /**
+     * 库存数量（前端需要）
+     */
+    @Column(name = "stock")
+    @Builder.Default
+    private Integer stock = 1;
+
+    /**
+     * 已售数量（前端需要）
+     */
+    @Column(name = "sold_count")
+    @Builder.Default
+    private Integer soldCount = 0;
+
+    /**
+     * 原价（用于显示折扣，前端需要）
+     */
+    @Column(name = "original_price", precision = 10, scale = 2)
+    private BigDecimal originalPrice;
+
+    /**
+     * 商品成色（前端需要）
+     * BRAND_NEW: 全新
+     * LIKE_NEW: 几乎全新
+     * LIGHTLY_USED: 轻微使用痕迹
+     * WELL_USED: 明显使用痕迹
+     * HEAVILY_USED: 重度使用痕迹
+     */
+    @Column(name = "condition", length = 50)
+    private String condition;
+
+    /**
+     * 交易方式（前端需要）
+     * MEET: 校园面交
+     * MAIL: 快递邮寄
+     * 可以是多个，用逗号分隔：MEET,MAIL
+     */
+    @Column(name = "delivery_method", length = 100)
+    private String deliveryMethod;
+
+    /**
      * 图片 URL 数组
      */
     @Column(name = "images", columnDefinition = "TEXT[]")
@@ -173,5 +213,36 @@ public class Goods extends BaseEntity {
      */
     public boolean isApproved() {
         return this.status == GoodsStatus.APPROVED;
+    }
+
+    /**
+     * 减少库存（下单时调用）
+     */
+    public void decreaseStock(int quantity) {
+        if (this.stock != null && this.stock >= quantity) {
+            this.stock -= quantity;
+        }
+    }
+
+    /**
+     * 增加库存（取消订单时调用）
+     */
+    public void increaseStock(int quantity) {
+        if (this.stock == null) {
+            this.stock = quantity;
+        } else {
+            this.stock += quantity;
+        }
+    }
+
+    /**
+     * 增加销量（订单完成时调用）
+     */
+    public void incrementSoldCount() {
+        if (this.soldCount == null) {
+            this.soldCount = 1;
+        } else {
+            this.soldCount++;
+        }
     }
 }

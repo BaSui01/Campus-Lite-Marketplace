@@ -34,8 +34,12 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     private static final int CAPTCHA_EXPIRE_SECONDS = 300; // 5分钟
     private static final int SLIDE_EXPIRE_SECONDS = 300; // 5分钟
+    private static final int ROTATE_EXPIRE_SECONDS = 300; // 5分钟
+    private static final int CLICK_EXPIRE_SECONDS = 300; // 5分钟
     private static final String CAPTCHA_KEY_PREFIX = "captcha:";
     private static final String SLIDE_KEY_PREFIX = "slide:";
+    private static final String ROTATE_KEY_PREFIX = "rotate:";
+    private static final String CLICK_KEY_PREFIX = "click:";
 
     /**
      * 生成图形验证码
@@ -87,7 +91,14 @@ public class CaptchaServiceImpl implements CaptchaService {
         redisTemplate.delete(key);
 
         boolean isValid = storedCode.equalsIgnoreCase(code);
-        log.info("验证码验证结果: captchaId={}, isValid={}", captchaId, isValid);
+        
+        // 增强日志：显示实际对比的值
+        if (!isValid) {
+            log.warn("❌ 验证码不匹配: captchaId={}, expected={}, actual={}", 
+                    captchaId, storedCode, code);
+        } else {
+            log.info("✅ 验证码验证成功: captchaId={}", captchaId);
+        }
 
         return isValid;
     }
@@ -151,9 +162,12 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     /**
      * 生成随机验证码（数字+字母）
+     * 改进点：
+     * 1. 去掉所有小写字母，只用大写字母+数字（更清晰）
+     * 2. 去掉易混淆字符：0/O、1/I/l
      */
     private String generateRandomCode(int length) {
-        String chars = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz"; // 去掉容易混淆的字符（I、O、l）
+        String chars = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"; // 只用大写字母+数字，去掉0、1、I、O
         Random random = new Random();
         StringBuilder code = new StringBuilder();
 
@@ -184,14 +198,14 @@ public class CaptchaServiceImpl implements CaptchaService {
         g.setPaint(gradient);
         g.fillRect(0, 0, width, height);
 
-        // 2. 绘制干扰线（5条）
-        for (int i = 0; i < 5; i++) {
+        // 2. 绘制干扰线（减少到3条，降低干扰）
+        for (int i = 0; i < 3; i++) {
             g.setColor(new Color(
-                    random.nextInt(100) + 100,
-                    random.nextInt(100) + 100,
-                    random.nextInt(100) + 100
+                    random.nextInt(50) + 150,  // 更浅的颜色
+                    random.nextInt(50) + 150,
+                    random.nextInt(50) + 150
             ));
-            g.setStroke(new BasicStroke(1.5f));
+            g.setStroke(new BasicStroke(1.0f));  // 更细的线条
             int x1 = random.nextInt(width);
             int y1 = random.nextInt(height);
             int x2 = random.nextInt(width);
@@ -199,35 +213,35 @@ public class CaptchaServiceImpl implements CaptchaService {
             g.drawLine(x1, y1, x2, y2);
         }
 
-        // 3. 绘制干扰点（50个）
-        for (int i = 0; i < 50; i++) {
+        // 3. 绘制干扰点（减少到30个，降低干扰）
+        for (int i = 0; i < 30; i++) {
             g.setColor(new Color(
-                    random.nextInt(255),
-                    random.nextInt(255),
-                    random.nextInt(255)
+                    random.nextInt(100) + 155,  // 更浅的颜色
+                    random.nextInt(100) + 155,
+                    random.nextInt(100) + 155
             ));
             g.fillOval(random.nextInt(width), random.nextInt(height), 2, 2);
         }
 
-        // 4. 绘制验证码文字
-        g.setFont(new Font("Arial", Font.BOLD, 28));
+        // 4. 绘制验证码文字（改进：更清晰的显示）
+        g.setFont(new Font("Arial", Font.BOLD, 32));  // 更大的字体
         for (int i = 0; i < code.length(); i++) {
-            // 随机颜色（深色）
+            // 随机颜色（深色，但更统一）
             g.setColor(new Color(
-                    random.nextInt(100),
-                    random.nextInt(100),
-                    random.nextInt(100)
+                    random.nextInt(50),   // 0-49，更深的颜色
+                    random.nextInt(50),
+                    random.nextInt(50)
             ));
 
-            // 随机旋转角度（-15° ~ 15°）
-            int angle = random.nextInt(30) - 15;
-            g.rotate(Math.toRadians(angle), 20 + i * 25, 25);
+            // 随机旋转角度（减小旋转幅度：-10° ~ 10°）
+            int angle = random.nextInt(20) - 10;
+            g.rotate(Math.toRadians(angle), 20 + i * 25, 28);
 
             // 绘制字符
-            g.drawString(String.valueOf(code.charAt(i)), 20 + i * 25, 30);
+            g.drawString(String.valueOf(code.charAt(i)), 20 + i * 25, 28);
 
             // 恢复旋转
-            g.rotate(-Math.toRadians(angle), 20 + i * 25, 25);
+            g.rotate(-Math.toRadians(angle), 20 + i * 25, 28);
         }
 
         g.dispose();
@@ -251,7 +265,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     // ========== 滑块验证码增强功能 ==========
 
     /**
-     * 生成滑块验证码（完整版本，包含拼图图片）
+     * 生成滑块验证码（完整版本，包含拼图图片） - 真实裁剪版本！✨
      */
     @Override
     public com.campus.marketplace.common.dto.response.SlideCaptchaResponse generateSlideCaptchaWithImage() {
@@ -266,14 +280,19 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         log.info("生成滑块验证码（带图片）: slideId={}, targetX={}, yPosition={}", slideId, targetX, yPosition);
 
-        // 3. 生成背景图片和滑块图片
-        BufferedImage backgroundImage = createSlideBackgroundImage(300, 200, targetX, yPosition);
-        BufferedImage sliderImage = createSliderImage(50, 50);
+        // 3. 先生成完整的原始图片（不带缺口）
+        BufferedImage originalImage = createOriginalImage(300, 200);
+
+        // 4. 从原始图片中裁剪出滑块（真实裁剪！）
+        BufferedImage sliderImage = cutPuzzlePiece(originalImage, targetX, yPosition, 50);
+
+        // 5. 在原始图片上绘制缺口，生成背景图
+        BufferedImage backgroundImage = drawPuzzleHole(originalImage, targetX, yPosition, 50);
 
         String backgroundBase64 = imageToBase64(backgroundImage);
         String sliderBase64 = imageToBase64(sliderImage);
 
-        // 4. 存储到 Redis（5分钟过期）
+        // 6. 存储到 Redis（5分钟过期）
         String key = SLIDE_KEY_PREFIX + slideId;
         redisTemplate.opsForValue().set(key, String.valueOf(targetX), SLIDE_EXPIRE_SECONDS, TimeUnit.SECONDS);
 
@@ -309,8 +328,8 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         int targetPosition = Integer.parseInt(storedPosition);
 
-        // 1. 验证X轴位置（允许±5px误差）
-        boolean positionValid = Math.abs(targetPosition - request.getXPosition()) <= 5;
+        // 1. 验证X轴位置（允许±10px误差，前端精度优化后仍保持一定容差）
+        boolean positionValid = Math.abs(targetPosition - request.getXPosition()) <= 10;
 
         // 2. 验证滑动轨迹（防作弊）
         boolean trackValid = true;
@@ -326,7 +345,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     /**
-     * 创建滑块背景图片（带缺口）
+     * 创建滑块背景图片（带缺口） - 真实拼图形状！🧩
      */
     private BufferedImage createSlideBackgroundImage(int width, int height, int targetX, int yPosition) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -359,50 +378,161 @@ public class CaptchaServiceImpl implements CaptchaService {
             g.fillOval(x, y, size, size);
         }
 
-        // 3. 绘制缺口（拼图形状）
+        // 3. 绘制拼图缺口（真实凹凸形状！）
         int puzzleSize = 50;
-        g.setColor(new Color(255, 255, 255, 200)); // 半透明白色
-        g.fillRect(targetX, yPosition, puzzleSize, puzzleSize);
+        java.awt.geom.Path2D.Double puzzlePath = createPuzzleShape(targetX, yPosition, puzzleSize);
 
-        // 绘制缺口边框
+        // 填充缺口（半透明白色）
+        g.setColor(new Color(255, 255, 255, 200));
+        g.fill(puzzlePath);
+
+        // 绘制缺口边框（深色）
         g.setColor(new Color(100, 100, 100));
         g.setStroke(new BasicStroke(2));
-        g.drawRect(targetX, yPosition, puzzleSize, puzzleSize);
+        g.draw(puzzlePath);
 
         g.dispose();
         return image;
     }
 
     /**
-     * 创建滑块图片（拼图块）
+     * 创建原始图片（用于裁剪拼图）
      */
-    private BufferedImage createSliderImage(int width, int height) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    private BufferedImage createOriginalImage(int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
 
         // 设置抗锯齿
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // 1. 绘制拼图块（带渐变）
+        Random random = new Random();
+
+        // 1. 绘制渐变背景
         GradientPaint gradient = new GradientPaint(
-                0, 0, new Color(100, 150, 200),
-                width, height, new Color(80, 130, 180)
+                0, 0, new Color(200, 220, 240),
+                width, height, new Color(180, 200, 220)
         );
         g.setPaint(gradient);
         g.fillRect(0, 0, width, height);
 
-        // 2. 绘制边框
-        g.setColor(new Color(60, 110, 160));
-        g.setStroke(new BasicStroke(2));
-        g.drawRect(0, 0, width - 1, height - 1);
-
-        // 3. 绘制一个小图标（表示这是滑块）
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 24));
-        g.drawString("→", width / 2 - 8, height / 2 + 8);
+        // 2. 绘制一些装饰性图案
+        for (int i = 0; i < 10; i++) {
+            g.setColor(new Color(
+                    random.nextInt(50) + 150,
+                    random.nextInt(50) + 150,
+                    random.nextInt(50) + 150,
+                    100
+            ));
+            int x = random.nextInt(width);
+            int y = random.nextInt(height);
+            int size = random.nextInt(30) + 10;
+            g.fillOval(x, y, size, size);
+        }
 
         g.dispose();
         return image;
+    }
+
+    /**
+     * 从原始图片裁剪拼图块（真实裁剪！）
+     */
+    private BufferedImage cutPuzzlePiece(BufferedImage originalImage, int x, int y, int size) {
+        BufferedImage puzzlePiece = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = puzzlePiece.createGraphics();
+
+        // 设置抗锯齿
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // 1. 创建拼图形状作为裁剪区域
+        java.awt.geom.Path2D.Double puzzlePath = createPuzzleShape(0, 0, size);
+        g.setClip(puzzlePath);
+
+        // 2. 从原始图片裁剪出对应区域
+        g.drawImage(originalImage, -x, -y, null);
+
+        // 3. 绘制边框（让拼图更清晰）
+        g.setClip(null);
+        g.setColor(new Color(60, 110, 160));
+        g.setStroke(new BasicStroke(2));
+        g.draw(puzzlePath);
+
+        g.dispose();
+        return puzzlePiece;
+    }
+
+    /**
+     * 在背景图上绘制缺口
+     */
+    private BufferedImage drawPuzzleHole(BufferedImage originalImage, int x, int y, int size) {
+        // 复制原始图片
+        BufferedImage backgroundImage = new BufferedImage(
+                originalImage.getWidth(),
+                originalImage.getHeight(),
+                BufferedImage.TYPE_INT_RGB
+        );
+        Graphics2D g = backgroundImage.createGraphics();
+
+        // 绘制原始图片
+        g.drawImage(originalImage, 0, 0, null);
+
+        // 设置抗锯齿
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // 创建拼图形状
+        java.awt.geom.Path2D.Double puzzlePath = createPuzzleShape(x, y, size);
+
+        // 填充缺口（半透明白色，显示为缺口效果）
+        g.setColor(new Color(255, 255, 255, 200));
+        g.fill(puzzlePath);
+
+        // 绘制缺口边框（深色）
+        g.setColor(new Color(100, 100, 100));
+        g.setStroke(new BasicStroke(2));
+        g.draw(puzzlePath);
+
+        g.dispose();
+        return backgroundImage;
+    }
+
+    /**
+     * 创建拼图形状（真实凹凸拼图！）🧩
+     * 
+     * @param x 起始X坐标
+     * @param y 起始Y坐标
+     * @param size 拼图大小
+     * @return 拼图路径
+     */
+    private java.awt.geom.Path2D.Double createPuzzleShape(int x, int y, int size) {
+        java.awt.geom.Path2D.Double path = new java.awt.geom.Path2D.Double();
+        
+        int bulgeDiameter = size / 5; // 凸起/凹陷的直径（拼图特征）
+        int bulgeRadius = bulgeDiameter / 2;
+        
+        // 从左上角开始绘制拼图形状
+        path.moveTo(x, y);
+        
+        // 顶边 - 中间有凸起
+        path.lineTo(x + size / 2 - bulgeRadius, y);
+        path.quadTo(x + size / 2, y - bulgeRadius, x + size / 2 + bulgeRadius, y); // 凸起的贝塞尔曲线
+        path.lineTo(x + size, y);
+        
+        // 右边 - 中间有凸起
+        path.lineTo(x + size, y + size / 2 - bulgeRadius);
+        path.quadTo(x + size + bulgeRadius, y + size / 2, x + size, y + size / 2 + bulgeRadius); // 凸起
+        path.lineTo(x + size, y + size);
+        
+        // 底边 - 中间有凹陷
+        path.lineTo(x + size / 2 + bulgeRadius, y + size);
+        path.quadTo(x + size / 2, y + size + bulgeRadius, x + size / 2 - bulgeRadius, y + size); // 凹陷
+        path.lineTo(x, y + size);
+        
+        // 左边 - 中间有凹陷
+        path.lineTo(x, y + size / 2 + bulgeRadius);
+        path.quadTo(x - bulgeRadius, y + size / 2, x, y + size / 2 - bulgeRadius); // 凹陷
+        path.lineTo(x, y);
+        
+        path.closePath();
+        return path;
     }
 
     /**
@@ -474,5 +604,312 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         // 方差小于10认为是直线
         return variance < 10;
+    }
+
+    // ========== 旋转验证码功能 ==========
+
+    /**
+     * 生成旋转验证码 🔄
+     */
+    @Override
+    public com.campus.marketplace.common.dto.response.RotateCaptchaResponse generateRotateCaptcha() {
+        String rotateId = UUID.randomUUID().toString();
+        Random random = new Random();
+
+        // 1. 生成随机旋转角度（0-359度）
+        int targetAngle = random.nextInt(360);
+
+        log.info("生成旋转验证码: rotateId={}, targetAngle={}", rotateId, targetAngle);
+
+        // 2. 生成原始图片（带明显方向特征）
+        BufferedImage originalImage = createRotatableImage(200, 200);
+
+        // 3. 生成旋转后的图片
+        BufferedImage rotatedImage = rotateImage(originalImage, targetAngle);
+
+        String originalBase64 = imageToBase64(originalImage);
+        String rotatedBase64 = imageToBase64(rotatedImage);
+
+        // 4. 存储到 Redis（5分钟过期）
+        String key = ROTATE_KEY_PREFIX + rotateId;
+        redisTemplate.opsForValue().set(key, String.valueOf(targetAngle), ROTATE_EXPIRE_SECONDS, TimeUnit.SECONDS);
+
+        return com.campus.marketplace.common.dto.response.RotateCaptchaResponse.builder()
+                .rotateId(rotateId)
+                .originalImage(originalBase64)
+                .rotatedImage(rotatedBase64)
+                .expiresIn(ROTATE_EXPIRE_SECONDS)
+                .build();
+    }
+
+    /**
+     * 验证旋转验证码 ✅
+     */
+    @Override
+    public boolean verifyRotateCaptcha(com.campus.marketplace.common.dto.request.RotateVerifyRequest request) {
+        if (request.getRotateId() == null || request.getAngle() == null) {
+            log.warn("旋转验证参数为空");
+            return false;
+        }
+
+        String key = ROTATE_KEY_PREFIX + request.getRotateId();
+        String storedAngle = redisTemplate.opsForValue().get(key);
+
+        if (storedAngle == null) {
+            log.warn("旋转验证码不存在或已过期: rotateId={}", request.getRotateId());
+            return false;
+        }
+
+        // 验证后立即删除（防止重复使用）
+        redisTemplate.delete(key);
+
+        int targetAngle = Integer.parseInt(storedAngle);
+
+        // 允许±10度误差（因为手动旋转难以精确）
+        int angleDiff = Math.abs(targetAngle - request.getAngle());
+        // 处理跨越0度的情况（例如：350度和10度实际只差20度）
+        if (angleDiff > 180) {
+            angleDiff = 360 - angleDiff;
+        }
+
+        boolean isValid = angleDiff <= 10;
+        log.info("旋转验证结果: rotateId={}, targetAngle={}, userAngle={}, angleDiff={}, isValid={}",
+                request.getRotateId(), targetAngle, request.getAngle(), angleDiff, isValid);
+
+        return isValid;
+    }
+
+    /**
+     * 创建可旋转的图片（带箭头或其他方向性标志）
+     */
+    private BufferedImage createRotatableImage(int width, int height) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+
+        // 设置抗锯齿
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // 1. 绘制渐变背景
+        GradientPaint gradient = new GradientPaint(
+                0, 0, new Color(230, 240, 250),
+                width, height, new Color(200, 220, 240)
+        );
+        g.setPaint(gradient);
+        g.fillRect(0, 0, width, height);
+
+        // 2. 绘制一个大箭头（明显的方向特征）
+        int centerX = width / 2;
+        int centerY = height / 2;
+
+        // 箭头主体（矩形）
+        g.setColor(new Color(100, 150, 200));
+        int arrowWidth = 40;
+        int arrowLength = 80;
+        g.fillRect(centerX - arrowWidth / 2, centerY - arrowLength / 2, arrowWidth, arrowLength);
+
+        // 箭头头部（三角形）
+        int[] xPoints = {centerX - 30, centerX, centerX + 30};
+        int[] yPoints = {centerY - arrowLength / 2, centerY - arrowLength / 2 - 40, centerY - arrowLength / 2};
+        g.fillPolygon(xPoints, yPoints, 3);
+
+        // 3. 绘制一些装饰性元素（增加识别度）
+        g.setColor(new Color(80, 130, 180));
+        g.setFont(new Font("Arial", Font.BOLD, 24));
+        g.drawString("↑", centerX - 10, centerY + arrowLength / 2 + 40);
+
+        // 4. 绘制边框
+        g.setColor(new Color(150, 180, 210));
+        g.setStroke(new BasicStroke(3));
+        g.drawRect(0, 0, width - 1, height - 1);
+
+        g.dispose();
+        return image;
+    }
+
+    /**
+     * 旋转图片
+     */
+    private BufferedImage rotateImage(BufferedImage src, double angle) {
+        int width = src.getWidth();
+        int height = src.getHeight();
+
+        BufferedImage rotated = new BufferedImage(width, height, src.getType());
+        Graphics2D g = rotated.createGraphics();
+
+        // 设置抗锯齿
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+        // 以图片中心为旋转点
+        g.rotate(Math.toRadians(angle), width / 2.0, height / 2.0);
+
+        // 绘制原始图片
+        g.drawImage(src, 0, 0, null);
+        g.dispose();
+
+        return rotated;
+    }
+
+    // ========== 点选验证码功能 ==========
+
+    /**
+     * 生成点选验证码 👆
+     */
+    @Override
+    public com.campus.marketplace.common.dto.response.ClickCaptchaResponse generateClickCaptcha() {
+        String clickId = UUID.randomUUID().toString();
+        Random random = new Random();
+
+        // 1. 随机选择需要点击的文字（2-4个字）
+        String[] wordPool = {"春", "夏", "秋", "冬", "梅", "兰", "竹", "菊", "红", "绿", "蓝", "黄"};
+        int wordCount = random.nextInt(3) + 2; // 2-4个字
+        java.util.List<String> targetWords = new java.util.ArrayList<>();
+        java.util.List<java.awt.Point> targetPositions = new java.util.ArrayList<>();
+
+        for (int i = 0; i < wordCount; i++) {
+            targetWords.add(wordPool[random.nextInt(wordPool.length)]);
+        }
+
+        log.info("生成点选验证码: clickId={}, targetWords={}", clickId, targetWords);
+
+        // 2. 生成背景图片并绘制文字
+        BufferedImage backgroundImage = createClickableImage(300, 200, targetWords, targetPositions);
+        String backgroundBase64 = imageToBase64(backgroundImage);
+
+        // 3. 生成提示文字
+        String hint = "请依次点击【" + String.join("】【", targetWords) + "】";
+
+        // 4. 存储到 Redis（5分钟过期）
+        String key = CLICK_KEY_PREFIX + clickId;
+        // 存储格式：x1,y1;x2,y2;x3,y3
+        String positionsStr = targetPositions.stream()
+                .map(p -> p.x + "," + p.y)
+                .reduce((a, b) -> a + ";" + b)
+                .orElse("");
+        redisTemplate.opsForValue().set(key, positionsStr, CLICK_EXPIRE_SECONDS, TimeUnit.SECONDS);
+
+        return com.campus.marketplace.common.dto.response.ClickCaptchaResponse.builder()
+                .clickId(clickId)
+                .backgroundImage(backgroundBase64)
+                .targetWords(targetWords)
+                .hint(hint)
+                .expiresIn(CLICK_EXPIRE_SECONDS)
+                .build();
+    }
+
+    /**
+     * 验证点选验证码 ✅
+     */
+    @Override
+    public boolean verifyClickCaptcha(com.campus.marketplace.common.dto.request.ClickVerifyRequest request) {
+        if (request.getClickId() == null || request.getClickPoints() == null || request.getClickPoints().isEmpty()) {
+            log.warn("点选验证参数为空");
+            return false;
+        }
+
+        String key = CLICK_KEY_PREFIX + request.getClickId();
+        String storedPositions = redisTemplate.opsForValue().get(key);
+
+        if (storedPositions == null) {
+            log.warn("点选验证码不存在或已过期: clickId={}", request.getClickId());
+            return false;
+        }
+
+        // 验证后立即删除（防止重复使用）
+        redisTemplate.delete(key);
+
+        // 解析存储的位置
+        String[] positions = storedPositions.split(";");
+        if (positions.length != request.getClickPoints().size()) {
+            log.warn("点选数量不匹配: expected={}, actual={}", positions.length, request.getClickPoints().size());
+            return false;
+        }
+
+        // 验证每个点击位置（允许±20px误差）
+        for (int i = 0; i < positions.length; i++) {
+            String[] xy = positions[i].split(",");
+            int targetX = Integer.parseInt(xy[0]);
+            int targetY = Integer.parseInt(xy[1]);
+
+            com.campus.marketplace.common.dto.request.ClickVerifyRequest.ClickPoint userPoint = request.getClickPoints().get(i);
+
+            int diffX = Math.abs(targetX - userPoint.getX());
+            int diffY = Math.abs(targetY - userPoint.getY());
+
+            if (diffX > 20 || diffY > 20) {
+                log.warn("点选位置不匹配: index={}, target=({},{}), user=({},{}), diff=({},{})",
+                        i, targetX, targetY, userPoint.getX(), userPoint.getY(), diffX, diffY);
+                return false;
+            }
+        }
+
+        log.info("点选验证通过: clickId={}, points={}", request.getClickId(), request.getClickPoints().size());
+        return true;
+    }
+
+    /**
+     * 创建点选验证码背景图片（带文字）
+     */
+    private BufferedImage createClickableImage(int width, int height, java.util.List<String> targetWords, java.util.List<java.awt.Point> targetPositions) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+
+        // 设置抗锯齿
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        Random random = new Random();
+
+        // 1. 绘制渐变背景
+        GradientPaint gradient = new GradientPaint(
+                0, 0, new Color(245, 250, 255),
+                width, height, new Color(230, 240, 250)
+        );
+        g.setPaint(gradient);
+        g.fillRect(0, 0, width, height);
+
+        // 2. 绘制干扰文字（随机汉字）
+        String[] noiseWords = {"福", "禄", "寿", "喜", "财", "贵", "吉", "祥", "安", "康", "乐", "和"};
+        g.setFont(new Font("SimSun", Font.BOLD, 28));
+
+        for (int i = 0; i < 15; i++) {
+            g.setColor(new Color(
+                    random.nextInt(100) + 155,
+                    random.nextInt(100) + 155,
+                    random.nextInt(100) + 155
+            ));
+            int x = random.nextInt(width - 40) + 10;
+            int y = random.nextInt(height - 40) + 30;
+            g.drawString(noiseWords[random.nextInt(noiseWords.length)], x, y);
+        }
+
+        // 3. 绘制目标文字（需要点击的文字，用明显颜色）
+        g.setFont(new Font("SimSun", Font.BOLD, 32));
+        for (String word : targetWords) {
+            // 随机位置（但确保不重叠）
+            int finalX = random.nextInt(width - 50) + 10;
+            int finalY = random.nextInt(height - 50) + 35;
+
+            // 确保不与已有目标重叠
+            final int checkX = finalX;
+            final int checkY = finalY;
+            boolean overlaps = targetPositions.stream()
+                    .anyMatch(p -> Math.abs(p.x - checkX) < 40 && Math.abs(p.y - checkY) < 40);
+
+            if (overlaps) {
+                // 如果重叠，重新生成位置
+                finalX = random.nextInt(width - 50) + 10;
+                finalY = random.nextInt(height - 50) + 35;
+            }
+
+            targetPositions.add(new java.awt.Point(finalX, finalY));
+
+            // 绘制目标文字（深色，更醒目）
+            g.setColor(new Color(random.nextInt(50), random.nextInt(50), random.nextInt(50)));
+            g.drawString(word, finalX, finalY);
+        }
+
+        g.dispose();
+        return image;
     }
 }

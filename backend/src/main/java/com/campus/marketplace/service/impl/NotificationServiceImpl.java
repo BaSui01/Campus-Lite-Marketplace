@@ -10,6 +10,7 @@ import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.NotificationRepository;
 import com.campus.marketplace.repository.UserRepository;
+import com.campus.marketplace.service.EmailTemplateService;
 import com.campus.marketplace.service.NotificationService;
 import com.campus.marketplace.service.NotificationPreferenceService;
 import com.campus.marketplace.service.WebPushService;
@@ -22,9 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,15 +46,12 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final JavaMailSender mailSender;
+    private final EmailTemplateService emailTemplateService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final NotificationPreferenceService preferenceService;
     private final WebPushService webPushService;
     private final com.campus.marketplace.service.NotificationTemplateService templateService;
     private final Environment environment;
-
-    @Value("${spring.mail.from:${spring.mail.username:}}")
-    private String mailFrom;
 
     private static final String UNREAD_COUNT_KEY = "notification:unread:";
     private static final String EMAIL_RATE_KEY = "notification:email:rate:";
@@ -137,22 +132,12 @@ public class NotificationServiceImpl implements NotificationService {
             log.warn("邮件速率限制检查失败，忽略: {}", e.getMessage());
         }
 
-        // 🎯 构建邮件
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
-        message.setSubject(subject);
-        message.setText(text);
-        // 发件人（优先 spring.mail.from，其次 spring.mail.username）
-        if (mailFrom != null && !mailFrom.isBlank()) {
-            message.setFrom(mailFrom);
-        }
-
-        // 🎯 发送邮件
+        // 🎯 发送HTML邮件
         try {
-            mailSender.send(message);
-            log.info("邮件通知发送成功: receiverId={}, email={}, subject={}", receiverId, user.getEmail(), subject);
+            emailTemplateService.sendNotification(user.getEmail(), subject, subject, text, null);
+            log.info("✅ HTML邮件通知发送成功: receiverId={}, email={}, subject={}", receiverId, user.getEmail(), subject);
         } catch (Exception e) {
-            log.error("邮件通知发送失败: receiverId={}, error={}", receiverId, e.getMessage(), e);
+            log.error("❌ HTML邮件通知发送失败: receiverId={}, error={}", receiverId, e.getMessage(), e);
             // 邮件发送失败不影响主流程，只记录错误日志
         }
     }

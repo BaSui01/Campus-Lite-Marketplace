@@ -73,6 +73,8 @@ public class GoodsServiceImpl implements GoodsService {
     private final FollowService followService;
     private final SubscriptionService subscriptionService;
     private final EncryptUtil encryptUtil;
+    private final com.campus.marketplace.repository.FavoriteRepository favoriteRepository;  // 🆕 收藏Repository
+    private final com.campus.marketplace.repository.ReviewRepository reviewRepository;  // 🆕 评价Repository
 
     /**
      * 发布物品
@@ -279,9 +281,12 @@ public class GoodsServiceImpl implements GoodsService {
         String categoryName = categoryRepository.findById(goods.getCategoryId())
                 .map(Category::getName)
                 .orElse("未知分类");
-        String sellerUsername = userRepository.findById(goods.getSellerId())
-                .map(User::getUsername)
-                .orElse("未知用户");
+
+        // 获取卖家信息（包括头像）
+        User seller = userRepository.findById(goods.getSellerId()).orElse(null);
+        String sellerUsername = seller != null ? seller.getUsername() : "未知用户";
+        String sellerAvatar = seller != null ? seller.getAvatar() : null;
+
         String coverImage = goods.getImages() != null && goods.getImages().length > 0
                 ? goods.getImages()[0]
                 : null;
@@ -295,9 +300,13 @@ public class GoodsServiceImpl implements GoodsService {
                 .categoryName(categoryName)
                 .sellerId(goods.getSellerId())
                 .sellerUsername(sellerUsername)
+                .sellerAvatar(sellerAvatar)  // ✅ 新增：卖家头像
                 .status(goods.getStatus())
                 .viewCount(goods.getViewCount())
                 .favoriteCount(goods.getFavoriteCount())
+                .stock(goods.getStock())  // ✅ 新增：库存
+                .soldCount(goods.getSoldCount())  // ✅ 新增：已售数量
+                .originalPrice(goods.getOriginalPrice())  // ✅ 新增：原价
                 .coverImage(coverImage)
                 .createdAt(goods.getCreatedAt())
                 .build();
@@ -308,9 +317,23 @@ public class GoodsServiceImpl implements GoodsService {
      */
     private GoodsDetailResponse convertToDetailResponse(Goods goods) {
         // 获取分类名称
-        String categoryName = goods.getCategory() != null 
-                ? goods.getCategory().getName() 
+        String categoryName = goods.getCategory() != null
+                ? goods.getCategory().getName()
                 : "未知分类";
+
+        // 🆕 获取当前用户是否已收藏（前端需要）
+        Boolean isFavorited = false;
+        try {
+            if (SecurityUtil.isAuthenticated()) {
+                String username = SecurityUtil.getCurrentUsername();
+                User currentUser = userRepository.findByUsername(username).orElse(null);
+                if (currentUser != null) {
+                    isFavorited = favoriteRepository.existsByUserIdAndGoodsId(currentUser.getId(), goods.getId());
+                }
+            }
+        } catch (Exception e) {
+            log.debug("获取收藏状态失败（未登录或其他原因）: {}", e.getMessage());
+        }
 
         // 获取卖家信息（敏感信息脱敏）
         User seller = goods.getSeller();
@@ -321,6 +344,23 @@ public class GoodsServiceImpl implements GoodsService {
         if (seller == null) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "卖家信息缺失");
         }
+
+        // 🆕 获取卖家评分（前端需要）
+        Double sellerRating = null;
+        try {
+            sellerRating = reviewRepository.getAverageRatingBySellerId(seller.getId());
+        } catch (Exception e) {
+            log.debug("获取卖家评分失败: {}", e.getMessage());
+        }
+
+        // 🆕 获取卖家在售商品数量（前端需要）
+        Integer sellerGoodsCount = null;
+        try {
+            sellerGoodsCount = (int) goodsRepository.countBySellerIdAndStatus(seller.getId(), GoodsStatus.APPROVED);
+        } catch (Exception e) {
+            log.debug("获取卖家商品数量失败: {}", e.getMessage());
+        }
+
         GoodsDetailResponse.SellerInfo sellerInfo = GoodsDetailResponse.SellerInfo.builder()
                 .id(seller.getId())
                 .username(seller.getUsername())
@@ -328,11 +368,13 @@ public class GoodsServiceImpl implements GoodsService {
                 .points(seller.getPoints())
                 .phone(seller.getPhone() != null ? encryptUtil.maskPhone(seller.getPhone()) : null)
                 .email(seller.getEmail() != null ? encryptUtil.maskEmail(seller.getEmail()) : null)
+                .rating(sellerRating)  // 🆕 卖家评分
+                .goodsCount(sellerGoodsCount)  // 🆕 在售商品数量
                 .build();
 
         // 转换图片数组为列表
-        List<String> images = goods.getImages() != null 
-                ? Arrays.asList(goods.getImages()) 
+        List<String> images = goods.getImages() != null
+                ? Arrays.asList(goods.getImages())
                 : List.of();
 
         List<TagResponse> tags = loadTagsForGoods(List.of(goods.getId()))
@@ -353,6 +395,10 @@ public class GoodsServiceImpl implements GoodsService {
                 .seller(sellerInfo)
                 .createdAt(goods.getCreatedAt())
                 .updatedAt(goods.getUpdatedAt())
+                .isFavorited(isFavorited)  // 🆕 是否已收藏
+                .condition(goods.getCondition())  // 🆕 商品成色
+                .deliveryMethod(goods.getDeliveryMethod())  // 🆕 交易方式
+                .originalPrice(goods.getOriginalPrice())  // 🆕 原价
                 .build();
     }
 

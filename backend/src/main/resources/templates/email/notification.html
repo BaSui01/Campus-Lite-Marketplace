@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+        .message {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            white-space: pre-wrap;
+        }
+        .action-button {
+            display: inline-block;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            box-shadow: 0 6px 8px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+        .divider {
+            height: 1px;
+            background-color: #eeeeee;
+            margin: 30px 0;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 30px 20px;
+            }
+            .title {
+                font-size: 18px;
+            }
+            .action-button {
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table class="email-container" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <!-- Header -->
+        <tr>
+            <td class="header">
+                <h1 class="logo">🎓 校园轻享集市</h1>
+            </td>
+        </tr>
+
+        <!-- Content -->
+        <tr>
+            <td class="content">
+                <div class="icon">📬</div>
+
+                <div class="title" th:text="${title}">您有新的通知</div>
+
+                <div class="message" th:text="${content}">
+                    这是一条通知消息的内容。
+                </div>
+
+                <div th:if="${hasLink}" style="text-align: center;">
+                    <a th:href="${link}" class="action-button">查看详情</a>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="message" style="font-size: 12px; color: #999999;">
+                    💡 <strong>温馨提示：</strong><br>
+                    • 您可以在"个人中心 - 通知设置"中管理通知偏好<br>
+                    • 如需帮助，请联系我们的客服团队
+                </div>
+            </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+            <td class="footer">
+                <p>此邮件由系统自动发送，请勿直接回复</p>
+                <p>
+                    © 2025 校园轻享集市 |
+                    <a href="#">隐私政策</a> |
+                    <a href="#">服务条款</a> |
+                    <a href="#">取消订阅</a>
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,29 +1,32 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.dto.response.SystemOverviewDTO;
+
 import java.util.List;
 import java.util.Map;
 
 /**
  * 数据统计服务接口
- * 
+ *
  * 功能：
  * 1. 系统概览统计
  * 2. 用户统计
  * 3. 物品统计
  * 4. 订单统计
  * 5. 趋势分析
- * 
+ *
  * @author BaSui
  * @date 2025-10-27
+ * @updated 2025-11-10 - 使用强类型 DTO 替代 Map<String, Object> 😎
  */
 public interface StatisticsService {
 
     /**
      * 获取系统概览统计
-     * 
-     * @return 系统统计数据
+     *
+     * @return 系统统计数据（强类型 DTO）
      */
-    Map<String, Object> getSystemOverview();
+    SystemOverviewDTO getSystemOverview();
 
     /**
      * 获取用户统计数据
