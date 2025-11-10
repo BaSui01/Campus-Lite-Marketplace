@@ -1,18 +1,13 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.LogisticsDTO;
-import com.campus.marketplace.common.enums.LogisticsStatus;
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.service.LogisticsService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,38 +35,16 @@ public class LogisticsAdminController {
 
     @GetMapping
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_STATISTICS_VIEW)")
-    @Operation(summary = "分页查询物流列表", description = "管理员查看所有物流信息，支持关键词搜索和状态筛选")
-    public ApiResponse<Page<LogisticsDTO>> listLogistics(
-            @Parameter(description = "关键词（订单ID/快递单号）", example = "SF1234567890")
-            @RequestParam(required = false) String keyword,
-
-            @Parameter(description = "物流状态", example = "IN_TRANSIT")
-            @RequestParam(required = false) LogisticsStatus status,
-
-            @Parameter(description = "页码（从0开始）", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-
-            @Parameter(description = "每页大小", example = "20")
-            @RequestParam(defaultValue = "20") int size,
-
-            @Parameter(description = "排序字段", example = "createdAt")
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-
-            @Parameter(description = "排序方向", example = "DESC")
-            @RequestParam(defaultValue = "DESC") String sortDirection
-    ) {
+    @Operation(summary = "分页查询物流列表", description = "管理员查看所有物流信息，支持分页、筛选、排序")
+    public ApiResponse<Page<LogisticsDTO>> listLogistics(com.campus.marketplace.common.dto.request.LogisticsFilterRequest filterRequest) {
         log.info("🎯 BaSui：管理端查询物流列表 - keyword={}, status={}, page={}, size={}",
-                keyword, status, page, size);
-
-        // 构建分页参数
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+                filterRequest.getKeyword(), filterRequest.getStatus(), filterRequest.getPage(), filterRequest.getSize());
 
         // 调用服务层查询
-        Page<LogisticsDTO> logisticsPage = logisticsService.listLogistics(keyword, status, pageable);
+        Page<LogisticsDTO> logisticsPage = logisticsService.listLogistics(filterRequest);
 
         log.info("✅ BaSui：查询成功 - 共 {} 条记录，当前第 {} 页",
-                logisticsPage.getTotalElements(), page + 1);
+                logisticsPage.getTotalElements(), filterRequest.getPage() + 1);
 
         return ApiResponse.success(logisticsPage);
     }

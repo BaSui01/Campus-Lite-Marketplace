@@ -501,11 +501,35 @@ public class DatabaseSeeder {
             // 🎯 根据状态设置销量（已审核的商品可能有销量）
             int soldCount = status == GoodsStatus.APPROVED ? (int)(Math.random() * 10) : 0;
 
+            // 🎯 根据标题和描述判断商品成色（前端需要）
+            String condition;
+            if (title.contains("全新") || description.contains("未拆封")) {
+                condition = "BRAND_NEW";  // 全新
+            } else if (description.contains("99新") || description.contains("九成新")) {
+                condition = "LIKE_NEW";  // 几乎全新
+            } else if (description.contains("八成新")) {
+                condition = "LIGHTLY_USED";  // 轻微使用痕迹
+            } else {
+                condition = "WELL_USED";  // 明显使用痕迹
+            }
+
+            // 🎯 根据描述判断交易方式（前端需要）
+            String deliveryMethod;
+            if (description.contains("当面交易") || description.contains("面交") || description.contains("自提")) {
+                deliveryMethod = "MEET";  // 校园面交
+            } else if (description.contains("包邮") || description.contains("邮寄")) {
+                deliveryMethod = "MAIL";  // 快递邮寄
+            } else {
+                deliveryMethod = "MEET,MAIL";  // 两种方式都支持
+            }
+
             Goods goods = Goods.builder()
                     .title(title)
                     .description(description)
                     .price(price)
                     .originalPrice(originalPrice)  // ✅ 新增：原价
+                    .condition(condition)  // 🆕 商品成色
+                    .deliveryMethod(deliveryMethod)  // 🆕 交易方式
                     .categoryId(categoryId)
                     .sellerId(seller.getId())
                     .campusId(campusId)
@@ -743,6 +767,7 @@ public class DatabaseSeeder {
     /**
      * 初始化评价数据
      * ⭐ 买家对已完成订单的评价
+     * 🎯 为卖家创建不同评分的评价，让评分更真实
      */
     private void seedReviews() {
         // 🚫 幂等性检查
@@ -763,6 +788,7 @@ public class DatabaseSeeder {
 
         int createdCount = 0;
 
+        // 🎯 为已完成的订单创建评价（使用不同的评分）
         for (com.campus.marketplace.common.entity.Order order : completedOrders) {
             Review review = Review.builder()
                     .orderId(order.getId())
@@ -779,7 +805,56 @@ public class DatabaseSeeder {
             createdCount++;
         }
 
+        // 🎯 为主要卖家添加更多评价数据（让评分更真实）
+        // seller_north: 4.8分（5条评价：4个5分，1个4分）
+        createdCount += createReviewForSeller("seller_north", "student1", 5, "商品质量很好，卖家服务态度也很棒！");
+        createdCount += createReviewForSeller("seller_north", "student2", 5, "物品和描述一致，非常满意！");
+        createdCount += createReviewForSeller("seller_north", "student3", 5, "卖家很靠谱，推荐！");
+        createdCount += createReviewForSeller("seller_north", "buyer_grad", 4, "商品不错，但交易时间有点晚");
+
+        // seller_south: 4.6分（5条评价：3个5分，2个4分）
+        createdCount += createReviewForSeller("seller_south", "student1", 5, "iPad很新，卖家人很好！");
+        createdCount += createReviewForSeller("seller_south", "student2", 4, "商品还行，但包装有点简陋");
+        createdCount += createReviewForSeller("seller_south", "student4", 5, "非常满意，下次还来！");
+        createdCount += createReviewForSeller("seller_south", "buyer_grad", 4, "物品质量可以，价格稍贵");
+
+        // student1: 4.5分（2条评价：1个5分，1个4分）
+        createdCount += createReviewForSeller("student1", "student2", 5, "教材很新，价格实惠！");
+        createdCount += createReviewForSeller("student1", "student3", 4, "书还不错，就是有点旧");
+
         log.info("已创建 {} 条评价", createdCount);
+    }
+
+    /**
+     * 为指定卖家创建评价
+     * 🎯 辅助方法，用于创建测试评价数据
+     */
+    private int createReviewForSeller(String sellerName, String buyerName, int rating, String content) {
+        Optional<User> sellerOpt = userRepository.findByUsername(sellerName);
+        Optional<User> buyerOpt = userRepository.findByUsername(buyerName);
+
+        if (sellerOpt.isEmpty() || buyerOpt.isEmpty()) {
+            return 0;
+        }
+
+        // 创建一个虚拟订单ID（用于评价关联）
+        // 注意：这里为了简化，使用sellerId作为orderId的一部分
+        // 实际生产环境中应该关联真实的订单
+        Long virtualOrderId = sellerOpt.get().getId() * 1000 + buyerOpt.get().getId();
+
+        Review review = Review.builder()
+                .orderId(virtualOrderId)
+                .buyerId(buyerOpt.get().getId())
+                .sellerId(sellerOpt.get().getId())
+                .rating(rating)
+                .qualityScore(rating)
+                .serviceScore(rating)
+                .deliveryScore(rating)
+                .content(content)
+                .status(ReviewStatus.NORMAL)
+                .build();
+        reviewRepository.save(review);
+        return 1;
     }
 
     // ==================== 🚀 方案二：核心业务实体初始化方法 ====================
