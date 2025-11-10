@@ -33,7 +33,8 @@
       "mcp__acemcp__search_context",
       "mcp__filesystem__write_file",
       "mcp__filesystem__directory_tree",
-      "mcp__filesystem__list_directory"
+      "mcp__filesystem__list_directory",
+      "mcp__github__create_pull_request"
     ],
     "deny": [],
     "ask": []
