@@ -79,13 +79,13 @@ export interface RefundFilterRequest {
      * @type {number}
      * @memberof RefundFilterRequest
      */
-    'pageOrDefault'?: number;
+    'sizeOrDefault'?: number;
     /**
      * 
      * @type {number}
      * @memberof RefundFilterRequest
      */
-    'sizeOrDefault'?: number;
+    'pageOrDefault'?: number;
     /**
      * 
      * @type {string}

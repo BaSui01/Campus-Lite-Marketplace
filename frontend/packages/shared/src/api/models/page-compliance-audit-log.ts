@@ -67,18 +67,6 @@ export interface PageComplianceAuditLog {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageComplianceAuditLog
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageComplianceAuditLog
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageComplianceAuditLog
      */
@@ -89,6 +77,18 @@ export interface PageComplianceAuditLog {
      * @memberof PageComplianceAuditLog
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageComplianceAuditLog
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageComplianceAuditLog
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

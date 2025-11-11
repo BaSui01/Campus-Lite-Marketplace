@@ -34,5 +34,8 @@ export * from './tokenUtils';
 // 🛡️ ECharts 错误抑制器
 export * from './suppressEChartsError';
 
+// 📦 订单状态映射（UI阶段 ↔ 后端状态）
+export * from './orderStatus';
+
 // 🚧 TODO: 后续添加工具函数
 // export * from './upload';

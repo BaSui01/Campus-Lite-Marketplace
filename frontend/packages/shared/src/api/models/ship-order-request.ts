@@ -13,51 +13,38 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
  * 
  * @export
- * @interface PageableObject
+ * @interface ShipOrderRequest
  */
-export interface PageableObject {
+export interface ShipOrderRequest {
     /**
      * 
-     * @type {number}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof ShipOrderRequest
      */
-    'offset'?: number;
+    'trackingNumber': string;
     /**
      * 
-     * @type {Array<SortObject>}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof ShipOrderRequest
      */
-    'sort'?: Array<SortObject>;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'unpaged'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'paged'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageSize'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageNumber'?: number;
+    'company': ShipOrderRequestCompanyEnum;
 }
+
+export const ShipOrderRequestCompanyEnum = {
+    Shunfeng: 'SHUNFENG',
+    Zhongtong: 'ZHONGTONG',
+    Yuantong: 'YUANTONG',
+    Yunda: 'YUNDA',
+    Ems: 'EMS',
+    Jingdong: 'JINGDONG',
+    Debang: 'DEBANG',
+    Shentong: 'SHENTONG'
+} as const;
+
+export type ShipOrderRequestCompanyEnum = typeof ShipOrderRequestCompanyEnum[keyof typeof ShipOrderRequestCompanyEnum];
+
 

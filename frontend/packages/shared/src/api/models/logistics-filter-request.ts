@@ -73,13 +73,13 @@ export interface LogisticsFilterRequest {
      * @type {number}
      * @memberof LogisticsFilterRequest
      */
-    'pageOrDefault'?: number;
+    'sizeOrDefault'?: number;
     /**
      * 
      * @type {number}
      * @memberof LogisticsFilterRequest
      */
-    'sizeOrDefault'?: number;
+    'pageOrDefault'?: number;
     /**
      * 
      * @type {string}

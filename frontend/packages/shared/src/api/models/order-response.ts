@@ -121,6 +121,36 @@ export interface OrderResponse {
      * @type {string}
      * @memberof OrderResponse
      */
+    'deliveryMethod'?: OrderResponseDeliveryMethodEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'receiverName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'receiverPhone'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'receiverAddress'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'buyerNote'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
     'paymentExpireAt'?: string;
     /**
      * 
@@ -143,5 +173,11 @@ export const OrderResponseStatusEnum = {
 } as const;
 
 export type OrderResponseStatusEnum = typeof OrderResponseStatusEnum[keyof typeof OrderResponseStatusEnum];
+export const OrderResponseDeliveryMethodEnum = {
+    FaceToFace: 'FACE_TO_FACE',
+    Express: 'EXPRESS'
+} as const;
+
+export type OrderResponseDeliveryMethodEnum = typeof OrderResponseDeliveryMethodEnum[keyof typeof OrderResponseDeliveryMethodEnum];
 
 

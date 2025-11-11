@@ -98,4 +98,17 @@ public interface OrderService {
      * @param request 配送信息
      */
     void updateOrderDelivery(String orderNo, com.campus.marketplace.common.dto.request.UpdateOrderDeliveryRequest request);
+
+    /**
+     * 卖家发货（快递）→ 订单进入 SHIPPED
+     * @param orderNo 订单号
+     * @param request 发货信息（物流公司、运单号）
+     */
+    void shipOrder(String orderNo, com.campus.marketplace.common.dto.request.ShipOrderRequest request);
+
+    /**
+     * 买家确认收货 → 订单从 DELIVERED 流转到 COMPLETED
+     * @param orderNo 订单号
+     */
+    void confirmReceipt(String orderNo);
 }

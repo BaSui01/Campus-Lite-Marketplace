@@ -12,6 +12,8 @@ import { websocketService } from '@campus/shared/utils';
 import { useNotificationStore } from '../../store';
 import { LogisticsCard } from '../../components/LogisticsCard';
 import type { Order, PaymentMethod, OrderStatus } from '@campus/shared/types';
+import { toUiStage, displayLabelForStatus } from '@campus/shared/utils';
+import type { OrderStatus as BackendOrderStatus } from '@campus/shared/types/enum';
 import './OrderDetail.css';
 
 /**
@@ -30,6 +32,7 @@ const OrderDetail: React.FC = () => {
   const [paying, setPaying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [shipping, setShipping] = useState(false);
   const [refunding, setRefunding] = useState(false);
 
   // 倒计时（待支付）
@@ -339,6 +342,28 @@ const OrderDetail: React.FC = () => {
   };
 
   /**
+   * 卖家发货（简版：弹窗输入快递单号，默认顺丰）
+   */
+  const handleShipOrder = async () => {
+    if (!order) return;
+
+    const tracking = window.prompt('请输入快递单号（顺丰示例）：');
+    if (!tracking) return;
+
+    setShipping(true);
+    try {
+      await orderService.shipOrder(order.orderNo, { trackingNumber: tracking, company: 'SHUNFENG' });
+      toast.success('发货成功！📦');
+      loadOrderDetail();
+    } catch (err: any) {
+      console.error('发货失败：', err);
+      toast.error(err.response?.data?.message || '发货失败，请稍后重试！😭');
+    } finally {
+      setShipping(false);
+    }
+  };
+
+  /**
    * 打开退款弹窗
    */
   const handleOpenRefundModal = () => {
@@ -406,49 +431,23 @@ const OrderDetail: React.FC = () => {
   /**
    * 获取订单状态文本
    */
-  const getStatusText = (status?: OrderStatus) => {
-    switch (status) {
-      case 'PENDING_PAYMENT':
-        return '待支付';
-      case 'PAID':
-        return '已支付';
-      case 'PENDING_DELIVERY':
-        return '待发货';
-      case 'PENDING_RECEIPT':
-        return '待收货';
-      case 'COMPLETED':
-        return '已完成';
-      case 'CANCELLED':
-        return '已取消';
-      case 'REFUNDING':
-        return '退款中';
-      case 'REFUNDED':
-        return '已退款';
-      default:
-        return '未知';
-    }
-  };
+  const getStatusText = (status?: OrderStatus) =>
+    status ? displayLabelForStatus(status as unknown as BackendOrderStatus) : '未知';
 
   /**
    * 获取订单状态样式类
    */
   const getStatusClass = (status?: OrderStatus) => {
-    switch (status) {
-      case 'PENDING_PAYMENT':
-        return 'status-pending';
-      case 'PAID':
-      case 'PENDING_DELIVERY':
-      case 'PENDING_RECEIPT':
-        return 'status-processing';
-      case 'COMPLETED':
-        return 'status-completed';
-      case 'CANCELLED':
-      case 'REFUNDED':
-        return 'status-cancelled';
-      case 'REFUNDING':
-        return 'status-refunding';
-      default:
-        return '';
+    if (!status) return '';
+    const stage = toUiStage(status as unknown as BackendOrderStatus);
+    switch (stage) {
+      case 'PENDING_PAYMENT': return 'status-pending';
+      case 'PENDING_SHIPMENT':
+      case 'PENDING_RECEIPT': return 'status-processing';
+      case 'COMPLETED': return 'status-completed';
+      case 'CANCELLED': return 'status-cancelled';
+      case 'AFTER_SALES': return status === 'REFUNDING' ? 'status-refunding' : 'status-cancelled';
+      default: return '';
     }
   };
 
@@ -522,6 +521,7 @@ const OrderDetail: React.FC = () => {
    */
   const buildTimelineItems = () => {
     if (!order) return [];
+    const stage = toUiStage(order.status as unknown as BackendOrderStatus);
     const items: any[] = [
       {
         title: '创建订单',
@@ -533,19 +533,19 @@ const OrderDetail: React.FC = () => {
         title: '支付成功',
         description: '等待卖家发货',
         time: order.paymentTime ? formatTime(order.paymentTime) : undefined,
-        status: order.status === 'PAID' || order.status === 'SHIPPED' || order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'success' : 'default',
+        status: ['PENDING_SHIPMENT','PENDING_RECEIPT','COMPLETED'].includes(stage) ? 'success' : 'default',
       },
       {
         title: '卖家发货',
         description: '物流运输中',
         time: undefined, // 需要后端物流时间，暂无
-        status: order.status === 'SHIPPED' || order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'success' : 'default',
+        status: ['PENDING_RECEIPT','COMPLETED'].includes(stage) ? 'success' : 'default',
       },
       {
         title: '确认收货',
         description: '待确认',
         time: undefined, // 需要后端 delivered/received 时间，暂无
-        status: order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'success' : 'default',
+        status: stage === 'COMPLETED' ? 'success' : 'default',
       },
       {
         title: order.status === 'CANCELLED' ? '订单已取消' : '交易完成',
@@ -557,22 +557,9 @@ const OrderDetail: React.FC = () => {
 
     // 计算当前激活节点
     let activeIndex = 0;
-    switch (order.status) {
-      case 'PENDING_PAYMENT':
-        activeIndex = 0; break;
-      case 'PAID':
-        activeIndex = 1; break;
-      case 'SHIPPED':
-        activeIndex = 2; break;
-      case 'DELIVERED':
-        activeIndex = 3; break;
-      case 'COMPLETED':
-        activeIndex = 4; break;
-      case 'CANCELLED':
-        activeIndex = 4; break;
-      default:
-        activeIndex = 0;
-    }
+    activeIndex = ['PENDING_PAYMENT','PENDING_SHIPMENT','PENDING_RECEIPT','COMPLETED','CANCELLED']
+      .indexOf(stage);
+    if (activeIndex < 0) activeIndex = 0;
     return { items, activeIndex };
   };
 
@@ -609,10 +596,12 @@ const OrderDetail: React.FC = () => {
   }
 
   // 判断按钮可见性
-  const canPay = order.status === 'PENDING_PAYMENT';
-  const canCancel = order.status === 'PENDING_PAYMENT' || order.status === 'PAID';
-  const canConfirmReceipt = order.status === 'PENDING_RECEIPT';
-  const canRefund = order.status === 'PAID' || order.status === 'PENDING_DELIVERY';
+  const stage = toUiStage(order.status as unknown as BackendOrderStatus);
+  const canPay = stage === 'PENDING_PAYMENT';
+  const canCancel = stage === 'PENDING_PAYMENT' || stage === 'PENDING_SHIPMENT';
+  const canConfirmReceipt = stage === 'PENDING_RECEIPT';
+  const canRefund = stage === 'PENDING_SHIPMENT' || stage === 'PENDING_RECEIPT';
+  const canShip = stage === 'PENDING_SHIPMENT' && (order as any)?.deliveryMethod === 'EXPRESS';
 
   return (
     <div className="order-detail-page">
@@ -796,6 +785,11 @@ const OrderDetail: React.FC = () => {
           {canRefund && (
             <button className="btn-warning" onClick={handleOpenRefundModal}>
               🔄 申请退款
+            </button>
+          )}
+          {canShip && (
+            <button className="btn-primary" onClick={handleShipOrder} disabled={shipping}>
+              {shipping ? '⏳ 发货中...' : '📦 立即发货'}
             </button>
           )}
           {canCancel && (

@@ -429,6 +429,22 @@ services:
     networks:
       - campus
 
+  # ========================================
+  # 🌉 ngrok（将本地服务暴露为公网地址）
+  # ========================================
+  ngrok:
+    image: ngrok/ngrok:3
+    container_name: campus-ngrok
+    restart: unless-stopped
+    profiles: ["tunnel"]
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:?请在 .env 中设置 NGROK_AUTHTOKEN}
+    command: ["http", "--log=stdout", "${NGROK_ADDR:-host.docker.internal:8200}"]
+    ports:
+      - "4040:4040"   # ngrok 本地控制台
+    networks:
+      - campus
+
   # ==========================================================
   # 🚀 可选扩展服务（注释形式保留，按需启用）
   # ==========================================================

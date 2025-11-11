@@ -177,6 +177,37 @@ public class OrderController {
     }
 
     /**
+     * 卖家发货（快递）
+     *
+     * POST /api/orders/{orderNo}/ship
+     */
+    @PostMapping("/{orderNo}/ship")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "卖家发货", description = "仅卖家可操作，订单需为已支付且为快递配送")
+    public ApiResponse<Void> shipOrder(
+            @Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo,
+            @Valid @RequestBody com.campus.marketplace.common.dto.request.ShipOrderRequest request
+    ) {
+        orderService.shipOrder(orderNo, request);
+        return ApiResponse.success(null);
+    }
+
+    /**
+     * 买家确认收货
+     *
+     * POST /api/orders/{orderNo}/confirm-receipt
+     */
+    @PostMapping("/{orderNo}/confirm-receipt")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "买家确认收货", description = "仅买家可操作，订单需处于 DELIVERED 状态")
+    public ApiResponse<Void> confirmReceipt(
+            @Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo
+    ) {
+        orderService.confirmReceipt(orderNo);
+        return ApiResponse.success(null);
+    }
+
+    /**
      * 取消订单（未支付）
      *
      * POST /api/orders/{orderNo}/cancel

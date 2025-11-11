@@ -67,18 +67,6 @@ export interface PageBlacklist {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageBlacklist
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageBlacklist
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageBlacklist
      */
@@ -89,6 +77,18 @@ export interface PageBlacklist {
      * @memberof PageBlacklist
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageBlacklist
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageBlacklist
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

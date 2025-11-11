@@ -67,18 +67,6 @@ export interface PageAppealMaterial {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageAppealMaterial
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageAppealMaterial
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageAppealMaterial
      */
@@ -89,6 +77,18 @@ export interface PageAppealMaterial {
      * @memberof PageAppealMaterial
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageAppealMaterial
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageAppealMaterial
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

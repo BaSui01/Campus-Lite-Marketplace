@@ -67,18 +67,6 @@ export interface PageLogisticsDTO {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageLogisticsDTO
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageLogisticsDTO
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageLogisticsDTO
      */
@@ -89,6 +77,18 @@ export interface PageLogisticsDTO {
      * @memberof PageLogisticsDTO
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageLogisticsDTO
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageLogisticsDTO
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

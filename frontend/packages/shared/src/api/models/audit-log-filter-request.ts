@@ -79,13 +79,13 @@ export interface AuditLogFilterRequest {
      * @type {number}
      * @memberof AuditLogFilterRequest
      */
-    'pageOrDefault'?: number;
+    'sizeOrDefault'?: number;
     /**
      * 
      * @type {number}
      * @memberof AuditLogFilterRequest
      */
-    'sizeOrDefault'?: number;
+    'pageOrDefault'?: number;
     /**
      * 
      * @type {string}

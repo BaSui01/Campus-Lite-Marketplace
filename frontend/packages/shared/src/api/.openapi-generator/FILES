@@ -82,6 +82,7 @@ models/api-response-list-tag-response.ts
 models/api-response-list-tag-statistics-response.ts
 models/api-response-list-topic.ts
 models/api-response-list-user-behavior-log-dto.ts
+models/api-response-list-user-feed-dto.ts
 models/api-response-list-user-feed.ts
 models/api-response-list-user.ts
 models/api-response-login-response.ts
@@ -360,6 +361,7 @@ models/seller-info-dto.ts
 models/seller-info.ts
 models/send-message-request.ts
 models/send-negotiation-request.ts
+models/ship-order-request.ts
 models/slide-captcha-response.ts
 models/sort-item.ts
 models/sort-object.ts
@@ -387,6 +389,7 @@ models/upload-evidence-request.ts
 models/user-behavior-log-dto.ts
 models/user-brief-info.ts
 models/user-credit-info-response.ts
+models/user-feed-dto.ts
 models/user-feed.ts
 models/user-info.ts
 models/user-persona-dto.ts

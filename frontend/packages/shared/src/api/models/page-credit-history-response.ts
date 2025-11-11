@@ -67,18 +67,6 @@ export interface PageCreditHistoryResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageCreditHistoryResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageCreditHistoryResponse
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageCreditHistoryResponse
      */
@@ -89,6 +77,18 @@ export interface PageCreditHistoryResponse {
      * @memberof PageCreditHistoryResponse
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageCreditHistoryResponse
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageCreditHistoryResponse
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

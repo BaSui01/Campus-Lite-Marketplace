@@ -67,18 +67,6 @@ export interface PageRevertRequest {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageRevertRequest
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageRevertRequest
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageRevertRequest
      */
@@ -89,6 +77,18 @@ export interface PageRevertRequest {
      * @memberof PageRevertRequest
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageRevertRequest
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageRevertRequest
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

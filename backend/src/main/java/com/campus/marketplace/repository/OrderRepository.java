@@ -40,7 +40,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     /**
      * 查询买家订单列表（包含关联数据）
      */
-    @EntityGraph(attributePaths = {"goods", "seller"})
+    @EntityGraph(attributePaths = {"goods", "buyer", "seller"})
     @Query("SELECT o FROM Order o WHERE o.buyerId = :buyerId " +
            "AND (:status IS NULL OR o.status = :status) " +
            "ORDER BY o.createdAt DESC")
@@ -53,7 +53,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     /**
      * 查询卖家订单列表（包含关联数据）
      */
-    @EntityGraph(attributePaths = {"goods", "buyer"})
+    @EntityGraph(attributePaths = {"goods", "buyer", "seller"})
     @Query("SELECT o FROM Order o WHERE o.sellerId = :sellerId " +
            "AND (:status IS NULL OR o.status = :status) " +
            "ORDER BY o.createdAt DESC")

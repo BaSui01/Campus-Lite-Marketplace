@@ -67,18 +67,6 @@ export interface PageEvent {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageEvent
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageEvent
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageEvent
      */
@@ -89,6 +77,18 @@ export interface PageEvent {
      * @memberof PageEvent
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageEvent
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageEvent
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

@@ -67,18 +67,6 @@ export interface PageAuditLogResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageAuditLogResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageAuditLogResponse
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageAuditLogResponse
      */
@@ -89,6 +77,18 @@ export interface PageAuditLogResponse {
      * @memberof PageAuditLogResponse
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageAuditLogResponse
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageAuditLogResponse
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

@@ -7,13 +7,7 @@
  */
 
 import { getApi } from '../utils/apiClient';
-import type {
-  CreateOrderRequest,
-  PayOrderRequest,
-  Order,
-  PageOrderResponse,
-  UpdateOrderDeliveryRequest,
-} from '../api/models';
+import type { CreateOrderRequest, PayOrderRequest, Order, PageOrderResponse, UpdateOrderDeliveryRequest, ShipOrderRequest } from '../api/models';
 
 /**
  * 支付响应数据类型
@@ -136,17 +130,7 @@ export class OrderService {
     return response.data.data as PaymentResponseData;
   }
 
-  /**
-   * 创建支付订单（已弃用 - 请使用 payOrder）
-   * @deprecated 请使用 payOrder 方法
-   * @param data 支付请求参数
-   * @returns 支付订单号或二维码链接
-   */
-  async createPayment(data: PayOrderRequest): Promise<string> {
-    const api = getApi();
-    const response = await api.createPayment({ payOrderRequest: data });
-    return response.data.data as string;
-  }
+  // （已移除）createPayment：请使用 payOrder()
 
   /**
    * 查询订单支付状态
@@ -157,6 +141,28 @@ export class OrderService {
     const api = getApi();
     const response = await api.queryPaymentStatus({ orderNo });
     return response.data.data as string;
+  }
+
+  // ==================== 发货 / 确认收货 ====================
+
+  /**
+   * 卖家发货（快递）
+   * @param orderNo 订单号
+   * @param opts 物流信息
+   */
+  async shipOrder(orderNo: string, opts: { trackingNumber: string; company: string }): Promise<void> {
+    const api = getApi();
+    const payload: ShipOrderRequest = { trackingNumber: opts.trackingNumber, company: opts.company as any } as any;
+    await api.shipOrder({ orderNo, shipOrderRequest: payload });
+  }
+
+  /**
+   * 买家确认收货
+   * @param params 包含 orderNo
+   */
+  async confirmReceipt(params: { orderNo: string }): Promise<void> {
+    const api = getApi();
+    await api.confirmReceipt({ orderNo: params.orderNo });
   }
 
   // ==================== 物流相关接口 ====================
@@ -206,7 +212,7 @@ export class OrderService {
   //   - getOrderByNo()     → 改用 getOrderDetail()
   //   - getBuyerOrders()   → 改用 listBuyerOrders()
   //   - getSellerOrders()  → 改用 listSellerOrders()
-  //   - payOrder()         → 改用 createPayment()
+  //   - payOrder()         →（已标准化）请继续使用 payOrder()
   //   - getPaymentStatus() → 改用 queryPaymentStatus()
   //
   // ✅ 已移除的功能（分散到专属服务）：
@@ -220,7 +226,7 @@ export class OrderService {
   //   新代码：orderService.getOrderDetail(orderNo)
   //
   //   旧代码：orderService.payOrder(data)
-  //   新代码：orderService.createPayment(data)
+  //   新代码：orderService.payOrder(orderNo, data)
   //
   // ==================== 🚀 重构完成 ====================
 }

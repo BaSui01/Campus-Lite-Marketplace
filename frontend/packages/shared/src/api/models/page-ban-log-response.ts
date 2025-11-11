@@ -67,18 +67,6 @@ export interface PageBanLogResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageBanLogResponse
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageBanLogResponse
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageBanLogResponse
      */
@@ -89,6 +77,18 @@ export interface PageBanLogResponse {
      * @memberof PageBanLogResponse
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageBanLogResponse
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageBanLogResponse
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

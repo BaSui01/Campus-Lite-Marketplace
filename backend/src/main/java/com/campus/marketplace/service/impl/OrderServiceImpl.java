@@ -55,6 +55,7 @@ public class OrderServiceImpl implements OrderService {
     private final GoodsRepository goodsRepository;
     private final UserRepository userRepository;
     private final PaymentService paymentService;
+    private final com.campus.marketplace.service.LogisticsService logisticsService;
     private final com.campus.marketplace.repository.ReviewRepository reviewRepository;
     private final com.campus.marketplace.common.utils.SensitiveWordFilter sensitiveWordFilter;
     private final NotificationService notificationService;
@@ -538,6 +539,7 @@ public class OrderServiceImpl implements OrderService {
      * 查询买家订单列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderResponse> listBuyerOrders(String status, int page, int size) {
         String username = SecurityUtil.getCurrentUsername();
         User buyer = userRepository.findByUsername(username)
@@ -557,6 +559,7 @@ public class OrderServiceImpl implements OrderService {
      * 查询卖家订单列表
      */
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderResponse> listSellerOrders(String status, int page, int size) {
         String username = SecurityUtil.getCurrentUsername();
         User seller = userRepository.findByUsername(username)
@@ -638,6 +641,94 @@ public class OrderServiceImpl implements OrderService {
         order.setReceiverAddress(request.receiverAddress());
         order.setBuyerNote(request.note());
         orderRepository.save(order);
+    }
+
+    /**
+     * 卖家发货（快递）
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void shipOrder(String orderNo, com.campus.marketplace.common.dto.request.ShipOrderRequest request) {
+        String username = SecurityUtil.getCurrentUsername();
+        User current = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        Order order = orderRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        // 仅卖家可发货
+        if (!order.getSellerId().equals(current.getId())) {
+            throw new BusinessException(ErrorCode.PERMISSION_DENIED, "仅卖家可发货");
+        }
+        // 必须已支付
+        if (order.getStatus() != com.campus.marketplace.common.enums.OrderStatus.PAID) {
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "当前状态不可发货");
+        }
+        // 仅快递模式要求发货
+        if (order.getDeliveryMethod() != com.campus.marketplace.common.enums.DeliveryMethod.EXPRESS) {
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "面交订单无需发货");
+        }
+
+        // 创建物流单并更新订单状态为 SHIPPED
+        try {
+            if (logisticsService != null) {
+                logisticsService.createLogistics(order.getId(), request.trackingNumber(), request.company());
+            }
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "创建物流失败: " + e.getMessage());
+        }
+
+        order.setStatus(com.campus.marketplace.common.enums.OrderStatus.SHIPPED);
+        orderRepository.save(order);
+
+        // 通知买家
+        try {
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("orderNo", order.getOrderNo());
+            params.put("logisticsCompany", request.company().name());
+            params.put("trackingNumber", request.trackingNumber());
+            notificationDispatcher.enqueueTemplate(order.getBuyerId(), "ORDER_SHIPPED", params,
+                    com.campus.marketplace.common.enums.NotificationType.ORDER_SHIPPED.name(),
+                    order.getId(), "ORDER", "/orders/" + order.getOrderNo());
+        } catch (Exception ignored) {}
+    }
+
+    /**
+     * 买家确认收货（DELIVERED → COMPLETED）
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void confirmReceipt(String orderNo) {
+        String username = SecurityUtil.getCurrentUsername();
+        User current = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        Order order = orderRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        // 仅买家可确认收货
+        if (!order.getBuyerId().equals(current.getId())) {
+            throw new BusinessException(ErrorCode.PERMISSION_DENIED, "仅买家可确认收货");
+        }
+        // 仅从 DELIVERED 流转
+        if (order.getStatus() != com.campus.marketplace.common.enums.OrderStatus.DELIVERED) {
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "当前状态不可确认收货");
+        }
+
+        order.setStatus(com.campus.marketplace.common.enums.OrderStatus.COMPLETED);
+        orderRepository.save(order);
+
+        // 通知买家/卖家
+        try {
+            java.util.Map<String, Object> params = new java.util.HashMap<>();
+            params.put("orderNo", order.getOrderNo());
+            notificationDispatcher.enqueueTemplate(order.getBuyerId(), "ORDER_COMPLETED", params,
+                    com.campus.marketplace.common.enums.NotificationType.ORDER_COMPLETED.name(),
+                    order.getId(), "ORDER", "/orders/" + order.getOrderNo());
+            notificationDispatcher.enqueueTemplate(order.getSellerId(), "ORDER_COMPLETED", params,
+                    com.campus.marketplace.common.enums.NotificationType.ORDER_COMPLETED.name(),
+                    order.getId(), "ORDER", "/orders/" + order.getOrderNo());
+        } catch (Exception ignored) {}
     }
 
     /**

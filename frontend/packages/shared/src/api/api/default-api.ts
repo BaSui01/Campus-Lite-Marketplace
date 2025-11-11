@@ -170,6 +170,8 @@ import type { ApiResponseListUserBehaviorLogDTO } from '../models';
 // @ts-ignore
 import type { ApiResponseListUserFeed } from '../models';
 // @ts-ignore
+import type { ApiResponseListUserFeedDTO } from '../models';
+// @ts-ignore
 import type { ApiResponseLoginResponse } from '../models';
 // @ts-ignore
 import type { ApiResponseLogisticsDTO } from '../models';
@@ -441,6 +443,8 @@ import type { ReviewRequest } from '../models';
 import type { SendMessageRequest } from '../models';
 // @ts-ignore
 import type { SendNegotiationRequest } from '../models';
+// @ts-ignore
+import type { ShipOrderRequest } from '../models';
 // @ts-ignore
 import type { TwoFactorRequest } from '../models';
 // @ts-ignore
@@ -3088,6 +3092,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(completePrivacyRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 仅买家可操作，订单需处于 DELIVERED 状态
+         * @summary 买家确认收货
+         * @param {string} orderNo 订单号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        confirmReceipt: async (orderNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orderNo' is not null or undefined
+            assertParamExists('confirmReceipt', 'orderNo', orderNo)
+            const localVarPath = `/orders/{orderNo}/confirm-receipt`
+                .replace(`{${"orderNo"}}`, encodeURIComponent(String(orderNo)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7594,17 +7636,19 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
-         * 查询指定商品的所有评价，支持评分筛选和排序（time=按时间，like=按点赞数）
+         * 筛选：rating（精确星级）、group（positive/neutral/negative）、hasImages；排序：time/like/image_first
          * @summary 获取商品评价列表
          * @param {number} goodsId 商品ID
          * @param {number} [page] 页码
          * @param {number} [size] 每页数量
          * @param {number} [rating] 评分筛选（1-5星）
-         * @param {string} [sortBy] 排序方式（time&#x3D;按时间，like&#x3D;按点赞数，helpful&#x3D;按点赞数）
+         * @param {string} [sortBy] 排序方式（time/like/image_first）
+         * @param {boolean} [hasImages] 只看有图
+         * @param {string} [group] 评分分组（positive&#x3D;4-5，neutral&#x3D;3，negative&#x3D;1-2）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getGoodsReviews: async (goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getGoodsReviews: async (goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, hasImages?: boolean, group?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsId' is not null or undefined
             assertParamExists('getGoodsReviews', 'goodsId', goodsId)
             const localVarPath = `/goods/{goodsId}/reviews`
@@ -7640,6 +7684,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 localVarQueryParameter['sortBy'] = sortBy;
             }
 
+            if (hasImages !== undefined) {
+                localVarQueryParameter['hasImages'] = hasImages;
+            }
+
+            if (group !== undefined) {
+                localVarQueryParameter['group'] = group;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -7658,11 +7710,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {number} [page] 页码
          * @param {number} [size] 每页数量
          * @param {number} [rating] 评分筛选（1-5星）
-         * @param {string} [sortBy] 排序方式（time/like/helpful）
+         * @param {string} [sortBy] 排序方式（time/like/image_first）
+         * @param {boolean} [hasImages] 只看有图
+         * @param {string} [group] 评分分组（positive&#x3D;4-5，neutral&#x3D;3，negative&#x3D;1-2）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getGoodsReviewsOld: async (goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getGoodsReviewsOld: async (goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, hasImages?: boolean, group?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'goodsId' is not null or undefined
             assertParamExists('getGoodsReviewsOld', 'goodsId', goodsId)
             const localVarPath = `/reviews/goods/{goodsId}`
@@ -7696,6 +7750,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (sortBy !== undefined) {
                 localVarQueryParameter['sortBy'] = sortBy;
+            }
+
+            if (hasImages !== undefined) {
+                localVarQueryParameter['hasImages'] = hasImages;
+            }
+
+            if (group !== undefined) {
+                localVarQueryParameter['group'] = group;
             }
 
 
@@ -10794,6 +10856,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          */
         getUserFeed: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/community/feed`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 返回精简 DTO，包含头像与显示名，支持目标类型
+         * @summary 获取用户动态流（v2）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserFeedV2: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/community/feed/v2`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -14230,6 +14326,44 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             };
         },
         /**
+         * 仅限买家本人或管理员调用；内部走正式回调逻辑，触发通知与商品售出状态。
+         * @summary 标记订单为已支付（dev）
+         * @param {string} orderNo 订单号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        markPaid: async (orderNo: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orderNo' is not null or undefined
+            assertParamExists('markPaid', 'orderNo', orderNo)
+            const localVarPath = `/admin/dev/orders/{orderNo}/mark-paid`
+                .replace(`{${"orderNo"}}`, encodeURIComponent(String(orderNo)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 将指定的回复标记为已读状态
          * @summary 标记回复为已读
          * @param {number} replyId 回复ID
@@ -16822,6 +16956,50 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 仅卖家可操作，订单需为已支付且为快递配送
+         * @summary 卖家发货
+         * @param {string} orderNo 订单号
+         * @param {ShipOrderRequest} shipOrderRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        shipOrder: async (orderNo: string, shipOrderRequest: ShipOrderRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'orderNo' is not null or undefined
+            assertParamExists('shipOrder', 'orderNo', orderNo)
+            // verify required parameter 'shipOrderRequest' is not null or undefined
+            assertParamExists('shipOrder', 'shipOrderRequest', shipOrderRequest)
+            const localVarPath = `/orders/{orderNo}/ship`
+                .replace(`{${"orderNo"}}`, encodeURIComponent(String(orderNo)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(shipOrderRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -19705,6 +19883,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 仅买家可操作，订单需处于 DELIVERED 状态
+         * @summary 买家确认收货
+         * @param {string} orderNo 订单号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async confirmReceipt(orderNo: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.confirmReceipt(orderNo, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.confirmReceipt']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 返回评价的总点赞数量
          * @summary 获取点赞数量
          * @param {number} reviewId 评价ID
@@ -21215,18 +21406,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
-         * 查询指定商品的所有评价，支持评分筛选和排序（time=按时间，like=按点赞数）
+         * 筛选：rating（精确星级）、group（positive/neutral/negative）、hasImages；排序：time/like/image_first
          * @summary 获取商品评价列表
          * @param {number} goodsId 商品ID
          * @param {number} [page] 页码
          * @param {number} [size] 每页数量
          * @param {number} [rating] 评分筛选（1-5星）
-         * @param {string} [sortBy] 排序方式（time&#x3D;按时间，like&#x3D;按点赞数，helpful&#x3D;按点赞数）
+         * @param {string} [sortBy] 排序方式（time/like/image_first）
+         * @param {boolean} [hasImages] 只看有图
+         * @param {string} [group] 评分分组（positive&#x3D;4-5，neutral&#x3D;3，negative&#x3D;1-2）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getGoodsReviews(goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageReview>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getGoodsReviews(goodsId, page, size, rating, sortBy, options);
+        async getGoodsReviews(goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, hasImages?: boolean, group?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageReview>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getGoodsReviews(goodsId, page, size, rating, sortBy, hasImages, group, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getGoodsReviews']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -21238,12 +21431,14 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {number} [page] 页码
          * @param {number} [size] 每页数量
          * @param {number} [rating] 评分筛选（1-5星）
-         * @param {string} [sortBy] 排序方式（time/like/helpful）
+         * @param {string} [sortBy] 排序方式（time/like/image_first）
+         * @param {boolean} [hasImages] 只看有图
+         * @param {string} [group] 评分分组（positive&#x3D;4-5，neutral&#x3D;3，negative&#x3D;1-2）
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getGoodsReviewsOld(goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageReview>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getGoodsReviewsOld(goodsId, page, size, rating, sortBy, options);
+        async getGoodsReviewsOld(goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, hasImages?: boolean, group?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponsePageReview>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getGoodsReviewsOld(goodsId, page, size, rating, sortBy, hasImages, group, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getGoodsReviewsOld']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -22288,6 +22483,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getUserFeed(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getUserFeed']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 返回精简 DTO，包含头像与显示名，支持目标类型
+         * @summary 获取用户动态流（v2）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserFeedV2(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseListUserFeedDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserFeedV2(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getUserFeedV2']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -23383,6 +23590,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 仅限买家本人或管理员调用；内部走正式回调逻辑，触发通知与商品售出状态。
+         * @summary 标记订单为已支付（dev）
+         * @param {string} orderNo 订单号
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async markPaid(orderNo: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.markPaid(orderNo, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.markPaid']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 将指定的回复标记为已读状态
          * @summary 标记回复为已读
          * @param {number} replyId 回复ID
@@ -24219,6 +24439,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.setQuietHours(channel, start, end, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.setQuietHours']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 仅卖家可操作，订单需为已支付且为快递配送
+         * @summary 卖家发货
+         * @param {string} orderNo 订单号
+         * @param {ShipOrderRequest} shipOrderRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async shipOrder(orderNo: string, shipOrderRequest: ShipOrderRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseVoid>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.shipOrder(orderNo, shipOrderRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.shipOrder']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -25518,6 +25752,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.completeRequest(requestParameters.id, requestParameters.completePrivacyRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * 仅买家可操作，订单需处于 DELIVERED 状态
+         * @summary 买家确认收货
+         * @param {DefaultApiConfirmReceiptRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        confirmReceipt(requestParameters: DefaultApiConfirmReceiptRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.confirmReceipt(requestParameters.orderNo, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 返回评价的总点赞数量
          * @summary 获取点赞数量
          * @param {DefaultApiCountReviewLikesRequest} requestParameters Request parameters.
@@ -26660,14 +26904,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getGoodsReviewStatistics(requestParameters.goodsId, options).then((request) => request(axios, basePath));
         },
         /**
-         * 查询指定商品的所有评价，支持评分筛选和排序（time=按时间，like=按点赞数）
+         * 筛选：rating（精确星级）、group（positive/neutral/negative）、hasImages；排序：time/like/image_first
          * @summary 获取商品评价列表
          * @param {DefaultApiGetGoodsReviewsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getGoodsReviews(requestParameters: DefaultApiGetGoodsReviewsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview> {
-            return localVarFp.getGoodsReviews(requestParameters.goodsId, requestParameters.page, requestParameters.size, requestParameters.rating, requestParameters.sortBy, options).then((request) => request(axios, basePath));
+            return localVarFp.getGoodsReviews(requestParameters.goodsId, requestParameters.page, requestParameters.size, requestParameters.rating, requestParameters.sortBy, requestParameters.hasImages, requestParameters.group, options).then((request) => request(axios, basePath));
         },
         /**
          * 查询指定商品的所有评价，支持评分筛选和排序。推荐使用 GET /goods/{goodsId}/reviews
@@ -26677,7 +26921,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @throws {RequiredError}
          */
         getGoodsReviewsOld(requestParameters: DefaultApiGetGoodsReviewsOldRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview> {
-            return localVarFp.getGoodsReviewsOld(requestParameters.goodsId, requestParameters.page, requestParameters.size, requestParameters.rating, requestParameters.sortBy, options).then((request) => request(axios, basePath));
+            return localVarFp.getGoodsReviewsOld(requestParameters.goodsId, requestParameters.page, requestParameters.size, requestParameters.rating, requestParameters.sortBy, requestParameters.hasImages, requestParameters.group, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -27459,6 +27703,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.getUserFeed(options).then((request) => request(axios, basePath));
         },
         /**
+         * 返回精简 DTO，包含头像与显示名，支持目标类型
+         * @summary 获取用户动态流（v2）
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserFeedV2(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListUserFeedDTO> {
+            return localVarFp.getUserFeedV2(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary 获取我关注的话题
          * @param {*} [options] Override http request option.
@@ -28237,6 +28490,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
             return localVarFp.markOvertimeLogistics(options).then((request) => request(axios, basePath));
         },
         /**
+         * 仅限买家本人或管理员调用；内部走正式回调逻辑，触发通知与商品售出状态。
+         * @summary 标记订单为已支付（dev）
+         * @param {DefaultApiMarkPaidRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        markPaid(requestParameters: DefaultApiMarkPaidRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.markPaid(requestParameters.orderNo, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 将指定的回复标记为已读状态
          * @summary 标记回复为已读
          * @param {DefaultApiMarkReplyAsReadRequest} requestParameters Request parameters.
@@ -28854,6 +29117,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         setQuietHours(requestParameters: DefaultApiSetQuietHoursRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
             return localVarFp.setQuietHours(requestParameters.channel, requestParameters.start, requestParameters.end, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 仅卖家可操作，订单需为已支付且为快递配送
+         * @summary 卖家发货
+         * @param {DefaultApiShipOrderRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        shipOrder(requestParameters: DefaultApiShipOrderRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid> {
+            return localVarFp.shipOrder(requestParameters.orderNo, requestParameters.shipOrderRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -30006,6 +30279,16 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     completeRequest(id: number, completePrivacyRequest: CompletePrivacyRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 仅买家可操作，订单需处于 DELIVERED 状态
+     * @summary 买家确认收货
+     * @param {string} orderNo 订单号
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    confirmReceipt(orderNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 返回评价的总点赞数量
@@ -31170,18 +31453,20 @@ export interface DefaultApiInterface {
     getGoodsReviewStatistics(goodsId: number, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseReviewStatisticsDTO>;
 
     /**
-     * 查询指定商品的所有评价，支持评分筛选和排序（time=按时间，like=按点赞数）
+     * 筛选：rating（精确星级）、group（positive/neutral/negative）、hasImages；排序：time/like/image_first
      * @summary 获取商品评价列表
      * @param {number} goodsId 商品ID
      * @param {number} [page] 页码
      * @param {number} [size] 每页数量
      * @param {number} [rating] 评分筛选（1-5星）
-     * @param {string} [sortBy] 排序方式（time&#x3D;按时间，like&#x3D;按点赞数，helpful&#x3D;按点赞数）
+     * @param {string} [sortBy] 排序方式（time/like/image_first）
+     * @param {boolean} [hasImages] 只看有图
+     * @param {string} [group] 评分分组（positive&#x3D;4-5，neutral&#x3D;3，negative&#x3D;1-2）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    getGoodsReviews(goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview>;
+    getGoodsReviews(goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, hasImages?: boolean, group?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview>;
 
     /**
      * 查询指定商品的所有评价，支持评分筛选和排序。推荐使用 GET /goods/{goodsId}/reviews
@@ -31190,12 +31475,14 @@ export interface DefaultApiInterface {
      * @param {number} [page] 页码
      * @param {number} [size] 每页数量
      * @param {number} [rating] 评分筛选（1-5星）
-     * @param {string} [sortBy] 排序方式（time/like/helpful）
+     * @param {string} [sortBy] 排序方式（time/like/image_first）
+     * @param {boolean} [hasImages] 只看有图
+     * @param {string} [group] 评分分组（positive&#x3D;4-5，neutral&#x3D;3，negative&#x3D;1-2）
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    getGoodsReviewsOld(goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview>;
+    getGoodsReviewsOld(goodsId: number, page?: number, size?: number, rating?: number, sortBy?: string, hasImages?: boolean, group?: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponsePageReview>;
 
     /**
      * 
@@ -31998,6 +32285,15 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     getUserFeed(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListUserFeed>;
+
+    /**
+     * 返回精简 DTO，包含头像与显示名，支持目标类型
+     * @summary 获取用户动态流（v2）
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getUserFeedV2(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseListUserFeedDTO>;
 
     /**
      * 
@@ -32852,6 +33148,16 @@ export interface DefaultApiInterface {
     markOvertimeLogistics(options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseInteger>;
 
     /**
+     * 仅限买家本人或管理员调用；内部走正式回调逻辑，触发通知与商品售出状态。
+     * @summary 标记订单为已支付（dev）
+     * @param {string} orderNo 订单号
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    markPaid(orderNo: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
      * 将指定的回复标记为已读状态
      * @summary 标记回复为已读
      * @param {number} replyId 回复ID
@@ -33503,6 +33809,17 @@ export interface DefaultApiInterface {
      * @memberof DefaultApiInterface
      */
     setQuietHours(channel: SetQuietHoursChannelEnum, start: string, end: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
+
+    /**
+     * 仅卖家可操作，订单需为已支付且为快递配送
+     * @summary 卖家发货
+     * @param {string} orderNo 订单号
+     * @param {ShipOrderRequest} shipOrderRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    shipOrder(orderNo: string, shipOrderRequest: ShipOrderRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseVoid>;
 
     /**
      * 
@@ -34963,6 +35280,20 @@ export interface DefaultApiCompleteRequestRequest {
      * @memberof DefaultApiCompleteRequest
      */
     readonly completePrivacyRequest: CompletePrivacyRequest
+}
+
+/**
+ * Request parameters for confirmReceipt operation in DefaultApi.
+ * @export
+ * @interface DefaultApiConfirmReceiptRequest
+ */
+export interface DefaultApiConfirmReceiptRequest {
+    /**
+     * 订单号
+     * @type {string}
+     * @memberof DefaultApiConfirmReceipt
+     */
+    readonly orderNo: string
 }
 
 /**
@@ -36498,11 +36829,25 @@ export interface DefaultApiGetGoodsReviewsRequest {
     readonly rating?: number
 
     /**
-     * 排序方式（time&#x3D;按时间，like&#x3D;按点赞数，helpful&#x3D;按点赞数）
+     * 排序方式（time/like/image_first）
      * @type {string}
      * @memberof DefaultApiGetGoodsReviews
      */
     readonly sortBy?: string
+
+    /**
+     * 只看有图
+     * @type {boolean}
+     * @memberof DefaultApiGetGoodsReviews
+     */
+    readonly hasImages?: boolean
+
+    /**
+     * 评分分组（positive&#x3D;4-5，neutral&#x3D;3，negative&#x3D;1-2）
+     * @type {string}
+     * @memberof DefaultApiGetGoodsReviews
+     */
+    readonly group?: string
 }
 
 /**
@@ -36540,11 +36885,25 @@ export interface DefaultApiGetGoodsReviewsOldRequest {
     readonly rating?: number
 
     /**
-     * 排序方式（time/like/helpful）
+     * 排序方式（time/like/image_first）
      * @type {string}
      * @memberof DefaultApiGetGoodsReviewsOld
      */
     readonly sortBy?: string
+
+    /**
+     * 只看有图
+     * @type {boolean}
+     * @memberof DefaultApiGetGoodsReviewsOld
+     */
+    readonly hasImages?: boolean
+
+    /**
+     * 评分分组（positive&#x3D;4-5，neutral&#x3D;3，negative&#x3D;1-2）
+     * @type {string}
+     * @memberof DefaultApiGetGoodsReviewsOld
+     */
+    readonly group?: string
 }
 
 /**
@@ -38865,6 +39224,20 @@ export interface DefaultApiMarkExecutedRequest {
 }
 
 /**
+ * Request parameters for markPaid operation in DefaultApi.
+ * @export
+ * @interface DefaultApiMarkPaidRequest
+ */
+export interface DefaultApiMarkPaidRequest {
+    /**
+     * 订单号
+     * @type {string}
+     * @memberof DefaultApiMarkPaid
+     */
+    readonly orderNo: string
+}
+
+/**
  * Request parameters for markReplyAsRead operation in DefaultApi.
  * @export
  * @interface DefaultApiMarkReplyAsReadRequest
@@ -39954,6 +40327,27 @@ export interface DefaultApiSetQuietHoursRequest {
      * @memberof DefaultApiSetQuietHours
      */
     readonly end: string
+}
+
+/**
+ * Request parameters for shipOrder operation in DefaultApi.
+ * @export
+ * @interface DefaultApiShipOrderRequest
+ */
+export interface DefaultApiShipOrderRequest {
+    /**
+     * 订单号
+     * @type {string}
+     * @memberof DefaultApiShipOrder
+     */
+    readonly orderNo: string
+
+    /**
+     * 
+     * @type {ShipOrderRequest}
+     * @memberof DefaultApiShipOrder
+     */
+    readonly shipOrderRequest: ShipOrderRequest
 }
 
 /**
@@ -41534,6 +41928,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 仅买家可操作，订单需处于 DELIVERED 状态
+     * @summary 买家确认收货
+     * @param {DefaultApiConfirmReceiptRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public confirmReceipt(requestParameters: DefaultApiConfirmReceiptRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).confirmReceipt(requestParameters.orderNo, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 返回评价的总点赞数量
      * @summary 获取点赞数量
      * @param {DefaultApiCountReviewLikesRequest} requestParameters Request parameters.
@@ -42908,7 +43314,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
-     * 查询指定商品的所有评价，支持评分筛选和排序（time=按时间，like=按点赞数）
+     * 筛选：rating（精确星级）、group（positive/neutral/negative）、hasImages；排序：time/like/image_first
      * @summary 获取商品评价列表
      * @param {DefaultApiGetGoodsReviewsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -42916,7 +43322,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      * @memberof DefaultApi
      */
     public getGoodsReviews(requestParameters: DefaultApiGetGoodsReviewsRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getGoodsReviews(requestParameters.goodsId, requestParameters.page, requestParameters.size, requestParameters.rating, requestParameters.sortBy, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).getGoodsReviews(requestParameters.goodsId, requestParameters.page, requestParameters.size, requestParameters.rating, requestParameters.sortBy, requestParameters.hasImages, requestParameters.group, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -42928,7 +43334,7 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      * @memberof DefaultApi
      */
     public getGoodsReviewsOld(requestParameters: DefaultApiGetGoodsReviewsOldRequest, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getGoodsReviewsOld(requestParameters.goodsId, requestParameters.page, requestParameters.size, requestParameters.rating, requestParameters.sortBy, options).then((request) => request(this.axios, this.basePath));
+        return DefaultApiFp(this.configuration).getGoodsReviewsOld(requestParameters.goodsId, requestParameters.page, requestParameters.size, requestParameters.rating, requestParameters.sortBy, requestParameters.hasImages, requestParameters.group, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -43871,6 +44277,17 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 返回精简 DTO，包含头像与显示名，支持目标类型
+     * @summary 获取用户动态流（v2）
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getUserFeedV2(options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getUserFeedV2(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary 获取我关注的话题
      * @param {*} [options] Override http request option.
@@ -44809,6 +45226,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * 仅限买家本人或管理员调用；内部走正式回调逻辑，触发通知与商品售出状态。
+     * @summary 标记订单为已支付（dev）
+     * @param {DefaultApiMarkPaidRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public markPaid(requestParameters: DefaultApiMarkPaidRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).markPaid(requestParameters.orderNo, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 将指定的回复标记为已读状态
      * @summary 标记回复为已读
      * @param {DefaultApiMarkReplyAsReadRequest} requestParameters Request parameters.
@@ -45549,6 +45978,18 @@ export class DefaultApi extends BaseAPI implements DefaultApiInterface {
      */
     public setQuietHours(requestParameters: DefaultApiSetQuietHoursRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).setQuietHours(requestParameters.channel, requestParameters.start, requestParameters.end, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 仅卖家可操作，订单需为已支付且为快递配送
+     * @summary 卖家发货
+     * @param {DefaultApiShipOrderRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public shipOrder(requestParameters: DefaultApiShipOrderRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).shipOrder(requestParameters.orderNo, requestParameters.shipOrderRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -153,22 +153,22 @@ const PostDetail: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 获取评论列表
-      const response = await postService.getReplies(postId, { page: 0, size: 100 });
+      const pageReply = await postService.getReplies(postId, { page: 0, size: 100 });
 
-      if (response.success && response.data) {
-        const apiComments: Comment[] = response.data.content.map((c: any) => ({
-          commentId: String(c.id),
-          postId: String(postId),
-          // 兼容后端字段：优先 authorId/authorName，其次 userId/userName
-          authorId: String(c.authorId ?? c.userId),
-          authorName: c.authorName ?? c.userName ?? '未知用户',
-          authorAvatar: c.authorAvatar ?? c.userAvatar,
-          content: c.content,
-          createdAt: c.createdAt ?? c.createTime,
-        }));
+      // postService.getReplies 已返回 data.data(即 PageReplyResponse)，无需再判 success/data
+      const list = Array.isArray(pageReply?.content) ? pageReply.content : [];
+      const apiComments: Comment[] = list.map((c: any) => ({
+        commentId: String(c.id),
+        postId: String(postId),
+        // 兼容后端字段：优先 authorId/authorName，其次 userId/userName
+        authorId: String(c.authorId ?? c.userId),
+        authorName: c.authorName ?? c.userName ?? '未知用户',
+        authorAvatar: c.authorAvatar ?? c.userAvatar,
+        content: c.content,
+        createdAt: c.createdAt ?? c.createTime,
+      }));
 
-        setComments(apiComments);
-      }
+      setComments(apiComments);
     } catch (err: any) {
       console.error('加载评论失败：', err);
       // 不显示错误提示，静默失败
@@ -224,37 +224,36 @@ const PostDetail: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 获取推荐帖子
-      const response = await postService.getPosts({
+      const pagePosts = await postService.getPosts({
         page: 0,
         size: 5,
         sortBy: 'createdAt',
         sortDirection: 'DESC',
       });
 
-      if (response.success && response.data) {
-        const posts: PostDetail[] = response.data.content
-          .filter((p: any) => p.id !== Number(id)) // 排除当前帖子
-          .slice(0, 4) // 取前4个
-          .map((p: any) => ({
-            id: p.id,
-            title: p.title || '',
-            content: p.content,
-            authorId: p.userId,
-            authorName: p.userName || '未知用户',
-            authorAvatar: p.userAvatar,
-            images: p.images || [],
-            likeCount: p.likeCount || 0,
-            collectCount: p.collectCount || 0,
-            viewCount: p.viewCount || 0,
-            replyCount: p.commentCount || 0,
-            isLiked: p.isLiked || false,
-            isCollected: p.isCollected || false,
-            createdAt: p.createTime || p.createdAt,
-            status: p.status || 'APPROVED',
-          }));
+      const list = Array.isArray(pagePosts?.content) ? pagePosts.content : [];
+      const posts: PostDetail[] = list
+        .filter((p: any) => p.id !== Number(id))
+        .slice(0, 4)
+        .map((p: any) => ({
+          id: p.id,
+          title: p.title || '',
+          content: p.content,
+          authorId: p.userId ?? p.authorId,
+          authorName: p.userName ?? p.authorName ?? '未知用户',
+          authorAvatar: p.userAvatar ?? p.authorAvatar,
+          images: p.images || [],
+          likeCount: p.likeCount || 0,
+          collectCount: p.collectCount || 0,
+          viewCount: p.viewCount || 0,
+          replyCount: p.commentCount ?? p.replyCount ?? 0,
+          isLiked: p.isLiked || false,
+          isCollected: p.isCollected || false,
+          createdAt: p.createTime || p.createdAt,
+          status: p.status || 'APPROVED',
+        }));
 
-        setRelatedPosts(posts);
-      }
+      setRelatedPosts(posts);
     } catch (err: any) {
       console.error('加载推荐帖子失败：', err);
       // 不显示错误提示

@@ -97,13 +97,13 @@ export interface DisputeFilterRequest {
      * @type {number}
      * @memberof DisputeFilterRequest
      */
-    'pageOrDefault'?: number;
+    'sizeOrDefault'?: number;
     /**
      * 
      * @type {number}
      * @memberof DisputeFilterRequest
      */
-    'sizeOrDefault'?: number;
+    'pageOrDefault'?: number;
     /**
      * 
      * @type {string}

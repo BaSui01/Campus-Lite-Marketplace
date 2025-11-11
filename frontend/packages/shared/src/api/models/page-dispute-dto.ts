@@ -67,18 +67,6 @@ export interface PageDisputeDTO {
     'sort'?: Array<SortObject>;
     /**
      * 
-     * @type {PageableObject}
-     * @memberof PageDisputeDTO
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageDisputeDTO
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageDisputeDTO
      */
@@ -89,6 +77,18 @@ export interface PageDisputeDTO {
      * @memberof PageDisputeDTO
      */
     'last'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageDisputeDTO
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
+     * @type {PageableObject}
+     * @memberof PageDisputeDTO
+     */
+    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

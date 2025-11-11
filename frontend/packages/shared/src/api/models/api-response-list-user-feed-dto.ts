@@ -15,49 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { SortObject } from './sort-object';
+import type { UserFeedDTO } from './user-feed-dto';
 
 /**
- * 
+ * 统一响应包装结构
  * @export
- * @interface PageableObject
+ * @interface ApiResponseListUserFeedDTO
  */
-export interface PageableObject {
+export interface ApiResponseListUserFeedDTO {
     /**
-     * 
+     * 业务状态码，0 表示成功
      * @type {number}
-     * @memberof PageableObject
+     * @memberof ApiResponseListUserFeedDTO
      */
-    'offset'?: number;
+    'code'?: number;
     /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageableObject
+     * 人类可读的响应消息
+     * @type {string}
+     * @memberof ApiResponseListUserFeedDTO
      */
-    'sort'?: Array<SortObject>;
+    'message'?: string;
     /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
+     * 业务数据载荷
+     * @type {Array<UserFeedDTO>}
+     * @memberof ApiResponseListUserFeedDTO
      */
-    'unpaged'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'paged'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageSize'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageNumber'?: number;
+    'data'?: Array<UserFeedDTO> | null;
 }
 

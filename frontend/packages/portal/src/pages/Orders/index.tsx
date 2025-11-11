@@ -8,11 +8,19 @@ import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton, Empty, OrderCard } from '@campus/shared/components';
-import { orderService } from '@campus/shared/services';;
+import { orderService } from '@campus/shared/services';
+import { 
+  preferredBackendStatusForStage, 
+  isStatusInStage, 
+  toUiStage, 
+  type UiOrderStage 
+} from '@campus/shared/utils';
+import { OrderStatus as BackendOrderStatus } from '@campus/shared/types/enum';
 import './Orders.css';
 
 type OrderType = 'buyer' | 'seller';
-type OrderStatus = 'all' | 'PENDING_PAYMENT' | 'PENDING_SHIPMENT' | 'SHIPPED' | 'COMPLETED' | 'CANCELLED';
+// UI 标签的筛选值（聚合态），与后端枚举解耦
+type OrderStatus = 'all' | 'PENDING_PAYMENT' | 'PENDING_SHIPMENT' | 'PENDING_RECEIPT' | 'COMPLETED' | 'CANCELLED' | 'AFTER_SALES';
 
 const ORDER_TABS = [
   { value: 'buyer' as OrderType, label: '我买到的' },
@@ -23,7 +31,7 @@ const STATUS_TABS = [
   { value: 'all' as OrderStatus, label: '全部' },
   { value: 'PENDING_PAYMENT' as OrderStatus, label: '待支付' },
   { value: 'PENDING_SHIPMENT' as OrderStatus, label: '待发货' },
-  { value: 'SHIPPED' as OrderStatus, label: '已发货' },
+  { value: 'PENDING_RECEIPT' as OrderStatus, label: '待收货' },
   { value: 'COMPLETED' as OrderStatus, label: '已完成' },
   { value: 'CANCELLED' as OrderStatus, label: '已取消' },
 ];
@@ -45,17 +53,30 @@ export const Orders: React.FC = () => {
   const { data: ordersData, isLoading } = useQuery({
     queryKey: ['orders', orderType, orderStatus, page],
     queryFn: async () => {
+      // 将 UI 阶段映射为后端枚举（只能传单值时取首选）
+      let backendStatus: BackendOrderStatus | undefined = undefined;
+      if (orderStatus !== 'all') {
+        const uiStage = orderStatus as UiOrderStage;
+        backendStatus = preferredBackendStatusForStage(uiStage);
+      }
+
       const params = {
-        status: orderStatus === 'all' ? undefined : orderStatus,
+        status: backendStatus,
         page,
-        pageSize,
-      };
+        size: pageSize,
+      } as any;
 
-      const response = orderType === 'buyer'
-        ? await orderService.getBuyerOrders(params)
-        : await orderService.getSellerOrders(params);
+      const pageResp = orderType === 'buyer'
+        ? await orderService.listBuyerOrders(params)
+        : await orderService.listSellerOrders(params);
 
-      return response.data;
+      // 如果选择“待收货/售后”等需要匹配多个后端状态的阶段，这里做一次前端归并过滤，避免后端多状态查询不支持
+      if (orderStatus === 'PENDING_RECEIPT' || orderStatus === 'AFTER_SALES') {
+        const filtered = (pageResp.content || []).filter((o) => isStatusInStage(o.status as BackendOrderStatus, orderStatus as UiOrderStage));
+        return { ...pageResp, content: filtered };
+      }
+
+      return pageResp;
     },
     staleTime: 1 * 60 * 1000, // 1分钟缓存
   });
@@ -134,7 +155,37 @@ export const Orders: React.FC = () => {
               {orderList.map((order) => (
                 <OrderCard
                   key={order.orderNo}
-                  order={order}
+                  order={{
+                    // 将后端返回的订单转为 OrderCard 需要的结构与状态（UI 阶段）
+                    id: String(order.id),
+                    orderNo: order.orderNo!,
+                    status: ((): any => {
+                      const backendStatus = order.status as BackendOrderStatus;
+                      // AFTER_SALES 细分：优先依据后端原始状态判断
+                      if (backendStatus === 'REFUNDING') return 'refunding';
+                      if (backendStatus === 'REFUNDED') return 'refunded';
+                      const stage = toUiStage(backendStatus);
+                      switch (stage) {
+                        case 'PENDING_PAYMENT': return 'pending_payment';
+                        case 'PENDING_SHIPMENT': return 'pending_delivery';
+                        case 'PENDING_RECEIPT': return 'pending_receipt';
+                        case 'COMPLETED': return 'completed';
+                        case 'CANCELLED': return 'cancelled';
+                        default: return 'pending_payment';
+                      }
+                    })(),
+                    items: [{
+                      goodsId: String(order.goodsId),
+                      goodsName: order.goodsTitle || '—',
+                      goodsImage: order.goodsImage || '',
+                      price: Number(order.actualAmount || order.amount || 0),
+                      quantity: 1,
+                    }],
+                    totalAmount: Number(order.actualAmount || order.amount || 0),
+                    buyer: order.buyerUsername ? { id: String(order.buyerId), name: order.buyerUsername } : undefined,
+                    seller: order.sellerUsername ? { id: String(order.sellerId), name: order.sellerUsername } : undefined,
+                    createdAt: order.createdAt as unknown as string,
+                  }}
                   onViewDetail={() => handleViewOrder(order.orderNo!)}
                 />
               ))}

@@ -13,84 +13,76 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PageableObject } from './pageable-object';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
  * 业务数据载荷
  * @export
- * @interface PageObject
+ * @interface UserFeedDTO
  */
-export interface PageObject {
+export interface UserFeedDTO {
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof UserFeedDTO
      */
-    'totalElements'?: number;
+    'id'?: number;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof UserFeedDTO
      */
-    'totalPages'?: number;
+    'actorId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserFeedDTO
+     */
+    'displayName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserFeedDTO
+     */
+    'avatarUrl'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserFeedDTO
+     */
+    'feedType'?: UserFeedDTOFeedTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserFeedDTO
+     */
+    'targetType'?: UserFeedDTOTargetTypeEnum;
     /**
      * 
      * @type {number}
-     * @memberof PageObject
+     * @memberof UserFeedDTO
      */
-    'size'?: number;
+    'targetId'?: number;
     /**
      * 
-     * @type {Array<object>}
-     * @memberof PageObject
+     * @type {string}
+     * @memberof UserFeedDTO
      */
-    'content'?: Array<object>;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageObject
-     */
-    'number'?: number;
-    /**
-     * 
-     * @type {Array<SortObject>}
-     * @memberof PageObject
-     */
-    'sort'?: Array<SortObject>;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'last'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageObject
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageObject
-     */
-    'pageable'?: PageableObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageObject
-     */
-    'empty'?: boolean;
+    'createdAt'?: string;
 }
+
+export const UserFeedDTOFeedTypeEnum = {
+    Post: 'POST',
+    Review: 'REVIEW',
+    Collect: 'COLLECT',
+    Like: 'LIKE'
+} as const;
+
+export type UserFeedDTOFeedTypeEnum = typeof UserFeedDTOFeedTypeEnum[keyof typeof UserFeedDTOFeedTypeEnum];
+export const UserFeedDTOTargetTypeEnum = {
+    Post: 'POST',
+    Goods: 'GOODS'
+} as const;
+
+export type UserFeedDTOTargetTypeEnum = typeof UserFeedDTOTargetTypeEnum[keyof typeof UserFeedDTOTargetTypeEnum];
+
 
