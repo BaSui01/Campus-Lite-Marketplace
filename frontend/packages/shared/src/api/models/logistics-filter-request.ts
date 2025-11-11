@@ -85,13 +85,13 @@ export interface LogisticsFilterRequest {
      * @type {string}
      * @memberof LogisticsFilterRequest
      */
-    'sortDirectionOrDefault'?: string;
+    'sortByOrDefault'?: string;
     /**
      * 
      * @type {string}
      * @memberof LogisticsFilterRequest
      */
-    'sortByOrDefault'?: string;
+    'sortDirectionOrDefault'?: string;
 }
 
 export const LogisticsFilterRequestSortDirectionEnum = {

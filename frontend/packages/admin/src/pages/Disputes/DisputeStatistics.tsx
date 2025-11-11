@@ -351,3 +351,6 @@ export const DisputeStatistics: React.FC = () => {
     </div>
   );
 };
+
+// ✅ 添加默认导出
+export default DisputeStatistics;

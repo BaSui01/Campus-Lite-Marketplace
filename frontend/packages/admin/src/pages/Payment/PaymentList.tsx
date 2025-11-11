@@ -19,19 +19,14 @@ import { useNavigate } from 'react-router-dom';
 import {
   Table,
   Button,
-  Input,
-  Select,
   Space,
   Tag,
   Card,
   Row,
   Col,
   Statistic,
-  DatePicker,
-  message,
 } from 'antd';
 import {
-  SearchOutlined,
   EyeOutlined,
   DollarOutlined,
   CheckCircleOutlined,
@@ -41,10 +36,10 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { paymentService } from '@campus/shared';
 import type { OrderResponse } from '@campus/shared/api';
-import dayjs, { Dayjs } from 'dayjs';
-
-const { Option } = Select;
-const { RangePicker } = DatePicker;
+import { FilterPanel } from '@campus/shared/components';
+import type { FilterConfig, FilterValues } from '@campus/shared/types/filter';
+import { PAYMENT_STATUS_OPTIONS, PAYMENT_METHOD_OPTIONS } from '@campus/shared/constants';
+import dayjs from 'dayjs';
 
 /**
  * 支付状态映射
@@ -91,41 +86,68 @@ const PAYMENT_METHOD_MAP: Record<string, { text: string; color: string }> = {
   BALANCE: { text: '余额支付', color: 'orange' },
 };
 
+// 支付筛选配置
+const paymentFilters: FilterConfig[] = [
+  {
+    type: 'input',
+    field: 'keyword',
+    label: '关键词',
+    placeholder: '搜索订单号/商品名/买家',
+    width: 220,
+  },
+  {
+    type: 'select',
+    field: 'status',
+    label: '支付状态',
+    placeholder: '选择状态',
+    options: PAYMENT_STATUS_OPTIONS,
+    width: 130,
+  },
+  {
+    type: 'select',
+    field: 'paymentMethod',
+    label: '支付方式',
+    placeholder: '选择支付方式',
+    options: PAYMENT_METHOD_OPTIONS,
+    width: 150,
+  },
+  {
+    type: 'dateRange',
+    field: 'dateRange',
+    label: '时间范围',
+    format: 'YYYY-MM-DD',
+  },
+];
+
 export const PaymentList: React.FC = () => {
   const navigate = useNavigate();
 
-  // 查询参数
-  const [keyword, setKeyword] = useState<string>('');
-  const [status, setStatus] = useState<string | undefined>();
-  const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
+  // 筛选参数（使用 FilterPanel 统一管理）
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [page, setPage] = useState<number>(0);
   const [size, setSize] = useState<number>(20);
 
-  // 构建查询参数
-  const queryParams = {
-    keyword,
-    status: status === 'PAID_ALL' ? 'PAID,SHIPPED,COMPLETED' : status, // 已支付包含多种状态
-    paymentMethod,
-    startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
-    endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
-    page,
-    size,
-  };
-
   // 查询支付记录列表
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['payments', 'admin', 'list', queryParams],
-    queryFn: () => paymentService.listPayments(queryParams),
+    queryKey: ['payments', 'admin', 'list', filterValues, page, size],
+    queryFn: () => paymentService.listPayments({
+      keyword: filterValues.keyword,
+      status: filterValues.status,
+      paymentMethod: filterValues.paymentMethod,
+      startDate: filterValues.dateRange?.[0],
+      endDate: filterValues.dateRange?.[1],
+      page,
+      size,
+    }),
     staleTime: 5 * 60 * 1000, // 缓存5分钟
   });
 
   // 查询支付统计
   const { data: statistics } = useQuery({
-    queryKey: ['payments', 'statistics', dateRange],
+    queryKey: ['payments', 'statistics', filterValues.dateRange],
     queryFn: () => paymentService.getPaymentStatistics(
-      dateRange?.[0]?.format('YYYY-MM-DD'),
-      dateRange?.[1]?.format('YYYY-MM-DD')
+      filterValues.dateRange?.[0],
+      filterValues.dateRange?.[1]
     ),
     staleTime: 5 * 60 * 1000,
   });
@@ -134,15 +156,6 @@ export const PaymentList: React.FC = () => {
   const handleSearch = () => {
     setPage(0);
     refetch();
-  };
-
-  // 重置筛选
-  const handleReset = () => {
-    setKeyword('');
-    setStatus(undefined);
-    setPaymentMethod(undefined);
-    setDateRange(null);
-    setPage(0);
   };
 
   // 查看详情
@@ -297,62 +310,17 @@ export const PaymentList: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 搜索筛选区域 */}
-      <Card style={{ marginBottom: 24 }}>
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
-          <Space wrap>
-            <Input
-              placeholder="搜索订单号/商品名/买家"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onPressEnter={handleSearch}
-              style={{ width: 250 }}
-              prefix={<SearchOutlined />}
-            />
-
-            <Select
-              placeholder="支付状态"
-              value={status}
-              onChange={setStatus}
-              allowClear
-              style={{ width: 150 }}
-            >
-              <Option value="PAID_ALL">全部已支付</Option>
-              <Option value="PENDING_PAYMENT">待支付</Option>
-              <Option value="PAID">已支付</Option>
-              <Option value="SHIPPED">已发货</Option>
-              <Option value="COMPLETED">已完成</Option>
-              <Option value="REFUNDED">已退款</Option>
-              <Option value="CANCELLED">已取消</Option>
-            </Select>
-
-            <Select
-              placeholder="支付方式"
-              value={paymentMethod}
-              onChange={setPaymentMethod}
-              allowClear
-              style={{ width: 150 }}
-            >
-              <Option value="WECHAT_PAY">微信支付</Option>
-              <Option value="ALIPAY">支付宝</Option>
-              <Option value="BALANCE">余额支付</Option>
-            </Select>
-
-            <RangePicker
-              value={dateRange}
-              onChange={setDateRange}
-              format="YYYY-MM-DD"
-              placeholder={['开始日期', '结束日期']}
-            />
-
-            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-              搜索
-            </Button>
-
-            <Button onClick={handleReset}>重置</Button>
-          </Space>
-        </Space>
-      </Card>
+      {/* 筛选面板 */}
+      <FilterPanel
+        config={{ filters: paymentFilters }}
+        values={filterValues}
+        onChange={setFilterValues}
+        onSearch={handleSearch}
+        onReset={() => {
+          setFilterValues({});
+          setPage(0);
+        }}
+      />
 
       {/* 数据表格 */}
       <Card>

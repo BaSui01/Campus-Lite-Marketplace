@@ -112,6 +112,7 @@ export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
  */
 export const Button: React.FC<ButtonProps> = ({
   type = 'default',
+  htmlType = 'button',
   size = 'medium',
   disabled = false,
   loading = false,
@@ -149,7 +150,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={classNames}
-      type={rest.htmlType || 'button'}
+      type={htmlType}
       disabled={disabled || loading}
       onClick={handleClick}
       style={style}

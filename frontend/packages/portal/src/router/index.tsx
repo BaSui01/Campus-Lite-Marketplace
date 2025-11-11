@@ -30,6 +30,7 @@ const OrderCreate = lazy(() => import('../pages/Order/Create'));
 const OrderDetail = lazy(() => import('../pages/OrderDetail'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Community = lazy(() => import('../pages/Community'));
+const PostDetail = lazy(() => import('../pages/Post/Detail'));
 const Search = lazy(() => import('../pages/Search'));
 const Settings = lazy(() => import('../pages/Settings'));
 const NotificationSettings = lazy(() => import('../pages/Settings/NotificationSettings'));
@@ -159,42 +160,14 @@ const RedirectIfAuth = ({ children }: { children: React.ReactNode }) => {
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      console.log('[RedirectIfAuth] 🔍 开始检查认证状态...');
-
-      // 1. 检查 Zustand 状态
-      if (!isAuthenticated) {
-        console.log('[RedirectIfAuth] ✅ 未登录，允许访问登录页');
-        setIsChecking(false);
-        return;
-      }
-
-      // 2. 检查 Token 是否存在且有效
-      const token = getAccessToken();
-      if (!token) {
-        console.log('[RedirectIfAuth] ⚠️ Token 不存在，清理状态');
-        await logout(); // 清理无效状态
-        setIsChecking(false);
-        return;
-      }
-
-      // 3. 检查 Token 是否过期
-      const isValid = isTokenValid(token);
-      if (!isValid) {
-        console.log('[RedirectIfAuth] ⏰ Token 已过期，清理状态');
-        await logout(); // 清理过期状态
-        setIsChecking(false);
-        return;
-      }
-
-      // 4. Token 有效，重定向到首页
-      console.log('[RedirectIfAuth] ✅ 已登录且 Token 有效，重定向到首页');
-      setShouldRedirect(true);
+    if (!isAuthenticated) {
       setIsChecking(false);
-    };
+      return;
+    }
 
-    checkAuth();
-  }, [isAuthenticated, logout]);
+    setShouldRedirect(true);
+    setIsChecking(false);
+  }, [isAuthenticated]);
 
   // 显示加载状态
   if (isChecking) {
@@ -343,6 +316,14 @@ export const router = createBrowserRouter(
         element: (
           <LazyLoadWrapper>
             <Community />
+          </LazyLoadWrapper>
+        ),
+      },
+      {
+        path: 'posts/:id',
+        element: (
+          <LazyLoadWrapper>
+            <PostDetail />
           </LazyLoadWrapper>
         ),
       },

@@ -19,7 +19,7 @@ import {
   Select,
   Space,
   Tag,
-  message,
+  App,
   Modal,
   Form,
   Radio,
@@ -48,6 +48,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 };
 
 export const PostAuditList: React.FC = () => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
 

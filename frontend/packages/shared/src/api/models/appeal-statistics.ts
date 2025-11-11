@@ -100,12 +100,12 @@ export interface AppealStatistics {
      * @type {number}
      * @memberof AppealStatistics
      */
-    'pendingRate'?: number;
+    'completionRate'?: number;
     /**
      * 
      * @type {number}
      * @memberof AppealStatistics
      */
-    'completionRate'?: number;
+    'pendingRate'?: number;
 }
 

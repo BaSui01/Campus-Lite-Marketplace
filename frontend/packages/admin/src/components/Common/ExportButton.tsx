@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { Button, Modal, Form, Select, DatePicker, Progress, Space, message } from 'antd';
+import { Button, Modal, Form, Select, DatePicker, Progress, Space, App } from 'antd';
 import { DownloadOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useModal } from '@/hooks';
 import { useExport } from '@/hooks';
@@ -76,6 +76,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
   children = '导出',
   ...buttonProps
 }) => {
+  const { message } = App.useApp(); // ✅ 使用 App 提供的 message 实例
   const [form] = Form.useForm();
   const { visible, open, close } = useModal();
   const [selectedType, setSelectedType] = React.useState<ExportType | undefined>(exportType);
@@ -86,7 +87,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
     onSuccess: (url) => {
       message.success('导出成功！');
       onSuccess?.(url);
-      
+
       // 自动下载
       window.open(url, '_blank');
     },

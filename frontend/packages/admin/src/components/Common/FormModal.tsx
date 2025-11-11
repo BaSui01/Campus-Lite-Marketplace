@@ -12,7 +12,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Modal, Form, message } from 'antd';
+import { Modal, Form, App } from 'antd';
 import type { FormInstance, ModalProps } from 'antd';
 
 /**
@@ -92,6 +92,7 @@ export const FormModal = <T extends Record<string, any>>({
   width = 600,
   ...modalProps
 }: FormModalProps<T>) => {
+  const { message } = App.useApp(); // ✅ 使用 App 提供的 message 实例
   const [internalForm] = Form.useForm();
   const form = externalForm || internalForm;
   const [submitting, setSubmitting] = React.useState(false);

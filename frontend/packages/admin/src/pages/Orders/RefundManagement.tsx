@@ -17,11 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Table,
   Button,
-  Input,
-  Select,
   Space,
   Tag,
-  message,
   Modal,
   Form,
   Radio,
@@ -31,10 +28,10 @@ import {
   Statistic,
   Image,
   Descriptions,
-  DatePicker,
+  App,
+  Modal,
 } from 'antd';
 import {
-  SearchOutlined,
   CheckOutlined,
   CloseOutlined,
   EyeOutlined,
@@ -43,11 +40,12 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { refundService } from '@campus/shared/services/refund';
 import type { Refund } from '@campus/shared/services/refund';
-import dayjs, { Dayjs } from 'dayjs';
+import { FilterPanel } from '@campus/shared/components';
+import type { FilterConfig, FilterValues } from '@campus/shared/types/filter';
+import { REFUND_STATUS_OPTIONS } from '@campus/shared/constants';
+import dayjs from 'dayjs';
 
-const { Option } = Select;
-const { TextArea } = Input;
-const { RangePicker } = DatePicker;
+const { TextArea } = Form.Item;
 
 /**
  * 退款状态映射
@@ -61,15 +59,39 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
   FAILED: { text: '失败', color: 'red' },
 };
 
+// 退款筛选配置
+const refundFilters: FilterConfig[] = [
+  {
+    type: 'input',
+    field: 'keyword',
+    label: '关键词',
+    placeholder: '搜索退款单号/订单号/商品名/买家',
+    width: 280,
+  },
+  {
+    type: 'select',
+    field: 'status',
+    label: '退款状态',
+    placeholder: '选择状态',
+    options: REFUND_STATUS_OPTIONS,
+    width: 130,
+  },
+  {
+    type: 'dateRange',
+    field: 'dateRange',
+    label: '申请时间',
+    format: 'YYYY-MM-DD',
+  },
+];
+
 export const RefundManagement: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
   const [form] = Form.useForm();
 
-  // 查询参数
-  const [keyword, setKeyword] = useState<string>('');
-  const [status, setStatus] = useState<string | undefined>();
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
+  // 筛选参数（使用 FilterPanel 统一管理）
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [page, setPage] = useState<number>(0);
   const [size, setSize] = useState<number>(20);
 
@@ -83,21 +105,18 @@ export const RefundManagement: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchReviewModalVisible, setBatchReviewModalVisible] = useState(false);
 
-  // 构建查询参数
-  const queryParams = {
-    keyword,
-    status,
-    startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
-    endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
-    page,
-    size,
-  };
-
   // 查询退款列表
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['refunds', 'list', queryParams],
+    queryKey: ['refunds', 'list', filterValues, page, size],
     queryFn: async () => {
-      const response = await refundService.listRefunds(queryParams);
+      const response = await refundService.listRefunds({
+        keyword: filterValues.keyword,
+        status: filterValues.status,
+        startDate: filterValues.dateRange?.[0],
+        endDate: filterValues.dateRange?.[1],
+        page,
+        size,
+      });
       return response.data;
     },
     staleTime: 5 * 60 * 1000,
@@ -120,9 +139,6 @@ export const RefundManagement: React.FC = () => {
     onSuccess: () => {
       message.success('审核成功');
       setReviewModalVisible(false);
-      setCurrentRefundId(null);
-      form.resetFields();
-      refetch();
       queryClient.invalidateQueries({ queryKey: ['refunds'] });
     },
     onError: () => {
@@ -133,14 +149,11 @@ export const RefundManagement: React.FC = () => {
   // 批量审核
   const batchReviewMutation = useMutation({
     mutationFn: (params: { refundIds: number[]; approved: boolean; reason?: string }) =>
-      refundService.batchReviewRefunds(params.refundIds, params.approved, params.reason),
-    onSuccess: (response) => {
-      const { successCount, failureCount } = response.data;
-      message.success(`批量审核完成：成功${successCount}个，失败${failureCount}个`);
+      refundService.batchReviewRefunds(params),
+    onSuccess: () => {
+      message.success('批量审核成功');
       setBatchReviewModalVisible(false);
       setSelectedRowKeys([]);
-      form.resetFields();
-      refetch();
       queryClient.invalidateQueries({ queryKey: ['refunds'] });
     },
     onError: () => {
@@ -154,32 +167,16 @@ export const RefundManagement: React.FC = () => {
     refetch();
   };
 
-  // 重置筛选
-  const handleReset = () => {
-    setKeyword('');
-    setStatus(undefined);
-    setDateRange(null);
-    setPage(0);
-  };
-
-  // 查看详情
-  const handleViewDetail = (record: Refund) => {
-    setCurrentRefund(record);
-    setDetailModalVisible(true);
-  };
-
-  // 打开单个审核弹窗
+  // 打开审核弹窗
   const handleOpenReviewModal = (refundId: number) => {
     setCurrentRefundId(refundId);
-    form.resetFields();
-    form.setFieldsValue({ approved: true });
     setReviewModalVisible(true);
   };
 
-  // 提交单个审核
+  // 提交审核
   const handleReviewSubmit = async () => {
     if (!currentRefundId) return;
-
+    
     try {
       const values = await form.validateFields();
       reviewMutation.mutate({
@@ -194,10 +191,6 @@ export const RefundManagement: React.FC = () => {
 
   // 打开批量审核弹窗
   const handleOpenBatchReviewModal = (approved: boolean) => {
-    if (selectedRowKeys.length === 0) {
-      message.warning('请选择要审核的退款');
-      return;
-    }
     form.resetFields();
     form.setFieldsValue({ approved });
     setBatchReviewModalVisible(true);
@@ -215,6 +208,12 @@ export const RefundManagement: React.FC = () => {
     } catch (error) {
       console.error('表单校验失败:', error);
     }
+  };
+
+  // 查看详情
+  const handleViewDetail = async (refund: Refund) => {
+    setCurrentRefund(refund);
+    setDetailModalVisible(true);
   };
 
   // 表格列定义
@@ -293,7 +292,7 @@ export const RefundManagement: React.FC = () => {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
-      render: (date: string) => new Date(date).toLocaleString('zh-CN'),
+      render: (date: string) => date ? dayjs(date).format('YYYY-MM-DD HH:mm:ss') : '-',
     },
     {
       title: '操作',
@@ -308,7 +307,7 @@ export const RefundManagement: React.FC = () => {
             icon={<EyeOutlined />}
             onClick={() => handleViewDetail(record)}
           >
-            查看
+            详情
           </Button>
           {record.status === 'PENDING' && (
             <Button
@@ -326,15 +325,18 @@ export const RefundManagement: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{ padding: '24px' }}>
+      <h2>💰 退款管理</h2>
+
       {/* 统计卡片 */}
-      <Row gutter={16} style={{ marginBottom: 16 }}>
+      <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={6}>
           <Card>
             <Statistic
-              title="总退款数"
-              value={statistics?.total || 0}
+              title="总退款单数"
+              value={statistics?.totalRefunds || 0}
               prefix={<DollarOutlined />}
+              suffix="单"
             />
           </Card>
         </Col>
@@ -342,67 +344,48 @@ export const RefundManagement: React.FC = () => {
           <Card>
             <Statistic
               title="待审核"
-              value={statistics?.pending || 0}
+              value={statistics?.pendingRefunds || 0}
               valueStyle={{ color: '#fa8c16' }}
+              suffix="单"
             />
           </Card>
         </Col>
         <Col span={6}>
           <Card>
             <Statistic
-              title="已批准"
-              value={statistics?.approved || 0}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="已拒绝"
-              value={statistics?.rejected || 0}
+              title="已退款金额"
+              value={statistics?.completedRefundAmount || 0}
+              precision={2}
+              prefix="¥"
               valueStyle={{ color: '#f5222d' }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="退款成功率"
+              value={statistics?.successRate || 0}
+              precision={1}
+              suffix="%"
+              valueStyle={{ color: '#3f8600' }}
             />
           </Card>
         </Col>
       </Row>
 
-      {/* 搜索和筛选栏 */}
-      <Card style={{ marginBottom: 16 }}>
-        <Space wrap>
-          <Input
-            placeholder="搜索退款单号/订单号/商品名/买家"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            onPressEnter={handleSearch}
-            style={{ width: 280 }}
-            prefix={<SearchOutlined />}
-          />
-          <Select
-            placeholder="选择状态"
-            value={status}
-            onChange={setStatus}
-            allowClear
-            style={{ width: 130 }}
-          >
-            <Option value="PENDING">待审核</Option>
-            <Option value="APPROVED">已批准</Option>
-            <Option value="REJECTED">已拒绝</Option>
-            <Option value="PROCESSING">处理中</Option>
-            <Option value="COMPLETED">已完成</Option>
-          </Select>
-          <RangePicker
-            value={dateRange}
-            onChange={setDateRange}
-            style={{ width: 260 }}
-            format="YYYY-MM-DD"
-          />
-          <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-            搜索
-          </Button>
-          <Button onClick={handleReset}>重置</Button>
-        </Space>
-      </Card>
+      {/* 筛选面板 */}
+      <FilterPanel
+        config={{ filters: refundFilters }}
+        values={filterValues}
+        onChange={setFilterValues}
+        onSearch={handleSearch}
+        onReset={() => {
+          setFilterValues({});
+          setPage(0);
+        }}
+        style={{ marginBottom: 16 }}
+      />
 
       {/* 批量操作按钮 */}
       <Space style={{ marginBottom: 16 }}>
@@ -449,63 +432,16 @@ export const RefundManagement: React.FC = () => {
             setSize(s);
           },
         }}
-        scroll={{ x: 1500 }}
+        scroll={{ x: 1600 }}
       />
 
       {/* 审核弹窗 */}
       <Modal
-        title="审核退款"
+        title="退款审核"
         open={reviewModalVisible}
         onOk={handleReviewSubmit}
-        onCancel={() => {
-          setReviewModalVisible(false);
-          setCurrentRefundId(null);
-          form.resetFields();
-        }}
-        confirmLoading={reviewMutation.isPending}
-        okText="提交审核"
-        cancelText="取消"
-      >
-        <Form form={form} layout="vertical" initialValues={{ approved: true }}>
-          <Form.Item
-            name="approved"
-            label="审核结果"
-            rules={[{ required: true, message: '请选择审核结果' }]}
-          >
-            <Radio.Group>
-              <Radio value={true}>批准退款</Radio>
-              <Radio value={false}>拒绝退款</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item
-            name="reason"
-            label="审核意见"
-            rules={[
-              { required: false },
-              { max: 200, message: '审核意见不能超过200字' },
-            ]}
-          >
-            <TextArea
-              rows={4}
-              placeholder="请填写审核意见（选填，最多200字）"
-              showCount
-              maxLength={200}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* 批量审核弹窗 */}
-      <Modal
-        title={`批量审核 (${selectedRowKeys.length}个退款)`}
-        open={batchReviewModalVisible}
-        onOk={handleBatchReviewSubmit}
-        onCancel={() => {
-          setBatchReviewModalVisible(false);
-          form.resetFields();
-        }}
-        confirmLoading={batchReviewMutation.isPending}
-        okText="提交审核"
+        onCancel={() => setReviewModalVisible(false)}
+        okText="提交"
         cancelText="取消"
       >
         <Form form={form} layout="vertical">
@@ -515,23 +451,44 @@ export const RefundManagement: React.FC = () => {
             rules={[{ required: true, message: '请选择审核结果' }]}
           >
             <Radio.Group>
-              <Radio value={true}>批准退款</Radio>
-              <Radio value={false}>拒绝退款</Radio>
+              <Radio value={true}>批准</Radio>
+              <Radio value={false}>拒绝</Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item
             name="reason"
-            label="审核意见"
-            rules={[
-              { required: false },
-              { max: 200, message: '审核意见不能超过200字' },
-            ]}
+            label="审核说明"
+            rules={[{ required: true, message: '请输入审核说明' }]}
+          >
+            <TextArea rows={4} placeholder="请输入审核说明（批准原因或拒绝理由）" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 批量审核弹窗 */}
+      <Modal
+        title="批量审核"
+        open={batchReviewModalVisible}
+        onOk={handleBatchReviewSubmit}
+        onCancel={() => setBatchReviewModalVisible(false)}
+        okText="提交"
+        cancelText="取消"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="approved" label="审核结果">
+            <Radio.Group>
+              <Radio value={true}>批准</Radio>
+              <Radio value={false}>拒绝</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item
+            name="reason"
+            label="审核说明"
+            rules={[{ required: true, message: '请输入审核说明' }]}
           >
             <TextArea
               rows={4}
-              placeholder="请填写统一的审核意见（选填，最多200字）"
-              showCount
-              maxLength={200}
+              placeholder={`将对 ${selectedRowKeys.length} 个退款单执行相同操作`}
             />
           </Form.Item>
         </Form>
@@ -541,89 +498,48 @@ export const RefundManagement: React.FC = () => {
       <Modal
         title="退款详情"
         open={detailModalVisible}
-        onCancel={() => {
-          setDetailModalVisible(false);
-          setCurrentRefund(null);
-        }}
-        footer={[
-          <Button key="close" onClick={() => setDetailModalVisible(false)}>
-            关闭
-          </Button>,
-        ]}
+        onCancel={() => setDetailModalVisible(false)}
+        footer={null}
         width={800}
       >
         {currentRefund && (
-          <div>
-            <Descriptions column={2} bordered>
-              <Descriptions.Item label="退款单号">{currentRefund.refundNo}</Descriptions.Item>
-              <Descriptions.Item label="订单号">
-                <Button
-                  type="link"
-                  size="small"
-                  onClick={() => {
-                    setDetailModalVisible(false);
-                    navigate(`/admin/orders/${currentRefund.orderNo}`);
-                  }}
-                >
-                  {currentRefund.orderNo}
-                </Button>
-              </Descriptions.Item>
-              <Descriptions.Item label="买家">{currentRefund.buyerName}</Descriptions.Item>
-              <Descriptions.Item label="卖家">{currentRefund.sellerName}</Descriptions.Item>
-              <Descriptions.Item label="退款金额">
-                <span style={{ color: '#f5222d', fontWeight: 'bold' }}>
-                  ¥{currentRefund.refundAmount?.toFixed(2)}
-                </span>
-              </Descriptions.Item>
-              <Descriptions.Item label="状态">
-                <Tag color={STATUS_MAP[currentRefund.status]?.color}>
-                  {STATUS_MAP[currentRefund.status]?.text}
-                </Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label="退款原因" span={2}>
-                {currentRefund.refundReason}
-              </Descriptions.Item>
-              {currentRefund.refundProof && currentRefund.refundProof.length > 0 && (
-                <Descriptions.Item label="退款凭证" span={2}>
-                  <Image.PreviewGroup>
-                    <Space>
-                      {currentRefund.refundProof.map((url, index) => (
-                        <Image
-                          key={index}
-                          src={url}
-                          alt={`凭证${index + 1}`}
-                          width={80}
-                          height={80}
-                          style={{ objectFit: 'cover' }}
-                        />
-                      ))}
-                    </Space>
-                  </Image.PreviewGroup>
-                </Descriptions.Item>
-              )}
-              <Descriptions.Item label="申请时间">
-                {new Date(currentRefund.createdAt).toLocaleString('zh-CN')}
-              </Descriptions.Item>
-              <Descriptions.Item label="更新时间">
-                {new Date(currentRefund.updatedAt).toLocaleString('zh-CN')}
-              </Descriptions.Item>
-              {currentRefund.reviewedAt && (
-                <Descriptions.Item label="审核时间">
-                  {new Date(currentRefund.reviewedAt).toLocaleString('zh-CN')}
-                </Descriptions.Item>
-              )}
-              {currentRefund.reviewerName && (
-                <Descriptions.Item label="审核人">
-                  {currentRefund.reviewerName}
-                </Descriptions.Item>
-              )}
-              {currentRefund.reviewReason && (
-                <Descriptions.Item label="审核意见" span={2}>
-                  {currentRefund.reviewReason}
-                </Descriptions.Item>
-              )}
-            </Descriptions>
-          </div>
+          <Descriptions column={2} bordered>
+            <Descriptions.Item label="退款单号" span={2}>
+              {currentRefund.refundNo}
+            </Descriptions.Item>
+            <Descriptions.Item label="订单号" span={2}>
+              {currentRefund.orderNo}
+            </Descriptions.Item>
+            <Descriptions.Item label="商品">
+              {currentRefund.goodsTitle}
+            </Descriptions.Item>
+            <Descriptions.Item label="商品图片">
+              <Image
+                src={currentRefund.goodsImage}
+                alt="商品"
+                style={{ width: 60, height: 60 }}
+              />
+            </Descriptions.Item>
+            <Descriptions.Item label="买家">
+              {currentRefund.buyerName}
+            </Descriptions.Item>
+            <Descriptions.Item label="退款金额">
+              <span style={{ color: '#f5222d', fontWeight: 'bold' }}>
+                ¥{currentRefund.refundAmount?.toFixed(2)}
+              </span>
+            </Descriptions.Item>
+            <Descriptions.Item label="退款原因" span={2}>
+              {currentRefund.refundReason}
+            </Descriptions.Item>
+            <Descriptions.Item label="状态">
+              <Tag color={STATUS_MAP[currentRefund.status]?.color}>
+                {STATUS_MAP[currentRefund.status]?.text}
+              </Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="申请时间">
+              {currentRefund.createdAt ? dayjs(currentRefund.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
+            </Descriptions.Item>
+          </Descriptions>
         )}
       </Modal>
     </div>

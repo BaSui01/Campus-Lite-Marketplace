@@ -14,11 +14,12 @@ import {
   Space,
   Modal,
   Form,
-  message,
   Typography,
   Tag,
   Divider,
   Alert,
+  App,
+  Modal,
 } from 'antd';
 import {
   PlusOutlined,
@@ -37,6 +38,7 @@ const { Title } = Typography;
 
 const RateLimit: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [userWhitelistModalVisible, setUserWhitelistModalVisible] = useState(false);
   const [ipWhitelistModalVisible, setIpWhitelistModalVisible] = useState(false);
   const [ipBlacklistModalVisible, setIpBlacklistModalVisible] = useState(false);

@@ -20,14 +20,14 @@ import {
   Select,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Card,
   Row,
   Col,
   Statistic,
   Avatar,
+  App,
+  Modal,
 } from 'antd';
 import {
   SearchOutlined,
@@ -50,6 +50,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 
 export const BannedUserList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
   const [form] = Form.useForm();
 
   const [keyword, setKeyword] = useState<string>('');

@@ -22,7 +22,6 @@ import {
   Select,
   Space,
   Tag,
-  message,
   Modal,
   Form,
   Card,
@@ -35,6 +34,8 @@ import {
   InputNumber,
   Slider,
   Badge,
+  App,
+  Modal,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -90,6 +91,7 @@ const ENV_MAP: Record<Environment, { text: string; color: string }> = {
  */
 export const FeatureFlagList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<FeatureFlagRequest>();
 
   // 查询参数

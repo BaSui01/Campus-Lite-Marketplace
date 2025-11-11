@@ -17,8 +17,7 @@ import {
   Button,
   Space,
   Tag,
-  message,
-  Modal,
+  App,
   Card,
   Input,
   Popconfirm,
@@ -42,6 +41,8 @@ const { Search } = Input;
  * 通知模板列表页面
  */
 const NotificationTemplateList: React.FC = () => {
+  const { message } = App.useApp();
+
   // ========== 状态管理 ==========
   const [loading, setLoading] = useState(false);
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);

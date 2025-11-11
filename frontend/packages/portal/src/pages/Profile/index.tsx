@@ -10,7 +10,8 @@ import { Skeleton } from '@campus/shared/components';
 import { userService } from '@campus/shared/services/user';
 import { goodsService } from '@campus/shared/services/goods';
 import { useNotificationStore } from '../../store';
-import type { User, PageGoodsResponse } from '@campus/shared/types';
+import type { PageGoodsResponse } from '@campus/shared/types';
+import type { UserProfileResponse } from '@campus/shared/api/models';
 import './Profile.css';
 
 /**
@@ -28,7 +29,7 @@ const Profile: React.FC = () => {
   // ==================== 状态管理 ====================
 
   const [activeTab, setActiveTab] = useState<ProfileTab>('info'); // 当前 Tab
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,8 +56,7 @@ const Profile: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 获取当前用户资料
-      const response = await userService.getProfile();
-      const userData = response.data;
+      const userData = await userService.getProfile();
       setUser(userData);
     } catch (err: any) {
       console.error('加载用户资料失败：', err);

@@ -15066,11 +15066,15 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
             if (start !== undefined) {
-                localVarQueryParameter['start'] = start;
+                localVarQueryParameter['start'] = (start as any instanceof Date) ?
+                    (start as any).toISOString() :
+                    start;
             }
 
             if (end !== undefined) {
-                localVarQueryParameter['end'] = end;
+                localVarQueryParameter['end'] = (end as any instanceof Date) ?
+                    (end as any).toISOString() :
+                    end;
             }
 
 

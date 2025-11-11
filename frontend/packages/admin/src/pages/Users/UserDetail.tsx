@@ -15,13 +15,12 @@ import {
   Button,
   Space,
   Image,
-  Modal,
   Form,
   Input,
   DatePicker,
-  message,
   Tooltip,
   App,
+  Modal,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -38,7 +37,7 @@ const UserDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { modal } = App.useApp();
+  const { message, modal } = App.useApp();
   const [banModalVisible, setBanModalVisible] = useState(false);
   const [roleModalVisible, setRoleModalVisible] = useState(false);
   const [banForm] = Form.useForm();
@@ -48,8 +47,8 @@ const UserDetail: React.FC = () => {
   const { data: user, isLoading } = useQuery({
     queryKey: ['user-detail', id],
     queryFn: async () => {
-      const response = await userService.getUserById(Number(id));
-      return response.data;
+      // ✅ getUserById 已经返回 User 对象，不需要再 .data
+      return await userService.getUserById(Number(id));
     },
     enabled: !!id,
   });

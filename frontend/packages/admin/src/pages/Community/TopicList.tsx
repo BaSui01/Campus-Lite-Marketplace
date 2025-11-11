@@ -18,8 +18,6 @@ import {
   Input,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Card,
   Row,
@@ -27,6 +25,7 @@ import {
   Statistic,
   Tooltip,
   App,
+  Modal,
 } from 'antd';
 import {
   PlusOutlined,
@@ -47,8 +46,8 @@ import dayjs from 'dayjs';
 const { TextArea } = Input;
 
 export const TopicList: React.FC = () => {
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
-  const { modal } = App.useApp();
 
   // 搜索关键词
   const [keyword, setKeyword] = useState<string>('');
@@ -474,3 +473,6 @@ export const TopicList: React.FC = () => {
     </div>
   );
 };
+
+// ✅ 添加默认导出
+export default TopicList;

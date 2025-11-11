@@ -187,13 +187,13 @@ export interface User {
      * @type {boolean}
      * @memberof User
      */
-    'admin'?: boolean;
+    'banned'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof User
      */
-    'banned'?: boolean;
+    'admin'?: boolean;
 }
 
 export const UserStatusEnum = {

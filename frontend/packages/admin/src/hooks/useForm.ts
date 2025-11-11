@@ -12,8 +12,8 @@
  */
 
 import { useState } from 'react';
-import { message } from 'antd';
 import type { FormInstance } from 'antd';
+import { toast } from '@campus/shared';
 
 /**
  * useForm Hook 参数
@@ -103,7 +103,7 @@ export const useForm = <T = any>(options: UseFormOptions<T>): UseFormResult => {
       const result = await onSubmit(values);
 
       // 成功提示
-      message.success(successMessage);
+      toast.success(successMessage);
 
       // 成功回调
       onSuccess?.(result);
@@ -116,7 +116,7 @@ export const useForm = <T = any>(options: UseFormOptions<T>): UseFormResult => {
 
       // 提交失败
       console.error('表单提交失败:', error);
-      message.error(error.message || errorMessage);
+      toast.error(error.message || errorMessage);
 
       // 失败回调
       onError?.(error);

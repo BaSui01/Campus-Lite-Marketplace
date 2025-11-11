@@ -22,8 +22,6 @@ import {
   Select,
   Space,
   Tag as AntTag,
-  message,
-  Modal,
   Form,
   Card,
   Statistic,
@@ -34,6 +32,8 @@ import {
   Badge,
   ColorPicker,
   type Color,
+  App,
+  Modal,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -68,6 +68,7 @@ const TAG_TYPE_MAP: Record<TagType, { text: string; color: string }> = {
  */
 export const TagList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<TagRequest>();
 
   // 查询参数

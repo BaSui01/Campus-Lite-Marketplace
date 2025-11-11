@@ -91,13 +91,13 @@ export interface AuditLogFilterRequest {
      * @type {string}
      * @memberof AuditLogFilterRequest
      */
-    'sortDirectionOrDefault'?: string;
+    'sortByOrDefault'?: string;
     /**
      * 
      * @type {string}
      * @memberof AuditLogFilterRequest
      */
-    'sortByOrDefault'?: string;
+    'sortDirectionOrDefault'?: string;
 }
 
 export const AuditLogFilterRequestSortDirectionEnum = {

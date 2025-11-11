@@ -19,9 +19,8 @@ import {
   Input,
   Space,
   Card,
-  message,
   Tag,
-  Modal,
+  App,
   Row,
   Col,
   Statistic,
@@ -40,7 +39,6 @@ import dayjs from 'dayjs';
 import { blacklistService } from '@/services';
 
 const { Text } = Typography;
-const { confirm } = Modal;
 
 interface BlacklistRecord {
   id: number;
@@ -62,6 +60,7 @@ interface BlacklistStatistics {
 }
 
 export const BlacklistManagement: React.FC = () => {
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   const [page, setPage] = useState<number>(0);
   const [size, setSize] = useState<number>(20);
@@ -104,7 +103,7 @@ export const BlacklistManagement: React.FC = () => {
 
   // 单个解除黑名单
   const handleUnblock = (record: BlacklistRecord) => {
-    confirm({
+    modal.confirm({
       title: '确认解除黑名单',
       icon: <ExclamationCircleOutlined />,
       content: (
@@ -130,7 +129,7 @@ export const BlacklistManagement: React.FC = () => {
       return;
     }
 
-    confirm({
+    modal.confirm({
       title: `批量解除黑名单`,
       icon: <ExclamationCircleOutlined />,
       content: `确定要解除选中的 ${selectedRowKeys.length} 条黑名单记录吗？`,

@@ -70,16 +70,37 @@ export function suppressEChartsResizeObserverError(): void {
     originalConsoleError.apply(console, args);
   };
 
-  // 重写 console.warn（抑制 Antd 静态方法警告）
+  // 重写 console.warn（抑制 Antd 静态方法警告 + ECharts 错误）
   console.warn = (...args: any[]) => {
     const warnMessage = args[0]?.toString() || '';
+    const stackTrace = args[0]?.stack?.toString() || '';
+    const errorName = args[0]?.name || '';
 
     // 检查是否是 Antd 静态方法警告
     const isAntdStaticWarning =
       warnMessage.includes('[antd:') &&
       warnMessage.includes('Static function can not consume context');
 
-    if (isAntdStaticWarning) {
+    // 检查是否是 ECharts ResizeObserver 错误（也可能通过 console.warn 输出）
+    const isEChartsResizeObserverError =
+      // TypeError: Cannot read properties of undefined (reading 'disconnect')
+      (errorName === 'TypeError' && warnMessage.includes('disconnect')) ||
+      // 包含 ResizeObserver 关键字
+      warnMessage.includes('ResizeObserver') ||
+      // 来自 echarts-for-react 相关文件
+      warnMessage.includes('resizeObserver.js') ||
+      warnMessage.includes('sensorPool.js') ||
+      warnMessage.includes('core.tsx') ||
+      // 堆栈追踪包含 ECharts 相关信息
+      stackTrace.includes('EChartsReactCore') ||
+      stackTrace.includes('resizeObserver') ||
+      stackTrace.includes('sensorPool') ||
+      stackTrace.includes('componentWillUnmount') ||
+      stackTrace.includes('dispose') ||
+      // 完整错误消息匹配
+      warnMessage.includes("Cannot read properties of undefined (reading 'disconnect')");
+
+    if (isAntdStaticWarning || isEChartsResizeObserverError) {
       // 抑制此警告，不输出到控制台
       return;
     }

@@ -91,13 +91,13 @@ export interface RefundFilterRequest {
      * @type {string}
      * @memberof RefundFilterRequest
      */
-    'sortDirectionOrDefault'?: string;
+    'sortByOrDefault'?: string;
     /**
      * 
      * @type {string}
      * @memberof RefundFilterRequest
      */
-    'sortByOrDefault'?: string;
+    'sortDirectionOrDefault'?: string;
 }
 
 export const RefundFilterRequestSortDirectionEnum = {

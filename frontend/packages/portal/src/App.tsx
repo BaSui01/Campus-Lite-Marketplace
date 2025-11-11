@@ -16,6 +16,8 @@ import { useTheme } from './hooks/useTheme';
 import ErrorBoundary from './components/ErrorBoundary';
 import './styles/theme.css';
 import './App.css';
+// 🔧 BaSui 修复：加载认证调试工具（开发环境）
+import './utils/authDebug';
 
 // 创建 React Query 客户端
 const queryClient = new QueryClient({
@@ -42,9 +44,11 @@ function App() {
     initAuth();
   }, [initAuth]);
 
-  // 初始化 WebSocket 服务（只有登录后才连接！🎯）
+  // 初始化 WebSocket 服务（只有登录后且启用时才连接！🎯）
+  const websocketEnabled = import.meta.env.VITE_ENABLE_WEBSOCKET !== 'false';
+  
   useWebSocketService({
-    autoConnect: isAuthenticated, // ✅ 改为根据登录状态决定是否连接
+    autoConnect: isAuthenticated && websocketEnabled, // ✅ 根据登录状态和配置决定是否连接
     onOpen: () => {
       console.log('✅ WebSocket 已连接');
     },

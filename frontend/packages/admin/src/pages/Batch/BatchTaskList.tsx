@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Table, Button, Select, Space, Tag, Card, Progress, Modal, Form, Input, message } from 'antd';
+import { Table, Button, Select, Space, Tag, Card, Progress, Modal, Form, Input, App } from 'antd';
 import { PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { batchService, BatchTaskStatus, BatchType } from '@campus/shared/services';
@@ -27,6 +27,7 @@ const TASK_TYPE_MAP: Record<string, string> = {
 };
 
 export const BatchTaskList: React.FC = () => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [status, setStatus] = useState<string | undefined>();

@@ -11,8 +11,6 @@ import {
   Button,
   Select,
   Space,
-  Modal,
-  message,
   Typography,
   Tag,
   Tooltip,
@@ -43,7 +41,7 @@ interface SoftDeleteRecord {
 
 const RecycleBin: React.FC = () => {
   const queryClient = useQueryClient();
-  const { modal } = App.useApp();
+  const { message, modal } = App.useApp();
   const [selectedEntity, setSelectedEntity] = useState<string>();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);

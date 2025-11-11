@@ -26,7 +26,7 @@ import {
   Spin,
   Badge,
   Tabs,
-  message,
+  App,
 } from 'antd';
 import {
   DashboardOutlined,
@@ -72,6 +72,7 @@ const ERROR_SEVERITY_MAP = {
 };
 
 export const SystemMonitor: React.FC = () => {
+  const { message, modal } = App.useApp();
   // 时间范围选择
   const [timeRange, setTimeRange] = useState<number>(24);
 

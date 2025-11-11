@@ -23,14 +23,13 @@ import {
   Row,
   Col,
   Statistic,
-  message,
-  Modal,
   Form,
   Select,
   DatePicker,
   Input,
   Progress,
   App,
+  Modal,
 } from 'antd';
 import {
   DownloadOutlined,
@@ -93,8 +92,8 @@ const EXPORT_TYPE_CONFIG: Record<string, { text: string; icon: React.ReactNode }
 };
 
 export const ExportCenter: React.FC = () => {
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
-  const { modal } = App.useApp();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
 

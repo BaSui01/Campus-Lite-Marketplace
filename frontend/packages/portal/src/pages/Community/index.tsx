@@ -398,6 +398,13 @@ const Community: React.FC = () => {
   };
 
   /**
+   * 查看帖子详情
+   */
+  const handleViewPost = (postId: string) => {
+    navigate(`/posts/${postId}`);
+  };
+
+  /**
    * 加载更多
    */
   const handleLoadMore = () => {
@@ -553,7 +560,11 @@ const Community: React.FC = () => {
           ) : (
             <>
               {posts.map((post) => (
-                <div key={post.postId} className="post-card">
+                <div
+                  key={post.postId}
+                  className="post-card"
+                  onClick={() => handleViewPost(post.postId)}
+                >
                   {/* 用户信息 */}
                   <div className="post-card__header">
                     <div className="post-card__avatar">
@@ -587,13 +598,19 @@ const Community: React.FC = () => {
                   <div className="post-card__actions">
                     <button
                       className={`post-card__action ${post.isLiked ? 'active' : ''}`}
-                      onClick={() => handleToggleLike(post)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleLike(post);
+                      }}
                     >
                       {post.isLiked ? '❤️' : '🤍'} {post.likeCount}
                     </button>
                     <button
                       className="post-card__action"
-                      onClick={() => handleOpenCommentModal(post)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenCommentModal(post);
+                      }}
                     >
                       💬 {post.commentCount}
                     </button>

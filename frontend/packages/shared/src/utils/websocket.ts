@@ -8,6 +8,7 @@ import {
   WEBSOCKET_HEARTBEAT_INTERVAL,
   WEBSOCKET_RECONNECT_INTERVAL,
   WEBSOCKET_MAX_RECONNECT,
+  WEBSOCKET_RECONNECT_BACKOFF,
 } from '../constants';
 import { getAccessToken } from './tokenUtils';
 
@@ -21,7 +22,11 @@ export enum WebSocketReadyState {
 }
 
 export enum WebSocketMessageType {
-  HEARTBEAT = 'heartbeat',
+  HEARTBEAT = 'HEARTBEAT',
+  TEXT = 'TEXT',
+  IMAGE = 'IMAGE',
+  SYSTEM = 'SYSTEM',
+  ERROR = 'ERROR',
   CHAT = 'chat',
   NOTIFICATION = 'notification',
   ORDER_UPDATE = 'order_update',
@@ -31,9 +36,13 @@ export enum WebSocketMessageType {
 
 export interface WebSocketMessage<T = any> {
   type: WebSocketMessageType | string;
-  data: T;
-  id?: string;
+  content?: string;
+  data?: T;
+  toUserId?: number;
+  fromUserId?: number;
+  messageId?: number;
   timestamp?: number;
+  extra?: string;
 }
 
 export interface WebSocketClientOptions {
@@ -95,14 +104,16 @@ export class WebSocketClient {
 
     const token = getAccessToken();
     if (!token) {
-      console.error('[WebSocket] Token 不存在，无法建立连接');
+      console.error('[WebSocket] ❌ Token 不存在，无法建立连接');
+      console.log('[WebSocket] 💡 请确保已登录并且 Token 已保存到 localStorage');
       return;
     }
 
     const wsUrl = `${this.url}?token=${encodeURIComponent(token)}`;
 
     try {
-      console.log('[WebSocket] 正在连接...', wsUrl);
+      console.log('[WebSocket] 🔌 正在连接...', wsUrl);
+      console.log('[WebSocket] 📍 Token 前20字符:', token.substring(0, 20) + '...');
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = (event) => {
@@ -115,11 +126,36 @@ export class WebSocketClient {
       };
 
       this.ws.onclose = (event) => {
-        console.log('[WebSocket] 连接关闭', event.code, event.reason);
+        console.log('[WebSocket] 🔴 连接关闭', {
+          code: event.code,
+          reason: event.reason || '无原因',
+          wasClean: event.wasClean,
+        });
+        
         this.stopHeartbeat();
         this.listeners.onClose?.(event);
+        
+        // 错误码处理和重连策略
         if (!this.manualClose) {
-          this.reconnect();
+          if (event.code === 1006) {
+            // 1006: 异常关闭 - 可能是后端未启动或网络问题
+            console.warn('[WebSocket] ⚠️ 连接异常关闭 (1006)');
+            if (this.reconnectCount === 0) {
+              console.warn('[WebSocket] 💡 提示：请确保后端服务已启动 (http://localhost:8200)');
+            }
+            this.reconnect();
+          } else if (event.code === 1003) {
+            // 1003: 不可接受的数据 - Token 验证失败
+            console.error('[WebSocket] ❌ Token 验证失败 (1003)，停止重连');
+            console.error('[WebSocket] 💡 提示：请重新登录获取有效 Token');
+            // Token 失败不重连
+          } else if (event.code === 1000 || event.code === 1001) {
+            // 1000/1001: 正常关闭 - 不重连
+            console.log('[WebSocket] ✅ 正常关闭，不重连');
+          } else {
+            // 其他错误码 - 尝试重连
+            this.reconnect();
+          }
         }
       };
 
@@ -200,7 +236,8 @@ export class WebSocketClient {
     this.heartbeatTimer = setInterval(() => {
       this.send({
         type: WebSocketMessageType.HEARTBEAT,
-        data: { timestamp: Date.now() },
+        content: 'PING',
+        timestamp: Date.now(),
       });
     }, this.heartbeatInterval);
   }
@@ -226,18 +263,31 @@ export class WebSocketClient {
 
   private reconnect(): void {
     if (this.reconnectCount >= this.maxReconnect) {
-      console.error('[WebSocket] 达到最大重连次数，停止重连');
+      console.error(`[WebSocket] ❌ 达到最大重连次数 (${this.maxReconnect})，停止重连`);
+      console.error('[WebSocket] 💡 提示：请检查后端服务是否启动，或手动刷新页面重新连接');
       return;
     }
+    
     this.reconnectCount += 1;
-    console.log(`[WebSocket] ${this.reconnectInterval}ms 后尝试第 ${this.reconnectCount} 次重连`);
+    
+    // 指数退避策略：每次重连间隔翻倍，最大30秒
+    const backoffDelay = Math.min(
+      this.reconnectInterval * Math.pow(WEBSOCKET_RECONNECT_BACKOFF, this.reconnectCount - 1),
+      30000
+    );
+    
+    console.log(
+      `[WebSocket] 🔄 ${Math.round(backoffDelay / 1000)}秒后尝试第 ${this.reconnectCount}/${this.maxReconnect} 次重连`
+    );
+    
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
     }
+    
     this.reconnectTimer = setTimeout(() => {
       this.listeners.onReconnect?.(this.reconnectCount);
       this.connect();
-    }, this.reconnectInterval);
+    }, backoffDelay);
   }
 }
 

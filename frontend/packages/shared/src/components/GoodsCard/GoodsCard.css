@@ -1,593 +1,320 @@
 /**
- * 💎 GoodsCard 组件样式 - 终极升级版
+ * GoodsCard 组件样式 - 精致的商品卡片设计 🛍️
  * @author BaSui 😎
- * @updated 2025-11-09 - 添加毛玻璃、渐变边框、发光效果、主题适配
- * @description 商品卡片组件样式 - 精致优雅的设计
+ * @updated 2025-11-11 - 现代化设计升级
  */
 
-/* ==================== GoodsCard 容器 ==================== */
-.campus-goods-card {
+/* ==================== 主卡片容器 ==================== */
+.goods-card {
   position: relative;
-  width: 100%;
-  max-width: 320px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: var(--radius-xl, 16px);
   overflow: hidden;
-
-  /* 🌫️ 增强毛玻璃效果 */
-  background: var(--backdrop-bg, rgba(255, 255, 255, 0.85));
-  backdrop-filter: var(--backdrop-blur, blur(12px)) saturate(180%);
-  -webkit-backdrop-filter: var(--backdrop-blur, blur(12px)) saturate(180%);
-
-  /* 🎨 基础边框 */
-  border: 1px solid var(--color-border-light, rgba(0, 0, 0, 0.06));
-
-  /* ⚡ 性能优化 */
-  contain: layout style paint;
-  will-change: transform, box-shadow;
-}
-
-/* 🌈 渐变边框效果（使用伪元素） */
-.campus-goods-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  background: var(--white, #ffffff);
   border-radius: var(--radius-xl, 16px);
-  padding: 2px;
-  background: var(--gradient-primary, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  z-index: 1;
+  border: 2px solid transparent;
+  box-shadow: var(--shadow-card, 0 8px 24px rgba(0, 0, 0, 0.08));
+  transition: all var(--transition-smooth, 0.4s cubic-bezier(0.4, 0, 0.2, 1));
+  cursor: pointer;
 }
 
-.campus-goods-card:hover::before {
-  opacity: 1;
+/* Hover 状态 */
+.goods-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-card-hover, 0 16px 40px rgba(102, 126, 234, 0.2));
+  border-color: rgba(102, 126, 234, 0.3);
 }
 
-.campus-goods-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-card-hover, 0 12px 28px rgba(0, 0, 0, 0.12)),
-              0 6px 12px rgba(102, 126, 234, 0.15);
-  border-color: transparent;
+.goods-card:active {
+  transform: translateY(-4px) scale(1.01);
 }
 
 /* ==================== 图片区域 ==================== */
-.campus-goods-card__image-wrapper {
+.goods-card__image-wrapper {
   position: relative;
   width: 100%;
-  height: 220px;
+  padding-top: 100%; /* 1:1 宽高比 */
   overflow: hidden;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: var(--bg-gray, #f8f9fa);
+  border-radius: var(--radius-lg, 12px) var(--radius-lg, 12px) 0 0;
 }
 
-.campus-goods-card__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.campus-goods-card:hover .campus-goods-card__image {
-  transform: scale(1.08);
-}
-
-/* 图片遮罩层 */
-.campus-goods-card__image-wrapper::after {
-  content: '';
+.goods-card__image {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.05) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-smooth, 0.4s cubic-bezier(0.4, 0, 0.2, 1));
 }
 
-.campus-goods-card:hover .campus-goods-card__image-wrapper::after {
-  opacity: 1;
+.goods-card:hover .goods-card__image {
+  transform: scale(1.1);
 }
 
-/* 状态标签 */
-.campus-goods-card__status {
+/* 图片加载状态 */
+.goods-card__image-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  color: var(--text-tertiary, #999);
+}
+
+/* ==================== 徽章区域 ==================== */
+.goods-card__badges {
   position: absolute;
   top: 12px;
   left: 12px;
-  z-index: 2;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* 折扣标签 */
-.campus-goods-card__discount {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 2;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-/* ==================== 内容区域 ==================== */
-.campus-goods-card__content {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px;
-}
-
-/* 商品名称 */
-.campus-goods-card__name {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.5;
-  color: var(--text-primary, #1a1a1a);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transition: color 0.2s ease;
-}
-
-.campus-goods-card:hover .campus-goods-card__name {
-  color: #667eea;
-}
-
-/* 商品描述 */
-.campus-goods-card__description {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--text-secondary, #666);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  min-height: 38px;
-}
-
-/* ==================== 价格区域 ==================== */
-.campus-goods-card__price-wrapper {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.campus-goods-card__price {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--color-error, #ff4d4f);
-  line-height: 1;
-  letter-spacing: -0.5px;
-
-  /* ✨ 价格发光效果 */
-  text-shadow: 0 2px 4px rgba(255, 77, 79, 0.2),
-               0 0 10px rgba(255, 77, 79, 0.15),
-               0 0 20px rgba(255, 77, 79, 0.1);
-
-  /* 🎭 发光动画 */
-  animation: price-glow 2s ease-in-out infinite;
-}
-
-@keyframes price-glow {
-  0%, 100% {
-    text-shadow: 0 2px 4px rgba(255, 77, 79, 0.2),
-                 0 0 10px rgba(255, 77, 79, 0.15),
-                 0 0 20px rgba(255, 77, 79, 0.1);
-  }
-  50% {
-    text-shadow: 0 2px 4px rgba(255, 77, 79, 0.3),
-                 0 0 15px rgba(255, 77, 79, 0.25),
-                 0 0 30px rgba(255, 77, 79, 0.2);
-  }
-}
-
-.campus-goods-card__original-price {
-  font-size: 14px;
-  color: var(--text-tertiary, #999);
-  text-decoration: line-through;
-  line-height: 1;
-  opacity: 0.8;
-}
-
-/* ==================== 标签区域 ==================== */
-.campus-goods-card__tags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 2px;
+  z-index: 10;
 }
 
-/* ==================== 底部信息 ==================== */
-.campus-goods-card__footer {
+.goods-card__badge {
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-full, 9999px);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.goods-card__badge--hot {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  border: none;
+}
+
+.goods-card__badge--new {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.goods-card__badge--sold-out {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+}
+
+/* ==================== 内容区域 ==================== */
+.goods-card__content {
+  padding: 16px;
+}
+
+/* 商品名称 */
+.goods-card__name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 44px; /* 保证2行高度 */
+  transition: color var(--transition-base, 0.2s ease-in-out);
+}
+
+.goods-card:hover .goods-card__name {
+  color: var(--primary-color, #667eea);
+}
+
+/* 商品描述 */
+.goods-card__description {
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==================== 价格区域 ==================== */
+.goods-card__price-wrapper {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-/* 卖家信息 */
-.campus-goods-card__seller {
+.goods-card__price {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ff6b6b;
+  letter-spacing: -0.5px;
+}
+
+.goods-card__price-symbol {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.goods-card__original-price {
+  font-size: 14px;
+  color: var(--text-tertiary, #999);
+  text-decoration: line-through;
+}
+
+/* ==================== 标签区域 ==================== */
+.goods-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.goods-card__tag {
+  padding: 4px 10px;
+  background: rgba(102, 126, 234, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.15);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-color, #667eea);
+  transition: all var(--transition-base, 0.2s ease-in-out);
+}
+
+.goods-card__tag:hover {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ==================== 卖家信息 ==================== */
+.goods-card__seller {
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 4px 8px;
-  border-radius: 8px;
-  margin: -4px -8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light, #e5e7eb);
 }
 
-.campus-goods-card__seller:hover {
-  background: rgba(102, 126, 234, 0.08);
-}
-
-.campus-goods-card__seller-avatar {
-  width: 24px;
-  height: 24px;
+.goods-card__seller-avatar {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid rgba(102, 126, 234, 0.2);
-  transition: border-color 0.2s ease;
 }
 
-.campus-goods-card__seller:hover .campus-goods-card__seller-avatar {
-  border-color: #667eea;
-}
-
-.campus-goods-card__seller-name {
+.goods-card__seller-name {
+  flex: 1;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-secondary, #666);
-  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition: color 0.2s ease;
 }
 
-.campus-goods-card__seller:hover .campus-goods-card__seller-name {
-  color: #667eea;
-}
-
-/* 已售数量 */
-.campus-goods-card__sold-count {
+/* ==================== 统计信息 ==================== */
+.goods-card__stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light, #e5e7eb);
   font-size: 12px;
-  font-weight: 500;
   color: var(--text-tertiary, #999);
-  padding: 4px 10px;
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 12px;
 }
 
-/* ==================== 操作按钮 ==================== */
-.campus-goods-card__action-btn {
-  flex: 1;
-  padding: 10px 18px;
+.goods-card__stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.goods-card__stat-icon {
   font-size: 14px;
-  font-weight: 600;
+}
+
+/* ==================== 收藏按钮 ==================== */
+.goods-card__favorite {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   border: none;
-  border-radius: 10px;
+  border-radius: 50%;
+  font-size: 20px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-  letter-spacing: 0.3px;
+  transition: all var(--transition-base, 0.2s ease-in-out);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.campus-goods-card__action-btn--primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+.goods-card__favorite:hover {
+  transform: scale(1.15);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
-.campus-goods-card__action-btn--primary:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #6a4190 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+.goods-card__favorite--active {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
 }
 
-.campus-goods-card__action-btn--primary:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-}
-
-.campus-goods-card__action-btn--secondary {
-  background-color: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.15);
-}
-
-.campus-goods-card__action-btn--secondary:hover {
-  background-color: rgba(102, 126, 234, 0.08);
-  border-color: #5568d3;
-  color: #5568d3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
-}
-
-.campus-goods-card__action-btn--secondary:active {
-  transform: translateY(0);
-  background-color: rgba(102, 126, 234, 0.15);
-  box-shadow: 0 1px 4px rgba(102, 126, 234, 0.2);
-}
-
-/* ==================== 响应式设计 ==================== */
-
-/* 平板适配 */
-@media (max-width: 1024px) {
-  .campus-goods-card {
-    max-width: 300px;
+/* ==================== 响应式 ==================== */
+@media (max-width: 767px) {
+  .goods-card {
+    border-radius: var(--radius-lg, 12px);
   }
 
-  .campus-goods-card__content {
-    padding: 16px;
-  }
-
-  .campus-goods-card__image-wrapper {
-    height: 200px;
-  }
-
-  .campus-goods-card__name {
-    font-size: 15px;
-  }
-
-  .campus-goods-card__price {
-    font-size: 22px;
-  }
-}
-
-/* 移动端适配 */
-@media (max-width: 768px) {
-  .campus-goods-card {
-    max-width: 100%;
-    border-radius: 14px;
-  }
-
-  .campus-goods-card:hover {
+  .goods-card:hover {
     transform: translateY(-4px);
   }
 
-  .campus-goods-card__content {
-    padding: 14px;
-    gap: 8px;
+  .goods-card__name {
+    font-size: 15px;
+    min-height: 42px;
   }
 
-  .campus-goods-card__image-wrapper {
-    height: 180px;
-  }
-
-  .campus-goods-card:hover .campus-goods-card__image {
-    transform: scale(1.05);
-  }
-
-  .campus-goods-card__status,
-  .campus-goods-card__discount {
-    top: 10px;
-    left: 10px;
-  }
-
-  .campus-goods-card__discount {
-    right: 10px;
-    left: auto;
-  }
-
-  .campus-goods-card__name {
-    font-size: 14px;
-  }
-
-  .campus-goods-card__description {
-    font-size: 12px;
-    -webkit-line-clamp: 1;
-    min-height: 18px;
-  }
-
-  .campus-goods-card__price {
+  .goods-card__price {
     font-size: 20px;
   }
 
-  .campus-goods-card__original-price {
-    font-size: 12px;
+  .goods-card__content {
+    padding: 14px;
   }
 
-  .campus-goods-card__tags {
-    gap: 6px;
-  }
-
-  .campus-goods-card__footer {
-    margin-top: 6px;
-    padding-top: 10px;
-  }
-
-  .campus-goods-card__seller-avatar {
-    width: 20px;
-    height: 20px;
-  }
-
-  .campus-goods-card__seller-name {
-    font-size: 12px;
-  }
-
-  .campus-goods-card__sold-count {
-    font-size: 11px;
-    padding: 3px 8px;
-  }
-
-  .campus-goods-card__action-btn {
-    padding: 8px 14px;
-    font-size: 13px;
-    border-radius: 8px;
-  }
-}
-
-/* 超小屏幕适配 */
-@media (max-width: 374px) {
-  .campus-goods-card__image-wrapper {
-    height: 150px;
-  }
-
-  .campus-goods-card__name {
-    font-size: 13px;
-  }
-
-  .campus-goods-card__price {
+  .goods-card__favorite {
+    width: 36px;
+    height: 36px;
     font-size: 18px;
   }
 }
 
-/* ==================== 🌙 暗色主题适配 ==================== */
-[data-theme='dark'] .campus-goods-card,
-.dark-theme .campus-goods-card {
-  background: var(--backdrop-bg, rgba(26, 26, 26, 0.85));
-  border-color: var(--color-border-light, rgba(255, 255, 255, 0.1));
-  box-shadow: var(--shadow-card, 0 2px 8px rgba(0, 0, 0, 0.4));
-}
-
-[data-theme='dark'] .campus-goods-card:hover,
-.dark-theme .campus-goods-card:hover {
-  box-shadow: var(--shadow-card-hover, 0 12px 28px rgba(0, 0, 0, 0.6)),
-              0 6px 12px rgba(124, 143, 240, 0.2);
-}
-
-/* 暗色主题下的图片背景 */
-[data-theme='dark'] .campus-goods-card__image-wrapper,
-.dark-theme .campus-goods-card__image-wrapper {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
-}
-
-/* 暗色主题下的文字颜色 */
-[data-theme='dark'] .campus-goods-card__name,
-.dark-theme .campus-goods-card__name {
-  color: var(--color-text-primary, #e8e8e8);
-}
-
-[data-theme='dark'] .campus-goods-card:hover .campus-goods-card__name,
-.dark-theme .campus-goods-card:hover .campus-goods-card__name {
-  color: var(--color-primary-light, #a5b4f5);
-}
-
-[data-theme='dark'] .campus-goods-card__description,
-.dark-theme .campus-goods-card__description {
-  color: var(--color-text-secondary, #b3b3b3);
-}
-
-/* 暗色主题下的价格发光效果（更明显） */
-[data-theme='dark'] .campus-goods-card__price,
-.dark-theme .campus-goods-card__price {
-  color: var(--color-error, #ff7875);
-  text-shadow: 0 2px 4px rgba(255, 120, 117, 0.3),
-               0 0 15px rgba(255, 120, 117, 0.25),
-               0 0 30px rgba(255, 120, 117, 0.15);
-}
-
-@keyframes price-glow-dark {
-  0%, 100% {
-    text-shadow: 0 2px 4px rgba(255, 120, 117, 0.3),
-                 0 0 15px rgba(255, 120, 117, 0.25),
-                 0 0 30px rgba(255, 120, 117, 0.15);
+/* ==================== 加载动画 ==================== */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
   }
-  50% {
-    text-shadow: 0 2px 4px rgba(255, 120, 117, 0.4),
-                 0 0 20px rgba(255, 120, 117, 0.35),
-                 0 0 40px rgba(255, 120, 117, 0.25);
+  100% {
+    background-position: 1000px 0;
   }
 }
 
-[data-theme='dark'] .campus-goods-card__price,
-.dark-theme .campus-goods-card__price {
-  animation: price-glow-dark 2s ease-in-out infinite;
+.goods-card--loading {
+  pointer-events: none;
 }
 
-/* 暗色主题下的底部信息 */
-[data-theme='dark'] .campus-goods-card__footer,
-.dark-theme .campus-goods-card__footer {
-  border-top-color: var(--color-border-light, rgba(255, 255, 255, 0.1));
-}
-
-[data-theme='dark'] .campus-goods-card__seller:hover,
-.dark-theme .campus-goods-card__seller:hover {
-  background: rgba(124, 143, 240, 0.15);
-}
-
-[data-theme='dark'] .campus-goods-card__sold-count,
-.dark-theme .campus-goods-card__sold-count {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--color-text-tertiary, #808080);
-}
-
-/* 暗色主题下的按钮 */
-[data-theme='dark'] .campus-goods-card__action-btn--primary,
-.dark-theme .campus-goods-card__action-btn--primary {
-  background: var(--gradient-primary, linear-gradient(135deg, #7c8ff0 0%, #9d6bc8 100%));
-  box-shadow: 0 4px 12px rgba(124, 143, 240, 0.4);
-}
-
-[data-theme='dark'] .campus-goods-card__action-btn--primary:hover,
-.dark-theme .campus-goods-card__action-btn--primary:hover {
-  box-shadow: 0 6px 16px rgba(124, 143, 240, 0.5);
-}
-
-[data-theme='dark'] .campus-goods-card__action-btn--secondary,
-.dark-theme .campus-goods-card__action-btn--secondary {
-  color: var(--color-primary-light, #a5b4f5);
-  border-color: var(--color-primary-light, #a5b4f5);
-}
-
-[data-theme='dark'] .campus-goods-card__action-btn--secondary:hover,
-.dark-theme .campus-goods-card__action-btn--secondary:hover {
-  background-color: rgba(124, 143, 240, 0.15);
-}
-
-/* ==================== 🎭 无障碍优化 ==================== */
-
-/* 减少动画（用户偏好） */
-@media (prefers-reduced-motion: reduce) {
-  .campus-goods-card,
-  .campus-goods-card__image,
-  .campus-goods-card__action-btn {
-    transition: none;
-  }
-
-  .campus-goods-card__price {
-    animation: none;
-  }
-
-  .campus-goods-card__discount {
-    animation: none;
-  }
-
-  .campus-goods-card:hover {
-    transform: none;
-  }
-}
-
-/* 键盘焦点样式 */
-.campus-goods-card:focus-visible {
-  outline: 2px solid var(--color-primary, #667eea);
-  outline-offset: 2px;
+.goods-card--loading .goods-card__image-wrapper {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
 }

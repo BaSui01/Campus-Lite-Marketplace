@@ -38,87 +38,87 @@ const BlacklistManagement = lazy(() => import('@/pages/Users/BlacklistManagement
 const ProfilePage = lazy(() => import('@/pages/Profile'));
 
 // 角色权限
-const RoleList = lazy(() => import('@/pages/Roles').then(m => ({ default: m.RoleList })));
+const RoleList = lazy(() => import('@/pages/Roles/RoleList'));
 
 // 系统管理
-const RateLimit = lazy(() => import('@/pages/System').then(m => ({ default: m.RateLimit })));
-const RecycleBin = lazy(() => import('@/pages/System').then(m => ({ default: m.RecycleBin })));
-const Notifications = lazy(() => import('@/pages/System').then(m => ({ default: m.Notifications })));
-const Compliance = lazy(() => import('@/pages/System').then(m => ({ default: m.Compliance })));
-const RevertManagement = lazy(() => import('@/pages/System').then(m => ({ default: m.RevertManagement })));
-const CampusList = lazy(() => import('@/pages/System').then(m => ({ default: m.CampusList })));
-const CategoryList = lazy(() => import('@/pages/System').then(m => ({ default: m.CategoryList })));
-const TagList = lazy(() => import('@/pages/System').then(m => ({ default: m.TagList })));
-const FeatureFlagList = lazy(() => import('@/pages/System').then(m => ({ default: m.FeatureFlagList })));
-const SystemMonitor = lazy(() => import('@/pages/System').then(m => ({ default: m.SystemMonitor })));
-const TaskList = lazy(() => import('@/pages/System').then(m => ({ default: m.TaskList })));
+const RateLimit = lazy(() => import('@/pages/System/RateLimit'));
+const RecycleBin = lazy(() => import('@/pages/System/RecycleBin'));
+const Notifications = lazy(() => import('@/pages/System/Notifications'));
+const Compliance = lazy(() => import('@/pages/System/Compliance'));
+const RevertManagement = lazy(() => import('@/pages/System/RevertManagement'));
+const CampusList = lazy(() => import('@/pages/System/CampusList'));
+const CategoryList = lazy(() => import('@/pages/System/CategoryList'));
+const TagList = lazy(() => import('@/pages/System/TagList'));
+const FeatureFlagList = lazy(() => import('@/pages/System/FeatureFlagList'));
+const SystemMonitor = lazy(() => import('@/pages/System/SystemMonitor'));
+const TaskList = lazy(() => import('@/pages/System/TaskList'));
 
 // 商品管理
-const GoodsList = lazy(() => import('@/pages/Goods').then(m => ({ default: m.GoodsList })));
-const GoodsDetail = lazy(() => import('@/pages/Goods').then(m => ({ default: m.GoodsDetail })));
-const GoodsAudit = lazy(() => import('@/pages/Goods').then(m => ({ default: m.GoodsAudit })));
+const GoodsList = lazy(() => import('@/pages/Goods/GoodsList'));
+const GoodsDetail = lazy(() => import('@/pages/Goods/GoodsDetail'));
+const GoodsAudit = lazy(() => import('@/pages/Goods/GoodsAudit'));
 
 // 订单管理
-const OrderList = lazy(() => import('@/pages/Orders').then(m => ({ default: m.OrderList })));
-const OrderDetail = lazy(() => import('@/pages/Orders').then(m => ({ default: m.OrderDetail })));
-const RefundManagement = lazy(() => import('@/pages/Orders').then(m => ({ default: m.RefundManagement })));
+const OrderList = lazy(() => import('@/pages/Orders/OrderList'));
+const OrderDetail = lazy(() => import('@/pages/Orders/OrderDetail'));
+const RefundManagement = lazy(() => import('@/pages/Orders/RefundManagement'));
 
 // 支付管理
-const PaymentList = lazy(() => import('@/pages/Payment').then(m => ({ default: m.PaymentList })));
-const PaymentDetail = lazy(() => import('@/pages/Payment').then(m => ({ default: m.PaymentDetail })));
+const PaymentList = lazy(() => import('@/pages/Payment/PaymentList'));
+const PaymentDetail = lazy(() => import('@/pages/Payment/PaymentDetail'));
 
 // 消息管理
-const MessageList = lazy(() => import('@/pages/Messages').then(m => ({ default: m.MessageList })));
-const MessageDetail = lazy(() => import('@/pages/Messages').then(m => ({ default: m.MessageDetail })));
+const MessageList = lazy(() => import('@/pages/Messages/MessageList'));
+const MessageDetail = lazy(() => import('@/pages/Messages/MessageDetail'));
 
 // 导出中心
-const ExportCenter = lazy(() => import('@/pages/Export').then(m => ({ default: m.ExportCenter })));
+const ExportCenter = lazy(() => import('@/pages/Export/ExportCenter'));
 
 // 物流管理
-const LogisticsList = lazy(() => import('@/pages/Logistics').then(m => ({ default: m.LogisticsList })));
+const LogisticsList = lazy(() => import('@/pages/Logistics/LogisticsList'));
 
 // 行为分析
-const BehaviorDashboard = lazy(() => import('@/pages/Behavior').then(m => ({ default: m.BehaviorDashboard })));
+const BehaviorDashboard = lazy(() => import('@/pages/Behavior/BehaviorDashboard'));
 
 // 推荐管理
-const RecommendConfig = lazy(() => import('@/pages/Recommend').then(m => ({ default: m.RecommendConfig })));
+const RecommendConfig = lazy(() => import('@/pages/Recommend/RecommendConfig'));
 
 // 搜索管理
-const SearchStatistics = lazy(() => import('@/pages/Search').then(m => ({ default: m.SearchStatistics })));
+const SearchStatistics = lazy(() => import('@/pages/Search/SearchStatistics'));
 
 // 申诉管理
-const AppealList = lazy(() => import('@/pages/Appeals').then(m => ({ default: m.AppealList })));
-const AppealDetail = lazy(() => import('@/pages/Appeals').then(m => ({ default: m.AppealDetail })));
+const AppealList = lazy(() => import('@/pages/Appeals/AppealList'));
+const AppealDetail = lazy(() => import('@/pages/Appeals/AppealDetail'));
 
 // 评价管理
-const ReviewList = lazy(() => import('@/pages/Reviews').then(m => ({ default: m.ReviewList })));
+const ReviewList = lazy(() => import('@/pages/Reviews/ReviewList'));
 
 // 批量任务
-const BatchTaskList = lazy(() => import('@/pages/Batch').then(m => ({ default: m.BatchTaskList })));
+const BatchTaskList = lazy(() => import('@/pages/Batch/BatchTaskList'));
 
 // 纠纷管理
-const DisputeList = lazy(() => import('@/pages/Disputes').then(m => ({ default: m.DisputeList })));
-const DisputeDetail = lazy(() => import('@/pages/Disputes').then(m => ({ default: m.DisputeDetail })));
-const DisputeStatistics = lazy(() => import('@/pages/Disputes').then(m => ({ default: m.DisputeStatistics })));
+const DisputeList = lazy(() => import('@/pages/Disputes/DisputeList'));
+const DisputeDetail = lazy(() => import('@/pages/Disputes/DisputeDetail'));
+const DisputeStatistics = lazy(() => import('@/pages/Disputes/DisputeStatistics'));
 
 // 日志管理
-const AuditLogList = lazy(() => import('@/pages/Logs').then(m => ({ default: m.AuditLogList })));
-const OperationLogList = lazy(() => import('@/pages/Logs').then(m => ({ default: m.OperationLogList })));
+const AuditLogList = lazy(() => import('@/pages/Logs/AuditLogList'));
+const OperationLogList = lazy(() => import('@/pages/Logs/OperationLogList'));
 
 // 内容管理
-const PostAuditList = lazy(() => import('@/pages/Content').then(m => ({ default: m.PostAuditList })));
-const ReportList = lazy(() => import('@/pages/Content').then(m => ({ default: m.ReportList })));
-const ReviewAuditList = lazy(() => import('@/pages/Content').then(m => ({ default: m.ReviewAuditList })));
+const PostAuditList = lazy(() => import('@/pages/Content/PostAuditList'));
+const ReportList = lazy(() => import('@/pages/Content/ReportList'));
+const ReviewAuditList = lazy(() => import('@/pages/Content/ReviewAuditList'));
 
 // 社区管理
-const TopicList = lazy(() => import('@/pages/Community').then(m => ({ default: m.TopicList })));
-const CommunityList = lazy(() => import('@/pages/Community').then(m => ({ default: m.CommunityList })));
+const TopicList = lazy(() => import('@/pages/Community/TopicList'));
+const CommunityList = lazy(() => import('@/pages/Community/CommunityList'));
 
 // 统计分析
-const StatisticsDashboard = lazy(() => import('@/pages/Statistics').then(m => ({ default: m.StatisticsDashboard })));
+const StatisticsDashboard = lazy(() => import('@/pages/Statistics/StatisticsDashboard'));
 
 // 通知模板
-const NotificationTemplateList = lazy(() => import('@/pages/NotificationTemplates').then(m => ({ default: m.NotificationTemplateList })));
+const NotificationTemplateList = lazy(() => import('@/pages/NotificationTemplates/NotificationTemplateList'));
 
 // ===== 辅助函数：包裹 Suspense =====
 const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType<any>>) => (
@@ -525,6 +525,31 @@ export const router = createBrowserRouter([
       },
       // 所有路由已配置完成
     ],
+  },
+  // ===== 404 兜底路由（修复404问题 - BaSui 2025-11-10）=====
+  {
+    path: '*',
+    element: (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', padding: '20px' }}>
+        <h1 style={{ fontSize: '72px', fontWeight: 'bold', color: '#667eea', margin: 0 }}>404</h1>
+        <p style={{ fontSize: '20px', color: '#666', marginTop: '16px' }}>页面不存在</p>
+        <button
+          onClick={() => window.location.href = '/admin/login'}
+          style={{
+            marginTop: '32px',
+            padding: '12px 32px',
+            fontSize: '16px',
+            color: '#fff',
+            backgroundColor: '#667eea',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+        >
+          返回首页
+        </button>
+      </div>
+    ),
   },
 ], {
   // ===== React Router v7 兼容性配置 =====

@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Space, Tag, Card, Row, Col, Statistic, Popconfirm, message } from 'antd';
+import { Table, Button, Space, Tag, Card, Row, Col, Statistic, Popconfirm, App } from 'antd';
 import { EyeOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { disputeService } from '@/services/dispute';
@@ -91,6 +91,7 @@ const disputeFilters: FilterConfig[] = [
 export const DisputeList: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
 
   // 筛选参数（使用 FilterPanel 统一管理）
   const [filterValues, setFilterValues] = useState<FilterValues>({});

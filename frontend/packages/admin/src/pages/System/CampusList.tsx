@@ -21,8 +21,6 @@ import {
   Select,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Card,
   Statistic,
@@ -31,6 +29,7 @@ import {
   Descriptions,
   Popconfirm,
   App,
+  Modal,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -53,7 +52,7 @@ const { Option } = Select;
  */
 export const CampusList: React.FC = () => {
   const queryClient = useQueryClient();
-  const { modal } = App.useApp();
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<CampusRequest>();
 
   // 查询参数

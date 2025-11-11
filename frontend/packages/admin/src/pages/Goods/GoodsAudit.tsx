@@ -19,14 +19,14 @@ import {
   Input,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Radio,
   Card,
   Statistic,
   Row,
   Col,
+  App,
+  Modal,
 } from 'antd';
 import {
   SearchOutlined,
@@ -43,6 +43,7 @@ const { TextArea } = Input;
 export const GoodsAudit: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
   const [form] = Form.useForm();
 
   // 查询参数

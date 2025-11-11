@@ -24,7 +24,6 @@ import {
   Row,
   Col,
   Statistic,
-  message,
   Timeline,
   App,
 } from 'antd';
@@ -101,7 +100,7 @@ const logisticsFilters: FilterConfig[] = [
 
 export const LogisticsList: React.FC = () => {
   const navigate = useNavigate();
-  const { modal } = App.useApp();
+  const { message, modal } = App.useApp();
 
   // 筛选参数（使用 FilterPanel 统一管理）
   const [filterValues, setFilterValues] = useState<FilterValues>({});

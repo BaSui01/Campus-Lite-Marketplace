@@ -30,10 +30,17 @@ export const API_RETRY_DELAY = 1000;
 /**
  * WebSocket 连接URL（从环境变量读取）
  * 💡 BaSui：后端有两个 WebSocket 端点：
- * - /ws/message: 私信消息（默认）
- * - /ws/dispute: 纠纷系统
+ * - /api/ws/message: 私信消息（默认）
+ * - /api/ws/dispute: 纠纷系统
+ * ⚠️ 注意：必须包含 /api 前缀（context-path）
  */
-export const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8200/ws/message';
+export const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8200/api/ws/message';
+
+/**
+ * WebSocket 是否启用（开发环境可设为 false 来禁用自动连接）
+ * 💡 在 .env 中设置 VITE_ENABLE_WEBSOCKET=false 可禁用
+ */
+export const WEBSOCKET_ENABLED = import.meta.env.VITE_ENABLE_WEBSOCKET !== 'false';
 
 /**
  * WebSocket 心跳间隔（毫秒）
@@ -43,12 +50,17 @@ export const WEBSOCKET_HEARTBEAT_INTERVAL = 30000;
 /**
  * WebSocket 重连间隔（毫秒）
  */
-export const WEBSOCKET_RECONNECT_INTERVAL = 5000;
+export const WEBSOCKET_RECONNECT_INTERVAL = 3000;
 
 /**
- * WebSocket 最大重连次数
+ * WebSocket 最大重连次数（减少到5次，避免无限重连浪费资源）
  */
-export const WEBSOCKET_MAX_RECONNECT = 10;
+export const WEBSOCKET_MAX_RECONNECT = 5;
+
+/**
+ * WebSocket 重连退避倍数（每次重连间隔翻倍）
+ */
+export const WEBSOCKET_RECONNECT_BACKOFF = 2;
 
 // ==================== 认证配置 ====================
 

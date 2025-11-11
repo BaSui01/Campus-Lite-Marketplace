@@ -183,6 +183,44 @@ export { RichTextEditor, type RichTextEditorProps } from './RichTextEditor';
 export { ImageCaptcha, type ImageCaptchaProps } from './ImageCaptcha/ImageCaptcha';
 
 /**
+ * RotateCaptcha - 旋转验证码组件 🔄
+ * @description 旋转图片到正确角度的验证码组件
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @example
+ * ```tsx
+ * <RotateCaptcha
+ *   onSuccess={(rotateId, angle) => {
+ *     console.log('验证成功:', rotateId, angle);
+ *   }}
+ *   onFail={() => {
+ *     console.log('验证失败');
+ *   }}
+ * />
+ * ```
+ */
+export { RotateCaptcha, type RotateCaptchaProps } from './RotateCaptcha/RotateCaptcha';
+
+/**
+ * ClickCaptcha - 点选验证码组件 👆
+ * @description 按顺序点击指定文字的验证码组件
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @example
+ * ```tsx
+ * <ClickCaptcha
+ *   onSuccess={(clickId, points) => {
+ *     console.log('验证成功:', clickId, points);
+ *   }}
+ *   onFail={() => {
+ *     console.log('验证失败');
+ *   }}
+ * />
+ * ```
+ */
+export { ClickCaptcha, type ClickCaptchaProps } from './ClickCaptcha/ClickCaptcha';
+
+/**
  * TwoFactorVerify - 2FA 验证组件 🔐
  * @description 双因素认证验证码输入组件，登录时输入 6 位 TOTP 验证码
  * @author BaSui 😎
@@ -392,4 +430,6 @@ export {
   type FilterFieldType,
   type DateRangeValue,
   type NumberRangeValue,
+  type FilterValueTransformer,
+  type FilterValueValidator,
 } from './FilterPanel';

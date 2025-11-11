@@ -12,8 +12,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { message } from 'antd';
-import { exportService, ExportType } from '@campus/shared';
+import { exportService, ExportType, toast } from '@campus/shared';
 
 /**
  * 导出任务状态
@@ -146,15 +145,15 @@ export const useExport = (options: UseExportOptions): UseExportResult => {
         if (task.downloadToken) {
           const url = exportService.downloadExport(task.downloadToken);
           setDownloadUrl(url);
-          message.success('导出成功，可以下载了');
+          toast.success('导出成功，可以下载了');
           onSuccess?.(url);
         }
-        
+
         clearPolling();
       } else if (task.status === 'FAILED') {
         setStatus('FAILED');
         setError(task.message || '导出失败');
-        message.error('导出失败');
+        toast.error('导出失败');
         onError?.(new Error(task.message || '导出失败'));
         clearPolling();
       } else if (task.status === 'PROCESSING') {
@@ -169,7 +168,7 @@ export const useExport = (options: UseExportOptions): UseExportResult => {
         } else {
           setStatus('FAILED');
           setError('导出超时');
-          message.error('导出超时，请稍后重试');
+          toast.error('导出超时，请稍后重试');
           clearPolling();
         }
       } else {
@@ -182,7 +181,7 @@ export const useExport = (options: UseExportOptions): UseExportResult => {
     } catch (err: any) {
       setStatus('FAILED');
       setError(err.message || '查询任务状态失败');
-      message.error(err.message || '查询任务状态失败');
+      toast.error(err.message || '查询任务状态失败');
       onError?.(err);
       clearPolling();
     }
@@ -209,7 +208,7 @@ export const useExport = (options: UseExportOptions): UseExportResult => {
         setTaskId(id);
         setStatus('PROCESSING');
         setProgress(10);
-        message.success('导出任务已创建，正在处理...');
+        toast.success('导出任务已创建，正在处理...');
 
         // 开始轮询
         pollingCountRef.current = 0;
@@ -217,7 +216,7 @@ export const useExport = (options: UseExportOptions): UseExportResult => {
       } catch (err: any) {
         setStatus('FAILED');
         setError(err.message || '创建导出任务失败');
-        message.error(err.message || '创建导出任务失败');
+        toast.error(err.message || '创建导出任务失败');
         onError?.(err);
       }
     },
@@ -231,13 +230,13 @@ export const useExport = (options: UseExportOptions): UseExportResult => {
     if (taskId) {
       try {
         await exportService.cancelExport(taskId);
-        message.success('已取消导出');
+        toast.success('已取消导出');
         clearPolling();
         setStatus('IDLE');
         setProgress(0);
         setTaskId(null);
       } catch (err: any) {
-        message.error(err.message || '取消失败');
+        toast.error(err.message || '取消失败');
       }
     }
   }, [taskId, clearPolling]);

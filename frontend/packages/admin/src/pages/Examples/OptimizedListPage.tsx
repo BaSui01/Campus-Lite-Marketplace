@@ -12,7 +12,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Table, Space, Button, Card, Row, Col, Statistic, message } from 'antd';
+import { Table, Space, Button, Card, Row, Col, Statistic, App } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
@@ -49,10 +49,11 @@ const STATUS_MAP = {
  * 优化后的列表页面
  */
 export const OptimizedListPage: React.FC = () => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
 
   // ===== 使用公共 Hooks =====
-  
+
   // 1. 表格状态管理（分页、排序、筛选）
   const { page, size, total, setTotal, handleTableChange, tableParams } = useTable({
     defaultPageSize: 20,

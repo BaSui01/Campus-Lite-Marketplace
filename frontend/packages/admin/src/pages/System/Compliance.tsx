@@ -12,13 +12,13 @@ import {
   Input,
   Select,
   Space,
-  Modal,
   Form,
-  message,
   Typography,
   Tag,
   Popconfirm,
   Tooltip,
+  App,
+  Modal,
 } from 'antd';
 import {
   PlusOutlined,
@@ -40,6 +40,7 @@ const { Search } = Input;
 
 const Compliance: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [whitelistModalVisible, setWhitelistModalVisible] = useState(false);
   const [auditModalVisible, setAuditModalVisible] = useState(false);
   const [selectedTargetType, setSelectedTargetType] = useState<string>();

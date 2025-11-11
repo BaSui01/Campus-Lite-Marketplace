@@ -271,11 +271,12 @@ class LogisticsServiceImpl implements LogisticsService {
    */
   async getLogisticsStatistics(startDate?: string, endDate?: string): Promise<LogisticsStatistics> {
     const api = getApi();
-    
+
     // 默认查询最近30天
-    const end = endDate || new Date().toISOString().split('T')[0];
-    const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    
+    // ✅ 修复：后端期望 "yyyy-MM-dd HH:mm:ss" 格式，添加时间部分
+    const end = endDate ? `${endDate} 23:59:59` : `${new Date().toISOString().split('T')[0]} 23:59:59`;
+    const start = startDate ? `${startDate} 00:00:00` : `${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} 00:00:00`;
+
     const response = await api.getLogisticsStatistics({ startDate: start, endDate: end });
     const data = response.data.data as LogisticsStatisticsDTO;
     

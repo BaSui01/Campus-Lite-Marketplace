@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Table, Button, Space, Tag, message, Modal, Form, Radio, Card, Row, Col, Statistic, Rate, Input } from 'antd';
+import { Table, Button, Space, Tag, App, Modal, Form, Radio, Card, Row, Col, Statistic, Rate, Input } from 'antd';
 import { CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { reviewService } from '@campus/shared/services/goods/review';
@@ -16,6 +16,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 };
 
 export const ReviewAuditList: React.FC = () => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [page, setPage] = useState<number>(0);

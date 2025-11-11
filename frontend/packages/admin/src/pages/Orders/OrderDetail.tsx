@@ -23,7 +23,6 @@ import {
   Modal,
   Form,
   Input,
-  message,
   Spin,
   Tag,
   Row,
@@ -32,6 +31,7 @@ import {
   Image,
   Divider,
   App,
+  Modal,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -62,7 +62,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 export const OrderDetail: React.FC = () => {
   const { orderNo } = useParams<{ orderNo: string }>();
   const navigate = useNavigate();
-  const { modal } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
 
   const [cancelModalVisible, setCancelModalVisible] = useState(false);

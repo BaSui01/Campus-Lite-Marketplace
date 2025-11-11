@@ -13,7 +13,7 @@
  */
 
 import React, { useState } from 'react';
-import { Upload, Modal, message } from 'antd';
+import { Upload, Modal, App } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd';
 import { uploadService } from '@campus/shared';
@@ -70,6 +70,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   maxSize = 5,
   accept = 'image/*',
 }) => {
+  const { message } = App.useApp(); // ✅ 使用 App 提供的 message 实例
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const [fileList, setFileList] = useState<UploadFile[]>(() =>

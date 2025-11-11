@@ -80,17 +80,17 @@ export const Register: React.FC = () => {
         throw new Error('密码加密失败，请重试');
       }
       
-      const data = registerType === 'phone' 
+      const data = registerType === 'phone'
         ? {
             phone: formData.phone,
             password: encryptedPassword,
-            verificationCode: formData.verificationCode,
+            code: formData.verificationCode,
             username: formData.username,
           }
         : {
             email: formData.email,
             password: encryptedPassword,
-            verificationCode: formData.verificationCode,
+            code: formData.verificationCode,
             username: formData.username,
           };
       
@@ -100,15 +100,14 @@ export const Register: React.FC = () => {
       
       return response;
     },
-    onSuccess: (data) => {
-      // 注册成功，保存token
-      if (data.token) {
-        setAuth(data.token, data.user);
-        
-        // 跳转到redirect参数指定的页面或首页
-        const redirect = searchParams.get('redirect') || '/';
-        navigate(decodeURIComponent(redirect));
-      }
+    onSuccess: () => {
+      alert('🎉 注册成功！即将跳转到登录页...');
+      navigate('/login', {
+        state: {
+          username: formData.username,
+          password: formData.password,
+        },
+      });
     },
     onError: (error: any) => {
       setErrors({ submit: error?.message || '注册失败，请重试' });

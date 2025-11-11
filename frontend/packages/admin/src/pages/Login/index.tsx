@@ -13,6 +13,8 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { encryptPassword } from '@campus/shared/utils/crypto';
+import { verifyCaptcha } from '@campus/shared/services/captcha'; // 🎯 导入方案B验证方法
+import type { CaptchaVerifyRequest } from '@campus/shared/types/captcha'; // 🎯 导入方案B类型
 import { ImageCaptcha, TwoFactorVerify } from '@campus/shared/components'; // ✅ 导入图形验证码和2FA组件
 import type { LoginRequest } from '@campus/shared';
 import './Login.css';
@@ -29,6 +31,9 @@ const Login: React.FC = () => {
   const [captchaData, setCaptchaData] = useState<{ captchaId: string; code: string } | null>(null);
   const [resetCaptcha, setResetCaptcha] = useState(false);
 
+  // 🎯 方案B：验证码通行证（新增 - BaSui 2025-11-11）
+  const [captchaToken, setCaptchaToken] = useState<string>(''); // 验证码通行证
+
   // 🔐 2FA 状态（新增 - BaSui 2025-11-10）
   const [show2FAVerify, setShow2FAVerify] = useState(false);
   const [tempToken, setTempToken] = useState<string>('');
@@ -36,8 +41,8 @@ const Login: React.FC = () => {
 
   // ===== 提交登录 =====
   const handleSubmit = async (values: LoginRequest) => {
-    // 1️⃣ 验证图形验证码
-    if (!captchaData) {
+    // 1️⃣ 验证验证码通行证（方案B）
+    if (!captchaToken) {
       message.error('请先完成图形验证码！');
       return;
     }
@@ -48,12 +53,11 @@ const Login: React.FC = () => {
     const encryptedPassword = encryptPassword(values.password);
     console.log('✅ 密码已加密传输');
 
-    // ✅ 发送加密后的密码 + 验证码数据
+    // ✅ 发送加密后的密码 + 验证码通行证（方案B）
     const loginParams = {
       username: values.username,
       password: encryptedPassword,
-      captchaId: captchaData.captchaId,   // ✅ 验证码ID
-      captchaCode: captchaData.code,       // ✅ 验证码输入
+      captchaToken: captchaToken, // ✅ 方案B：验证码通行证
     };
 
     try {
@@ -131,11 +135,40 @@ const Login: React.FC = () => {
   };
 
   /**
-   * 🎨 图形验证码成功回调
+   * 🎨 图形验证码成功回调（方案B：先验证验证码，获取通行证 - BaSui 2025-11-11）
    */
-  const handleCaptchaSuccess = (captchaId: string, code: string) => {
+  const handleCaptchaSuccess = async (captchaId: string, code: string) => {
     console.log('✅ [AdminLogin] 图形验证码验证成功:', { captchaId, code });
     setCaptchaData({ captchaId, code });
+
+    try {
+      // 🎯 方案B：调用验证码验证接口，获取验证码通行证
+      const request: CaptchaVerifyRequest = {
+        type: 'image',
+        captchaId: captchaId,
+        captchaCode: code,
+      };
+
+      console.log('[AdminLogin] 🔐 开始验证验证码，请求:', request);
+
+      const response = await verifyCaptcha(request);
+
+      console.log('[AdminLogin] ✅ 验证码验证成功，获得通行证:', response.captchaToken);
+
+      // 保存验证码通行证
+      setCaptchaToken(response.captchaToken);
+    } catch (error: any) {
+      console.error('[AdminLogin] ❌ 验证码验证失败:', error);
+
+      message.error(error?.message || '验证码验证失败，请重试');
+
+      // 重置验证状态
+      setCaptchaData(null);
+      setCaptchaToken('');
+
+      // 重置验证码
+      setResetCaptcha(prev => !prev);
+    }
   };
 
   /**
@@ -144,6 +177,7 @@ const Login: React.FC = () => {
   const handleCaptchaFail = () => {
     console.warn('❌ [AdminLogin] 图形验证码验证失败');
     setCaptchaData(null);
+    setCaptchaToken('');
   };
 
   // 🔐 如果需要 2FA 验证，显示 2FA 验证组件（新增 - BaSui 2025-11-10）

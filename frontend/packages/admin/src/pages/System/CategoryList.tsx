@@ -22,13 +22,13 @@ import {
   Select,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Card,
   Popconfirm,
   InputNumber,
   Tooltip,
+  App,
+  Modal,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -56,6 +56,7 @@ type Category = CategoryTreeNode;
  */
 export const CategoryList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<CategoryRequest>();
 
   // 查询参数

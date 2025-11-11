@@ -18,7 +18,6 @@ import {
   Radio,
   Input,
   InputNumber,
-  message,
   Spin,
   Image,
   Avatar,
@@ -28,6 +27,7 @@ import {
   Divider,
   Tabs,
   App,
+  Modal,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -69,7 +69,7 @@ const TYPE_MAP: Record<string, string> = {
 export const DisputeDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { modal } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [arbitrateModalVisible, setArbitrateModalVisible] = useState(false);

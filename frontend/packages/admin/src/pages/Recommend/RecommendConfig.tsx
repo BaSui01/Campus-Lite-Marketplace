@@ -22,7 +22,7 @@ import {
   Switch,
   Button,
   Space,
-  message,
+  App,
   Divider,
   Row,
   Col,
@@ -71,6 +71,7 @@ const ALGORITHM_TYPE_MAP: Record<string, { text: string; description: string }> 
 };
 
 export const RecommendConfig: React.FC = () => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
 

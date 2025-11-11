@@ -64,6 +64,12 @@ export interface PageObject {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {number}
+     * @memberof PageObject
+     */
+    'numberOfElements'?: number;
+    /**
+     * 
      * @type {boolean}
      * @memberof PageObject
      */
@@ -74,12 +80,6 @@ export interface PageObject {
      * @memberof PageObject
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageObject
-     */
-    'numberOfElements'?: number;
     /**
      * 
      * @type {PageableObject}

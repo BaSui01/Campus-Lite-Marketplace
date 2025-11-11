@@ -19,6 +19,12 @@ export default defineConfig(({ mode }) => {
       port: parseInt(env.VITE_ADMIN_PORT || '3000'),
       host: true, // 允许外部访问
       open: false, // 不自动打开浏览器
+      // 🎯 SPA 路由回退配置（修复404问题 - BaSui 2025-11-10）
+      proxy: {
+        // 所有非API请求都返回 index.html
+      },
+      // 配置开发服务器的中间件，处理 SPA 路由
+      middlewareMode: false,
     },
 
     // 📦 构建配置

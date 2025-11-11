@@ -19,7 +19,6 @@ import {
   Button,
   Space,
   Tag,
-  message,
   Popconfirm,
   Card,
   Statistic,
@@ -94,7 +93,7 @@ const goodsFilters: FilterConfig[] = [
 export const GoodsList: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { modal } = App.useApp();
+  const { message, modal } = App.useApp();
 
   // 筛选参数（使用 FilterPanel 统一管理）
   const [filterValues, setFilterValues] = useState<FilterValues>({});

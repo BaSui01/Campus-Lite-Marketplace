@@ -17,6 +17,7 @@ import type {
   User,
   UpdateProfileRequest,
   UpdatePasswordRequest,
+  UserProfileResponse,
 } from '../api/models';
 
 // 注意：PageInfo 已废弃，改用 API 生成的分页类型

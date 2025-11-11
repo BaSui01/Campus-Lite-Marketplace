@@ -57,18 +57,86 @@ const API_BASE_URL = normalizeBaseUrl(resolveEnvBaseUrl() || DEFAULT_BASE_PATH);
 
 /**
  * 获取访问 Token（内部使用）
+ * 🔧 BaSui 修复：统一从 Zustand persist 存储中读取，避免与路由守卫判断不一致
+ *
+ * 读取优先级：
+ * 1. Portal 端：从 'auth-storage' (Zustand persist) 读取
+ * 2. Admin 端：从 'admin-auth-storage' (Zustand persist) 读取
+ * 3. 兜底：从 localStorage 直接读取 'access_token'（向后兼容）
+ *
  * @internal
  */
 const getAccessTokenInternal = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
+  try {
+    // 1. 尝试从 Portal 端 Zustand persist 读取
+    const portalAuthStorage = localStorage.getItem('auth-storage');
+    if (portalAuthStorage) {
+      const portalAuthData = JSON.parse(portalAuthStorage);
+      const portalToken = portalAuthData?.state?.accessToken;
+      if (portalToken) {
+        return portalToken;
+      }
+    }
+
+    // 2. 尝试从 Admin 端 Zustand persist 读取
+    const adminAuthStorage = localStorage.getItem('admin-auth-storage');
+    if (adminAuthStorage) {
+      const adminAuthData = JSON.parse(adminAuthStorage);
+      const adminToken = adminAuthData?.state?.accessToken;
+      if (adminToken) {
+        return adminToken;
+      }
+    }
+
+    // 3. 兜底：从 localStorage 直接读取（向后兼容）
+    return localStorage.getItem(TOKEN_KEY);
+  } catch (error) {
+    console.error('[API Client] ❌ 获取 Access Token 失败:', error);
+    // 兜底：从 localStorage 直接读取
+    return localStorage.getItem(TOKEN_KEY);
+  }
 };
 
 /**
  * 获取刷新 Token（内部使用）
+ * 🔧 BaSui 修复：统一从 Zustand persist 存储中读取
+ *
+ * 读取优先级：
+ * 1. Portal 端：从 'auth-storage' (Zustand persist) 读取
+ * 2. Admin 端：从 'admin-auth-storage' (Zustand persist) 读取
+ * 3. 兜底：从 localStorage 直接读取 'refresh_token'（向后兼容）
+ *
  * @internal
  */
 const getRefreshTokenInternal = (): string | null => {
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
+  try {
+    // 1. 尝试从 Portal 端 Zustand persist 读取
+    const portalAuthStorage = localStorage.getItem('auth-storage');
+    if (portalAuthStorage) {
+      const portalAuthData = JSON.parse(portalAuthStorage);
+      const portalRefreshToken = portalAuthData?.state?.refreshToken;
+      if (portalRefreshToken) {
+        return portalRefreshToken;
+      }
+    }
+
+    // 2. 尝试从 Admin 端 Zustand persist 读取
+    const adminAuthStorage = localStorage.getItem('admin-auth-storage');
+    if (adminAuthStorage) {
+      const adminAuthData = JSON.parse(adminAuthStorage);
+      const adminRefreshToken = adminAuthData?.state?.refreshToken;
+      if (adminRefreshToken) {
+        return adminRefreshToken;
+      }
+    }
+
+    // 3. 兜底：从 localStorage 直接读取（向后兼容）
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  } catch (error) {
+    console.error('[API Client] ❌ 获取 Refresh Token 失败:', error);
+    // 兜底：从 localStorage 直接读取
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  }
 };
 
 /** 单例 DefaultApi 实例缓存 */

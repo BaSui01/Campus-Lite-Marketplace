@@ -82,10 +82,47 @@ export class AuthService {
    * @returns 登出响应
    */
   async logout(): Promise<ApiResponse<void>> {
-    // ✅ logout 需要 authorization 参数（Token 通过 axios 拦截器自动注入到 Header）
-    // ⚠️ 这里传空字符串，实际 Token 由 apiClient 拦截器注入
-    const response = await this.api.logout('' as any);
+    // 🔧 BaSui 修复：从 localStorage 获取当前 Token 传递给 logout 接口
+    // ⚠️ 注意：虽然 apiClient 拦截器会注入 Token 到 Header，
+    //    但 OpenAPI 生成的代码会先校验参数不能为空，所以必须传递实际 Token
+    const token = this.getAccessToken();
+    if (!token) {
+      console.warn('[AuthService] ⚠️ Token 不存在，跳过登出接口调用');
+      return { code: 200, message: '登出成功', data: undefined } as ApiResponse<void>;
+    }
+
+    const response = await this.api.logout(`Bearer ${token}`);
     return response.data as ApiResponse<void>;
+  }
+
+  /**
+   * 获取当前 Access Token（内部方法）
+   * @private
+   */
+  private getAccessToken(): string | null {
+    try {
+      // 1. 尝试从 Portal 端 Zustand persist 读取
+      const portalAuthStorage = localStorage.getItem('auth-storage');
+      if (portalAuthStorage) {
+        const portalAuthData = JSON.parse(portalAuthStorage);
+        const portalToken = portalAuthData?.state?.accessToken;
+        if (portalToken) return portalToken;
+      }
+
+      // 2. 尝试从 Admin 端 Zustand persist 读取
+      const adminAuthStorage = localStorage.getItem('admin-auth-storage');
+      if (adminAuthStorage) {
+        const adminAuthData = JSON.parse(adminAuthStorage);
+        const adminToken = adminAuthData?.state?.accessToken;
+        if (adminToken) return adminToken;
+      }
+
+      // 3. 兜底：从 localStorage 直接读取
+      return localStorage.getItem('access_token');
+    } catch (error) {
+      console.error('[AuthService] ❌ 获取 Token 失败:', error);
+      return localStorage.getItem('access_token');
+    }
   }
 
   /**
@@ -106,6 +143,16 @@ export class AuthService {
    */
   async sendRegisterEmailCode(email: string): Promise<ApiResponse<void>> {
     const response = await this.api.sendRegisterEmailCode({ email });
+    return response.data as ApiResponse<void>;
+  }
+
+  /**
+   * 发送注册短信验证码
+   * @param phone 手机号
+   * @returns 发送结果
+   */
+  async sendRegisterSmsCode(phone: string): Promise<ApiResponse<void>> {
+    const response = await apiClient.post('/auth/register/code/sms', null, { params: { phone } });
     return response.data as ApiResponse<void>;
   }
 
@@ -188,9 +235,11 @@ export class AuthService {
   /**
    * 启用 2FA（生成密钥和 QR 码）
    * @returns 2FA 设置响应（包含密钥、QR 码、恢复码）
+   * ✅ 修复：使用 OpenAPI 生成的 API（BaSui 2025-11-10）
    */
   async enable2FA(): Promise<ApiResponse<any>> {
-    const response = await apiClient.post('/auth/2fa/enable');
+    // ✅ 使用 OpenAPI 生成的 enable2FA 方法
+    const response = await this.api.enable2FA();
     return response.data as ApiResponse<any>;
   }
 
@@ -198,9 +247,11 @@ export class AuthService {
    * 验证 2FA 代码并完成启用
    * @param data 验证码
    * @returns 验证结果
+   * ✅ 修复：使用 OpenAPI 生成的 API（BaSui 2025-11-10）
    */
   async verify2FA(data: { code: string }): Promise<ApiResponse<void>> {
-    const response = await apiClient.post('/auth/2fa/verify', data);
+    // ✅ 使用 OpenAPI 生成的 verify2FA 方法
+    const response = await this.api.verify2FA({ verify2FARequest: data });
     return response.data as ApiResponse<void>;
   }
 
@@ -208,9 +259,11 @@ export class AuthService {
    * 禁用 2FA
    * @param data 密码
    * @returns 禁用结果
+   * ✅ 修复：使用 OpenAPI 生成的 API（BaSui 2025-11-10）
    */
   async disable2FA(data: { password: string }): Promise<ApiResponse<void>> {
-    const response = await apiClient.post('/auth/2fa/disable', data);
+    // ✅ 使用 OpenAPI 生成的 disable2FA 方法
+    const response = await this.api.disable2FA({ disable2FARequest: data });
     return response.data as ApiResponse<void>;
   }
 
@@ -218,18 +271,22 @@ export class AuthService {
    * 重新生成恢复码
    * @param data 密码
    * @returns 新的恢复码列表
+   * ✅ 修复:使用 OpenAPI 生成的 API（BaSui 2025-11-10）
    */
   async regenerateRecoveryCodes(data: { password: string }): Promise<ApiResponse<string[]>> {
-    const response = await apiClient.post('/auth/2fa/recovery-codes/regenerate', data);
+    // ✅ 使用 OpenAPI 生成的 regenerateRecoveryCodes 方法
+    const response = await this.api.regenerateRecoveryCodes({ disable2FARequest: data });
     return response.data as ApiResponse<string[]>;
   }
 
   /**
    * 检查 2FA 状态
    * @returns 是否启用 2FA
+   * ✅ 修复：使用 OpenAPI 生成的 API（BaSui 2025-11-10）
    */
   async check2FAStatus(): Promise<ApiResponse<boolean>> {
-    const response = await apiClient.get('/auth/2fa/status');
+    // ✅ 使用 OpenAPI 生成的 check2FAStatus 方法
+    const response = await this.api.check2FAStatus();
     return response.data as ApiResponse<boolean>;
   }
 }

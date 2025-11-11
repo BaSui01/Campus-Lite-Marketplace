@@ -109,13 +109,13 @@ export interface DisputeFilterRequest {
      * @type {string}
      * @memberof DisputeFilterRequest
      */
-    'sortDirectionOrDefault'?: string;
+    'sortByOrDefault'?: string;
     /**
      * 
      * @type {string}
      * @memberof DisputeFilterRequest
      */
-    'sortByOrDefault'?: string;
+    'sortDirectionOrDefault'?: string;
 }
 
 export const DisputeFilterRequestSortDirectionEnum = {
