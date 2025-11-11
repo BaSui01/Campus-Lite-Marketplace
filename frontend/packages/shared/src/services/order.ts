@@ -15,6 +15,16 @@ import type {
 } from '../api/models';
 
 /**
+ * 支付响应数据类型
+ */
+export interface PaymentResponseData {
+  orderNo: string;           // 订单号
+  paymentUrl: string;        // 支付链接或二维码
+  qrCode?: string;           // 二维码（可选）
+  expireSeconds?: number;    // 过期秒数（可选）
+}
+
+/**
  * 订单查询参数
  */
 export interface OrderListParams {
@@ -95,7 +105,22 @@ export class OrderService {
   // ==================== 支付相关接口 ====================
 
   /**
-   * 创建支付订单
+   * 支付订单（新接口）💳
+   * @param orderNo 订单号
+   * @param data 支付请求参数
+   * @returns 支付响应（包含支付链接或二维码）
+   */
+  async payOrder(orderNo: string, data: PayOrderRequest): Promise<PaymentResponseData> {
+    const api = getApi();
+    // 使用新的支付接口：POST /api/orders/{orderNo}/pay
+    // 注意：这里暂时直接调用 axios，等 OpenAPI 重新生成后可以改用 api.payOrder
+    const response = await api['axios'].post(`/orders/${orderNo}/pay`, data);
+    return response.data.data as PaymentResponseData;
+  }
+
+  /**
+   * 创建支付订单（已弃用 - 请使用 payOrder）
+   * @deprecated 请使用 payOrder 方法
    * @param data 支付请求参数
    * @returns 支付订单号或二维码链接
    */

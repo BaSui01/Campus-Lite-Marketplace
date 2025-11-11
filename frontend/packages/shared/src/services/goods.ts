@@ -20,6 +20,7 @@ export interface GoodsListParams {
   categoryId?: number;     // 分类 ID
   minPrice?: number;       // 最低价格
   maxPrice?: number;       // 最高价格
+  status?: string;         // 商品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）
   page?: number;           // 页码（从 0 开始）
   size?: number;           // 每页大小
   sortBy?: string;         // 排序字段
@@ -38,18 +39,21 @@ export class GoodsService {
    */
   async listGoods(params?: GoodsListParams): Promise<PageGoodsResponse> {
     const api = getApi();
-    // ✅ listGoods 需要对象参数
-    const response = await api.listGoods({
-      keyword: params?.keyword,
-      categoryId: params?.categoryId,
-      minPrice: params?.minPrice,
-      maxPrice: params?.maxPrice,
-      page: params?.page,
-      size: params?.size,
-      sortBy: params?.sortBy,
-      sortDirection: params?.sortDirection,
-      tags: params?.tags,
-    });
+    // ✅ listGoods 需要对象参数，只传递有值的参数避免后端枚举解析错误
+    const requestParams: any = {};
+    
+    if (params?.keyword !== undefined) requestParams.keyword = params.keyword;
+    if (params?.categoryId !== undefined) requestParams.categoryId = params.categoryId;
+    if (params?.minPrice !== undefined) requestParams.minPrice = params.minPrice;
+    if (params?.maxPrice !== undefined) requestParams.maxPrice = params.maxPrice;
+    if (params?.status !== undefined) requestParams.status = params.status;  // 只在有值时传递status（枚举类型）
+    if (params?.page !== undefined) requestParams.page = params.page;
+    if (params?.size !== undefined) requestParams.size = params.size;
+    if (params?.sortBy !== undefined) requestParams.sortBy = params.sortBy;
+    if (params?.sortDirection !== undefined) requestParams.sortDirection = params.sortDirection;
+    if (params?.tags !== undefined) requestParams.tags = params.tags;
+    
+    const response = await api.listGoods(requestParams);
     return response.data.data as PageGoodsResponse;
   }
 

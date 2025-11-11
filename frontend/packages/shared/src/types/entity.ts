@@ -208,6 +208,8 @@ export enum GoodsStatus {
   PENDING = 'PENDING',
   /** 已上架 */
   APPROVED = 'APPROVED',
+  /** 已锁定（待支付占用） */
+  LOCKED = 'LOCKED',
   /** 已拒绝 */
   REJECTED = 'REJECTED',
   /** 已售出 */

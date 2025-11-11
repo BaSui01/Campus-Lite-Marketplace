@@ -50,6 +50,8 @@ export enum GoodsStatus {
   PENDING = 'PENDING',
   /** 已上架 */
   APPROVED = 'APPROVED',
+  /** 已锁定（待支付占用） */
+  LOCKED = 'LOCKED',
   /** 已拒绝 */
   REJECTED = 'REJECTED',
   /** 已售出 */
@@ -409,6 +411,7 @@ export const UserStatusLabel: Record<UserStatus, string> = {
 export const GoodsStatusLabel: Record<GoodsStatus, string> = {
   [GoodsStatus.PENDING]: '待审核',
   [GoodsStatus.APPROVED]: '已上架',
+  [GoodsStatus.LOCKED]: '已锁定',
   [GoodsStatus.REJECTED]: '已拒绝',
   [GoodsStatus.SOLD]: '已售出',
   [GoodsStatus.OFF_SHELF]: '已下架',
