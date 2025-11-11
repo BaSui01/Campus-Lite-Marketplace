@@ -5,9 +5,12 @@
  */
 
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Input, Button, TwoFactorVerify } from '@campus/shared/components'; // ✅ 从 shared 包导入
-import { SliderCaptcha } from '../../components/SliderCaptcha';
+import { encryptPassword } from '@campus/shared/utils'; // 🔐 导入密码加密工具
+import { verifyCaptcha } from '@campus/shared/services/captcha'; // 🎯 导入方案B验证方法
+import type { CaptchaVerifyRequest } from '@campus/shared/types/captcha'; // 🎯 导入方案B类型
+import { UnifiedCaptcha, type CaptchaResult } from '../../components/UnifiedCaptcha';
 import { useAuthStore } from '../../store';
 import type { LoginRequest } from '@campus/shared/api/models';
 import './Login.css';
@@ -18,22 +21,26 @@ import './Login.css';
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login } = useAuthStore(); // ✅ 获取 login 方法
-  
-  // 获取重定向路径（登录成功后跳转）
+  const location = useLocation();
+  const { login } = useAuthStore();
+
   const redirectPath = searchParams.get('redirect') || '/';
 
-  // 表单状态
+  // 表单状态（自动填充注册页传来的用户名密码）
   const [formData, setFormData] = useState<LoginRequest>({
-    username: '',
-    password: '',
+    username: location.state?.username || '',
+    password: location.state?.password || '',
   });
 
   // UI 状态
   const [loading, setLoading] = useState(false);
-  const [isVerified, setIsVerified] = useState(false); // 是否通过滑块验证
+  const [isVerified, setIsVerified] = useState(false); // 是否通过验证码验证
   const [resetCaptcha, setResetCaptcha] = useState(false); // 重置验证码
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // 🎯 方案B：验证码通行证（新增 - BaSui 2025-11-11）
+  const [captchaToken, setCaptchaToken] = useState<string>(''); // 验证码通行证
+  const [verifyStatus, setVerifyStatus] = useState<'idle' | 'verifying' | 'success' | 'error'>('idle'); // 验证状态
 
   // 2FA 状态（新增 - BaSui 2025-11-09）
   const [show2FAVerify, setShow2FAVerify] = useState(false); // 是否显示 2FA 验证
@@ -52,13 +59,44 @@ const Login: React.FC = () => {
   };
 
   /**
+   * 🔍 智能识别登录凭证类型
+   */
+  const detectCredentialType = (credential: string): 'email' | 'phone' | 'username' | 'invalid' => {
+    const trimmed = credential.trim();
+
+    // 邮箱：包含 @
+    if (trimmed.includes('@')) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      return emailRegex.test(trimmed) ? 'email' : 'invalid';
+    }
+
+    // 手机号：11位纯数字
+    if (/^1[3-9]\d{9}$/.test(trimmed)) {
+      return 'phone';
+    }
+
+    // 用户名：3-20位字母数字下划线
+    if (/^[a-zA-Z0-9_]{3,20}$/.test(trimmed)) {
+      return 'username';
+    }
+
+    return 'invalid';
+  };
+
+  /**
    * ✅ 验证表单数据
    */
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
+    // 验证用户名/邮箱/手机号
     if (!formData.username.trim()) {
-      newErrors.username = '用户名不能为空！';
+      newErrors.username = '请输入用户名/邮箱/手机号！';
+    } else {
+      const credentialType = detectCredentialType(formData.username);
+      if (credentialType === 'invalid') {
+        newErrors.username = '格式错误！用户名3-20位字母数字下划线，或输入有效的邮箱/手机号';
+      }
     }
 
     if (!formData.password.trim()) {
@@ -68,7 +106,7 @@ const Login: React.FC = () => {
     }
 
     if (!isVerified) {
-      newErrors.captcha = '请先完成滑块验证！';
+      newErrors.captcha = '请先完成验证码验证！';
     }
 
     setErrors(newErrors);
@@ -88,11 +126,29 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      // 2. ✅ 使用 useAuthStore.login() 方法（会自动更新状态）
-      console.log('[Login] 🚀 调用登录接口:', formData);
-      const response = await login(formData);
+      // 2. 🔐 加密密码（防止明文传输）
+      let encryptedPassword: string;
+      try {
+        encryptedPassword = encryptPassword(formData.password);
+        console.log('[Login] ✅ 密码已加密');
+      } catch (error) {
+        console.error('[Login] ❌ 密码加密失败:', error);
+        setErrors({ form: '密码加密失败，请重试' });
+        setLoading(false);
+        return;
+      }
 
-      // 3. 🔐 检查是否需要 2FA 验证（新增 - BaSui 2025-11-09）
+      // 3. ✅ 使用 useAuthStore.login() 方法（会自动更新状态）
+      // 🎯 方案B：使用验证码通行证（captchaToken）
+      const loginParams = {
+        username: formData.username,
+        password: encryptedPassword, // 使用加密后的密码
+        captchaToken: captchaToken, // ✅ 方案B：验证码通行证
+      };
+      console.log('[Login] 🚀 调用登录接口（方案B：使用验证码通行证）');
+      const response = await login(loginParams);
+
+      // 4. 🔐 检查是否需要 2FA 验证（新增 - BaSui 2025-11-09）
       if (response?.requires2FA) {
         console.log('[Login] 🔐 需要 2FA 验证');
         setShow2FAVerify(true);
@@ -103,7 +159,7 @@ const Login: React.FC = () => {
 
       console.log('[Login] ✅ 登录成功，状态已更新');
 
-      // 4. 跳转到重定向路径或首页
+      // 5. 跳转到重定向路径或首页
       console.log('[Login] 📍 跳转到:', redirectPath);
       setTimeout(() => {
         navigate(redirectPath, { replace: true });
@@ -131,10 +187,14 @@ const Login: React.FC = () => {
     setErrors({});
 
     try {
+      // 🔐 加密密码
+      const encryptedPassword = encryptPassword(formData.password);
+
       // 使用 2FA 代码再次登录
       console.log('[Login] 🔐 提交 2FA 验证码');
       await login({
         ...formData,
+        password: encryptedPassword, // 使用加密后的密码
         twoFactorCode: code,
       });
 
@@ -165,26 +225,67 @@ const Login: React.FC = () => {
   };
 
   /**
-   * 🎯 滑块验证成功（修改：接收验证码数据 - BaSui 2025-11-10）
+   * 🎯 验证码验证成功（方案B：先验证验证码，获取通行证 - BaSui 2025-11-11）
    */
-  const handleCaptchaSuccess = (slideId: string, position: number) => {
-    console.log('[Login] ✅ 滑块验证通过！slideId:', slideId, 'position:', position);
-    setIsVerified(true);
-    setErrors(prev => ({ ...prev, captcha: '' }));
+  const handleCaptchaSuccess = async (result: CaptchaResult) => {
+    console.log('[Login] ✅ 验证码验证通过！类型:', result.type, '数据:', result);
 
-    // ✅ 保存验证码数据到表单（用于登录请求）
-    setFormData(prev => ({
-      ...prev,
-      captchaId: slideId,
-      slidePosition: position,
-    }));
+    // 🔄 设置验证中状态
+    setVerifyStatus('verifying');
+
+    try {
+      // 🎯 方案B：调用验证码验证接口，获取验证码通行证
+      const request: CaptchaVerifyRequest = {
+        type: result.type as 'image' | 'slider' | 'rotate' | 'click',
+        captchaId: (result.captchaId || result.slideId || result.rotateId || result.clickId) as string,
+        captchaCode: result.captchaCode,
+        slidePosition: result.slidePosition,
+        rotateAngle: result.rotateAngle,
+        clickPoints: result.clickPoints,
+      };
+
+      console.log('[Login] 🔐 开始验证验证码，请求:', request);
+
+      const response = await verifyCaptcha(request);
+
+      console.log('[Login] ✅ 验证码验证成功，获得通行证:', response.captchaToken);
+
+      // ✅ 设置成功状态
+      setVerifyStatus('success');
+
+      // 保存验证码通行证
+      setCaptchaToken(response.captchaToken);
+      setIsVerified(true);
+      setErrors(prev => ({ ...prev, captcha: '' }));
+    } catch (error: any) {
+      console.error('[Login] ❌ 验证码验证失败:', error);
+
+      // ❌ 设置失败状态
+      setVerifyStatus('error');
+
+      // 显示错误提示
+      setErrors(prev => ({
+        ...prev,
+        captcha: error?.message || '验证码验证失败，请重试',
+      }));
+
+      // 重置验证状态
+      setIsVerified(false);
+      setCaptchaToken('');
+
+      // 2秒后重置验证码
+      setTimeout(() => {
+        setVerifyStatus('idle');
+        setResetCaptcha(prev => !prev);
+      }, 2000);
+    }
   };
 
   /**
-   * 🎯 滑块验证失败
+   * 🎯 验证码验证失败
    */
   const handleCaptchaFail = () => {
-    console.warn('[Login] ❌ 滑块验证失败！');
+    console.warn('[Login] ❌ 验证码验证失败！');
     setIsVerified(false);
   };
 
@@ -253,10 +354,10 @@ const Login: React.FC = () => {
 
           {/* 用户名输入框 */}
           <div className="login-form__field">
-            <label className="login-form__label">用户名</label>
+            <label className="login-form__label">用户名/邮箱/手机号</label>
             <Input
               size="large"
-              placeholder="请输入用户名"
+              placeholder="请输入用户名/邮箱/手机号"
               value={formData.username}
               onChange={handleInputChange('username')}
               onPressEnter={handlePressEnter}
@@ -283,12 +384,13 @@ const Login: React.FC = () => {
             />
           </div>
 
-          {/* 滑块验证 */}
+          {/* 智能验证码（随机展示四种之一） */}
           <div className="login-form__field">
-            <SliderCaptcha
+            <UnifiedCaptcha
               onSuccess={handleCaptchaSuccess}
               onFail={handleCaptchaFail}
               reset={resetCaptcha}
+              verifyStatus={verifyStatus}
             />
             {errors.captcha && (
               <div className="login-form__field-error">{errors.captcha}</div>

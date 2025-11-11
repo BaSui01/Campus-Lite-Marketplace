@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ClickPoint } from './click-point';
 
 /**
  * 
@@ -50,6 +53,18 @@ export interface LoginRequest {
      * @memberof LoginRequest
      */
     'slidePosition'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof LoginRequest
+     */
+    'rotateAngle'?: number;
+    /**
+     * 
+     * @type {Array<ClickPoint>}
+     * @memberof LoginRequest
+     */
+    'clickPoints'?: Array<ClickPoint>;
     /**
      * 
      * @type {string}

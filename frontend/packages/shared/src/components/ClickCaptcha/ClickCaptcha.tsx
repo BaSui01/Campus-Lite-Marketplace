@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { apiClient } from '../../services/api-client';
+import { apiClient } from '../../utils/apiClient';
 import './ClickCaptcha.css';
 
 export interface ClickCaptchaProps {
@@ -36,7 +36,8 @@ export const ClickCaptcha: React.FC<ClickCaptchaProps> = ({
   className = '',
 }) => {
   const [captchaData, setCaptchaData] = useState<ClickCaptchaData | null>(null);
-  const [clickedPoints, setClickedPoints] = useState<ClickPoint[]>([]);
+  const [clickedPoints, setClickedPoints] = useState<ClickPoint[]>([]); // 用于传给后端的坐标（原始尺寸）
+  const [displayPoints, setDisplayPoints] = useState<ClickPoint[]>([]); // 用于显示标记的坐标（显示尺寸）
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,9 +49,10 @@ export const ClickCaptcha: React.FC<ClickCaptchaProps> = ({
       setIsLoading(true);
       const response = await apiClient.get('/api/captcha/click');
       
-      if (response.data.code === 0 && response.data.data) {
+      if (response.data.code === 200 && response.data.data) {
         setCaptchaData(response.data.data);
         setClickedPoints([]);
+        setDisplayPoints([]);
         setIsSuccess(false);
         setIsFailed(false);
         console.log('✅ [ClickCaptcha] 验证码生成成功:', response.data.data);
@@ -72,50 +74,75 @@ export const ClickCaptcha: React.FC<ClickCaptchaProps> = ({
     if (!captchaData || isSuccess || isFailed) return;
 
     const rect = imageRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    const imgElement = imageRef.current?.querySelector('img');
+    if (!rect || !imgElement) return;
 
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    // 🎯 获取点击位置（相对于容器）
+    const clickX = event.clientX - rect.left;
+    const clickY = event.clientY - rect.top;
 
-    const newPoints = [...clickedPoints, { x, y }];
-    setClickedPoints(newPoints);
+    // 🎯 获取图片的实际尺寸和显示尺寸
+    const naturalWidth = imgElement.naturalWidth;   // 图片原始宽度（后端生成：300px）
+    const naturalHeight = imgElement.naturalHeight; // 图片原始高度（后端生成：200px）
+    const displayWidth = imgElement.clientWidth;    // 图片显示宽度（前端可能放大）
+    const displayHeight = imgElement.clientHeight;  // 图片显示高度（前端可能放大）
 
-    console.log('👆 [ClickCaptcha] 点击位置:', { x, y }, '总共:', newPoints.length);
+    // 🎯 计算缩放比例
+    const scaleX = naturalWidth / displayWidth;
+    const scaleY = naturalHeight / displayHeight;
+
+    // 🎯 转换为图片原始坐标（用于传给后端）
+    const scaledX = Math.round(clickX * scaleX);
+    const scaledY = Math.round(clickY * scaleY);
+
+    console.log('👆 [ClickCaptcha] 坐标转换:', {
+      点击位置: { clickX, clickY },
+      图片原始尺寸: { naturalWidth, naturalHeight },
+      图片显示尺寸: { displayWidth, displayHeight },
+      缩放比例: { scaleX, scaleY },
+      后端坐标: { scaledX, scaledY },
+    });
+
+    // ✅ 保存两组坐标
+    const newScaledPoints = [...clickedPoints, { x: scaledX, y: scaledY }]; // 后端坐标
+    const newDisplayPoints = [...displayPoints, { x: clickX, y: clickY }];  // 显示坐标
+
+    setClickedPoints(newScaledPoints);
+    setDisplayPoints(newDisplayPoints);
+
+    console.log('👆 [ClickCaptcha] 点击位置 - 后端:', { x: scaledX, y: scaledY }, '显示:', { x: clickX, y: clickY }, '总共:', newScaledPoints.length);
 
     // 如果点击数量达到目标数量，自动验证
-    if (newPoints.length === captchaData.targetWords.length) {
-      await verifyClick(newPoints);
+    if (newScaledPoints.length === captchaData.targetWords.length) {
+      await verifyClick(newScaledPoints);
     }
   };
 
-  // 验证点击
+  // 🎯 收集点击数据（不调用后端验证，留给登录接口验证）
+  //
+  // 🔧 BaSui 修复 (2025-11-11)：
+  // 问题：前端验证后Redis中的验证码被删除，登录时无法再次验证
+  // 方案：前端只收集数据（clickId + clickPoints），真正验证由登录接口执行
   const verifyClick = async (points: ClickPoint[]) => {
     if (!captchaData) return;
 
-    try {
-      const response = await apiClient.post('/api/captcha/click/verify', {
+    // ✅ 简单的前端校验（给用户反馈）
+    // 注意：这不是真实验证，只是UI反馈，真实验证在后端
+    const isLikelyCorrect = points.length === captchaData.targetWords.length;
+
+    if (isLikelyCorrect) {
+      console.log('✅ [ClickCaptcha] 点击已记录，等待后端验证:', {
         clickId: captchaData.clickId,
-        clickPoints: points,
+        points,
       });
-
-      if (response.data.code === 0 && response.data.data === true) {
-        console.log('✅ [ClickCaptcha] 验证成功！');
-        setIsSuccess(true);
-        onSuccess?.(captchaData.clickId, points);
-      } else {
-        console.log('❌ [ClickCaptcha] 验证失败！');
-        setIsFailed(true);
-        onFail?.();
-
-        // 1.5秒后重置
-        setTimeout(() => {
-          resetCaptcha();
-        }, 1500);
-      }
-    } catch (error) {
-      console.error('❌ [ClickCaptcha] 验证请求失败:', error);
+      setIsSuccess(true);
+      onSuccess?.(captchaData.clickId, points);
+    } else {
+      console.log('❌ [ClickCaptcha] 点击数量不正确');
       setIsFailed(true);
       onFail?.();
+
+      // 1.5秒后重置
       setTimeout(() => {
         resetCaptcha();
       }, 1500);
@@ -125,6 +152,7 @@ export const ClickCaptcha: React.FC<ClickCaptchaProps> = ({
   // 重置验证码
   const resetCaptcha = () => {
     setClickedPoints([]);
+    setDisplayPoints([]);
     setIsSuccess(false);
     setIsFailed(false);
     generateCaptcha();
@@ -134,6 +162,7 @@ export const ClickCaptcha: React.FC<ClickCaptchaProps> = ({
   const undoLastClick = () => {
     if (clickedPoints.length > 0) {
       setClickedPoints(clickedPoints.slice(0, -1));
+      setDisplayPoints(displayPoints.slice(0, -1));
     }
   };
 
@@ -158,8 +187,8 @@ export const ClickCaptcha: React.FC<ClickCaptchaProps> = ({
           <>
             <img src={captchaData.backgroundImage} alt="点选验证码" />
             
-            {/* 点击标记 */}
-            {clickedPoints.map((point, index) => (
+            {/* 点击标记（使用显示坐标） */}
+            {displayPoints.map((point, index) => (
               <div
                 key={index}
                 className="click-captcha__marker"

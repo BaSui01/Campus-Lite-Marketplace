@@ -1,6 +1,8 @@
 package com.campus.marketplace.service.impl;
 
 import com.campus.marketplace.common.dto.response.CaptchaResponse;
+import com.campus.marketplace.common.exception.BusinessException;
+import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.service.CaptchaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -276,18 +278,18 @@ public class CaptchaServiceImpl implements CaptchaService {
         int targetX = random.nextInt(200) + 50;
 
         // 2. 生成Y轴位置（随机，让滑块在不同高度）
-        int yPosition = random.nextInt(100) + 50; // 50-150px
+        int yposition = random.nextInt(100) + 50; // 50-150px
 
-        log.info("生成滑块验证码（带图片）: slideId={}, targetX={}, yPosition={}", slideId, targetX, yPosition);
+        log.info("生成滑块验证码（带图片）: slideId={}, targetX={}, yposition={}", slideId, targetX, yposition);
 
         // 3. 先生成完整的原始图片（不带缺口）
         BufferedImage originalImage = createOriginalImage(300, 200);
 
         // 4. 从原始图片中裁剪出滑块（真实裁剪！）
-        BufferedImage sliderImage = cutPuzzlePiece(originalImage, targetX, yPosition, 50);
+        BufferedImage sliderImage = cutPuzzlePiece(originalImage, targetX, yposition, 50);
 
         // 5. 在原始图片上绘制缺口，生成背景图
-        BufferedImage backgroundImage = drawPuzzleHole(originalImage, targetX, yPosition, 50);
+        BufferedImage backgroundImage = drawPuzzleHole(originalImage, targetX, yposition, 50);
 
         String backgroundBase64 = imageToBase64(backgroundImage);
         String sliderBase64 = imageToBase64(sliderImage);
@@ -300,7 +302,7 @@ public class CaptchaServiceImpl implements CaptchaService {
                 .slideId(slideId)
                 .backgroundImage(backgroundBase64)
                 .sliderImage(sliderBase64)
-                .yPosition(yPosition)
+                .yposition(yposition)
                 .expiresIn(SLIDE_EXPIRE_SECONDS)
                 .build();
     }
@@ -350,7 +352,7 @@ public class CaptchaServiceImpl implements CaptchaService {
      * 注：此方法保留以备将来滑块验证码功能扩展使用
      */
     @SuppressWarnings("unused")
-    private BufferedImage createSlideBackgroundImage(int width, int height, int targetX, int yPosition) {
+    private BufferedImage createSlideBackgroundImage(int width, int height, int targetX, int yposition) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
 
@@ -383,7 +385,7 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         // 3. 绘制拼图缺口（真实凹凸形状！）
         int puzzleSize = 50;
-        java.awt.geom.Path2D.Double puzzlePath = createPuzzleShape(targetX, yPosition, puzzleSize);
+        java.awt.geom.Path2D.Double puzzlePath = createPuzzleShape(targetX, yposition, puzzleSize);
 
         // 填充缺口（半透明白色）
         g.setColor(new Color(255, 255, 255, 200));
@@ -914,5 +916,165 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         g.dispose();
         return image;
+    }
+
+    // ========== 统一验证码验证接口（新增 - BaSui 2025-11-11） ==========
+
+    private static final int CAPTCHA_TOKEN_EXPIRE_SECONDS = 60; // 验证码通行证有效期60秒
+    private static final String CAPTCHA_TOKEN_PREFIX = "captcha:token:";
+
+    /**
+     * 统一验证码验证接口（支持四种验证码类型）
+     *
+     * @param request 统一验证码验证请求
+     * @return 验证码通行证（临时token）
+     */
+    @Override
+    public com.campus.marketplace.common.dto.response.CaptchaVerifyResponse verifyUnifiedCaptcha(
+            com.campus.marketplace.common.dto.request.UnifiedCaptchaVerifyRequest request
+    ) {
+        log.info("收到统一验证码验证请求: type={}, captchaId={}", request.getType(), request.getCaptchaId());
+
+        boolean isValid = false;
+
+        // 根据验证码类型调用对应的验证方法
+        switch (request.getType().toLowerCase()) {
+            case "image":
+                // 图形验证码验证
+                if (request.getCaptchaCode() == null) {
+                    throw new BusinessException(
+                            ErrorCode.PARAM_ERROR,
+                            "图形验证码输入不能为空"
+                    );
+                }
+                isValid = verifyImageCaptcha(request.getCaptchaId(), request.getCaptchaCode());
+                break;
+
+            case "slider":
+                // 滑块验证码验证
+                if (request.getSlidePosition() == null) {
+                    throw new BusinessException(
+                            ErrorCode.PARAM_ERROR,
+                            "滑块位置不能为空"
+                    );
+                }
+                // 如果有轨迹数据，使用完整验证
+                if (request.getTrack() != null && !request.getTrack().isEmpty()) {
+                    com.campus.marketplace.common.dto.request.SlideVerifyRequest slideRequest =
+                            new com.campus.marketplace.common.dto.request.SlideVerifyRequest();
+                    slideRequest.setSlideId(request.getCaptchaId());
+                    slideRequest.setXPosition(request.getSlidePosition());
+                    // 转换轨迹数据
+                    java.util.List<com.campus.marketplace.common.dto.request.SlideVerifyRequest.TrackPoint> trackPoints =
+                            request.getTrack().stream()
+                                    .map(p -> {
+                                        com.campus.marketplace.common.dto.request.SlideVerifyRequest.TrackPoint tp =
+                                                new com.campus.marketplace.common.dto.request.SlideVerifyRequest.TrackPoint();
+                                        tp.setX(p.getX());
+                                        tp.setY(p.getY());
+                                        tp.setT(p.getT());
+                                        return tp;
+                                    })
+                                    .collect(java.util.stream.Collectors.toList());
+                    slideRequest.setTrack(trackPoints);
+                    isValid = verifySlideCaptchaWithTrack(slideRequest);
+                } else {
+                    // 简单验证
+                    isValid = verifySlideCaptcha(request.getCaptchaId(), request.getSlidePosition());
+                }
+                break;
+
+            case "rotate":
+                // 旋转验证码验证
+                if (request.getRotateAngle() == null) {
+                    throw new BusinessException(
+                            ErrorCode.PARAM_ERROR,
+                            "旋转角度不能为空"
+                    );
+                }
+                com.campus.marketplace.common.dto.request.RotateVerifyRequest rotateRequest =
+                        new com.campus.marketplace.common.dto.request.RotateVerifyRequest(
+                                request.getCaptchaId(),
+                                request.getRotateAngle()
+                        );
+                isValid = verifyRotateCaptcha(rotateRequest);
+                break;
+
+            case "click":
+                // 点击验证码验证
+                if (request.getClickPoints() == null || request.getClickPoints().isEmpty()) {
+                    throw new BusinessException(
+                            ErrorCode.PARAM_ERROR,
+                            "点击坐标不能为空"
+                    );
+                }
+                java.util.List<com.campus.marketplace.common.dto.request.ClickVerifyRequest.ClickPoint> clickPoints =
+                        request.getClickPoints().stream()
+                                .map(p -> new com.campus.marketplace.common.dto.request.ClickVerifyRequest.ClickPoint(p.getX(), p.getY()))
+                                .collect(java.util.stream.Collectors.toList());
+                com.campus.marketplace.common.dto.request.ClickVerifyRequest clickRequest =
+                        new com.campus.marketplace.common.dto.request.ClickVerifyRequest(
+                                request.getCaptchaId(),
+                                clickPoints
+                        );
+                isValid = verifyClickCaptcha(clickRequest);
+                break;
+
+            default:
+                throw new BusinessException(
+                        ErrorCode.PARAM_ERROR,
+                        "不支持的验证码类型: " + request.getType()
+                );
+        }
+
+        // 验证失败
+        if (!isValid) {
+            log.warn("❌ 验证码验证失败: type={}, captchaId={}", request.getType(), request.getCaptchaId());
+            throw new BusinessException(
+                    ErrorCode.CAPTCHA_ERROR,
+                    "验证码验证失败，请重试"
+            );
+        }
+
+        // 验证成功，生成验证码通行证（临时token）
+        String captchaToken = UUID.randomUUID().toString();
+        String key = CAPTCHA_TOKEN_PREFIX + captchaToken;
+        redisTemplate.opsForValue().set(key, "verified", CAPTCHA_TOKEN_EXPIRE_SECONDS, TimeUnit.SECONDS);
+
+        log.info("✅ 验证码验证成功，生成通行证: captchaToken={}", captchaToken);
+
+        return com.campus.marketplace.common.dto.response.CaptchaVerifyResponse.builder()
+                .captchaToken(captchaToken)
+                .expiresIn(CAPTCHA_TOKEN_EXPIRE_SECONDS)
+                .message("验证码验证成功")
+                .build();
+    }
+
+    /**
+     * 验证验证码通行证（临时token）
+     *
+     * @param captchaToken 验证码通行证
+     * @return 验证是否通过
+     */
+    @Override
+    public boolean verifyCaptchaToken(String captchaToken) {
+        if (captchaToken == null || captchaToken.isEmpty()) {
+            log.warn("验证码通行证为空");
+            return false;
+        }
+
+        String key = CAPTCHA_TOKEN_PREFIX + captchaToken;
+        String value = redisTemplate.opsForValue().get(key);
+
+        if (value == null) {
+            log.warn("验证码通行证不存在或已过期: captchaToken={}", captchaToken);
+            return false;
+        }
+
+        // 验证通过后删除token（防止重复使用）
+        redisTemplate.delete(key);
+        log.info("✅ 验证码通行证验证成功: captchaToken={}", captchaToken);
+
+        return true;
     }
 }

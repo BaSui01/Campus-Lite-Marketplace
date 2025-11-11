@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * 用户登录请求 DTO
  *
- * @author BaSui
+ * @author BaSui 😎
  * @date 2025-10-25
- * @updated 2025-11-09 - 添加验证码字段
+ * @updated 2025-11-11 - 同时支持方案A(直接验证)和方案B(验证码通行证)
  */
 public record LoginRequest(
 
@@ -18,23 +18,45 @@ public record LoginRequest(
         String password,
 
         /**
-         * 验证码ID（可选，用于图形验证码或滑块验证码）
+         * 🎯 方案B：验证码通行证(推荐)
+         * 通过 POST /api/captcha/verify 接口获取
+         * 有效期60秒,一次性使用
+         */
+        String captchaToken,
+
+        /**
+         * 🔄 方案A：验证码ID(兼容旧方式)
+         * 用于图形/滑块/旋转/点击验证码
          */
         String captchaId,
 
         /**
-         * 验证码输入（可选，用于图形验证码）
+         * 🔄 方案A：图形验证码答案
          */
         String captchaCode,
 
         /**
-         * 滑块位置（可选，用于滑块验证码）
+         * 🔄 方案A：滑块验证码位置
          */
         Integer slidePosition,
 
         /**
-         * 2FA 验证码（可选，6位数字，用于双因素认证）
+         * 🔄 方案A：旋转验证码角度
+         */
+        Integer rotateAngle,
+
+        /**
+         * 🔄 方案A：点击验证码坐标列表
+         */
+        java.util.List<ClickPoint> clickPoints,
+
+        /**
+         * 2FA 验证码(可选,6位数字,用于双因素认证)
          */
         String twoFactorCode
 ) {
+    /**
+     * 点击验证码坐标点
+     */
+    public record ClickPoint(int x, int y) {}
 }

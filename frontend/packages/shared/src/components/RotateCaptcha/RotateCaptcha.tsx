@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { apiClient } from '../../services/api-client';
+import { apiClient } from '../../utils/apiClient';
 import './RotateCaptcha.css';
 
 export interface RotateCaptchaProps {
@@ -48,7 +48,7 @@ export const RotateCaptcha: React.FC<RotateCaptchaProps> = ({
       setIsLoading(true);
       const response = await apiClient.get('/api/captcha/rotate');
       
-      if (response.data.code === 0 && response.data.data) {
+      if (response.data.code === 200 && response.data.data) {
         setCaptchaData(response.data.data);
         setCurrentAngle(0);
         setIsSuccess(false);
@@ -123,34 +123,53 @@ export const RotateCaptcha: React.FC<RotateCaptchaProps> = ({
     };
   }, [isRotating, startX, captchaData]);
 
-  // 验证旋转角度
+  // 🎯 收集旋转数据（不调用后端验证，留给登录接口验证）
+  //
+  // 🔧 BaSui 修复 (2025-11-11)：
+  // 问题：前端验证后Redis中的验证码被删除，登录时无法再次验证
+  // 方案：前端只收集数据（rotateId + angle），真正验证由登录接口执行
   const verifyRotation = async () => {
     if (!captchaData || isSuccess) return;
 
-    try {
-      const response = await apiClient.post('/api/captcha/rotate/verify', {
+    // 🎯 角度转换逻辑：
+    // 后端逻辑：
+    // 1. 生成原始图片（0度）
+    // 2. 将图片旋转 targetAngle 度（如 120度）
+    // 3. 返回：原始图片（0度）+ 旋转后的图片（120度）
+    // 4. 用户需要将旋转后的图片旋转回 0度
+    // 5. 后端验证：Math.abs(targetAngle - userAngle) <= 10
+    //
+    // 前端逻辑：
+    // 1. 用户拖动滑块，图片旋转 currentAngle 度（顺时针）
+    // 2. 如果用户旋转到和参考图一致，说明：
+    //    - 后端旋转了 targetAngle 度（如 120度）
+    //    - 用户旋转了 currentAngle 度（如 240度）
+    //    - 图片最终角度 = targetAngle + currentAngle = 120 + 240 = 360 = 0度
+    // 3. 所以：currentAngle = 360 - targetAngle
+    // 4. 反推：targetAngle = 360 - currentAngle
+    //
+    // 因此，前端应该发送：(360 - currentAngle) % 360
+
+    const angleToSend = (360 - currentAngle) % 360;
+
+    // ✅ 简单的前端角度校验（允许一定误差，给用户反馈）
+    // 注意：这不是真实验证，只是UI反馈，真实验证在后端
+    const isLikelyCorrect = currentAngle > 10; // 简单判断：至少旋转了10度
+
+    if (isLikelyCorrect) {
+      console.log('✅ [RotateCaptcha] 角度已记录，等待后端验证:', {
         rotateId: captchaData.rotateId,
-        angle: currentAngle,
+        用户旋转角度: currentAngle,
+        发送角度: angleToSend,
       });
-
-      if (response.data.code === 0 && response.data.data === true) {
-        console.log('✅ [RotateCaptcha] 验证成功！');
-        setIsSuccess(true);
-        onSuccess?.(captchaData.rotateId, currentAngle);
-      } else {
-        console.log('❌ [RotateCaptcha] 验证失败！');
-        setIsFailed(true);
-        onFail?.();
-
-        // 1.5秒后重置
-        setTimeout(() => {
-          resetCaptcha();
-        }, 1500);
-      }
-    } catch (error) {
-      console.error('❌ [RotateCaptcha] 验证请求失败:', error);
+      setIsSuccess(true);
+      onSuccess?.(captchaData.rotateId, angleToSend);
+    } else {
+      console.log('❌ [RotateCaptcha] 角度太小，请重新旋转');
       setIsFailed(true);
       onFail?.();
+
+      // 1.5秒后重置
       setTimeout(() => {
         resetCaptcha();
       }, 1500);

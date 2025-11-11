@@ -178,4 +178,22 @@ public class CaptchaController {
         boolean isValid = captchaService.verifyClickCaptcha(request);
         return ApiResponse.success("验证完成", isValid);
     }
+
+    /**
+     * 统一验证码验证接口（新增 - BaSui 2025-11-11）
+     *
+     * POST /api/captcha/verify
+     */
+    @PostMapping("/verify")
+    @Operation(
+            summary = "统一验证码验证接口",
+            description = "支持四种验证码类型（image/slider/rotate/click），验证成功后返回验证码通行证（临时token，有效期60秒）"
+    )
+    public ApiResponse<com.campus.marketplace.common.dto.response.CaptchaVerifyResponse> verifyUnifiedCaptcha(
+            @RequestBody @org.springframework.validation.annotation.Validated com.campus.marketplace.common.dto.request.UnifiedCaptchaVerifyRequest request
+    ) {
+        log.info("收到统一验证码验证请求: type={}, captchaId={}", request.getType(), request.getCaptchaId());
+        com.campus.marketplace.common.dto.response.CaptchaVerifyResponse response = captchaService.verifyUnifiedCaptcha(request);
+        return ApiResponse.success("验证码验证成功", response);
+    }
 }

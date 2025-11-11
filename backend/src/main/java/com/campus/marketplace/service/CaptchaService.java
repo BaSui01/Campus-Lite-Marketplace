@@ -88,4 +88,22 @@ public interface CaptchaService {
      * @return 验证是否通过
      */
     boolean verifyClickCaptcha(com.campus.marketplace.common.dto.request.ClickVerifyRequest request);
+
+    /**
+     * 统一验证码验证接口（支持四种验证码类型）
+     *
+     * @param request 统一验证码验证请求
+     * @return 验证码通行证（临时token）
+     */
+    com.campus.marketplace.common.dto.response.CaptchaVerifyResponse verifyUnifiedCaptcha(
+            com.campus.marketplace.common.dto.request.UnifiedCaptchaVerifyRequest request
+    );
+
+    /**
+     * 验证验证码通行证（临时token）
+     *
+     * @param captchaToken 验证码通行证
+     * @return 验证是否通过
+     */
+    boolean verifyCaptchaToken(String captchaToken);
 }

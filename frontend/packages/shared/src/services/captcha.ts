@@ -191,3 +191,78 @@ export interface SlideCaptchaHookResult {
   /** 验证滑块 */
   verify: (position: number, track?: SlideVerifyRequest['track']) => Promise<boolean>;
 }
+
+// ========== 方案B：统一验证码验证接口（新增 - BaSui 2025-11-11） ==========
+
+/**
+ * 导入方案B相关类型
+ */
+import type {
+  CaptchaVerifyRequest,
+  CaptchaVerifyResponse,
+  ApiResponse,
+} from '../types/captcha';
+
+/**
+ * 🎯 统一验证码验证服务（方案B - 推荐）
+ *
+ * 工作流程：
+ * 1. 用户完成验证码验证（滑动/输入/旋转/点击）
+ * 2. 前端调用此接口验证验证码
+ * 3. 验证成功后获得验证码通行证（captchaToken，有效期60秒）
+ * 4. 登录时携带captchaToken，无需再次验证验证码
+ *
+ * @param {CaptchaVerifyRequest} request - 验证请求
+ * @returns {Promise<CaptchaVerifyResponse>} 验证码通行证
+ *
+ * @example
+ * // 图形验证码
+ * const response = await verifyCaptcha({
+ *   type: 'image',
+ *   captchaId: 'xxx',
+ *   captchaCode: '3F4A',
+ * });
+ * console.log('验证码通行证:', response.captchaToken);
+ *
+ * @example
+ * // 滑块验证码
+ * const response = await verifyCaptcha({
+ *   type: 'slider',
+ *   captchaId: 'xxx',
+ *   slidePosition: 120,
+ * });
+ * console.log('验证码通行证:', response.captchaToken);
+ */
+export const verifyCaptcha = async (
+  request: CaptchaVerifyRequest
+): Promise<CaptchaVerifyResponse> => {
+  try {
+    console.log('[verifyCaptcha] 🔐 开始验证验证码:', request.type);
+
+    const response = await apiClient.post<ApiResponse<CaptchaVerifyResponse>>(
+      '/api/captcha/verify',
+      request
+    );
+
+    if (response.data.code !== 200 || !response.data.data) {
+      throw new Error(response.data.message || '❌ 验证码验证失败');
+    }
+
+    console.log('[verifyCaptcha] ✅ 验证码验证成功，获得通行证:', response.data.data.captchaToken);
+
+    return response.data.data;
+  } catch (error: any) {
+    console.error('[verifyCaptcha] ❌ 验证码验证失败:', error);
+    throw new Error(error?.response?.data?.message || error?.message || '验证码验证失败，请重试');
+  }
+};
+
+/**
+ * 🔐 导出统一验证服务（方便调用）
+ */
+export const unifiedCaptchaService = {
+  /**
+   * 验证验证码（方案B - 推荐）
+   */
+  verify: verifyCaptcha,
+};

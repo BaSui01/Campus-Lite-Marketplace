@@ -205,10 +205,21 @@ public class AuthServiceImpl implements AuthService {
         log.info("用户登录: credential={}", credential);
 
         // 0. 🔐 验证验证码（新增 - BaSui 2025-11-09）
-        // ⚠️ 如果是2FA验证阶段，跳过图形验证码检查（修复 - BaSui 2025-11-10）
+        // ⚠️ 如果是2FA验证阶段，跳过验证码检查（修复 - BaSui 2025-11-10）
+        // 🎯 优先使用验证码通行证（captchaToken），兼容旧方式（更新 - BaSui 2025-11-11）
         if (request.twoFactorCode() == null || request.twoFactorCode().isEmpty()) {
-            if (request.captchaId() != null && request.captchaCode() != null) {
-                // 图形验证码验证
+            // 🎯 方案B（推荐）：使用验证码通行证（新增 - BaSui 2025-11-11）
+            if (request.captchaToken() != null && !request.captchaToken().isEmpty()) {
+                boolean isValid = captchaService.verifyCaptchaToken(request.captchaToken());
+                if (!isValid) {
+                    log.warn("❌ 验证码通行证验证失败: captchaToken={}", request.captchaToken());
+                    throw new BusinessException(ErrorCode.CAPTCHA_ERROR, "验证码已过期或无效，请重新验证");
+                }
+                log.info("✅ 验证码通行证验证通过");
+            }
+            // 🎯 方案A（兼容旧方式）：直接验证验证码（保留兼容性）
+            else if (request.captchaId() != null && request.captchaCode() != null) {
+                // 1️⃣ 图形验证码验证
                 boolean isValid = captchaService.verifyImageCaptcha(request.captchaId(), request.captchaCode());
                 if (!isValid) {
                     log.warn("❌ 图形验证码验证失败: captchaId={}, code={}", request.captchaId(), request.captchaCode());
@@ -216,16 +227,46 @@ public class AuthServiceImpl implements AuthService {
                 }
                 log.info("✅ 图形验证码验证通过");
             } else if (request.captchaId() != null && request.slidePosition() != null) {
-                // 滑块验证码验证
+                // 2️⃣ 滑块验证码验证
                 boolean isValid = captchaService.verifySlideCaptcha(request.captchaId(), request.slidePosition());
                 if (!isValid) {
                     log.warn("❌ 滑块验证码验证失败: slideId={}, position={}", request.captchaId(), request.slidePosition());
                     throw new BusinessException(ErrorCode.SLIDE_VERIFY_FAILED);
                 }
                 log.info("✅ 滑块验证码验证通过");
+            } else if (request.captchaId() != null && request.rotateAngle() != null) {
+                // 3️⃣ 旋转验证码验证
+                com.campus.marketplace.common.dto.request.RotateVerifyRequest rotateRequest =
+                        new com.campus.marketplace.common.dto.request.RotateVerifyRequest(
+                                request.captchaId(),
+                                request.rotateAngle()
+                        );
+                boolean isValid = captchaService.verifyRotateCaptcha(rotateRequest);
+                if (!isValid) {
+                    log.warn("❌ 旋转验证码验证失败: rotateId={}, angle={}", request.captchaId(), request.rotateAngle());
+                    throw new BusinessException(ErrorCode.CAPTCHA_ERROR);
+                }
+                log.info("✅ 旋转验证码验证通过");
+            } else if (request.captchaId() != null && request.clickPoints() != null && !request.clickPoints().isEmpty()) {
+                // 4️⃣ 点击验证码验证
+                java.util.List<com.campus.marketplace.common.dto.request.ClickVerifyRequest.ClickPoint> clickPoints =
+                        request.clickPoints().stream()
+                                .map(p -> new com.campus.marketplace.common.dto.request.ClickVerifyRequest.ClickPoint(p.x(), p.y()))
+                                .toList();
+                com.campus.marketplace.common.dto.request.ClickVerifyRequest clickRequest =
+                        new com.campus.marketplace.common.dto.request.ClickVerifyRequest(
+                                request.captchaId(),
+                                clickPoints
+                        );
+                boolean isValid = captchaService.verifyClickCaptcha(clickRequest);
+                if (!isValid) {
+                    log.warn("❌ 点击验证码验证失败: clickId={}, points={}", request.captchaId(), request.clickPoints().size());
+                    throw new BusinessException(ErrorCode.CAPTCHA_ERROR);
+                }
+                log.info("✅ 点击验证码验证通过");
             }
         } else {
-            log.info("🔐 2FA验证阶段，跳过图形验证码检查");
+            log.info("🔐 2FA验证阶段，跳过验证码检查");
         }
 
         // 1. 🔐 解密密码（如果是加密密码）

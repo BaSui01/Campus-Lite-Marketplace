@@ -43,12 +43,12 @@ export interface SlideCaptchaResponse {
      * @type {number}
      * @memberof SlideCaptchaResponse
      */
-    'expiresIn'?: number;
+    'yposition'?: number;
     /**
      * 
      * @type {number}
      * @memberof SlideCaptchaResponse
      */
-    'yposition'?: number;
+    'expiresIn'?: number;
 }
 

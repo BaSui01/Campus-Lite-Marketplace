@@ -34,8 +34,9 @@ public class SlideCaptchaResponse {
 
     /**
      * 滑块Y轴位置（用于前端定位滑块）
+     * 💡 使用全小写字段名，避免前端驼峰转换问题
      */
-    private Integer yPosition;
+    private Integer yposition;
 
     /**
      * 过期时间（秒）
