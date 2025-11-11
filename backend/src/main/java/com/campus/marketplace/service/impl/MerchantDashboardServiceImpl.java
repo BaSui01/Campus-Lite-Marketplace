@@ -179,27 +179,65 @@ public class MerchantDashboardServiceImpl implements MerchantDashboardService {
         Map<String, Object> analysis = new HashMap<>();
         
         if (dashboard != null) {
-            analysis.put("visitorCount", dashboard.getVisitorCount());
-            analysis.put("newVisitorCount", dashboard.getNewVisitorCount());
-            analysis.put("pageViewCount", dashboard.getPageViewCount());
-            analysis.put("visitorSources", dashboard.getVisitorSources() != null ? 
-                dashboard.getVisitorSources() : Map.of());
+            int totalVisitors = dashboard.getVisitorCount();
+            int newVisitors = dashboard.getNewVisitorCount();
+            int returningVisitors = Math.max(0, totalVisitors - newVisitors);
+            int pageViewCount = dashboard.getPageViewCount();
             
-            // 计算老访客数
-            int returningVisitors = dashboard.getVisitorCount() - dashboard.getNewVisitorCount();
-            analysis.put("returningVisitorCount", Math.max(0, returningVisitors));
+            // 基础数据
+            analysis.put("totalVisitors", totalVisitors);
+            analysis.put("newVisitors", newVisitors);
+            analysis.put("returningVisitors", returningVisitors);
             
-            // 计算人均浏览量
-            double avgPageViews = dashboard.getVisitorCount() > 0 ? 
-                (double) dashboard.getPageViewCount() / dashboard.getVisitorCount() : 0.0;
-            analysis.put("avgPageViews", String.format("%.2f", avgPageViews));
+            // 人均浏览页数
+            double avgPageViews = totalVisitors > 0 ? 
+                (double) pageViewCount / totalVisitors : 0.0;
+            analysis.put("avgPageViews", avgPageViews);
+            
+            // 平均停留时间（模拟数据，实际需要埋点统计）
+            analysis.put("avgStayTime", 120); // 默认2分钟
+            
+            // 来源分布（转换为数组格式）
+            Map<String, Integer> visitorSourcesMap = dashboard.getVisitorSources() != null ? 
+                dashboard.getVisitorSources() : new HashMap<>();
+            
+            List<Map<String, Object>> sources = new ArrayList<>();
+            int totalSources = visitorSourcesMap.values().stream().mapToInt(Integer::intValue).sum();
+            
+            for (Map.Entry<String, Integer> entry : visitorSourcesMap.entrySet()) {
+                Map<String, Object> sourceItem = new HashMap<>();
+                sourceItem.put("source", entry.getKey());
+                sourceItem.put("count", entry.getValue());
+                sourceItem.put("percentage", totalSources > 0 ? 
+                    (double) entry.getValue() / totalSources : 0.0);
+                sources.add(sourceItem);
+            }
+            
+            // 如果没有来源数据，提供默认值
+            if (sources.isEmpty()) {
+                Map<String, Object> defaultSource = new HashMap<>();
+                defaultSource.put("source", "直接访问");
+                defaultSource.put("count", totalVisitors);
+                defaultSource.put("percentage", 1.0);
+                sources.add(defaultSource);
+            }
+            
+            analysis.put("sources", sources);
+            
+            // 访问高峰时段（模拟数据，实际需要详细的访问记录）
+            analysis.put("peakHours", List.of(10, 14, 20));
+            
         } else {
-            analysis.put("visitorCount", 0);
-            analysis.put("newVisitorCount", 0);
-            analysis.put("pageViewCount", 0);
-            analysis.put("returningVisitorCount", 0);
-            analysis.put("avgPageViews", "0.00");
-            analysis.put("visitorSources", Map.of());
+            // 无数据时返回空值
+            analysis.put("totalVisitors", 0);
+            analysis.put("newVisitors", 0);
+            analysis.put("returningVisitors", 0);
+            analysis.put("avgPageViews", 0.0);
+            analysis.put("avgStayTime", 0);
+            
+            // 空来源列表
+            analysis.put("sources", List.of());
+            analysis.put("peakHours", List.of());
         }
         
         return analysis;
