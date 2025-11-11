@@ -45,6 +45,26 @@ public interface EmailTemplateService {
     void sendNotification(String to, String subject, String title, String content, String link);
 
     /**
+     * 发送支付成功邮件（HTML美化版）🎉
+     *
+     * @param to             收件人邮箱
+     * @param orderNo        订单号
+     * @param goodsTitle     商品标题
+     * @param goodsDescription 商品描述
+     * @param goodsPrice     商品价格
+     * @param goodsImage     商品图片URL
+     * @param actualAmount   实付金额
+     * @param paymentMethod  支付方式
+     * @param paymentTime    支付时间
+     * @param transactionId  交易流水号
+     * @param sellerName     卖家名称（可选）
+     */
+    void sendPaymentSuccess(String to, String orderNo, String goodsTitle, 
+                           String goodsDescription, String goodsPrice, String goodsImage,
+                           String actualAmount, String paymentMethod, String paymentTime, 
+                           String transactionId, String sellerName);
+
+    /**
      * 发送HTML邮件（通用方法）
      *
      * @param to           收件人邮箱

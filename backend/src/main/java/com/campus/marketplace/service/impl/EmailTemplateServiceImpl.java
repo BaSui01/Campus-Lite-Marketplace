@@ -71,6 +71,27 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
     }
 
     @Override
+    public void sendPaymentSuccess(String to, String orderNo, String goodsTitle,
+                                   String goodsDescription, String goodsPrice, String goodsImage,
+                                   String actualAmount, String paymentMethod, String paymentTime,
+                                   String transactionId, String sellerName) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("orderNo", orderNo);
+        variables.put("goodsTitle", goodsTitle);
+        variables.put("goodsDescription", goodsDescription);
+        variables.put("goodsPrice", goodsPrice);
+        variables.put("goodsImage", goodsImage);
+        variables.put("actualAmount", actualAmount);
+        variables.put("paymentMethod", paymentMethod);
+        variables.put("paymentTime", paymentTime);
+        variables.put("transactionId", transactionId);
+        variables.put("sellerName", sellerName);
+
+        String subject = "【校园轻享集市】支付成功通知";
+        sendHtmlEmail(to, subject, "payment-success", variables);
+    }
+
+    @Override
     public void sendHtmlEmail(String to, String subject, String templateName, Map<String, Object> variables) {
         try {
             // 🎯 创建 MimeMessage（支持HTML）
