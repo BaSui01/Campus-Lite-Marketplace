@@ -27,6 +27,8 @@ spring:
   jpa:
     # 禁用 OpenEntityManagerInView（避免懒加载问题和性能问题）
     open-in-view: ${JPA_OPEN_IN_VIEW:false}
+    # 🔧 显式指定 PostgreSQL 方言，避免 LIKE 查询类型转换错误
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       # 临时禁用schema validation，允许应用启动（存在实体类与数据库Schema不匹配问题）
       ddl-auto: ${JPA_DDL_AUTO:none}
@@ -221,7 +223,8 @@ alipay:
   charset: ${ALIPAY_CHARSET:UTF-8}
   format: ${ALIPAY_FORMAT:json}
   sign-type: ${ALIPAY_SIGN_TYPE:RSA2}
-  notify-url: ${ALIPAY_NOTIFY_URL:http://localhost:8080/api/payment/alipay/notify}
+  # 默认与本地后端端口(8200)保持一致，避免端口不一致导致 404
+  notify-url: ${ALIPAY_NOTIFY_URL:http://localhost:8200/api/payment/alipay/notify}
   return-url: ${ALIPAY_RETURN_URL:http://localhost:3000/payment/result}
 
 # 微信支付配置
@@ -291,6 +294,14 @@ app:
     # 格式：逗号分隔的密钥列表
     # 示例：old-key-1,old-key-2,old-key-3
     legacy-keys: ${BACKEND_LEGACY_KEYS:}
+
+# 订单超时与提醒配置（可覆盖）
+order:
+  timeout:
+    minutes: ${ORDER_TIMEOUT_MINUTES:30}              # 待支付超时分钟数（默认30）
+    reminder:
+      lead-minutes: ${ORDER_TIMEOUT_REMINDER_LEAD:5}  # 超时前提醒的提前分钟数（默认5）
+      interval: ${ORDER_TIMEOUT_REMINDER_INTERVAL:600000} # 提醒任务轮询间隔，默认10分钟（毫秒）
 
 # OpenAPI/Swagger 开关
 springdoc:

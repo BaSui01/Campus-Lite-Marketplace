@@ -133,6 +133,7 @@ public class RedisConfig {
      * PageImpl 的 Jackson MixIn 类,提供反序列化所需的构造函数信息
      * 🎯 解决 "Cannot construct instance of PageImpl (no Creators)" 错误
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class PageImplMixin {
         @com.fasterxml.jackson.annotation.JsonCreator
         PageImplMixin(
@@ -146,6 +147,7 @@ public class RedisConfig {
      * PageRequest 的 Jackson MixIn 类,提供反序列化所需的构造函数信息
      * 🎯 解决 "Cannot construct instance of PageRequest (no Creators)" 错误
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class PageRequestMixin {
         @com.fasterxml.jackson.annotation.JsonCreator
         PageRequestMixin(
@@ -159,6 +161,7 @@ public class RedisConfig {
      * Sort 的 Jackson MixIn 类,提供反序列化所需的构造函数信息
      * 🎯 解决 "Cannot construct instance of Sort (no Creators)" 错误
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class SortMixin {
         @com.fasterxml.jackson.annotation.JsonCreator
         SortMixin(

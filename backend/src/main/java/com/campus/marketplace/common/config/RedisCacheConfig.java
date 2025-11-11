@@ -121,6 +121,7 @@ public class RedisCacheConfig {
     /**
      * PageImpl 的 Jackson MixIn 类
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class PageImplMixin {
         @JsonCreator
         PageImplMixin(
@@ -133,6 +134,7 @@ public class RedisCacheConfig {
     /**
      * PageRequest 的 Jackson MixIn 类
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class PageRequestMixin {
         @JsonCreator
         PageRequestMixin(
@@ -145,6 +147,7 @@ public class RedisCacheConfig {
     /**
      * Sort 的 Jackson MixIn 类
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class SortMixin {
         @JsonCreator
         SortMixin(
