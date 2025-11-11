@@ -29,7 +29,7 @@ export const SellerCard: React.FC<SellerCardProps> = ({
   const navigate = useNavigate();
 
   const handleViewProfile = () => {
-    navigate(`/user/${sellerId}`);
+    navigate(`/users/${sellerId}`);
   };
 
   return (

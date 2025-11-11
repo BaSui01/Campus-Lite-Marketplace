@@ -64,17 +64,17 @@ export const Payment: React.FC = () => {
         throw new Error('银行卡支付暂未开放');
       }
 
-      // 调用后端支付接口
-      const response = await orderService.createPayment({
+      // 🎯 使用新的支付接口：POST /api/orders/{orderNo}/pay
+      const response = await orderService.payOrder(orderNo, {
         orderNo,
         paymentMethod: method as PayOrderRequestPaymentMethodEnum,
       });
 
       return {
-        orderNo,
-        paymentUrl: response,
-        qrCode: method === 'WECHAT' ? response : undefined,
-        expireSeconds: 1800, // 30分钟
+        orderNo: response.orderNo,
+        paymentUrl: response.paymentUrl,
+        qrCode: response.qrCode || (method === 'WECHAT' ? response.paymentUrl : undefined),
+        expireSeconds: response.expireSeconds || 1800, // 默认 30 分钟
       };
     },
     onSuccess: (data) => {

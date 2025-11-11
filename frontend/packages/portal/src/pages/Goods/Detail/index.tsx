@@ -230,6 +230,7 @@ export const GoodsDetail: React.FC = () => {
             <ActionBar
               isFavorited={!!goods.isFavorited}
               isOwner={goods.sellerId === currentUser?.id}
+              isFavoriteLoading={favoriteMutation.isPending}
               onFavorite={handleFavorite}
               onBuy={handleBuy}
               onContact={handleContact}

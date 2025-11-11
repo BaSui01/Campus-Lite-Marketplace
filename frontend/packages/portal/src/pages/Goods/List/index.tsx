@@ -72,7 +72,13 @@ export const GoodsList: React.FC = () => {
         page,
         size: pageSize,
       });
-      return response;
+      // 前端过滤仅保留审核通过的商品，避免后端不支持 status 参数导致 500
+      return {
+        ...response,
+        content: (response.content || []).filter(
+          (g) => (g.status || '').toUpperCase() === 'APPROVED'
+        ),
+      };
     },
     staleTime: 2 * 60 * 1000, // 2分钟缓存
   });
@@ -141,7 +147,7 @@ export const GoodsList: React.FC = () => {
           <GoodsSortBar
             sortBy={filters.sortBy}
             sortDirection={filters.sortDirection}
-            totalCount={totalElements}
+            totalCount={goodsList.length}
             onSortChange={handleSortChange}
           />
 
@@ -233,7 +239,7 @@ export const GoodsList: React.FC = () => {
                   </button>
 
                   <span className="pagination-info">
-                    共 {totalElements} 件商品
+                    本页 {goodsList.length} 件 · 第 {page + 1}/{Math.max(totalPages, 1)} 页
                   </span>
                 </div>
               )}

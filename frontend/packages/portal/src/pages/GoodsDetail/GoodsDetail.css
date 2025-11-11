@@ -192,6 +192,11 @@
   color: #52c41a;
 }
 
+.goods-status.status-locked {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
 .goods-status.status-rejected {
   background: #fff2f0;
   color: #ff4d4f;

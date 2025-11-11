@@ -51,7 +51,7 @@ export const GoodsSortBar: React.FC<GoodsSortBarProps> = ({
 
       <div className="goods-sort-bar__right">
         <span className="goods-sort-bar__count">
-          共 <strong>{totalCount}</strong> 件商品
+          本页 <strong>{totalCount}</strong> 件商品
         </span>
       </div>
     </div>

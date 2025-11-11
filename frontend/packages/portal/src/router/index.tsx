@@ -366,6 +366,26 @@ export const router = createBrowserRouter(
           </RequireAuth>
         ),
       },
+      // 重定向：/profile/posts → /profile?tab=posts
+      {
+        path: 'profile/posts',
+        element: <Navigate to="/profile?tab=posts" replace />,
+      },
+      // 重定向：/profile/published → /profile?tab=published
+      {
+        path: 'profile/published',
+        element: <Navigate to="/profile?tab=published" replace />,
+      },
+      // 重定向：/profile/favorites → /profile?tab=favorites
+      {
+        path: 'profile/favorites',
+        element: <Navigate to="/profile?tab=favorites" replace />,
+      },
+      // 兼容旧链接：/profile/collections → /profile?tab=favorites
+      {
+        path: 'profile/collections',
+        element: <Navigate to="/profile?tab=favorites" replace />,
+      },
       {
         path: 'points',
         element: (

@@ -173,7 +173,25 @@ const SellerDashboard: React.FC = () => {
    * 访客来源饼图配置
    */
   const getVisitorSourceOption = (): EChartsOption => {
-    if (!visitorAnalysis) return {};
+    if (!visitorAnalysis || !visitorAnalysis.sources || visitorAnalysis.sources.length === 0) {
+      return {
+        title: {
+          text: '访客来源分布',
+          left: 'center',
+          textStyle: { fontSize: 16, fontWeight: 'bold' },
+        },
+        graphic: {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          style: {
+            text: '暂无数据',
+            fontSize: 16,
+            fill: '#999',
+          },
+        },
+      };
+    }
 
     return {
       title: {

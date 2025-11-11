@@ -235,7 +235,7 @@ const UserProfile: React.FC = () => {
                   className="profile-credit-badge" 
                   style={{ backgroundColor: CREDIT_LEVEL_CONFIG[profile.creditLevel].color }}
                   title={`信用分: ${profile.creditScore || 100}`}
-                  onClick={() => !isOwnProfile ? navigate(`/user/${userId}/credit`) : navigate('/credit')}
+                  onClick={() => !isOwnProfile ? navigate(`/users/${userId}/credit`) : navigate('/credit')}
                 >
                   <span className="credit-icon">{CREDIT_LEVEL_CONFIG[profile.creditLevel].icon}</span>
                   <span className="credit-name">{CREDIT_LEVEL_CONFIG[profile.creditLevel].levelName}</span>

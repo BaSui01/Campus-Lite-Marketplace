@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { Services } from '@campus/shared';
@@ -13,11 +13,22 @@ import { ResultCard } from './components/ResultCard';
 import { validateOrderNo } from './utils/paymentUtils';
 
 const PaymentResult: React.FC = () => {
-  const { orderNo, status } = useParams<{
-    orderNo: string;
-    status: 'SUCCESS' | 'FAILED' | 'TIMEOUT';
-  }>();
+  const [searchParams] = useSearchParams();
+  // 兼容两种来源：
+  // 1) 站内跳转：/payment/result?orderNo=xxx&status=SUCCESS
+  // 2) 支付宝同步返回：/payment/result?charset=UTF-8&out_trade_no=...&trade_no=...
+  const orderNo = searchParams.get('orderNo') || searchParams.get('out_trade_no') || '';
+  const rawStatus = (searchParams.get('status') || '').toUpperCase();
+  const status = (['SUCCESS', 'FAILED', 'TIMEOUT'] as const).includes(rawStatus as any)
+    ? (rawStatus as 'SUCCESS' | 'FAILED' | 'TIMEOUT')
+    : undefined;
   const navigate = useNavigate();
+
+  // 轮询控制：最多轮询 90 秒（2s * 45 次）
+  const POLL_INTERVAL_MS = 2000;
+  const MAX_POLLS = 45;
+  const [pollCount, setPollCount] = React.useState(0);
+  const confirmedToastShown = React.useRef(false);
 
   // 参数验证
   React.useEffect(() => {
@@ -27,10 +38,9 @@ const PaymentResult: React.FC = () => {
       return;
     }
 
-    if (!status || !['SUCCESS', 'FAILED', 'TIMEOUT'].includes(status)) {
-      toast.error('无效的支付状态');
-      navigate('/orders');
-      return;
+    // 同步返回没有明确状态时，先展示“处理中”，随后根据订单详情判断
+    if (!status) {
+      toast.info('正在确认支付结果，请稍候…');
     }
   }, [orderNo, status, navigate]);
 
@@ -38,12 +48,47 @@ const PaymentResult: React.FC = () => {
   const {
     data: orderInfo,
     isLoading,
-    error
+    error,
+    refetch,
+    isFetching
   } = useQuery({
     queryKey: ['order-detail', orderNo],
     queryFn: () => Services.orderService.getOrderDetail(orderNo!),
     enabled: !!orderNo && validateOrderNo(orderNo),
+    refetchOnWindowFocus: false,
   });
+
+  // 轮询触发条件：
+  // - 有效 orderNo
+  // - 未超过最大轮询次数
+  // - 当前订单仍为待支付（或首次还未拿到订单详情）
+  // - URL 未明确标记为 FAILED/TIMEOUT（这两种不再继续轮询）
+  const shouldPoll =
+    !!orderNo &&
+    validateOrderNo(orderNo) &&
+    pollCount < MAX_POLLS &&
+    (orderInfo?.status === 'PENDING_PAYMENT' || !orderInfo) &&
+    status !== 'FAILED' &&
+    status !== 'TIMEOUT';
+
+  // 启动轮询
+  React.useEffect(() => {
+    if (!shouldPoll) return;
+    const timer = setInterval(() => {
+      refetch();
+      setPollCount((c) => c + 1);
+    }, POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldPoll]);
+
+  // 当检测到已支付时提醒一次
+  React.useEffect(() => {
+    if (orderInfo?.status === 'PAID' && !confirmedToastShown.current) {
+      confirmedToastShown.current = true;
+      toast.success('支付已确认 ✅');
+    }
+  }, [orderInfo?.status]);
 
   // 处理主操作
   const handlePrimaryAction = () => {
@@ -114,11 +159,17 @@ const PaymentResult: React.FC = () => {
           </h1>
           <p className="text-gray-600">
             订单 {orderNo} 的支付{status === 'SUCCESS' ? '成功' : status === 'FAILED' ? '失败' : '超时'}
+            {(!status || orderInfo?.status === 'PENDING_PAYMENT') && pollCount < MAX_POLLS && (
+              <span className="ml-2 text-blue-600">
+                （确认中{isFetching ? '…' : '…'} 第 {pollCount}/{MAX_POLLS} 次）
+              </span>
+            )}
           </p>
         </div>
 
         <ResultCard
-          status={status || 'FAILED'}
+          // 没有传入状态时，用 SUCCESS 先展示成功引导；实际状态以订单详情为准
+          status={status || 'SUCCESS'}
           orderInfo={orderInfo}
           onPrimaryAction={handlePrimaryAction}
           onSecondaryAction={handleSecondaryAction}

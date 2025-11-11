@@ -133,8 +133,13 @@ const Search: React.FC = () => {
         sortDirection: sortType === 'price_asc' ? 'ASC' : 'DESC',
       });
 
-      setGoodsResults(response.content || []);
-      setGoodsTotal(response.totalElements || 0);
+      // 前端过滤仅保留审核通过的商品，避免后端不支持 status 参数导致 500
+      const filtered = (response.content || []).filter(
+        (g) => (g.status || '').toUpperCase() === 'APPROVED'
+      );
+      setGoodsResults(filtered);
+      // 仅展示本页条数，避免与后端总数不一致造成困惑
+      setGoodsTotal(filtered.length);
     } catch (err: any) {
       console.error('搜索商品失败：', err);
       toast.error(err.response?.data?.message || '搜索失败！😭');

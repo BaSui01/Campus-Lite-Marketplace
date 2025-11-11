@@ -15,13 +15,27 @@ export const AlipayRedirect: React.FC<Props> = ({ paymentHtml, onCancel }) => {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log('🔍 [AlipayRedirect] 收到 paymentHtml:', paymentHtml ? '有内容' : '为空');
+    console.log('🔍 [AlipayRedirect] paymentHtml 长度:', paymentHtml?.length || 0);
+    console.log('🔍 [AlipayRedirect] paymentHtml 前100字符:', paymentHtml?.substring(0, 100) || '无');
+    
     if (paymentHtml && formRef.current) {
       // 将HTML表单注入到容器中并自动提交
       formRef.current.innerHTML = paymentHtml;
       const form = formRef.current.querySelector('form');
       if (form) {
-        setTimeout(() => form.submit(), 100);
+        console.log('✅ [AlipayRedirect] 找到表单，准备提交');
+        console.log('🔍 [AlipayRedirect] 表单 action:', form.action);
+        console.log('🔍 [AlipayRedirect] 表单 method:', form.method);
+        setTimeout(() => {
+          console.log('🚀 [AlipayRedirect] 提交表单...');
+          form.submit();
+        }, 100);
+      } else {
+        console.error('❌ [AlipayRedirect] 未找到表单！paymentHtml 内容可能有问题');
       }
+    } else {
+      console.error('❌ [AlipayRedirect] paymentHtml 为空或 formRef 未就绪');
     }
   }, [paymentHtml]);
 

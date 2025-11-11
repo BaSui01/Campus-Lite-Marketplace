@@ -142,13 +142,9 @@ const GoodsDetail: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 创建订单
-      const response = await orderService.createOrder({
+      const orderNo = await orderService.createOrder({
         goodsId: goods.id,
-        quantity: 1,
-      });
-
-      const orderData = response.data;
-      const orderNo = orderData?.orderNo;
+      } as any);
 
       if (orderNo) {
         // 跳转到订单详情页
@@ -223,6 +219,8 @@ const GoodsDetail: React.FC = () => {
         return '审核中';
       case 'APPROVED':
         return '在售';
+      case 'LOCKED':
+        return '已锁定';
       case 'REJECTED':
         return '已拒绝';
       case 'SOLD':
@@ -243,6 +241,8 @@ const GoodsDetail: React.FC = () => {
         return 'status-pending';
       case 'APPROVED':
         return 'status-approved';
+      case 'LOCKED':
+        return 'status-locked';
       case 'REJECTED':
         return 'status-rejected';
       case 'SOLD':
@@ -425,7 +425,7 @@ const GoodsDetail: React.FC = () => {
                         className="seller-credit-badge" 
                         style={{ backgroundColor: CREDIT_LEVEL_CONFIG[sellerCredit.creditLevel].color }}
                         title={`信用分: ${sellerCredit.creditScore}`}
-                        onClick={() => navigate(`/user/${goods.seller!.id}`)}
+                        onClick={() => navigate(`/users/${goods.seller!.id}`)}
                       >
                         <span className="credit-icon">{CREDIT_LEVEL_CONFIG[sellerCredit.creditLevel].icon}</span>
                         <span className="credit-name">{CREDIT_LEVEL_CONFIG[sellerCredit.creditLevel].levelName}</span>

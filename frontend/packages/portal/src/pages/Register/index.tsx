@@ -110,7 +110,12 @@ export const Register: React.FC = () => {
       });
     },
     onError: (error: any) => {
-      setErrors({ submit: error?.message || '注册失败，请重试' });
+      console.error('[Register] ❌ 注册失败:', error);
+      // 提取后端返回的错误信息
+      const errorMessage = error?.response?.data?.message 
+        || error?.message 
+        || '注册失败，请检查输入信息';
+      setErrors({ submit: errorMessage });
     },
   });
 
@@ -118,11 +123,13 @@ export const Register: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    // 用户名验证
+    // 用户名验证（与后端规则一致：3-50字符）
     if (!formData.username.trim()) {
       newErrors.username = '请输入用户名';
-    } else if (formData.username.length < 2 || formData.username.length > 20) {
-      newErrors.username = '用户名长度为2-20个字符';
+    } else if (formData.username.length < 3 || formData.username.length > 50) {
+      newErrors.username = '用户名长度为3-50个字符';
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      newErrors.username = '用户名只能包含字母、数字和下划线';
     }
 
     // 手机号/邮箱验证

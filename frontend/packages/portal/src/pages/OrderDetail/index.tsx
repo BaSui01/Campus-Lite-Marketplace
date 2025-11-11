@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Skeleton } from '@campus/shared/components';
+import { Skeleton, Timeline } from '@campus/shared/components';
 import { orderService } from '@campus/shared/services/order';
 import { websocketService } from '@campus/shared/utils';
 import { useNotificationStore } from '../../store';
@@ -31,6 +31,10 @@ const OrderDetail: React.FC = () => {
   const [cancelling, setCancelling] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [refunding, setRefunding] = useState(false);
+
+  // 倒计时（待支付）
+  const [expireAt, setExpireAt] = useState<Date | null>(null);
+  const [timeLeftSec, setTimeLeftSec] = useState<number | null>(null);
 
   // 支付弹窗相关
   const [showPayModal, setShowPayModal] = useState(false);
@@ -60,10 +64,30 @@ const OrderDetail: React.FC = () => {
     setError(null);
 
     try {
-      // 🚀 调用真实后端 API 获取订单详情
-      const response = await orderService.getOrderByNo(orderNo);
-      const orderData = response.data;
+      // 🚀 调用真实后端 API 获取订单详情（统一接口）
+      const orderData = await orderService.getOrderDetail(orderNo);
       setOrder(orderData);
+
+      // 计算倒计时截止时间（优先使用后端返回的 paymentExpireAt；否则用 createdAt + timeoutMinutes）
+      try {
+        let expire: Date | null = null;
+        if ((orderData as any).paymentExpireAt) {
+          expire = new Date((orderData as any).paymentExpireAt as string);
+        } else if (orderData.createdAt) {
+          const minutes = (orderData as any).timeoutMinutes ?? 30;
+          expire = new Date(new Date(orderData.createdAt).getTime() + minutes * 60 * 1000);
+        }
+        setExpireAt(expire);
+        if (expire) {
+          const left = Math.max(0, Math.floor((expire.getTime() - Date.now()) / 1000));
+          setTimeLeftSec(left);
+        } else {
+          setTimeLeftSec(null);
+        }
+      } catch (e) {
+        setExpireAt(null);
+        setTimeLeftSec(null);
+      }
     } catch (err: any) {
       console.error('加载订单详情失败：', err);
       setError(err.response?.data?.message || '加载订单详情失败，请稍后重试！😭');
@@ -75,6 +99,26 @@ const OrderDetail: React.FC = () => {
   useEffect(() => {
     loadOrderDetail();
   }, [orderNo]);
+
+  // 待支付倒计时
+  useEffect(() => {
+    if (!order || order.status !== 'PENDING_PAYMENT' || !expireAt) {
+      return;
+    }
+    const timer = setInterval(() => {
+      const left = Math.floor((expireAt.getTime() - Date.now()) / 1000);
+      if (left <= 0) {
+        setTimeLeftSec(0);
+        clearInterval(timer);
+        // 到点后刷新一次订单，便于看到“已取消/仍待支付”的最新状态
+        setTimeout(() => loadOrderDetail(), 1500);
+      } else {
+        setTimeLeftSec(left);
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.status, expireAt?.getTime?.()]);
 
   // ==================== 📦 实时订单状态更新（WebSocket）====================
 
@@ -168,10 +212,9 @@ const OrderDetail: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 支付订单
-      const response = await orderService.payOrder({
-        orderNo: order.orderNo,
+      const response = await orderService.payOrder(order.orderNo, {
         paymentMethod: selectedPaymentMethod,
-      });
+      } as any);
 
       const payData = response.data;
 
@@ -204,14 +247,13 @@ const OrderDetail: React.FC = () => {
 
     const pollInterval = setInterval(async () => {
       try {
-        const response = await orderService.getPaymentStatus(order.orderNo);
-        const status = response.data?.status;
+        const status = await orderService.queryPaymentStatus(order.orderNo);
 
-        if (status === 'PAID') {
+        if (status === 'PAID' || status === 'PENDING_DELIVERY' || status === 'PAID_SUCCESS') {
           clearInterval(pollInterval);
           toast.success('支付成功！🎉');
           loadOrderDetail(); // 重新加载订单详情
-        } else if (status === 'FAILED') {
+        } else if (status === 'FAILED' || status === 'PAY_FAILED') {
           clearInterval(pollInterval);
           toast.error('支付失败，请重试！😭');
         }
@@ -254,11 +296,8 @@ const OrderDetail: React.FC = () => {
     setCancelling(true);
 
     try {
-      // 🚀 调用真实后端 API 取消订单
-      await orderService.cancelOrder({
-        orderNo: order.orderNo,
-        reason: cancelReason,
-      });
+      // 🚀 调用真实后端 API 取消订单（简化：后端已忽略原因）
+      await orderService.cancelOrder(order.orderNo);
 
       toast.success('订单已取消！🚫');
       handleCloseCancelModal();
@@ -429,6 +468,92 @@ const OrderDetail: React.FC = () => {
     }
   };
 
+  /**
+   * 渲染待支付倒计时+锁定提示
+   */
+  const renderPendingCountdown = () => {
+    if (!order || order.status !== 'PENDING_PAYMENT') return null;
+    const minutes = Math.floor((timeLeftSec ?? 0) / 60);
+    const seconds = Math.max(0, (timeLeftSec ?? 0) % 60);
+    const mm = String(minutes).padStart(2, '0');
+    const ss = String(seconds).padStart(2, '0');
+
+    return (
+      <div className="pending-countdown">
+        <div className="countdown-title">请尽快完成支付</div>
+        <div className="countdown-timer">
+          <span className="time">{mm}</span>
+          <span className="colon">:</span>
+          <span className="time">{ss}</span>
+        </div>
+        <div className="lock-hint">
+          🔒 已为你锁定该商品
+          { (order as any)?.timeoutMinutes ? `（剩余${(order as any).timeoutMinutes}分钟内有效）` : '' }
+        </div>
+        { timeLeftSec === 0 && <div className="countdown-expired">已到期，订单可能已自动取消或即将取消…</div> }
+      </div>
+    );
+  };
+
+  /**
+   * 构建订单流程时间线
+   */
+  const buildTimelineItems = () => {
+    if (!order) return [];
+    const items: any[] = [
+      {
+        title: '创建订单',
+        description: '待支付',
+        time: formatTime(order.createdAt),
+        status: 'success',
+      },
+      {
+        title: '支付成功',
+        description: '等待卖家发货',
+        time: order.paymentTime ? formatTime(order.paymentTime) : undefined,
+        status: order.status === 'PAID' || order.status === 'SHIPPED' || order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'success' : 'default',
+      },
+      {
+        title: '卖家发货',
+        description: '物流运输中',
+        time: undefined, // 需要后端物流时间，暂无
+        status: order.status === 'SHIPPED' || order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'success' : 'default',
+      },
+      {
+        title: '确认收货',
+        description: '待确认',
+        time: undefined, // 需要后端 delivered/received 时间，暂无
+        status: order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'success' : 'default',
+      },
+      {
+        title: order.status === 'CANCELLED' ? '订单已取消' : '交易完成',
+        description: order.status === 'CANCELLED' ? '超时或主动取消' : '感谢你的购买',
+        time: undefined,
+        status: order.status === 'COMPLETED' ? 'success' : (order.status === 'CANCELLED' ? 'error' : 'default'),
+      },
+    ];
+
+    // 计算当前激活节点
+    let activeIndex = 0;
+    switch (order.status) {
+      case 'PENDING_PAYMENT':
+        activeIndex = 0; break;
+      case 'PAID':
+        activeIndex = 1; break;
+      case 'SHIPPED':
+        activeIndex = 2; break;
+      case 'DELIVERED':
+        activeIndex = 3; break;
+      case 'COMPLETED':
+        activeIndex = 4; break;
+      case 'CANCELLED':
+        activeIndex = 4; break;
+      default:
+        activeIndex = 0;
+    }
+    return { items, activeIndex };
+  };
+
   // ==================== 渲染 ====================
 
   // 加载中状态
@@ -477,6 +602,9 @@ const OrderDetail: React.FC = () => {
           </div>
           <h1 className="order-title">订单详情</h1>
           <p className="order-no">订单号：{order.orderNo}</p>
+
+          {/* 待支付倒计时与锁定提示 */}
+          {renderPendingCountdown()}
         </div>
 
         {/* ==================== 商品信息 ==================== */}
@@ -529,6 +657,15 @@ const OrderDetail: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* ==================== 订单进度（时间线） ==================== */}
+        <div className="order-timeline-section">
+          <h2 className="section-title">订单进度</h2>
+          {(() => {
+            const { items, activeIndex } = buildTimelineItems();
+            return <Timeline items={items as any} activeIndex={activeIndex} />;
+          })()}
         </div>
 
         {/* ==================== 物流信息 ==================== */}

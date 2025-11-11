@@ -133,7 +133,7 @@ export const OrderCreate: React.FC = () => {
           <h2 className="section-title">商品信息</h2>
           <div className="order-goods-card">
             <img
-              src={goods.coverImage || '/placeholder.jpg'}
+              src={goods.images?.[0] || '/placeholder.jpg'}
               alt={goods.title}
               className="order-goods-card__image"
             />

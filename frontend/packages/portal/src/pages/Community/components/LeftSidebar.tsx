@@ -38,7 +38,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         { icon: '⭐', label: '我的关注', onClick: () => navigate('/community?tab=followed') },
         { icon: '📬', label: '我的帖子', onClick: () => navigate('/profile/posts') },
         { icon: '💬', label: '我的评论', onClick: () => navigate('/profile/comments') },
-        { icon: '🔖', label: '我的收藏', onClick: () => navigate('/profile/collections') },
+        { icon: '🔖', label: '我的收藏', onClick: () => navigate('/profile/favorites') },
       ]
     : [];
 
