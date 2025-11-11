@@ -45,7 +45,6 @@ public class DisputeController {
      * @return 纠纷ID
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Operation(summary = "提交纠纷", description = "买家或卖家针对订单提交纠纷申请")
     public ApiResponse<Long> submitDispute(@Valid @RequestBody CreateDisputeRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
@@ -65,7 +64,6 @@ public class DisputeController {
      * @return 纠纷列表
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Operation(summary = "查询我的纠纷列表", description = "分页查询当前用户参与的纠纷")
     public ApiResponse<Page<DisputeDTO>> getUserDisputes(
             @Parameter(description = "纠纷状态", example = "NEGOTIATING")
@@ -92,7 +90,6 @@ public class DisputeController {
      * @return 纠纷详情
      */
     @GetMapping("/{disputeId}")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
     @Operation(summary = "查询纠纷详情", description = "查询指定纠纷的完整信息")
     public ApiResponse<DisputeDetailDTO> getDisputeDetail(
             @Parameter(description = "纠纷ID", example = "1")
@@ -112,7 +109,6 @@ public class DisputeController {
      * @return 是否成功
      */
     @PostMapping("/{disputeId}/escalate")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Operation(summary = "升级纠纷", description = "将协商失败的纠纷升级为待仲裁状态")
     public ApiResponse<Boolean> escalateToArbitration(
             @Parameter(description = "纠纷ID", example = "1")

@@ -31,6 +31,14 @@ public record OrderResponse(
         OrderStatus status,
         String paymentMethod,
         LocalDateTime paymentTime,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        /**
+         * 支付截止时间（由后端根据配置计算），用于前端倒计时显示
+         */
+        LocalDateTime paymentExpireAt,
+        /**
+         * 待支付超时阈值（分钟），用于前端说明文案
+         */
+        Integer timeoutMinutes
 ) {
 }

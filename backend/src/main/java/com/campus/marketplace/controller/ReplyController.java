@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +34,6 @@ public class ReplyController {
     private final ReplyService replyService;
 
     @PostMapping
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "创建回复", description = "回复帖子或楼中楼")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "创建回复请求体",
@@ -83,7 +81,6 @@ public class ReplyController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "删除回复", description = "作者或管理员删除回复")
     public ApiResponse<Void> deleteReply(
             @Parameter(description = "回复 ID", example = "54321") @PathVariable Long id

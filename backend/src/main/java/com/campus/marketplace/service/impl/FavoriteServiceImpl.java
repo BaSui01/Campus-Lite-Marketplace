@@ -48,7 +48,7 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "favorite:list", key = "#root.target.getCurrentUserId()")
+    @CacheEvict(value = "favorite:list", key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId()")
     public void addFavorite(Long goodsId) {
         log.info("添加收藏: goodsId={}", goodsId);
 
@@ -103,7 +103,7 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "favorite:list", key = "#root.target.getCurrentUserId()")
+    @CacheEvict(value = "favorite:list", key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId()")
     public void removeFavorite(Long goodsId) {
         log.info("取消收藏: goodsId={}", goodsId);
 
@@ -133,7 +133,7 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "favorite:list", key = "#root.target.getCurrentUserId()")
+    @Cacheable(value = "favorite:list", key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId() + ':' + #page + ':' + #size")
     public Page<GoodsResponse> listFavorites(int page, int size) {
         log.info("查询收藏列表: page={}, size={}", page, size);
 
@@ -221,19 +221,5 @@ public class FavoriteServiceImpl implements FavoriteService {
         return description.length() > 100 
                 ? description.substring(0, 100) + "..." 
                 : description;
-    }
-
-    /**
-     * 获取当前用户 ID（用于缓存 key）
-     */
-    public Long getCurrentUserId() {
-        try {
-            String username = SecurityUtil.getCurrentUsername();
-            return userRepository.findByUsername(username)
-                    .map(User::getId)
-                    .orElse(0L);
-        } catch (Exception e) {
-            return 0L;
-        }
     }
 }

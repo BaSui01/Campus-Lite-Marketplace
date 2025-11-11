@@ -36,7 +36,6 @@ public class RefundController {
     private final RefundService refundService;
 
     @PostMapping("/orders/{orderNo}/refunds")
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER')")
     @Operation(summary = "申请退款", description = "买家提交退款申请，支持附带凭证信息")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "退款凭证（可选）",
@@ -87,7 +86,6 @@ public class RefundController {
     }
 
     @GetMapping("/refunds")
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER')")
     @Operation(summary = "查询我的退款列表", description = "用户查询自己的退款列表，支持分页、状态筛选、时间范围筛选、排序")
     public ApiResponse<Page<RefundRequest>> listMyRefunds(RefundFilterRequest filterRequest) {
         Page<RefundRequest> result = refundService.listMyRefunds(filterRequest);
@@ -95,7 +93,6 @@ public class RefundController {
     }
 
     @GetMapping("/refunds/{refundNo}")
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER')")
     @Operation(summary = "查询我的退款详情", description = "用户查询自己的退款详情（仅限本人）")
     public ApiResponse<RefundRequest> getMyRefund(@Parameter(description = "退款单号", example = "RFD202510270001") @PathVariable String refundNo) {
         return ApiResponse.success(refundService.getMyRefund(refundNo));

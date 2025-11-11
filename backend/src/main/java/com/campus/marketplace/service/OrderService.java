@@ -90,5 +90,5 @@ public interface OrderService {
      * @param orderNo 订单号
      * @return 订单详情
      */
-    com.campus.marketplace.common.entity.Order getOrderDetail(String orderNo);
+    OrderResponse getOrderDetail(String orderNo);
 }

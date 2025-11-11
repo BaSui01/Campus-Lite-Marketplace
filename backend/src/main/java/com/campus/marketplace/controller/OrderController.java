@@ -1,9 +1,10 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.CreateOrderRequest;
+import com.campus.marketplace.common.dto.request.PayOrderRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.OrderResponse;
-import com.campus.marketplace.common.entity.Order;
+import com.campus.marketplace.common.dto.response.PaymentResponse;
 import com.campus.marketplace.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -126,10 +127,37 @@ public class OrderController {
     @GetMapping("/{orderNo}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "订单详情", description = "根据订单号查询订单详情")
-    public ApiResponse<Order> getOrderDetail(@Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo) {
+    public ApiResponse<OrderResponse> getOrderDetail(@Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo) {
         log.info("查询订单详情: orderNo={}", orderNo);
-        Order order = orderService.getOrderDetail(orderNo);
+        OrderResponse order = orderService.getOrderDetail(orderNo);
         return ApiResponse.success(order);
+    }
+
+    /**
+     * 支付订单 💳
+     * 
+     * POST /api/orders/{orderNo}/pay
+     * 
+     * @param orderNo 订单号
+     * @param request 支付请求（包含支付方式）
+     * @return 支付响应（包含支付链接或二维码）
+     */
+    @PostMapping("/{orderNo}/pay")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "支付订单", description = "为指定订单创建支付请求")
+    public ApiResponse<PaymentResponse> payOrder(
+            @Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo,
+            @Valid @RequestBody PayOrderRequest request
+    ) {
+        log.info("支付订单: orderNo={}, paymentMethod={}", orderNo, request.paymentMethod());
+        
+        // 确保 orderNo 一致
+        if (!orderNo.equals(request.orderNo())) {
+            throw new IllegalArgumentException("订单号不一致");
+        }
+        
+        PaymentResponse paymentResponse = orderService.payOrder(request);
+        return ApiResponse.success(paymentResponse);
     }
 
     /**

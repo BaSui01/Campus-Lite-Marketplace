@@ -3,7 +3,6 @@ package com.campus.marketplace.controller;
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
 import com.campus.marketplace.common.dto.request.CreateOrderRequest;
 import com.campus.marketplace.common.dto.response.OrderResponse;
-import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.common.enums.OrderStatus;
 import com.campus.marketplace.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,7 +111,7 @@ class OrderControllerMockMvcTest {
     @DisplayName("GET /api/orders/{orderNo} -> 查询订单详情")
     @WithMockUser(roles = "STUDENT")
     void getOrderDetail_returnsEntity() throws Exception {
-        Order order = Order.builder()
+        OrderResponse orderResponse = OrderResponse.builder()
                 .orderNo("O202510270001")
                 .goodsId(12345L)
                 .buyerId(2001L)
@@ -121,7 +120,7 @@ class OrderControllerMockMvcTest {
                 .actualAmount(new BigDecimal("5599"))
                 .status(OrderStatus.PAID)
                 .build();
-        when(orderService.getOrderDetail("O202510270001")).thenReturn(order);
+        when(orderService.getOrderDetail("O202510270001")).thenReturn(orderResponse);
 
         mockMvc.perform(get("/orders/{orderNo}", "O202510270001"))
                 .andExpect(status().isOk())

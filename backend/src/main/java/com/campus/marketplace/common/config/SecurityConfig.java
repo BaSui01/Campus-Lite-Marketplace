@@ -110,6 +110,7 @@ public class SecurityConfig {
                         
                         // 支付回调
                         .requestMatchers(HttpMethod.POST, matchersWithContext("/payment/wechat/notify")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/payment/alipay/notify")).permitAll()
                         .requestMatchers(HttpMethod.POST, matchersWithContext("/payment/alipay/refund/notify")).permitAll()
                         
                         // Swagger UI 和 API 文档

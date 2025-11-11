@@ -2,7 +2,7 @@ package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
-import com.campus.marketplace.common.entity.Order;
+import com.campus.marketplace.common.dto.response.OrderResponse;
 import com.campus.marketplace.service.OrderService;
 import com.campus.marketplace.service.RefundService;
 import com.campus.marketplace.service.impl.AlipayPaymentService;
@@ -84,7 +84,7 @@ class PaymentControllerMockMvcTest {
             when(wechatPaymentServiceV2.buildSuccessResponse()).thenReturn("<xml>SUCCESS</xml>");
             when(wechatPaymentServiceV2.buildFailResponse("订单信息为空")).thenReturn("<xml>FAIL</xml>");
             when(orderService.getOrderDetail("ORDER123")).thenReturn(
-                    Order.builder().orderNo("ORDER123").amount(new BigDecimal("99.90")).build()
+                    OrderResponse.builder().orderNo("ORDER123").amount(new BigDecimal("99.90")).build()
             );
             when(orderService.handlePaymentCallback(any(PaymentCallbackRequest.class), eq(true))).thenReturn(true);
 

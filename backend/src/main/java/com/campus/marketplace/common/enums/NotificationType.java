@@ -14,6 +14,7 @@ public enum NotificationType {
      * 订单相关通知
      */
     ORDER_CREATED("订单创建"),
+    ORDER_PENDING("订单待支付提醒"),
     ORDER_PAID("订单支付成功"),
     ORDER_CANCELLED("订单取消"),
     ORDER_COMPLETED("订单完成"),

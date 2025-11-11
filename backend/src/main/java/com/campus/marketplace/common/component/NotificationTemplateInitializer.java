@@ -30,7 +30,8 @@ public class NotificationTemplateInitializer {
     public ApplicationRunner initNotificationTemplates() {
         return args -> {
             Map<String, String[]> presets = Map.of(
-                    "ORDER_CREATED", new String[]{"tpl.order.created.title", "tpl.order.created.content", "IN_APP,EMAIL,WEB_PUSH"},
+                    // 变更：下单成功不再发邮件，仅站内+WebPush
+                    "ORDER_CREATED", new String[]{"tpl.order.created.title", "tpl.order.created.content", "IN_APP,WEB_PUSH"},
                     "ORDER_PAID", new String[]{"tpl.order.paid.title", "tpl.order.paid.content", "IN_APP,EMAIL,WEB_PUSH"},
                     "ORDER_CANCELLED", new String[]{"tpl.order.cancelled.title", "tpl.order.cancelled.content", "IN_APP,EMAIL,WEB_PUSH"},
                     "POST_REPLIED", new String[]{"tpl.post.replied.title", "tpl.post.replied.content", "IN_APP,EMAIL,WEB_PUSH"},
@@ -39,7 +40,17 @@ public class NotificationTemplateInitializer {
             for (var e : presets.entrySet()) {
                 String code = e.getKey();
                 String[] v = e.getValue();
-                repo.findByCode(code).orElseGet(() -> {
+                repo.findByCode(code).ifPresentOrElse(tpl -> {
+                    // 若已存在且 channels 变化（尤其ORDER_CREATED含EMAIL），做一次校正更新
+                    if ("ORDER_CREATED".equals(code)) {
+                        String channels = tpl.getChannels();
+                        if (channels != null && channels.contains("EMAIL")) {
+                            tpl.setChannels("IN_APP,WEB_PUSH");
+                            repo.save(tpl);
+                            log.info("更新通知模板渠道: {} -> {}", code, "IN_APP,WEB_PUSH");
+                        }
+                    }
+                }, () -> {
                     NotificationTemplate tpl = NotificationTemplate.builder()
                             .code(code)
                             .titleKey(v[0])
@@ -48,7 +59,6 @@ public class NotificationTemplateInitializer {
                             .build();
                     repo.save(tpl);
                     log.info("初始化通知模板: {}", code);
-                    return tpl;
                 });
             }
         };

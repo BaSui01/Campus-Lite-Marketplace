@@ -1,7 +1,7 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
-import com.campus.marketplace.common.entity.Order;
+import com.campus.marketplace.common.dto.response.OrderResponse;
 import com.campus.marketplace.service.OrderService;
 import com.campus.marketplace.service.RefundService;
 import com.campus.marketplace.service.impl.AlipayPaymentService;
@@ -86,9 +86,9 @@ class PaymentControllerTest {
         when(wechatPaymentService.buildSuccessResponse()).thenReturn("{\"code\":\"SUCCESS\"}");
         when(wechatPaymentService.buildFailResponse(anyString())).thenReturn("{\"code\":\"FAIL\"}");
 
-        Order order = Order.builder().orderNo("O1").amount(new BigDecimal("1"))
+        OrderResponse orderResponse = OrderResponse.builder().orderNo("O1").amount(new BigDecimal("1"))
                 .actualAmount(new BigDecimal("1")).build();
-        when(orderService.getOrderDetail("O1")).thenReturn(order);
+        when(orderService.getOrderDetail("O1")).thenReturn(orderResponse);
         when(orderService.handlePaymentCallback(any(PaymentCallbackRequest.class), anyBoolean())).thenReturn(true);
 
         mockMvc.perform(post("/payment/wechat/notify")
@@ -132,8 +132,8 @@ class PaymentControllerTest {
         when(wechatPaymentServiceV2.buildSuccessResponse()).thenReturn("<xml><return_code><![CDATA[SUCCESS]]></return_code></xml>");
         when(wechatPaymentServiceV2.buildFailResponse(anyString())).thenReturn("<xml><return_code><![CDATA[FAIL]]></return_code></xml>");
 
-        Order order = Order.builder().orderNo("O2").amount(new BigDecimal("2")).actualAmount(new BigDecimal("2")).build();
-        when(orderService.getOrderDetail("O2")).thenReturn(order);
+        OrderResponse orderResponse = OrderResponse.builder().orderNo("O2").amount(new BigDecimal("2")).actualAmount(new BigDecimal("2")).build();
+        when(orderService.getOrderDetail("O2")).thenReturn(orderResponse);
         when(orderService.handlePaymentCallback(any(PaymentCallbackRequest.class), anyBoolean())).thenReturn(true);
 
         mockMvc.perform(post("/payment/wechat/notify")

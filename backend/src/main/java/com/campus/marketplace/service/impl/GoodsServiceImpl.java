@@ -64,6 +64,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     private final GoodsRepository goodsRepository;
     private final UserRepository userRepository;
+    private final com.campus.marketplace.repository.OrderRepository orderRepository;
     private final CategoryRepository categoryRepository;
     private final SensitiveWordFilter sensitiveWordFilter;
     private final com.campus.marketplace.service.ComplianceService complianceService;
@@ -170,7 +171,7 @@ public class GoodsServiceImpl implements GoodsService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        log.info("查询物品列表: keyword={}, categoryId={}, minPrice=, maxPrice={}, status={}, page={}, size={}, tags={}",
+        log.info("查询物品列表: keyword={}, categoryId={}, minPrice={}, maxPrice={}, status={}, page={}, size={}, tags={}",
                 keyword, categoryId, minPrice, maxPrice, status, page, size, sanitizedTagIds);
 
         if (sanitizedTagIds.size() > 10) {
@@ -215,13 +216,17 @@ public class GoodsServiceImpl implements GoodsService {
         // ✅ 使用传入的 status 参数，如果为 null 则默认查询 APPROVED 状态
         GoodsStatus queryStatus = status != null ? status : GoodsStatus.APPROVED;
 
+        // 🔧 处理 keyword 为 null 的情况，避免 PostgreSQL 类型转换错误
+        // 当 keyword 为 null 时，PostgreSQL 可能将其识别为 bytea 类型，导致 LIKE 操作符报错
+        String sanitizedKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+
         Page<Goods> goodsPage = goodsIdsFilter == null
                 ? goodsRepository.findByConditionsWithCampus(
                 queryStatus,
                 categoryId,
                 minPrice,
                 maxPrice,
-                keyword,
+                sanitizedKeyword,
                 campusFilter,
                 pageable
         )
@@ -230,11 +235,16 @@ public class GoodsServiceImpl implements GoodsService {
                 categoryId,
                 minPrice,
                 maxPrice,
-                keyword,
+                sanitizedKeyword,
                 campusFilter,
                 goodsIdsFilter,
                 pageable
         );
+
+        // 🔧 记录查询结果，便于排查问题
+        log.info("📊 查询到 {} 条商品记录（总数：{}）", 
+                goodsPage.getContent().size(), 
+                goodsPage.getTotalElements());
 
         Map<Long, List<TagResponse>> tagsMap = loadTagsForGoods(
                 goodsPage.getContent().stream().map(Goods::getId).toList()
@@ -271,6 +281,33 @@ public class GoodsServiceImpl implements GoodsService {
             }
         }
 
+        // 2.5 若商品处于锁定状态，仅允许买家/卖家查看；其他用户视为不存在
+        if (goods.getStatus() == com.campus.marketplace.common.enums.GoodsStatus.LOCKED) {
+            Long currentUserId = null;
+            try {
+                if (SecurityUtil.isAuthenticated()) {
+                    String username = SecurityUtil.getCurrentUsername();
+                    var user = userRepository.findByUsername(username).orElse(null);
+                    currentUserId = user != null ? user.getId() : null;
+                }
+            } catch (Exception ignored) {}
+
+            boolean isSeller = currentUserId != null && currentUserId.equals(goods.getSellerId());
+            boolean isBuyer = false;
+            try {
+                var pending = orderRepository.findFirstByGoodsIdAndStatus(
+                        goods.getId(), com.campus.marketplace.common.enums.OrderStatus.PENDING_PAYMENT);
+                isBuyer = pending.isPresent() && currentUserId != null && currentUserId.equals(pending.get().getBuyerId());
+            } catch (Exception e) {
+                log.debug("查询商品锁定关联订单失败: goodsId={}, error={}", goods.getId(), e.getMessage());
+            }
+
+            if (!isSeller && !isBuyer) {
+                log.info("锁定中的商品对非参与方不可见: goodsId={}, userId={}", goods.getId(), currentUserId);
+                throw new BusinessException(ErrorCode.GOODS_NOT_FOUND);
+            }
+        }
+
         // 3. 增加浏览量
         goods.incrementViewCount();
         goodsRepository.save(goods);
@@ -281,41 +318,70 @@ public class GoodsServiceImpl implements GoodsService {
 
     /**
      * 转换为列表响应 DTO（不包含标签）
+     * 🔧 优先使用已加载的关联实体（EntityGraph），避免额外查询
      */
     private GoodsResponse convertToResponse(Goods goods) {
-        String categoryName = categoryRepository.findById(goods.getCategoryId())
-                .map(Category::getName)
-                .orElse("未知分类");
+        try {
+            // 🔧 优先使用已加载的 category 关联（EntityGraph 预加载）
+            String categoryName = "未知分类";
+            if (goods.getCategory() != null) {
+                categoryName = goods.getCategory().getName();
+            } else if (goods.getCategoryId() != null) {
+                // 备用方案：如果关联未加载，再查询数据库
+                categoryName = categoryRepository.findById(goods.getCategoryId())
+                        .map(Category::getName)
+                        .orElse("未知分类");
+            } else {
+                log.warn("⚠️ 商品 {} 的 categoryId 为 null", goods.getId());
+            }
 
-        // 获取卖家信息（包括头像）
-        User seller = userRepository.findById(goods.getSellerId()).orElse(null);
-        String sellerUsername = seller != null ? seller.getUsername() : "未知用户";
-        String sellerAvatar = seller != null ? seller.getAvatar() : null;
+            // 🔧 优先使用已加载的 seller 关联（EntityGraph 预加载）
+            String sellerUsername = "未知用户";
+            String sellerAvatar = null;
+            if (goods.getSeller() != null) {
+                sellerUsername = goods.getSeller().getUsername();
+                sellerAvatar = goods.getSeller().getAvatar();
+            } else if (goods.getSellerId() != null) {
+                // 备用方案：如果关联未加载，再查询数据库
+                User seller = userRepository.findById(goods.getSellerId()).orElse(null);
+                sellerUsername = seller != null ? seller.getUsername() : "未知用户";
+                sellerAvatar = seller != null ? seller.getAvatar() : null;
+                
+                if (seller == null) {
+                    log.warn("⚠️ 商品 {} 的卖家 {} 不存在", goods.getId(), goods.getSellerId());
+                }
+            } else {
+                log.warn("⚠️ 商品 {} 的 sellerId 为 null", goods.getId());
+            }
 
-        String coverImage = goods.getImages() != null && goods.getImages().length > 0
-                ? goods.getImages()[0]
-                : null;
+            String coverImage = goods.getImages() != null && goods.getImages().length > 0
+                    ? goods.getImages()[0]
+                    : null;
 
-        return GoodsResponse.builder()
-                .id(goods.getId())
-                .title(goods.getTitle())
-                .description(truncateDescription(goods.getDescription()))
-                .price(goods.getPrice())
-                .categoryId(goods.getCategoryId())
-                .categoryName(categoryName)
-                .sellerId(goods.getSellerId())
-                .sellerUsername(sellerUsername)
-                .sellerAvatar(sellerAvatar)  // ✅ 新增：卖家头像
-                .status(goods.getStatus())
-                .viewCount(goods.getViewCount())
-                .favoriteCount(goods.getFavoriteCount())
-                .stock(goods.getStock())  // ✅ 新增：库存
-                .soldCount(goods.getSoldCount())  // ✅ 新增：已售数量
-                .originalPrice(goods.getOriginalPrice())  // ✅ 新增：原价
-                .coverImage(coverImage)
-                .images(goods.getImages())  // ✅ 新增：所有图片（支持轮播）
-                .createdAt(goods.getCreatedAt())
-                .build();
+            return GoodsResponse.builder()
+                    .id(goods.getId())
+                    .title(goods.getTitle())
+                    .description(truncateDescription(goods.getDescription()))
+                    .price(goods.getPrice())
+                    .categoryId(goods.getCategoryId())
+                    .categoryName(categoryName)
+                    .sellerId(goods.getSellerId())
+                    .sellerUsername(sellerUsername)
+                    .sellerAvatar(sellerAvatar)  // ✅ 新增：卖家头像
+                    .status(goods.getStatus())
+                    .viewCount(goods.getViewCount())
+                    .favoriteCount(goods.getFavoriteCount())
+                    .stock(goods.getStock())  // ✅ 新增：库存
+                    .soldCount(goods.getSoldCount())  // ✅ 新增：已售数量
+                    .originalPrice(goods.getOriginalPrice())  // ✅ 新增：原价
+                    .coverImage(coverImage)
+                    .images(goods.getImages())  // ✅ 新增：所有图片（支持轮播）
+                    .createdAt(goods.getCreatedAt())
+                    .build();
+        } catch (Exception e) {
+            log.error("❌ 转换商品响应失败: goodsId={}, error={}", goods.getId(), e.getMessage(), e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "商品数据转换失败");
+        }
     }
 
     /**

@@ -2,6 +2,8 @@ package com.campus.marketplace.common.entity;
 
 import com.campus.marketplace.common.enums.GoodsStatus;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -127,6 +129,7 @@ public class Post extends BaseEntity {
     /**
      * 图片 URL 数组
      */
+    @JdbcTypeCode(SqlTypes.ARRAY) // ✅ 修复：明确映射 PostgreSQL text[] → Java String[]
     @Column(name = "images", columnDefinition = "TEXT[]")
     private String[] images;
 

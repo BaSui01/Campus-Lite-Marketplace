@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,23 +36,32 @@ public class MarketingCampaignController {
      * 创建营销活动
      */
     @PostMapping
-    @PreAuthorize("hasRole('MERCHANT')")
-    @Operation(summary = "创建营销活动", description = "商家创建营销活动（限时折扣/满减/秒杀）")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "创建营销活动", description = "认证用户创建营销活动（限时折扣/满减/秒杀）")
     public ApiResponse<MarketingCampaign> createCampaign(@RequestBody MarketingCampaign campaign) {
         log.info("创建营销活动: campaignName={}, campaignType={}", campaign.getCampaignName(), campaign.getCampaignType());
+
+        Long currentUserId = getCurrentUserId();
+        if (currentUserId == null) {
+            return ApiResponse.error(401, "未认证或身份无效");
+        }
+        // 将当前登录用户作为商家ID写入，避免 merchantId 为空导致数据约束异常
+        campaign.setMerchantId(currentUserId);
+
         MarketingCampaign created = marketingCampaignService.createCampaign(campaign);
         return ApiResponse.success(created);
     }
 
     /**
-     * 获取我的活动列表（商家）
+     * 获取我的活动列表（认证用户）
      */
     @GetMapping("/my")
-    @PreAuthorize("hasRole('MERCHANT')")
-    @Operation(summary = "获取我的活动列表", description = "商家查询自己创建的所有营销活动")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "获取我的活动列表", description = "认证用户查询自己创建的所有营销活动")
     public ApiResponse<List<MarketingCampaign>> getMyCompaigns() {
-        log.info("查询商家的营销活动列表");
-        List<MarketingCampaign> campaigns = marketingCampaignService.getMerchantCampaigns(null);
+        Long currentUserId = getCurrentUserId();
+        log.info("查询用户的营销活动列表, userId={}", currentUserId);
+        List<MarketingCampaign> campaigns = marketingCampaignService.getMerchantCampaigns(currentUserId);
         return ApiResponse.success(campaigns);
     }
 
@@ -95,8 +106,8 @@ public class MarketingCampaignController {
      * 修改活动
      */
     @PutMapping("/{campaignId}")
-    @PreAuthorize("hasRole('MERCHANT')")
-    @Operation(summary = "修改活动", description = "商家修改营销活动信息")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "修改活动", description = "认证用户修改营销活动信息")
     public ApiResponse<MarketingCampaign> updateCampaign(
             @Parameter(description = "活动ID", example = "1")
             @PathVariable Long campaignId,
@@ -110,8 +121,8 @@ public class MarketingCampaignController {
      * 暂停活动
      */
     @PostMapping("/{campaignId}/pause")
-    @PreAuthorize("hasRole('MERCHANT')")
-    @Operation(summary = "暂停活动", description = "商家暂停正在进行的活动")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "暂停活动", description = "认证用户暂停正在进行的活动")
     public ApiResponse<Void> pauseCampaign(
             @Parameter(description = "活动ID", example = "1")
             @PathVariable Long campaignId) {
@@ -124,8 +135,8 @@ public class MarketingCampaignController {
      * 恢复活动
      */
     @PostMapping("/{campaignId}/resume")
-    @PreAuthorize("hasRole('MERCHANT')")
-    @Operation(summary = "恢复活动", description = "商家恢复已暂停的活动")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "恢复活动", description = "认证用户恢复已暂停的活动")
     public ApiResponse<Void> resumeCampaign(
             @Parameter(description = "活动ID", example = "1")
             @PathVariable Long campaignId) {
@@ -138,8 +149,8 @@ public class MarketingCampaignController {
      * 结束活动
      */
     @PostMapping("/{campaignId}/end")
-    @PreAuthorize("hasRole('MERCHANT')")
-    @Operation(summary = "结束活动", description = "商家手动结束活动")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "结束活动", description = "认证用户手动结束活动")
     public ApiResponse<Void> endCampaign(
             @Parameter(description = "活动ID", example = "1")
             @PathVariable Long campaignId) {
@@ -152,8 +163,8 @@ public class MarketingCampaignController {
      * 删除活动
      */
     @DeleteMapping("/{campaignId}")
-    @PreAuthorize("hasRole('MERCHANT')")
-    @Operation(summary = "删除活动", description = "商家删除营销活动（软删除）")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "删除活动", description = "认证用户删除营销活动（软删除）")
     public ApiResponse<Void> deleteCampaign(
             @Parameter(description = "活动ID", example = "1")
             @PathVariable Long campaignId) {
@@ -225,13 +236,25 @@ public class MarketingCampaignController {
      * 获取活动统计数据
      */
     @GetMapping("/statistics")
-    @PreAuthorize("hasRole('MERCHANT')")
-    @Operation(summary = "获取活动统计", description = "商家查询营销活动统计数据")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "获取活动统计", description = "认证用户查询营销活动统计数据")
     public ApiResponse<Object> getCampaignStatistics(
-            @Parameter(description = "商家ID（可选，不传则查询当前商家）", example = "1")
+            @Parameter(description = "商家ID（可选，不传则查询当前用户）", example = "1")
             @RequestParam(required = false) Long merchantId) {
-        log.info("查询活动统计数据: merchantId={}", merchantId);
-        java.util.Map<String, Object> statistics = marketingCampaignService.getCampaignStatistics(merchantId);
+        Long currentUserId = merchantId != null ? merchantId : getCurrentUserId();
+        log.info("查询活动统计数据: merchantId={} (resolved)", currentUserId);
+        java.util.Map<String, Object> statistics = marketingCampaignService.getCampaignStatistics(currentUserId);
         return ApiResponse.success(statistics);
+    }
+
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            try {
+                return Long.parseLong(authentication.getName());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return null;
     }
 }

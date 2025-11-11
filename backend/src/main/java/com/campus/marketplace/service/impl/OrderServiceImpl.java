@@ -21,6 +21,7 @@ import com.campus.marketplace.service.OrderService;
 import com.campus.marketplace.service.PaymentService;
 import com.campus.marketplace.service.NotificationService;
 import com.campus.marketplace.common.component.NotificationDispatcher;
+import com.campus.marketplace.common.config.properties.OrderProperties;
 import com.campus.marketplace.service.AuditLogService;
 import com.campus.marketplace.repository.CouponUserRelationRepository;
 import com.campus.marketplace.service.CouponService;
@@ -58,9 +59,11 @@ public class OrderServiceImpl implements OrderService {
     private final com.campus.marketplace.common.utils.SensitiveWordFilter sensitiveWordFilter;
     private final NotificationService notificationService;
     private final NotificationDispatcher notificationDispatcher;
+    private final OrderProperties orderProperties;
     private final AuditLogService auditLogService;
     private final CouponUserRelationRepository couponUserRelationRepository;
     private final CouponService couponService;
+    private final com.campus.marketplace.service.EmailTemplateService emailTemplateService;
 
     /**
      * 创建订单
@@ -74,7 +77,8 @@ public class OrderServiceImpl implements OrderService {
         User buyer = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        Goods goods = goodsRepository.findById(request.goodsId())
+        // 为避免并发下单，使用行级写锁加载商品
+        Goods goods = goodsRepository.findByIdForUpdate(request.goodsId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.GOODS_NOT_FOUND));
         // 校区隔离：普通用户禁止跨校购买
         try {
@@ -94,6 +98,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(ErrorCode.GOODS_ALREADY_SOLD);
         }
 
+        // 仅支持从 APPROVED 状态进入下单锁定
         if (goods.getStatus() != GoodsStatus.APPROVED) {
             log.warn("物品未审核: goodsId={}, status={}", goods.getId(), goods.getStatus());
             throw new BusinessException(ErrorCode.GOODS_NOT_APPROVED);
@@ -134,22 +139,47 @@ public class OrderServiceImpl implements OrderService {
         log.info("订单创建成功: orderNo={}, buyerId={}, sellerId={}, amount={}",
                 orderNo, buyer.getId(), goods.getSellerId(), actualAmount);
 
-        goods.setStatus(GoodsStatus.SOLD);
+        // 下单后锁定商品，等待支付
+        goods.setStatus(GoodsStatus.LOCKED);
         goodsRepository.save(goods);
-        log.info("物品状态更新为已售出: goodsId={}", goods.getId());
+        log.info("物品状态更新为已锁定(待支付): goodsId={}", goods.getId());
 
-        // 通知买家与卖家（入队，模板）
+        // 下单即发送锁定期通知（买家/卖家）
         try {
-            java.util.Map<String, Object> params = new java.util.HashMap<>();
-            params.put("orderNo", orderNo);
-            params.put("goodsTitle", goods.getTitle());
-            notificationDispatcher.enqueueTemplate(buyer.getId(), "ORDER_CREATED", params,
-                    com.campus.marketplace.common.enums.NotificationType.ORDER_CREATED.name(),
-                    order.getId(), "ORDER", "/orders/" + orderNo);
-            notificationDispatcher.enqueueTemplate(goods.getSellerId(), "ORDER_CREATED", params,
-                    com.campus.marketplace.common.enums.NotificationType.ORDER_CREATED.name(),
-                    order.getId(), "ORDER", "/orders/" + orderNo);
-        } catch (Exception ignored) {}
+            if (notificationDispatcher != null) {
+                java.util.Map<String, Object> params = new java.util.HashMap<>();
+                params.put("orderNo", orderNo);
+                params.put("expireMinutes", orderProperties.getMinutes());
+                params.put("goodsTitle", goods.getTitle());
+                params.put("price", goods.getPrice() != null ? goods.getPrice().toPlainString() : null);
+
+                // 买家提醒
+                notificationDispatcher.enqueueTemplate(
+                        buyer.getId(),
+                        "ORDER_CREATED_LOCKED_BUYER",
+                        params,
+                        com.campus.marketplace.common.enums.NotificationType.ORDER_CREATED.name(),
+                        null,
+                        "ORDER",
+                        "/orders/" + orderNo
+                );
+                // 卖家提醒
+                notificationDispatcher.enqueueTemplate(
+                        goods.getSellerId(),
+                        "ORDER_CREATED_LOCKED_SELLER",
+                        params,
+                        com.campus.marketplace.common.enums.NotificationType.ORDER_CREATED.name(),
+                        null,
+                        "ORDER",
+                        "/orders/" + orderNo
+                );
+            }
+        } catch (Exception e) {
+            log.warn("发送下单锁定通知失败: orderNo={}, error={}", orderNo, e.getMessage());
+        }
+
+        // 需求变更：提交订单后不再发送邮件/通知，改为仅在支付成功后发送购买成功通知
+        // 原“ORDER_CREATED”模板通知调用已移除，避免用户在未支付时就收到邮件
 
         return orderNo;
     }
@@ -232,11 +262,43 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentTime(LocalDateTime.now());
         orderRepository.save(order);
 
+        // 支付成功后将商品从 LOCKED → SOLD（幂等处理）
+        try {
+            Goods goods = goodsRepository.findById(order.getGoodsId()).orElse(null);
+            if (goods != null) {
+                if (goods.getStatus() == GoodsStatus.LOCKED) {
+                    goods.setStatus(GoodsStatus.SOLD);
+                    goods.incrementSoldCount();
+                    goodsRepository.save(goods);
+                    log.info("支付成功，物品状态由LOCKED→SOLD: goodsId={}, orderNo={}", goods.getId(), order.getOrderNo());
+                } else {
+                    log.info("支付成功但商品状态非LOCKED，保持不变: goodsId={}, status={}", goods.getId(), goods.getStatus());
+                }
+            }
+        } catch (Exception e) {
+            log.warn("支付成功后更新商品状态失败: orderNo={}, error={}", order.getOrderNo(), e.getMessage());
+        }
+
         log.info("订单支付成功: orderNo={}, transactionId={}", order.getOrderNo(), request.transactionId());
+        
+        // 仅在此处进行一次通知发送（通过模板队列触发站内+邮件），避免重复邮件
+        // 若后续需要更丰富的邮件内容，应改造模板而非在此重复直发
+
         // 通知买家与卖家
         try {
             java.util.Map<String, Object> params = new java.util.HashMap<>();
             params.put("orderNo", order.getOrderNo());
+            try {
+                Goods g = goodsRepository.findById(order.getGoodsId()).orElse(null);
+                if (g != null) {
+                    params.put("goodsTitle", g.getTitle());
+                    params.put("goodsPrice", g.getPrice() != null ? g.getPrice().toPlainString() : null);
+                }
+            } catch (Exception ignored) {}
+            params.put("actualAmount", order.getActualAmount() != null ? order.getActualAmount().toPlainString() : null);
+            params.put("paymentMethod", order.getPaymentMethod());
+            params.put("paymentTime", order.getPaymentTime() != null ? order.getPaymentTime().toString() : null);
+            params.put("transactionId", request.transactionId());
             notificationDispatcher.enqueueTemplate(order.getBuyerId(), "ORDER_PAID", params,
                     com.campus.marketplace.common.enums.NotificationType.ORDER_PAID.name(),
                     order.getId(), "ORDER", "/orders/" + order.getOrderNo());
@@ -257,8 +319,9 @@ public class OrderServiceImpl implements OrderService {
     public int cancelTimeoutOrders() {
         log.info("开始取消超时订单");
 
-        // 查找30分钟前创建的待支付订单
-        LocalDateTime timeoutThreshold = LocalDateTime.now().minusMinutes(30);
+        // 查找超时未支付订单：创建时间早于超时阈值
+        int minutes = Math.max(1, orderProperties.getMinutes());
+        LocalDateTime timeoutThreshold = LocalDateTime.now().minusMinutes(minutes);
         var timeoutOrders = orderRepository.findTimeoutOrders(
                 OrderStatus.PENDING_PAYMENT,
                 timeoutThreshold
@@ -271,14 +334,17 @@ public class OrderServiceImpl implements OrderService {
                 order.setStatus(OrderStatus.CANCELLED);
                 orderRepository.save(order);
 
-                // 恢复物品状态
+                // 恢复物品状态（仅当处于 LOCKED 时回退到 APPROVED）
                 Goods goods = goodsRepository.findById(order.getGoodsId())
                         .orElse(null);
-                if (goods != null && goods.getStatus() == GoodsStatus.SOLD) {
-                    goods.setStatus(GoodsStatus.APPROVED);
-                    goodsRepository.save(goods);
-                    log.info("物品状态已恢复: goodsId={}, orderNo={}",
-                            goods.getId(), order.getOrderNo());
+                if (goods != null) {
+                    if (goods.getStatus() == GoodsStatus.LOCKED) {
+                        goods.setStatus(GoodsStatus.APPROVED);
+                        goodsRepository.save(goods);
+                        log.info("超时取消，物品状态由LOCKED→APPROVED: goodsId={}, orderNo={}", goods.getId(), order.getOrderNo());
+                    } else {
+                        log.info("超时取消但商品状态非LOCKED，保持不变: goodsId={}, status={}", goods.getId(), goods.getStatus());
+                    }
                 }
 
                 // 🎯 BaSui 新增：发送超时取消通知
@@ -355,9 +421,11 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
         Goods goods = goodsRepository.findById(order.getGoodsId()).orElse(null);
-        if (goods != null && goods.getStatus() == GoodsStatus.SOLD) {
-            goods.setStatus(GoodsStatus.APPROVED);
-            goodsRepository.save(goods);
+        if (goods != null) {
+            if (goods.getStatus() == GoodsStatus.LOCKED) {
+                goods.setStatus(GoodsStatus.APPROVED);
+                goodsRepository.save(goods);
+            }
         }
 
         // 优惠券回退（若有绑定）
@@ -503,7 +571,7 @@ public class OrderServiceImpl implements OrderService {
      * 查询订单详情
      */
     @Override
-    public Order getOrderDetail(String orderNo) {
+    public OrderResponse getOrderDetail(String orderNo) {
         Order order = orderRepository.findByOrderNoWithDetails(orderNo)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
@@ -526,7 +594,7 @@ public class OrderServiceImpl implements OrderService {
             throw e;
         } catch (Exception ignored) { }
 
-        return order;
+        return convertToResponse(order);
     }
 
     /**
@@ -539,9 +607,95 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 发送支付成功邮件 📧
+     * 
+     * 在支付回调成功后调用，发送包含商品详情的邮件给买家
+     * 
+     * @param order 订单对象
+     * @param transactionId 交易流水号
+     */
+    private void sendPaymentSuccessEmail(Order order, String transactionId) {
+        log.info("📧 准备发送支付成功邮件: orderNo={}", order.getOrderNo());
+
+        // 1. 查询买家信息（获取邮箱）
+        User buyer = userRepository.findById(order.getBuyerId())
+                .orElse(null);
+        if (buyer == null || buyer.getEmail() == null || buyer.getEmail().isEmpty()) {
+            log.warn("⚠️ 买家未绑定邮箱，跳过邮件发送: buyerId={}", order.getBuyerId());
+            return;
+        }
+
+        // 2. 查询商品信息
+        Goods goods = goodsRepository.findById(order.getGoodsId())
+                .orElse(null);
+        if (goods == null) {
+            log.warn("⚠️ 商品不存在，跳过邮件发送: goodsId={}", order.getGoodsId());
+            return;
+        }
+
+        // 3. 查询卖家信息
+        User seller = userRepository.findById(order.getSellerId())
+                .orElse(null);
+        String sellerName = seller != null ? seller.getUsername() : "未知卖家";
+
+        // 4. 准备邮件数据
+        String goodsTitle = goods.getTitle();
+        String goodsDescription = goods.getDescription() != null && !goods.getDescription().isEmpty() 
+                ? goods.getDescription() 
+                : "暂无描述";
+        String goodsPrice = String.format("%.2f", goods.getPrice());
+        String goodsImage = (goods.getImages() != null && goods.getImages().length > 0 && goods.getImages()[0] != null && !goods.getImages()[0].isEmpty())
+                ? goods.getImages()[0]
+                : "https://picsum.photos/200/200?random=" + goods.getId();
+        String actualAmount = String.format("%.2f", order.getActualAmount());
+        
+        // 支付方式格式化
+        String paymentMethod = order.getPaymentMethod();
+        if ("WECHAT".equalsIgnoreCase(paymentMethod)) {
+            paymentMethod = "微信支付";
+        } else if ("ALIPAY".equalsIgnoreCase(paymentMethod)) {
+            paymentMethod = "支付宝";
+        }
+        
+        String paymentTime = order.getPaymentTime() != null 
+                ? order.getPaymentTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        // 5. 发送邮件
+        try {
+            emailTemplateService.sendPaymentSuccess(
+                    buyer.getEmail(),
+                    order.getOrderNo(),
+                    goodsTitle,
+                    goodsDescription,
+                    goodsPrice,
+                    goodsImage,
+                    actualAmount,
+                    paymentMethod,
+                    paymentTime,
+                    transactionId,
+                    sellerName
+            );
+            log.info("✅ 支付成功邮件发送成功: orderNo={}, email={}", order.getOrderNo(), buyer.getEmail());
+        } catch (Exception e) {
+            log.error("💥 支付成功邮件发送异常: orderNo={}", order.getOrderNo(), e);
+            throw e;
+        }
+    }
+
+    /**
      * 转换为响应 DTO
      */
     private OrderResponse convertToResponse(Order order) {
+        // 计算支付截止时间
+        int minutes = 30;
+        try {
+            minutes = Math.max(1, orderProperties.getMinutes());
+        } catch (Exception ignored) {}
+        java.time.LocalDateTime expireAt = order.getCreatedAt() != null
+                ? order.getCreatedAt().plusMinutes(minutes)
+                : null;
+
         return OrderResponse.builder()
                 .id(order.getId())
                 .orderNo(order.getOrderNo())
@@ -560,6 +714,8 @@ public class OrderServiceImpl implements OrderService {
                 .paymentMethod(order.getPaymentMethod())
                 .paymentTime(order.getPaymentTime())
                 .createdAt(order.getCreatedAt())
+                .paymentExpireAt(expireAt)
+                .timeoutMinutes(minutes)
                 .build();
     }
 }

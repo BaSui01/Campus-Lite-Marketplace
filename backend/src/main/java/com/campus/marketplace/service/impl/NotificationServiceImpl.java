@@ -328,8 +328,45 @@ public class NotificationServiceImpl implements NotificationService {
                                          String link) {
         var locale = org.springframework.context.i18n.LocaleContextHolder.getLocale();
         var rendered = templateService.render(templateCode, locale, params == null ? Map.of() : params);
-        // 站内 + 邮件 + WebPush 联动
-        sendNotificationWithEmail(receiverId, type, rendered.title(), rendered.content(), relatedId, relatedType, link);
+
+        boolean enableInApp = rendered.channels() != null && rendered.channels().contains(com.campus.marketplace.common.enums.NotificationChannel.IN_APP);
+        boolean enableEmail = rendered.channels() != null && rendered.channels().contains(com.campus.marketplace.common.enums.NotificationChannel.EMAIL);
+        boolean enableWebPush = rendered.channels() != null && rendered.channels().contains(com.campus.marketplace.common.enums.NotificationChannel.WEB_PUSH);
+
+        // 站内通知（受退订控制）
+        if (enableInApp) {
+            try {
+                sendNotification(receiverId, type, rendered.title(), rendered.content(), relatedId, relatedType, link);
+            } catch (Exception e) {
+                log.warn("站内通知发送失败（模板）：userId={}, tpl={}", receiverId, templateCode, e);
+            }
+        }
+
+        // 邮件通知（受退订与静默控制）
+        if (enableEmail) {
+            boolean unsubEmail = preferenceService.isUnsubscribed(receiverId, type.name(), NotificationChannel.EMAIL);
+            if (!unsubEmail) {
+                try {
+                    sendEmailNotification(receiverId, rendered.title(), rendered.content());
+                } catch (Exception e) {
+                    log.warn("邮件通知发送失败（模板）：userId={}, tpl={}", receiverId, templateCode, e);
+                }
+            } else {
+                log.debug("用户退订了邮件渠道，跳过：userId={}, template={}", receiverId, templateCode);
+            }
+        }
+
+        // WebPush（受退订控制）
+        if (enableWebPush) {
+            boolean unsubWebPush = preferenceService.isUnsubscribed(receiverId, type.name(), NotificationChannel.WEB_PUSH);
+            if (!unsubWebPush) {
+                try {
+                    webPushService.send(receiverId, rendered.title(), rendered.content(), link);
+                } catch (Exception e) {
+                    log.warn("WebPush 发送失败（模板）：userId={}, tpl={}", receiverId, templateCode, e);
+                }
+            }
+        }
     }
 
     private int resolvePriority(NotificationType type) {

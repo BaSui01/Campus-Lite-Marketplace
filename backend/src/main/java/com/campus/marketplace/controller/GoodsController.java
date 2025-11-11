@@ -42,7 +42,6 @@ public class GoodsController {
     private final ReviewService reviewService;
 
         @PostMapping
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "发布物品", description = "用户发布二手物品信息")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "创建物品请求体",
@@ -72,24 +71,54 @@ public class GoodsController {
         return ApiResponse.success(goodsId);
     }
 
-        @GetMapping
+    @GetMapping
     @Operation(summary = "查询物品列表", description = "分页查询物品列表，支持关键词搜索、分类筛选、价格区间筛选、状态筛选和排序")
     public ApiResponse<Page<GoodsResponse>> listGoods(
             @Parameter(description = "搜索关键词", example = "苹果笔记本") @RequestParam(required = false) String keyword,
-            @Parameter(description = "分类 ID", example = "101") @RequestParam(required = false) Long categoryId,
-            @Parameter(description = "最低价格", example = "1000") @RequestParam(required = false) BigDecimal minPrice,
-            @Parameter(description = "最高价格", example = "5000") @RequestParam(required = false) BigDecimal maxPrice,
-            @Parameter(description = "物品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）", example = "APPROVED") @RequestParam(required = false) GoodsStatus status,
+            @Parameter(description = "分类 ID", example = "101") @RequestParam(required = false) String categoryId,
+            @Parameter(description = "最低价格", example = "1000") @RequestParam(required = false) String minPrice,
+            @Parameter(description = "最高价格", example = "5000") @RequestParam(required = false) String maxPrice,
+            @Parameter(description = "物品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）", example = "APPROVED") @RequestParam(required = false) String status,
             @Parameter(description = "页码（从 0 开始）", example = "0") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页数量", example = "20") @RequestParam(defaultValue = "20") int size,
             @Parameter(description = "排序字段（createdAt/price/viewCount）", example = "createdAt") @RequestParam(defaultValue = "createdAt") String sortBy,
             @Parameter(description = "排序方向（ASC/DESC）", example = "DESC") @RequestParam(defaultValue = "DESC") String sortDirection,
             @Parameter(description = "标签 ID 列表（全部匹配）", example = "1,3,5") @RequestParam(name = "tags", required = false) java.util.List<Long> tagIds
     ) {
+        // 兼容空字符串参数，避免类型转换异常导致 500
+        Long parsedCategoryId = parseLong(categoryId);
+        BigDecimal parsedMinPrice = parseDecimal(minPrice);
+        BigDecimal parsedMaxPrice = parseDecimal(maxPrice);
+        GoodsStatus parsedStatus = parseStatus(status);
+
         Page<GoodsResponse> result = goodsService.listGoods(
-                keyword, categoryId, minPrice, maxPrice, status, page, size, sortBy, sortDirection, tagIds
+                keyword,
+                parsedCategoryId,
+                parsedMinPrice,
+                parsedMaxPrice,
+                parsedStatus,
+                page,
+                size,
+                sortBy,
+                sortDirection,
+                tagIds
         );
         return ApiResponse.success(result);
+    }
+
+    private Long parseLong(String value) {
+        if (value == null || value.isBlank()) return null;
+        try { return Long.valueOf(value.trim()); } catch (Exception e) { return null; }
+    }
+
+    private BigDecimal parseDecimal(String value) {
+        if (value == null || value.isBlank()) return null;
+        try { return new BigDecimal(value.trim()); } catch (Exception e) { return null; }
+    }
+
+    private GoodsStatus parseStatus(String value) {
+        if (value == null || value.isBlank()) return null;
+        try { return GoodsStatus.valueOf(value.trim().toUpperCase()); } catch (Exception e) { return null; }
     }
 
         @GetMapping("/{id}")
@@ -102,7 +131,6 @@ public class GoodsController {
     }
 
         @GetMapping("/my")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "查询我发布的物品", description = "查询当前用户发布的所有物品（所有状态）")
     public ApiResponse<Page<GoodsResponse>> getMyGoods(
             @Parameter(description = "页码（从 0 开始）", example = "0") @RequestParam(defaultValue = "0") int page,

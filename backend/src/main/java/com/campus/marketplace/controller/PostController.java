@@ -36,7 +36,6 @@ public class PostController {
     private final PostService postService;
 
         @PostMapping
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "发布帖子", description = "用户发布论坛帖子")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "创建帖子请求体",
@@ -66,7 +65,6 @@ public class PostController {
     }
 
         @PutMapping("/{id}")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "修改帖子", description = "作者或管理员可编辑帖子，内容变更将重置为待审核")
     public ApiResponse<Void> updatePost(
             @Parameter(description = "帖子 ID", example = "98765") @PathVariable Long id,
@@ -132,7 +130,6 @@ public class PostController {
     }
 
         @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "删除帖子", description = "作者或管理员删除帖子")
     public ApiResponse<Void> deletePost(
             @Parameter(description = "帖子 ID", example = "98765") @PathVariable Long id
@@ -165,7 +162,6 @@ public class PostController {
     }
 
     @GetMapping("/my-likes")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "查询我的点赞列表", description = "查询当前用户点赞的所有帖子")
     public ApiResponse<Page<PostResponse>> listMyLikes(
             @Parameter(description = "页码", example = "0") @RequestParam(defaultValue = "0") int page,
@@ -177,7 +173,6 @@ public class PostController {
     }
 
     @GetMapping("/my-collects")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "查询我的收藏列表", description = "查询当前用户收藏的所有帖子")
     public ApiResponse<Page<PostResponse>> listMyCollects(
             @Parameter(description = "页码", example = "0") @RequestParam(defaultValue = "0") int page,

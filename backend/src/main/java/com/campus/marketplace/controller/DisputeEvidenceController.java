@@ -44,7 +44,6 @@ public class DisputeEvidenceController {
      * @return 证据ID
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Operation(summary = "上传证据", description = "买卖双方上传图片、视频或聊天记录作为证据")
     public ApiResponse<Long> uploadEvidence(@Valid @RequestBody UploadEvidenceRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
@@ -63,7 +62,7 @@ public class DisputeEvidenceController {
      * @return 证据列表
      */
     @GetMapping("/{disputeId}")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
+
     @Operation(summary = "查询纠纷所有证据", description = "查询纠纷的完整证据列表")
     public ApiResponse<List<EvidenceDTO>> getDisputeEvidence(
             @Parameter(description = "纠纷ID", example = "1")
@@ -83,7 +82,7 @@ public class DisputeEvidenceController {
      * @return 买家证据列表
      */
     @GetMapping("/{disputeId}/buyer")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
+
     @Operation(summary = "查询买家证据", description = "查询买家上传的所有证据")
     public ApiResponse<List<EvidenceDTO>> getBuyerEvidence(
             @Parameter(description = "纠纷ID", example = "1")
@@ -103,7 +102,7 @@ public class DisputeEvidenceController {
      * @return 卖家证据列表
      */
     @GetMapping("/{disputeId}/seller")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
+
     @Operation(summary = "查询卖家证据", description = "查询卖家上传的所有证据")
     public ApiResponse<List<EvidenceDTO>> getSellerEvidence(
             @Parameter(description = "纠纷ID", example = "1")
@@ -151,7 +150,7 @@ public class DisputeEvidenceController {
      * @return 证据统计信息
      */
     @GetMapping("/{disputeId}/summary")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
+
     @Operation(summary = "查询证据统计", description = "查询纠纷的证据统计信息")
     public ApiResponse<EvidenceSummaryDTO> getEvidenceSummary(
             @Parameter(description = "纠纷ID", example = "1")
@@ -191,7 +190,6 @@ public class DisputeEvidenceController {
      * @return 是否成功
      */
     @DeleteMapping("/{evidenceId}")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Operation(summary = "删除证据", description = "上传者删除自己上传的未评估证据")
     public ApiResponse<Boolean> deleteEvidence(
             @Parameter(description = "证据ID", example = "1")
