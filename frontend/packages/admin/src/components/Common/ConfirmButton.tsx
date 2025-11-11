@@ -12,9 +12,8 @@
  */
 
 import React, { useState } from 'react';
-import { Button, App } from 'antd';
+import { Button, App, type ButtonProps } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import type { ButtonProps } from 'antd';
 
 /**
  * ConfirmButton 组件属性

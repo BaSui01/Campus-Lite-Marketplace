@@ -13,9 +13,8 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader as AntPageHeader, Breadcrumb } from 'antd';
+import { PageHeader as AntPageHeader, Breadcrumb, type PageHeaderProps as AntPageHeaderProps } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import type { PageHeaderProps as AntPageHeaderProps } from 'antd';
 
 /**
  * 面包屑项

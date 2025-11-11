@@ -173,8 +173,8 @@ export const TagList: React.FC = () => {
 
   // 统计数据
   const totalCount = data?.totalElements || 0;
-  const enabledCount = data?.content.filter(t => t.status === TagStatus.ENABLED).length || 0;
-  const hotTagsCount = data?.content.filter(t => t.hotCount > 100).length || 0;
+  const enabledCount = data?.content?.filter(t => t.status === TagStatus.ENABLED).length || 0;
+  const hotTagsCount = data?.content?.filter(t => t.hotCount > 100).length || 0;
 
   // 搜索处理
   const handleSearch = () => {
@@ -521,31 +521,34 @@ export const TagList: React.FC = () => {
           >
             <List
               dataSource={hotTags || []}
-              renderItem={(item: HotTag, index) => (
-                <List.Item>
-                  <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                    <Space>
-                      <Badge 
-                        count={index + 1} 
-                        style={{ 
-                          backgroundColor: index < 3 ? '#ff4d4f' : '#8c8c8c' 
-                        }} 
-                      />
-                      <AntTag icon={<TagOutlined />}>
-                        {item.name}
-                      </AntTag>
+              renderItem={(item: HotTag, index) => {
+                const typeInfo = TAG_TYPE_MAP[item.type] || { text: '未知', color: 'default' };
+                return (
+                  <List.Item>
+                    <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                      <Space>
+                        <Badge 
+                          count={index + 1} 
+                          style={{ 
+                            backgroundColor: index < 3 ? '#ff4d4f' : '#8c8c8c' 
+                          }} 
+                        />
+                        <AntTag icon={<TagOutlined />}>
+                          {item.name}
+                        </AntTag>
+                      </Space>
+                      <Space>
+                        <AntTag color={typeInfo.color}>
+                          {typeInfo.text}
+                        </AntTag>
+                        <span style={{ color: '#ff4d4f', fontWeight: 'bold' }}>
+                          {item.hotCount}
+                        </span>
+                      </Space>
                     </Space>
-                    <Space>
-                      <AntTag color={TAG_TYPE_MAP[item.type].color}>
-                        {TAG_TYPE_MAP[item.type].text}
-                      </AntTag>
-                      <span style={{ color: '#ff4d4f', fontWeight: 'bold' }}>
-                        {item.hotCount}
-                      </span>
-                    </Space>
-                  </Space>
-                </List.Item>
-              )}
+                  </List.Item>
+                );
+              }}
               size="small"
             />
           </Card>
@@ -656,11 +659,11 @@ export const TagList: React.FC = () => {
                 (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
               }
               options={data?.content
-                .filter(tag => !selectedRowKeys.includes(tag.id))
+                ?.filter(tag => !selectedRowKeys.includes(tag.id))
                 .map(tag => ({
                   value: tag.id,
                   label: `${tag.name} (${TAG_TYPE_MAP[tag.type].text})`,
-                }))}
+                })) || []}
             />
           </Form.Item>
         </div>

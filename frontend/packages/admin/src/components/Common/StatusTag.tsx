@@ -11,8 +11,7 @@
  */
 
 import React from 'react';
-import { Tag } from 'antd';
-import type { TagProps } from 'antd';
+import { Tag, type TagProps } from 'antd';
 
 /**
  * 状态映射配置

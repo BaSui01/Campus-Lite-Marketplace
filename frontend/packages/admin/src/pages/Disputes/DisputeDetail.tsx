@@ -27,7 +27,6 @@ import {
   Divider,
   Tabs,
   App,
-  Modal,
 } from 'antd';
 import {
   ArrowLeftOutlined,

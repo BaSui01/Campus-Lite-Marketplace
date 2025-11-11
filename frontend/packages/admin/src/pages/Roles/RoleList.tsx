@@ -19,7 +19,6 @@ import {
   Tag,
   Tooltip,
   App,
-  Modal,
 } from 'antd';
 import {
   PlusOutlined,

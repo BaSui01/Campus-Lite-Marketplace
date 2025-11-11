@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer, Modal, App } from 'antd';
+import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer, Modal, App, type MenuProps } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -37,7 +37,6 @@ import {
   BulbOutlined,
   BulbFilled,
 } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
 import { useAuth, usePermission, useBreakpoint, useTheme } from '@/hooks';
 import { UserAvatar, Badge } from '@campus/shared';
 import { MENU_ITEMS } from '@/config/menu';

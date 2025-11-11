@@ -37,6 +37,7 @@ import {
   Badge,
   Tooltip,
   Alert,
+  type UploadFile,
 } from 'antd';
 import {
   UserOutlined,
@@ -58,7 +59,6 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService, uploadService, ImageUploadWithCrop, authService } from '@campus/shared';
 import { useAuth } from '@/hooks';
-import type { UploadFile } from 'antd';
 import type { RcFile } from 'antd/es/upload';
 import type { ColumnsType } from 'antd/es/table';
 import './Profile.css';

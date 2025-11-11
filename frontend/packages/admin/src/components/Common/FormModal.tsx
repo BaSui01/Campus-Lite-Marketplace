@@ -12,8 +12,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Modal, Form, App } from 'antd';
-import type { FormInstance, ModalProps } from 'antd';
+import { Modal, Form, App, type FormInstance, type ModalProps } from 'antd';
 
 /**
  * FormModal 组件属性

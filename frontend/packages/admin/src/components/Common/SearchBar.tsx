@@ -12,9 +12,8 @@
  */
 
 import React from 'react';
-import { Form, Input, Select, DatePicker, Button, Space, Row, Col } from 'antd';
+import { Form, Input, Select, DatePicker, Button, Space, Row, Col, type FormInstance } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
-import type { FormInstance } from 'antd';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;

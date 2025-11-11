@@ -13,9 +13,8 @@
  */
 
 import React, { useState } from 'react';
-import { Upload, Modal, App } from 'antd';
+import { Upload, Modal, App, type UploadFile, type UploadProps } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import type { UploadFile, UploadProps } from 'antd';
 import { uploadService } from '@campus/shared';
 
 /**

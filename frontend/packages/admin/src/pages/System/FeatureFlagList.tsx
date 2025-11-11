@@ -35,7 +35,6 @@ import {
   Slider,
   Badge,
   App,
-  Modal,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {

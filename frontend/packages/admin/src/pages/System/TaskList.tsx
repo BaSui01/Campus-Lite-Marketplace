@@ -25,7 +25,6 @@ import {
   Tooltip,
   Modal,
   App,
-  Modal,
 } from 'antd';
 import {
   PlayCircleOutlined,

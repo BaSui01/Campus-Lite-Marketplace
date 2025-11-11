@@ -19,7 +19,6 @@ import {
   Divider,
   Alert,
   App,
-  Modal,
 } from 'antd';
 import {
   PlusOutlined,
@@ -29,9 +28,8 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { rateLimitService } from '@campus/shared';
+import { rateLimitService , PERMISSION_CODES } from '@campus/shared';
 import { PermissionGuard } from '@/components';
-import { PERMISSION_CODES } from '@campus/shared';
 import type { RateLimitRules } from '@campus/shared';
 
 const { Title } = Typography;
