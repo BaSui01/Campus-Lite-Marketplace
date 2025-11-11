@@ -1,7 +1,6 @@
 package com.campus.marketplace.websocket;
 
 import com.campus.marketplace.common.dto.websocket.WebSocketMessage;
-import com.campus.marketplace.common.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * Dispute WebSocket Handler
@@ -37,8 +35,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class DisputeWebSocketHandler extends TextWebSocketHandler {
 
-    private final WebSocketSessionManager sessionManager;
-    private final JwtUtil jwtUtil;
+    private final DisputeSessionManager sessionManager;
     private final ObjectMapper objectMapper;
 
     /**
@@ -54,36 +51,19 @@ public class DisputeWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         try {
-            // 1. Get JWT Token (from query parameter ?token=xxx)
-            String token = getTokenFromSession(session);
-            if (token == null || token.isEmpty()) {
-                log.warn("⚠️ Dispute WebSocket connection failed: missing Token, session ID={}", session.getId());
-                sendErrorMessage(session, "Missing authentication Token");
+            // 1. Get user ID from interceptor attributes (avoid redundant Token parsing)
+            Long userId = (Long) session.getAttributes().get("userId");
+            if (userId == null) {
+                log.warn("⚠️ Dispute WebSocket connection failed: interceptor did not provide userId, session ID={}", session.getId());
+                sendErrorMessage(session, "Authentication failed");
                 session.close(CloseStatus.NOT_ACCEPTABLE);
                 return;
             }
 
-            // 2. Validate Token and extract user ID
-            Long userId;
-            try {
-                userId = jwtUtil.getUserIdFromToken(token);
-                if (userId == null) {
-                    log.warn("⚠️ Dispute WebSocket connection failed: invalid Token, session ID={}", session.getId());
-                    sendErrorMessage(session, "Invalid Token");
-                    session.close(CloseStatus.NOT_ACCEPTABLE); // 1003
-                    return;
-                }
-            } catch (Exception e) {
-                log.error("❌ Dispute WebSocket connection failed: Token parsing error, session ID={}", session.getId(), e);
-                sendErrorMessage(session, "Token parsing failed");
-                session.close(CloseStatus.NOT_ACCEPTABLE); // 1003
-                return;
-            }
-
-            // 3. Register session
+            // 2. Register session
             sessionManager.addSession(userId, session);
 
-            // 4. Send connection success message
+            // 3. Send connection success message
             WebSocketMessage successMessage = WebSocketMessage.builder()
                     .type(WebSocketMessage.TYPE_SYSTEM)
                     .content("Dispute WebSocket connected successfully")
@@ -171,35 +151,6 @@ public class DisputeWebSocketHandler extends TextWebSocketHandler {
                 .build();
         sendMessage(session, pongMessage);
         log.debug("💓 Heartbeat replied: user ID={}", userId);
-    }
-
-    /**
-     * Get JWT Token from session
-     *
-     * Token passing methods:
-     * 1. Query parameter: ws://localhost:8080/ws/dispute?token=xxx
-     * 2. SockJS: ws://localhost:8080/ws/dispute/websocket?token=xxx
-     */
-    private String getTokenFromSession(WebSocketSession session) {
-        URI uri = session.getUri();
-        if (uri == null) {
-            return null;
-        }
-
-        String query = uri.getQuery();
-        if (query == null || query.isEmpty()) {
-            return null;
-        }
-
-        // Parse query parameter token=xxx
-        for (String param : query.split("&")) {
-            String[] keyValue = param.split("=");
-            if (keyValue.length == 2 && "token".equals(keyValue[0])) {
-                return keyValue[1];
-            }
-        }
-
-        return null;
     }
 
     /**

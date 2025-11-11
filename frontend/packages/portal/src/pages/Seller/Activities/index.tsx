@@ -7,9 +7,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Skeleton } from '@campus/shared/components';
-import { marketingService, CampaignStatus, CAMPAIGN_TYPE_CONFIG, CAMPAIGN_STATUS_CONFIG } from '../../services';
-import { MarketingCampaign,  } from '@campus/shared/services';;
-import { useNotificationStore } from '../../../store';
+import { marketingService, CampaignStatus, CAMPAIGN_TYPE_CONFIG, CAMPAIGN_STATUS_CONFIG, type MarketingCampaign } from '@/services';
+import { useNotificationStore } from '@/store';
 import './Activities.css';
 
 /**

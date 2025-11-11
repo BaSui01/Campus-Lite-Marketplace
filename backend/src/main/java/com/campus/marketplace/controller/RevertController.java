@@ -1,6 +1,9 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.request.CreateRevertRequestDto;
+import com.campus.marketplace.common.dto.response.RevertStatistics;
+import com.campus.marketplace.common.entity.RevertRequest;
+import com.campus.marketplace.common.enums.RevertRequestStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import com.campus.marketplace.common.dto.response.ApiResponse;
@@ -61,5 +64,47 @@ public class RevertController {
         Long adminId = SecurityUtil.getCurrentUserId();
         RevertExecutionResult result = revertService.executeRevert(revertRequestId, adminId);
         return ApiResponse.success(result);
+    }
+
+    // ==================== 管理员接口 ====================
+
+    @Operation(summary = "查询所有撤销请求（管理员）")
+    @GetMapping("/admin/requests")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Page<RevertRequest>> listRevertRequests(
+            @RequestParam(required = false) RevertRequestStatus status,
+            Pageable pageable) {
+        Page<RevertRequest> requests = revertService.listRevertRequests(status, pageable);
+        return ApiResponse.success(requests);
+    }
+
+    @Operation(summary = "获取撤销统计数据（管理员）")
+    @GetMapping("/admin/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<RevertStatistics> getRevertStatistics() {
+        RevertStatistics statistics = revertService.getRevertStatistics();
+        return ApiResponse.success(statistics);
+    }
+
+    @Operation(summary = "批准撤销请求（管理员）")
+    @PostMapping("/admin/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> approveRevert(
+            @PathVariable Long id,
+            @RequestParam(required = false) String comment) {
+        Long approverId = SecurityUtil.getCurrentUserId();
+        revertService.approveRevert(id, comment, approverId);
+        return ApiResponse.success();
+    }
+
+    @Operation(summary = "拒绝撤销请求（管理员）")
+    @PostMapping("/admin/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<Void> rejectRevert(
+            @PathVariable Long id,
+            @RequestParam(required = true) String reason) {
+        Long approverId = SecurityUtil.getCurrentUserId();
+        revertService.rejectRevert(id, reason, approverId);
+        return ApiResponse.success();
     }
 }

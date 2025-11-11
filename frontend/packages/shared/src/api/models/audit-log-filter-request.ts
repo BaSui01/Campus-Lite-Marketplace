@@ -76,10 +76,10 @@ export interface AuditLogFilterRequest {
     'actionType'?: AuditLogFilterRequestActionTypeEnum;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof AuditLogFilterRequest
      */
-    'pageOrDefault'?: number;
+    'sortByOrDefault'?: string;
     /**
      * 
      * @type {number}
@@ -88,10 +88,10 @@ export interface AuditLogFilterRequest {
     'sizeOrDefault'?: number;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof AuditLogFilterRequest
      */
-    'sortByOrDefault'?: string;
+    'pageOrDefault'?: number;
     /**
      * 
      * @type {string}

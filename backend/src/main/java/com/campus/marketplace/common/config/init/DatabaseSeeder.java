@@ -74,37 +74,59 @@ public class DatabaseSeeder {
     private static final String DEFAULT_USER_PASSWORD = "password123";
 
     private static final List<DefaultUserSeed> DEFAULT_USERS = List.of(
-            // 💡 学生用户（DEFAULT校区） - 普通活跃用户
-            new DefaultUserSeed("student1", "student1@basui12.shop", "20210001", "13800001011", 120, "DEFAULT"),
-            new DefaultUserSeed("student2", "student2@basui12.shop", "20210002", "13800001012", 100, "DEFAULT"),
-            new DefaultUserSeed("student3", "student3@basui12.shop", "20210003", "13800001013", 80, "DEFAULT"),
-            new DefaultUserSeed("student4", "student4@basui12.shop", "20210004", "13800001014", 150, "DEFAULT"),
-            new DefaultUserSeed("student5", "student5@basui12.shop", "20210005", "13800001015", 200, "DEFAULT"),
+            // 💡 学生用户（DEFAULT校区） - 普通活跃用户（使用真实头像）
+            new DefaultUserSeed("student1", "student1@basui12.shop", "20210001", "13800001011", 120, "DEFAULT",
+                    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("student2", "student2@basui12.shop", "20210002", "13800001012", 100, "DEFAULT",
+                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("student3", "student3@basui12.shop", "20210003", "13800001013", 80, "DEFAULT",
+                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("student4", "student4@basui12.shop", "20210004", "13800001014", 150, "DEFAULT",
+                    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("student5", "student5@basui12.shop", "20210005", "13800001015", 200, "DEFAULT",
+                    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&q=80"),
 
-            // 🏪 卖家用户（NORTH校区） - 活跃卖家
-            new DefaultUserSeed("seller_north", "seller_north@basui12.shop", "20200001", "13800001001", 320, "NORTH"),
-            new DefaultUserSeed("seller_north2", "seller_north2@basui12.shop", "20200003", "13800001004", 280, "NORTH"),
-            new DefaultUserSeed("seller_north3", "seller_north3@basui12.shop", "20200005", "13800001006", 400, "NORTH"),
+            // 🏪 卖家用户（NORTH校区） - 活跃卖家（使用真实头像）
+            new DefaultUserSeed("seller_north", "seller_north@basui12.shop", "20200001", "13800001001", 320, "NORTH",
+                    "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("seller_north2", "seller_north2@basui12.shop", "20200003", "13800001004", 280, "NORTH",
+                    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("seller_north3", "seller_north3@basui12.shop", "20200005", "13800001006", 400, "NORTH",
+                    "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?w=400&h=400&fit=crop&q=80"),
 
-            // 🏪 卖家用户（SOUTH校区） - 活跃卖家
-            new DefaultUserSeed("seller_south", "seller_south@basui12.shop", "20200002", "13800001002", 210, "SOUTH"),
-            new DefaultUserSeed("seller_south2", "seller_south2@basui12.shop", "20200004", "13800001005", 350, "SOUTH"),
-            new DefaultUserSeed("seller_south3", "seller_south3@basui12.shop", "20200006", "13800001007", 180, "SOUTH"),
+            // 🏪 卖家用户（SOUTH校区） - 活跃卖家（使用真实头像）
+            new DefaultUserSeed("seller_south", "seller_south@basui12.shop", "20200002", "13800001002", 210, "SOUTH",
+                    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("seller_south2", "seller_south2@basui12.shop", "20200004", "13800001005", 350, "SOUTH",
+                    "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("seller_south3", "seller_south3@basui12.shop", "20200006", "13800001007", 180, "SOUTH",
+                    "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&h=400&fit=crop&q=80"),
 
-            // 🎓 毕业生买家（DEFAULT校区） - 高信誉买家
-            new DefaultUserSeed("buyer_grad", "buyer_grad@basui12.shop", "20190001", "13800001003", 560, "DEFAULT"),
-            new DefaultUserSeed("buyer_grad2", "buyer_grad2@basui12.shop", "20190002", "13800001008", 420, "DEFAULT"),
+            // 🎓 毕业生买家（DEFAULT校区） - 高信誉买家（使用真实头像）
+            new DefaultUserSeed("buyer_grad", "buyer_grad@basui12.shop", "20190001", "13800001003", 560, "DEFAULT",
+                    "https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("buyer_grad2", "buyer_grad2@basui12.shop", "20190002", "13800001008", 420, "DEFAULT",
+                    "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=400&h=400&fit=crop&q=80"),
 
-            // 🛡️ 管理员用户 - 各职能角色
-            new DefaultUserSeed("security_manager", "security_manager@basui12.shop", null, null, 0, "DEFAULT"),
-            new DefaultUserSeed("content_manager", "content_manager@basui12.shop", null, null, 0, "DEFAULT"),
-            new DefaultUserSeed("operation_manager", "operation_manager@basui12.shop", null, null, 0, "DEFAULT"),
-            new DefaultUserSeed("compliance_officer", "compliance_officer@basui12.shop", null, null, 0, "DEFAULT"),
-            new DefaultUserSeed("campus_manager", "campus_manager@basui12.shop", null, null, 0, "NORTH"),
-            new DefaultUserSeed("category_manager", "category_manager@basui12.shop", null, null, 0, "DEFAULT"),
-            new DefaultUserSeed("rate_limit_manager", "rate_limit_manager@basui12.shop", null, null, 0, "DEFAULT"),
-            new DefaultUserSeed("analyst", "analyst@basui12.shop", null, null, 0, "DEFAULT"),
-            new DefaultUserSeed("support_agent", "support_agent@basui12.shop", null, null, 0, "DEFAULT")
+            // 🛡️ 管理员用户 - 各职能角色（使用真实头像）
+            new DefaultUserSeed("security_manager", "security_manager@basui12.shop", null, null, 0, "DEFAULT",
+                    "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("content_manager", "content_manager@basui12.shop", null, null, 0, "DEFAULT",
+                    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("operation_manager", "operation_manager@basui12.shop", null, null, 0, "DEFAULT",
+                    "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("compliance_officer", "compliance_officer@basui12.shop", null, null, 0, "DEFAULT",
+                    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("campus_manager", "campus_manager@basui12.shop", null, null, 0, "NORTH",
+                    "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("category_manager", "category_manager@basui12.shop", null, null, 0, "DEFAULT",
+                    "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("rate_limit_manager", "rate_limit_manager@basui12.shop", null, null, 0, "DEFAULT",
+                    "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("analyst", "analyst@basui12.shop", null, null, 0, "DEFAULT",
+                    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&q=80"),
+            new DefaultUserSeed("support_agent", "support_agent@basui12.shop", null, null, 0, "DEFAULT",
+                    "https://images.unsplash.com/photo-1554151228-14d9def656e4?w=400&h=400&fit=crop&q=80")
     );
 
     private final RoleRepository roleRepository;
@@ -320,6 +342,7 @@ public class DatabaseSeeder {
                 .password(passwordEncoder.encode("admin123"))
                 .email("admin@basui12.shop")
                 .nickname("系统管理员")
+                .avatar("https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&q=80") // 🖼️ 管理员头像
                 .campusId(defaultCampus != null ? defaultCampus.getId() : null)
                 .status(UserStatus.ACTIVE)
                 .build();
@@ -370,6 +393,7 @@ public class DatabaseSeeder {
                     .phone(seed.phone())
                     .points(seed.points())
                     .campusId(campus.getId())
+                    .avatar(seed.avatar()) // 🖼️ 头像URL
                     .status(UserStatus.ACTIVE)
                     .build();
 
@@ -415,6 +439,7 @@ public class DatabaseSeeder {
      * @param phone       手机号（可选）
      * @param points      初始积分
      * @param campusCode  校区代码
+     * @param avatar      头像URL（可选）
      */
     private record DefaultUserSeed(
             String username,
@@ -422,7 +447,8 @@ public class DatabaseSeeder {
             String studentId,
             String phone,
             Integer points,
-            String campusCode
+            String campusCode,
+            String avatar
     ) {
     }
 
@@ -430,7 +456,7 @@ public class DatabaseSeeder {
 
     /**
      * 初始化商品数据
-     * 🛍️ 为每个卖家创建不同分类的商品
+     * 🛍️ 为每个卖家创建不同分类的商品（使用真实互联网图片）
      *
      * @param campuses 校区映射
      */
@@ -441,7 +467,7 @@ public class DatabaseSeeder {
             return;
         }
 
-        // 📋 获取分类
+        // 📋 获取分类（假设顺序：数码电子、图书教材、运动户外、服饰鞋包、美妆个护、生活用品）
         List<Category> categories = categoryRepository.findAll();
         if (categories.isEmpty()) {
             log.warn("分类数据不存在，无法创建商品");
@@ -450,43 +476,254 @@ public class DatabaseSeeder {
 
         int createdCount = 0;
 
-        // 📱 DEFAULT校区 - student1的商品
+        // ==================== 📱 数码电子类商品 ====================
+        // DEFAULT校区 - student1
         createdCount += createGoodsForUser("student1", categories.get(0).getId(), campuses.get("DEFAULT").getId(),
-                "全新iPhone 14 Pro 256GB", "全新未拆封，深空黑色，支持当面交易", new BigDecimal("5999.00"), GoodsStatus.APPROVED);
-        createdCount += createGoodsForUser("student1", categories.get(1).getId(), campuses.get("DEFAULT").getId(),
-                "高等数学教材（第七版）", "九成新，无笔记无划痕，适合大一新生", new BigDecimal("25.00"), GoodsStatus.APPROVED);
-
-        // 📱 NORTH校区 - seller_north的商品
+                "全新iPhone 14 Pro 256GB", "全新未拆封，深空黑色，支持当面交易，原装配件齐全", new BigDecimal("5999.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1678652197950-91265b8005f3?w=800&h=800&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1678652197950-91265b8005f3?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=800&h=600&fit=crop&q=80"
+                });
+        
+        // NORTH校区 - seller_north
         createdCount += createGoodsForUser("seller_north", categories.get(0).getId(), campuses.get("NORTH").getId(),
-                "MacBook Air M2 2023款", "自用半年，99新，附赠鼠标键盘", new BigDecimal("7800.00"), GoodsStatus.APPROVED);
-        createdCount += createGoodsForUser("seller_north", categories.get(2).getId(), campuses.get("NORTH").getId(),
-                "羽毛球拍（双拍）", "李宁正品，八成新，送12个球", new BigDecimal("180.00"), GoodsStatus.APPROVED);
-        createdCount += createGoodsForUser("seller_north", categories.get(3).getId(), campuses.get("NORTH").getId(),
-                "Nike Air Max 270 运动鞋", "42码，黑白配色，九成新", new BigDecimal("450.00"), GoodsStatus.PENDING);
-
-        // 📱 SOUTH校区 - seller_south的商品
+                "MacBook Air M2 2023款", "自用半年，99新，附赠鼠标键盘，性能强劲", new BigDecimal("7800.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&h=600&fit=crop&q=80"
+                });
+        
         createdCount += createGoodsForUser("seller_south", categories.get(0).getId(), campuses.get("SOUTH").getId(),
-                "iPad Pro 11寸 2022款", "128GB，配Apple Pencil 2代", new BigDecimal("4500.00"), GoodsStatus.APPROVED);
+                "iPad Pro 11寸 2022款", "128GB，配Apple Pencil 2代，适合学习办公", new BigDecimal("4500.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1585790050230-5dd28404f05d?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1561154464-82e9adf32764?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_north2", categories.get(0).getId(), campuses.get("NORTH").getId(),
+                "华为 MatePad Pro 12.6", "8GB+256GB，鸿蒙系统，学习娱乐两不误", new BigDecimal("3200.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1585790050230-5dd28404f05d?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student2", categories.get(0).getId(), campuses.get("DEFAULT").getId(),
+                "小米13 Ultra 白色512GB", "八成新，徕卡三摄拍照神器，电池健康度95%", new BigDecimal("4200.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student3", categories.get(0).getId(), campuses.get("SOUTH").getId(),
+                "AirPods Pro 2代", "九成新，主动降噪，附赠硅胶保护套", new BigDecimal("1280.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_south2", categories.get(0).getId(), campuses.get("SOUTH").getId(),
+                "戴尔 XPS 13 笔记本", "i7-1165G7/16GB/512GB，轻薄便携，适合编程", new BigDecimal("5600.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&h=600&fit=crop&q=80"
+                });
+
+        // ==================== 📚 图书教材类商品 ====================
+        createdCount += createGoodsForUser("student1", categories.get(1).getId(), campuses.get("DEFAULT").getId(),
+                "高等数学教材（第七版）", "九成新，无笔记无划痕，适合大一新生", new BigDecimal("25.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800&h=600&fit=crop&q=80"
+                });
+        
         createdCount += createGoodsForUser("seller_south", categories.get(1).getId(), campuses.get("SOUTH").getId(),
-                "大学英语四级真题集", "全新未使用，包含近5年真题", new BigDecimal("35.00"), GoodsStatus.APPROVED);
-        createdCount += createGoodsForUser("seller_south", categories.get(4).getId(), campuses.get("SOUTH").getId(),
-                "兰蔻小黑瓶精华液", "专柜正品，七成满，保质期至2026年", new BigDecimal("280.00"), GoodsStatus.APPROVED);
+                "大学英语四级真题集", "全新未使用，包含近5年真题，送词汇手册", new BigDecimal("35.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student2", categories.get(1).getId(), campuses.get("DEFAULT").getId(),
+                "数据结构与算法分析（Java版）", "经典教材，有少量笔记批注，不影响阅读", new BigDecimal("42.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_north", categories.get(1).getId(), campuses.get("NORTH").getId(),
+                "经济学原理（曼昆第7版）", "八成新，配套习题册一起出售", new BigDecimal("68.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student3", categories.get(1).getId(), campuses.get("SOUTH").getId(),
+                "计算机网络（谢希仁第8版）", "全新，买错版本了，适合计算机专业学生", new BigDecimal("38.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&h=600&fit=crop&q=80"
+                });
 
-        // 📱 更多卖家的商品
-        createdCount += createGoodsForUser("seller_north2", categories.get(5).getId(), campuses.get("NORTH").getId(),
-                "宿舍小冰箱", "海尔品牌，使用1年，制冷效果好", new BigDecimal("320.00"), GoodsStatus.APPROVED);
+        // ==================== 🏃 运动户外类商品 ====================
+        createdCount += createGoodsForUser("seller_north", categories.get(2).getId(), campuses.get("NORTH").getId(),
+                "羽毛球拍（双拍）", "李宁正品，八成新，送12个球，适合校内运动", new BigDecimal("180.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1593786481097-5b5e2e6d3b1f?w=800&h=600&fit=crop&q=80"
+                });
+        
         createdCount += createGoodsForUser("seller_south2", categories.get(2).getId(), campuses.get("SOUTH").getId(),
-                "山地自行车", "捷安特，21速变速，适合校园代步", new BigDecimal("580.00"), GoodsStatus.APPROVED);
+                "山地自行车", "捷安特，21速变速，适合校园代步和周末骑行", new BigDecimal("580.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student1", categories.get(2).getId(), campuses.get("DEFAULT").getId(),
+                "瑜伽垫套装", "8mm加厚防滑，送瑜伽砖和拉力带", new BigDecimal("88.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_north2", categories.get(2).getId(), campuses.get("NORTH").getId(),
+                "哑铃套装 20KG", "可调节重量，宿舍健身神器", new BigDecimal("150.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student2", categories.get(2).getId(), campuses.get("DEFAULT").getId(),
+                "篮球 斯伯丁74-602Y", "九成新，室内外通用，手感很好", new BigDecimal("120.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1608245449230-4ac19066d2d0?w=800&h=600&fit=crop&q=80"
+                });
 
-        log.info("已创建 {} 件商品", createdCount);
+        // ==================== 👕 服饰鞋包类商品 ====================
+        createdCount += createGoodsForUser("seller_north", categories.get(3).getId(), campuses.get("NORTH").getId(),
+                "Nike Air Max 270 运动鞋", "42码，黑白配色，九成新，适合日常穿搭", new BigDecimal("450.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student3", categories.get(3).getId(), campuses.get("SOUTH").getId(),
+                "Adidas 三叶草卫衣", "M码，黑色经典款，99新基本没穿", new BigDecimal("280.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_south", categories.get(3).getId(), campuses.get("SOUTH").getId(),
+                "New Balance 574 复古跑鞋", "US8码，灰色经典款，八成新", new BigDecimal("320.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1539185441755-769473a23570?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student1", categories.get(3).getId(), campuses.get("DEFAULT").getId(),
+                "优衣库羽绒服", "女款S码，红色，保暖效果好", new BigDecimal("380.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1548883354-7622d03aca27?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_north2", categories.get(3).getId(), campuses.get("NORTH").getId(),
+                "双肩包 北面背包", "30L容量，适合通勤和短途旅行", new BigDecimal("420.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&h=600&fit=crop&q=80"
+                });
+
+        // ==================== 💄 美妆个护类商品 ====================
+        createdCount += createGoodsForUser("seller_south", categories.get(4).getId(), campuses.get("SOUTH").getId(),
+                "兰蔻小黑瓶精华液", "专柜正品，七成满，保质期至2026年", new BigDecimal("280.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student2", categories.get(4).getId(), campuses.get("DEFAULT").getId(),
+                "雅诗兰黛红石榴套装", "洗面奶+水+乳液，九成新", new BigDecimal("480.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student3", categories.get(4).getId(), campuses.get("SOUTH").getId(),
+                "飞利浦电动牙刷", "钻石系列，使用半年，送4个刷头", new BigDecimal("350.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_north", categories.get(4).getId(), campuses.get("NORTH").getId(),
+                "MAC口红套装", "5支正品口红，各色号齐全，八成新", new BigDecimal("520.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?w=800&h=600&fit=crop&q=80"
+                });
+
+        // ==================== 🏠 生活用品类商品 ====================
+        createdCount += createGoodsForUser("seller_north2", categories.get(5).getId(), campuses.get("NORTH").getId(),
+                "宿舍小冰箱", "海尔品牌，使用1年，制冷效果好，静音", new BigDecimal("320.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student1", categories.get(5).getId(), campuses.get("DEFAULT").getId(),
+                "小米台灯 1S", "护眼台灯，三档调光，适合学习", new BigDecimal("98.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1541280910158-c4e14f9c94a3?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_south2", categories.get(5).getId(), campuses.get("SOUTH").getId(),
+                "蓝牙音箱 JBL Flip5", "防水便携，音质出色，户外必备", new BigDecimal("480.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student2", categories.get(5).getId(), campuses.get("DEFAULT").getId(),
+                "美的电热水壶", "1.7L大容量，304不锈钢，快速烧水", new BigDecimal("65.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1595981234030-d316fc2c8161?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("seller_north", categories.get(5).getId(), campuses.get("NORTH").getId(),
+                "宜家收纳箱套装", "3个大号收纳箱，宿舍整理必备", new BigDecimal("120.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1600096194534-95cf5ece04cf?w=800&h=600&fit=crop&q=80"
+                });
+        
+        createdCount += createGoodsForUser("student3", categories.get(5).getId(), campuses.get("SOUTH").getId(),
+                "戴森吹风机 HD03", "九成新，三档风速，护发不毛躁", new BigDecimal("1580.00"), GoodsStatus.APPROVED,
+                new String[]{
+                        "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=800&h=600&fit=crop&q=80",
+                        "https://images.unsplash.com/photo-1621609764180-2ca554a9d6f2?w=800&h=600&fit=crop&q=80"
+                });
+
+        log.info("已创建 {} 件商品（包含真实互联网图片URL）", createdCount);
     }
 
     /**
-     * 为指定用户创建商品
+     * 为指定用户创建商品（支持图片）
      * 🎯 辅助方法，减少重复代码
      */
     private int createGoodsForUser(String username, Long categoryId, Long campusId,
-                                   String title, String description, BigDecimal price, GoodsStatus status) {
+                                   String title, String description, BigDecimal price, GoodsStatus status,
+                                   String[] images) {
         return userRepository.findByUsername(username).map(seller -> {
             // 🎯 计算原价（如果有折扣）
             BigDecimal originalPrice = null;
@@ -534,6 +771,7 @@ public class DatabaseSeeder {
                     .sellerId(seller.getId())
                     .campusId(campusId)
                     .status(status)
+                    .images(images)  // 🖼️ 商品图片URL数组
                     .viewCount(0)
                     .favoriteCount(0)
                     .stock(stock)  // ✅ 新增：库存

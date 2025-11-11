@@ -172,13 +172,13 @@ export interface Order {
      * @type {boolean}
      * @memberof Order
      */
-    'paid'?: boolean;
+    'pendingPayment'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof Order
      */
-    'pendingPayment'?: boolean;
+    'paid'?: boolean;
 }
 
 export const OrderStatusEnum = {

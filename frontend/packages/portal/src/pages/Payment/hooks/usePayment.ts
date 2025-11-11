@@ -1,13 +1,12 @@
 /**
- * /Ø¶¡Hook
+ * /Ø¶ï¿½Hook
  * @author BaSui =
- * @description /Ø¶åâWebSocketžöô°
+ * @description /Ø¶ï¿½ï¿½WebSocketï¿½ï¿½ï¿½ï¿½
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { orderService } from '../../../../shared/src/services/order';
-import { websocketService } from '../../../../shared/src/services/websocket';
+import { Services } from '@campus/shared';
 import { validateOrderNo } from '../utils/paymentUtils';
 
 interface UsePaymentOptions {
@@ -20,7 +19,7 @@ export const usePayment = (options: UsePaymentOptions) => {
   const [status, setStatus] = useState<string>('PENDING');
   const [error, setError] = useState<string | null>(null);
 
-  // /Ø¶åâ
+  // /Ø¶ï¿½ï¿½
   const {
     data: paymentStatus,
     isLoading,
@@ -28,43 +27,44 @@ export const usePayment = (options: UsePaymentOptions) => {
     error: queryError
   } = useQuery({
     queryKey: ['payment-status', options.orderNo],
-    queryFn: () => orderService.queryPaymentStatus(options.orderNo),
+    queryFn: () => Services.orderService.queryPaymentStatus(options.orderNo),
     refetchInterval: options.autoPoll ? 3000 : false,
     enabled: !!options.orderNo && validateOrderNo(options.orderNo),
     staleTime: 1000,
   });
 
-  // WebSocketžöô°
+  // WebSocketï¿½ï¿½ï¿½ï¿½
   useEffect(() => {
+    // TODO: WebSocketåŠŸèƒ½æš‚æ—¶ç¦ç”¨ï¼Œç­‰å¾… websocketService å®žçŽ°
     if (!options.websocketEnabled) return;
 
-    const handleOrderUpdate = (data: any) => {
-      if (data.orderNo === options.orderNo) {
-        setStatus(data.status);
-        refetch();
-      }
-    };
+    // const handleOrderUpdate = (data: any) => {
+    //   if (data.orderNo === options.orderNo) {
+    //     setStatus(data.status);
+    //     refetch();
+    //   }
+    // };
 
-    websocketService.onOrderUpdate(handleOrderUpdate);
+    // Services.websocketService.onOrderUpdate(handleOrderUpdate);
 
-    // nÝWebSocketòÞ¥
-    if (!websocketService.isConnected()) {
-      websocketService.connect();
-    }
+    // // nï¿½WebSocketï¿½Þ¥
+    // if (!Services.websocketService.isConnected()) {
+    //   Services.websocketService.connect();
+    // }
 
-    return () => {
-      websocketService.offOrderUpdate(handleOrderUpdate);
-    };
+    // return () => {
+    //   Services.websocketService.offOrderUpdate(handleOrderUpdate);
+    // };
   }, [options.orderNo, options.websocketEnabled, refetch]);
 
-  // ï
+  // ï¿½
   useEffect(() => {
     if (queryError) {
-      setError(queryError.message || 'åâ/Ø¶1%');
+      setError(queryError.message || 'ï¿½ï¿½/Ø¶1%');
     }
   }, [queryError]);
 
-  // K¨7°¶
+  // Kï¿½7ï¿½ï¿½
   const refreshStatus = useCallback(() => {
     setError(null);
     refetch();

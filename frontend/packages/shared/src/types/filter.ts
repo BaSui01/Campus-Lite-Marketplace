@@ -47,8 +47,8 @@ export interface FilterConfig<V = any> {
   field: string;
   /** 显示标签 */
   label: string;
-  /** 占位符 */
-  placeholder?: string;
+  /** 占位符（dateRange 类型时需要传 [string, string]） */
+  placeholder?: string | [string, string];
   /** 选项列表（select/multiSelect/radio/checkbox 类型必填） */
   options?: FilterOption<V>[];
   /** 默认值 */

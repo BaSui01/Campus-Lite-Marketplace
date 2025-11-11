@@ -45,15 +45,16 @@ export const OrderCreate: React.FC = () => {
   // 创建订单
   const createOrderMutation = useMutation({
     mutationFn: async () => {
+      // 🔧 BaSui: 只传递后端需要的字段（goodsId 和 couponId）
       const response = await orderService.createOrder({
         goodsId,
-        ...addressInfo,
+        // couponId 如需支持优惠券，在此传递
       });
       return response;
     },
-    onSuccess: (data) => {
-      // 跳转到支付页面
-      navigate(`/payment?orderNo=${data.orderNo}`);
+    onSuccess: (orderNo) => {
+      // 🎯 直接跳转到支付页面（订单号在响应中）
+      navigate(`/payment?orderNo=${orderNo}`);
     },
     onError: (error: any) => {
       setErrors({ submit: error?.message || '创建订单失败，请重试' });

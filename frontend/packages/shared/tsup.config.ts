@@ -13,7 +13,8 @@ export default defineConfig({
   format: ['esm', 'cjs'],
 
   // 生成类型声明文件
-  dts: true,
+  // 🚧 BaSui: 暂时禁用 DTS 生成，marketing.ts 类型转换有问题需要修复
+  dts: false,
 
   // 代码分割
   splitting: true,

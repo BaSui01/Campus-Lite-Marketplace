@@ -52,13 +52,24 @@ public class TestRedisConfig {
     }
 
     /**
-     * 提供Mock的RedisTemplate
+     * 提供Mock的RedisTemplate<String, Object>
      */
     @Bean
     @Primary
     @ConditionalOnMissingBean
     @SuppressWarnings("unchecked") // Mock返回原始类型，需要抑制类型安全警告
     public RedisTemplate<String, Object> redisTemplate() {
+        return mock(RedisTemplate.class);
+    }
+
+    /**
+     * 提供Mock的RedisTemplate<String, String>（用于CaptchaService等）
+     */
+    @Bean(name = "stringStringRedisTemplate")
+    @Primary
+    @ConditionalOnMissingBean(name = "stringStringRedisTemplate")
+    @SuppressWarnings("unchecked")
+    public RedisTemplate<String, String> stringStringRedisTemplate() {
         return mock(RedisTemplate.class);
     }
 }

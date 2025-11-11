@@ -31,7 +31,6 @@ import {
   Image,
   Divider,
   App,
-  Modal,
 } from 'antd';
 import {
   ArrowLeftOutlined,

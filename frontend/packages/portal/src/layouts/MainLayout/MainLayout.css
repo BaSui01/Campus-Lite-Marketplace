@@ -176,6 +176,7 @@
 
 .main-layout__logo {
   display: flex;
+  flex-direction: row; /* 明确指定横向排列 */
   align-items: center;
   gap: 14px;
   text-decoration: none;
@@ -186,7 +187,8 @@
   padding: 10px 16px;
   border-radius: var(--radius-lg);
   position: relative;
-  overflow: hidden;
+  flex-shrink: 0; /* 防止被压缩 */
+  /* 移除 overflow: hidden，避免裁剪 emoji */
 }
 
 /* Logo悬浮效果 - 渐变光晕 */
@@ -198,6 +200,8 @@
   opacity: 0;
   transition: opacity var(--transition-base);
   border-radius: var(--radius-lg);
+  /* 确保背景层在内容下方 */
+  z-index: 0;
 }
 
 .main-layout__logo:hover::before {
@@ -214,6 +218,8 @@
   transition: all var(--transition-base);
   position: relative;
   z-index: 1;
+  flex-shrink: 0; /* 防止emoji被压缩 */
+  line-height: 1; /* 确保emoji垂直居中 */
 }
 
 .main-layout__logo:hover .main-layout__logo-icon {
@@ -231,7 +237,10 @@
   letter-spacing: -0.5px;
   position: relative;
   z-index: 1;
-  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+  white-space: nowrap; /* 防止文字换行 */
+  display: inline-block; /* 确保渐变背景正确显示 */
+  line-height: 1.2; /* 设置合适的行高 */
+  flex-shrink: 0; /* 防止文字被压缩 */
 }
 
 /* 移动端菜单按钮 */

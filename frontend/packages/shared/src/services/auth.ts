@@ -91,7 +91,7 @@ export class AuthService {
       return { code: 200, message: '登出成功', data: undefined } as ApiResponse<void>;
     }
 
-    const response = await this.api.logout(`Bearer ${token}`);
+    const response = await this.api.logout({ authorization: `Bearer ${token}` });
     return response.data as ApiResponse<void>;
   }
 
@@ -287,7 +287,7 @@ export class AuthService {
   async check2FAStatus(): Promise<ApiResponse<boolean>> {
     // ✅ 使用 OpenAPI 生成的 check2FAStatus 方法
     const response = await this.api.check2FAStatus();
-    return response.data as ApiResponse<boolean>;
+    return response.data as unknown as ApiResponse<boolean>;
   }
 }
 

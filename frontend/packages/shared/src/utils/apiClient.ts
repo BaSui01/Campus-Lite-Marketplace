@@ -231,7 +231,7 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
     getRefreshToken: getRefreshTokenInternal,
     setTokens,
     clearTokens,
-    refreshEndpoint: joinWithBaseUrl(API_BASE_URL, '/api/auth/refresh'),
+    refreshEndpoint: joinWithBaseUrl(API_BASE_URL, '/auth/refresh'), // 🔧 BaSui 修复：API_BASE_URL 已包含 /api，避免重复
     onRefreshFailed: () => {
       // 🎯 智能判断登录路径：管理端跳转到 /admin/login，门户端跳转到 /login
       const currentPath = window.location.pathname;

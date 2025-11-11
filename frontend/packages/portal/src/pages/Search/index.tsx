@@ -83,7 +83,7 @@ const Search: React.FC = () => {
   const [postTotal, setPostTotal] = useState(0);
 
   // 分页
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [pageSize] = useState(20);
 
   // ==================== 数据加载 ====================
@@ -130,7 +130,7 @@ const Search: React.FC = () => {
         page,
         size: pageSize,
         sortBy: sortType === 'newest' ? 'createdAt' : sortType === 'price_asc' ? 'price' : sortType === 'price_desc' ? 'price' : undefined,
-        sortDirection: sortType === 'price_asc' ? 'asc' : 'desc',
+        sortDirection: sortType === 'price_asc' ? 'ASC' : 'DESC',
       });
 
       setGoodsResults(response.content || []);
@@ -390,7 +390,7 @@ const Search: React.FC = () => {
    * 处理搜索输入
    */
   const handleSearch = () => {
-    setPage(1);
+    setPage(0);
     setShowHistory(false);
     saveToHistory(keyword); // 🌟 保存搜索历史
     performSearch();
@@ -410,7 +410,7 @@ const Search: React.FC = () => {
    */
   const handleTypeChange = (value: string) => {
     setSearchType(value as SearchType);
-    setPage(1);
+    setPage(0);
   };
 
   /**
@@ -452,20 +452,32 @@ const Search: React.FC = () => {
    * 💰 应用价格筛选
    */
   const handleApplyPriceFilter = () => {
-    const min = minPriceInput.trim() ? parseFloat(minPriceInput) : undefined;
-    const max = maxPriceInput.trim() ? parseFloat(maxPriceInput) : undefined;
+    const minInput = minPriceInput.trim();
+    const maxInput = maxPriceInput.trim();
 
-    // 验证价格输入
+    // 空输入直接清除价格筛选
+    if (!minInput && !maxInput) {
+      handleClearPriceFilter();
+      return;
+    }
+
+    const min = minInput ? parseFloat(minInput) : undefined;
+    const max = maxInput ? parseFloat(maxInput) : undefined;
+
+    // 价格验证
     if (min !== undefined && (isNaN(min) || min < 0)) {
       console.warn('[Search] 💰 最低价格无效:', minPriceInput);
+      alert('❌ 最低价格必须为非负数！');
       return;
     }
     if (max !== undefined && (isNaN(max) || max < 0)) {
       console.warn('[Search] 💰 最高价格无效:', maxPriceInput);
+      alert('❌ 最高价格必须为非负数！');
       return;
     }
     if (min !== undefined && max !== undefined && min > max) {
       console.warn('[Search] 💰 最低价格不能大于最高价格');
+      alert('❌ 最低价格不能大于最高价格！\n请调整价格范围后重试。');
       return;
     }
 

@@ -62,23 +62,33 @@ export const GoodsFilter: React.FC<GoodsFilterProps> = ({
 
   // 处理价格筛选应用
   const handleApplyPrice = () => {
-    const min = minPriceInput.trim() ? parseFloat(minPriceInput) : undefined;
-    const max = maxPriceInput.trim() ? parseFloat(maxPriceInput) : undefined;
+    const minInput = minPriceInput.trim();
+    const maxInput = maxPriceInput.trim();
+    
+    // 空输入直接清除价格筛选
+    if (!minInput && !maxInput) {
+      handleClearPrice();
+      return;
+    }
 
-    // 验证价格
+    const min = minInput ? parseFloat(minInput) : undefined;
+    const max = maxInput ? parseFloat(maxInput) : undefined;
+
+    // 价格验证
     if (min !== undefined && (isNaN(min) || min < 0)) {
-      alert('请输入有效的最低价格');
+      alert('❌ 最低价格必须为非负数！');
       return;
     }
     if (max !== undefined && (isNaN(max) || max < 0)) {
-      alert('请输入有效的最高价格');
+      alert('❌ 最高价格必须为非负数！');
       return;
     }
     if (min !== undefined && max !== undefined && min > max) {
-      alert('最低价格不能大于最高价格');
+      alert('❌ 最低价格不能大于最高价格！\n请调整价格范围后重试。');
       return;
     }
 
+    // 应用筛选
     onFilterChange({ minPrice: min, maxPrice: max });
   };
 

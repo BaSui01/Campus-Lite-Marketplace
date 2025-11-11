@@ -29,7 +29,6 @@ import {
   Image,
   Descriptions,
   App,
-  Modal,
 } from 'antd';
 import {
   CheckOutlined,

@@ -155,7 +155,9 @@ public class RedisCacheConfig {
     /**
      * Sort.Order 的 Jackson MixIn 类
      * 🎯 解决 "Cannot construct instance of Sort$Order (no Creators)" 错误
+     * 🔧 添加 @JsonIgnoreProperties 忽略未知字段（例如旧版本缓存中的 "ascending"）
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class SortOrderMixin {
         @JsonCreator
         SortOrderMixin(

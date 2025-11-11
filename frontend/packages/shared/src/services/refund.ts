@@ -91,11 +91,16 @@ export class RefundService {
    */
   async listMyRefunds(params?: RefundListParams): Promise<ApiResponse<PageInfo<Refund>>> {
     const api = getApi();
-    const response = await api.listMyRefunds({
-      page: params?.page,
-      size: params?.size,
+    // ✅ 构造完整的 RefundFilterRequest 对象
+    const filterRequest = {
+      page: params?.page ?? 0,
+      size: params?.size ?? 20,
       status: params?.status as any,
-    });
+      keyword: params?.keyword,
+      startTime: params?.startDate,
+      endTime: params?.endDate,
+    };
+    const response = await api.listMyRefunds({ filterRequest });
     return response.data as ApiResponse<PageInfo<Refund>>;
   }
 
@@ -106,12 +111,16 @@ export class RefundService {
    */
   async listRefunds(params?: RefundListParams): Promise<ApiResponse<PageInfo<Refund>>> {
     const api = getApi();
-    const response = await api.listAllRefunds({
-      page: params?.page,
-      size: params?.size,
+    // ✅ 构造完整的 RefundFilterRequest 对象
+    const filterRequest = {
+      page: params?.page ?? 0,
+      size: params?.size ?? 20,
       status: params?.status as any,
       keyword: params?.keyword,
-    });
+      startTime: params?.startDate,
+      endTime: params?.endDate,
+    };
+    const response = await api.listAllRefunds({ filterRequest });
     return response.data as ApiResponse<PageInfo<Refund>>;
   }
 

@@ -1,6 +1,5 @@
 package com.campus.marketplace.service;
 
-import com.campus.marketplace.common.dto.request.SlideVerifyRequest;
 import com.campus.marketplace.common.dto.response.CaptchaResponse;
 import com.campus.marketplace.common.dto.response.SlideCaptchaResponse;
 
@@ -52,27 +51,13 @@ public interface CaptchaService {
     boolean verifySlideCaptcha(String slideId, int userPosition);
 
     /**
-     * 验证滑块验证码（完整版本，包含轨迹分析）
-     *
-     * @param request 滑块验证请求（包含滑块ID、位置、轨迹）
-     * @return 验证是否通过
-     */
-    boolean verifySlideCaptchaWithTrack(SlideVerifyRequest request);
-
-    /**
      * 生成旋转验证码
      *
      * @return 旋转验证码响应（包含原始图片、旋转后的图片）
      */
     com.campus.marketplace.common.dto.response.RotateCaptchaResponse generateRotateCaptcha();
 
-    /**
-     * 验证旋转验证码
-     *
-     * @param request 旋转验证请求（包含旋转验证码ID、用户旋转的角度）
-     * @return 验证是否通过
-     */
-    boolean verifyRotateCaptcha(com.campus.marketplace.common.dto.request.RotateVerifyRequest request);
+
 
     /**
      * 生成点选验证码
@@ -81,13 +66,7 @@ public interface CaptchaService {
      */
     com.campus.marketplace.common.dto.response.ClickCaptchaResponse generateClickCaptcha();
 
-    /**
-     * 验证点选验证码
-     *
-     * @param request 点选验证请求（包含点选验证码ID、用户点击的坐标）
-     * @return 验证是否通过
-     */
-    boolean verifyClickCaptcha(com.campus.marketplace.common.dto.request.ClickVerifyRequest request);
+
 
     /**
      * 统一验证码验证接口（支持四种验证码类型）

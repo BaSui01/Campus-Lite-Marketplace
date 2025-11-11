@@ -1,0 +1,96 @@
+/**
+ * 支付方式选择器样式
+ */
+
+.payment-method-selector {
+  margin-bottom: 2rem;
+}
+
+.selector-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.method-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.method-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: #f7fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.method-item:hover:not(.disabled) {
+  border-color: #667eea;
+  background: #edf2f7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.method-item.selected {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.method-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.method-icon {
+  font-size: 2rem;
+  margin-right: 1rem;
+}
+
+.method-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.method-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.method-badge {
+  padding: 0.25rem 0.5rem;
+  background: #fbd38d;
+  color: #744210;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.method-check {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #667eea;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  font-size: 0.875rem;
+}

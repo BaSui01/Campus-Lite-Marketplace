@@ -239,7 +239,7 @@ const NotificationSettingsPage: React.FC = () => {
               <label className="toggle-switch">
                 <input
                   type="checkbox"
-                  checked={preferences.order}
+                  checked={localSettings.order}
                   onChange={() => handleToggle('order')}
                 />
                 <span className="slider"></span>
@@ -257,7 +257,7 @@ const NotificationSettingsPage: React.FC = () => {
               <label className="toggle-switch">
                 <input
                   type="checkbox"
-                  checked={preferences.social}
+                  checked={localSettings.social}
                   onChange={() => handleToggle('social')}
                 />
                 <span className="slider"></span>
@@ -275,7 +275,7 @@ const NotificationSettingsPage: React.FC = () => {
               <label className="toggle-switch">
                 <input
                   type="checkbox"
-                  checked={preferences.priceAlert}
+                  checked={localSettings.priceAlert}
                   onChange={() => handleToggle('priceAlert')}
                 />
                 <span className="slider"></span>
@@ -293,7 +293,7 @@ const NotificationSettingsPage: React.FC = () => {
               <label className="toggle-switch">
                 <input
                   type="checkbox"
-                  checked={preferences.followUpdate}
+                  checked={localSettings.followUpdate}
                   onChange={() => handleToggle('followUpdate')}
                 />
                 <span className="slider"></span>
@@ -319,7 +319,7 @@ const NotificationSettingsPage: React.FC = () => {
               <label className="toggle-switch">
                 <input
                   type="checkbox"
-                  checked={preferences.email}
+                  checked={localSettings.email}
                   onChange={() => handleToggle('email')}
                 />
                 <span className="slider"></span>
@@ -337,7 +337,7 @@ const NotificationSettingsPage: React.FC = () => {
               <label className="toggle-switch">
                 <input
                   type="checkbox"
-                  checked={preferences.webPush}
+                  checked={localSettings.webPush}
                   onChange={() => handleToggle('webPush')}
                 />
                 <span className="slider"></span>

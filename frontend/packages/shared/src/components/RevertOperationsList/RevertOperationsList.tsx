@@ -4,7 +4,7 @@
  * @description 展示用户可以撤销的操作列表（表格形式）
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Table, type TableColumn } from '../Table';
 import { Button } from '../Button';
 import { Tag, type TagColor } from '../Tag';
@@ -13,8 +13,7 @@ import { Pagination } from '../Pagination';
 import { Loading } from '../Loading';
 import { Empty } from '../Empty';
 import type { 
-  RevertRequest, 
-  RevertRequestStatus 
+  RevertRequestStatus,
 } from '../../types/revert';
 import './RevertOperationsList.css';
 
@@ -379,19 +378,10 @@ export const RevertOperationsList: React.FC<RevertOperationsListProps> = ({
             total={total}
             onChange={handlePaginationChange}
             showSizeChanger
-            showTotal={(total) => `共 ${total} 条记录`}
+            showTotal={true}
           />
         </div>
       )}
     </div>
   );
-};
-
-// 类型导出
-export type { 
-  RevertableOperation, 
-  RevertListParams, 
-  RevertListResponse,
-  EntityType,
-  ActionType
 };

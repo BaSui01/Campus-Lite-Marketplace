@@ -50,4 +50,27 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      */
     @org.springframework.data.jpa.repository.Query("SELECT AVG(r.rating) FROM Review r WHERE r.sellerId = :sellerId AND r.status = 'APPROVED'")
     Double getAverageRatingBySellerId(@org.springframework.data.repository.query.Param("sellerId") Long sellerId);
+    
+    /**
+     * 根据商品ID和状态查询评价（分页）
+     * 通过子查询关联订单表获取商品ID
+     */
+    @org.springframework.data.jpa.repository.Query("SELECT r FROM Review r WHERE r.orderId IN (SELECT o.id FROM Order o WHERE o.goodsId = :goodsId) AND r.status = :status")
+    Page<Review> findByOrderGoodsIdAndStatus(
+        @org.springframework.data.repository.query.Param("goodsId") Long goodsId,
+        @org.springframework.data.repository.query.Param("status") ReviewStatus status,
+        Pageable pageable
+    );
+    
+    /**
+     * 根据商品ID、评分和状态查询评价（分页）
+     * 通过子查询关联订单表获取商品ID
+     */
+    @org.springframework.data.jpa.repository.Query("SELECT r FROM Review r WHERE r.orderId IN (SELECT o.id FROM Order o WHERE o.goodsId = :goodsId) AND r.rating = :rating AND r.status = :status")
+    Page<Review> findByOrderGoodsIdAndRatingAndStatus(
+        @org.springframework.data.repository.query.Param("goodsId") Long goodsId,
+        @org.springframework.data.repository.query.Param("rating") Integer rating,
+        @org.springframework.data.repository.query.Param("status") ReviewStatus status,
+        Pageable pageable
+    );
 }

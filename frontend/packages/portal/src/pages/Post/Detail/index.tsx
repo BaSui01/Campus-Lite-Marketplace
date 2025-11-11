@@ -1,0 +1,650 @@
+/**
+ * 帖子详情页 - 深入了解帖子内容！📰
+ * @author BaSui 😎
+ * @description 帖子完整内容、作者信息、点赞评论、相关推荐
+ * @created 2025-11-11 - 复用 Community 页面组件和逻辑
+ */
+
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button, Skeleton, Modal, Input } from '@campus/shared/components';
+import { postService, communityService } from '@campus/shared/services';
+import { useAuthStore, useNotificationStore } from '../../../store';
+import './PostDetail.css';
+
+// ==================== 类型定义 ====================
+
+interface PostDetail {
+  id: number;
+  title: string;
+  content: string;
+  authorId: number;
+  authorName: string;
+  authorAvatar?: string;
+  images?: string[];
+  likeCount: number;
+  collectCount: number;
+  viewCount: number;
+  replyCount: number;
+  isLiked: boolean;
+  isCollected: boolean;
+  createdAt: string;
+  status: string;
+}
+
+interface Comment {
+  commentId: string;
+  postId: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string;
+  content: string;
+  createdAt: string;
+}
+
+/**
+ * 帖子详情页组件
+ */
+const PostDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const toast = useNotificationStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  // ==================== 状态管理 ====================
+
+  const [post, setPost] = useState<PostDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // 评论相关
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentContent, setCommentContent] = useState('');
+  const [commenting, setCommenting] = useState(false);
+
+  // 相关推荐
+  const [relatedPosts, setRelatedPosts] = useState<PostDetail[]>([]);
+  const [relatedLoading, setRelatedLoading] = useState(false);
+
+  // 图片预览
+  const [showImagePreview, setShowImagePreview] = useState(false);
+  const [previewImageIndex, setPreviewImageIndex] = useState(0);
+
+  // ==================== 数据加载 ====================
+
+  /**
+   * 加载帖子详情
+   */
+  const loadPostDetail = async () => {
+    if (!id) {
+      setError('帖子 ID 不能为空！😰');
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 🚀 调用真实后端 API 获取帖子详情
+      const postData = await postService.getPostById(Number(id));
+
+      // 转换数据格式
+      const detailPost: PostDetail = {
+        id: postData.id,
+        title: postData.title || '',
+        content: postData.content,
+        authorId: postData.authorId,
+        authorName: postData.authorName || '未知用户',
+        authorAvatar: postData.authorAvatar,
+        images: postData.images || [],
+        likeCount: postData.likeCount || 0,
+        collectCount: postData.collectCount || 0,
+        viewCount: postData.viewCount || 0,
+        replyCount: postData.replyCount || 0,
+        isLiked: postData.isLiked || false,
+        isCollected: postData.isCollected || false,
+        createdAt: postData.createdAt || postData.createTime || new Date().toISOString(),
+        status: postData.status || 'APPROVED',
+      };
+
+      setPost(detailPost);
+
+      // 加载评论和相关推荐
+      loadComments(Number(id));
+      loadRelatedPosts();
+    } catch (err: any) {
+      console.error('加载帖子详情失败：', err);
+      setError(err.response?.data?.message || '加载帖子详情失败，请稍后重试！😭');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * 加载评论列表
+   */
+  const loadComments = async (postId: number) => {
+    setCommentsLoading(true);
+
+    try {
+      // 🚀 调用真实后端 API 获取评论列表
+      const response = await postService.getReplies(postId, { page: 0, size: 100 });
+
+      if (response.success && response.data) {
+        const apiComments: Comment[] = response.data.content.map((c: any) => ({
+          commentId: String(c.id),
+          postId: String(postId),
+          authorId: String(c.userId),
+          authorName: c.userName || '未知用户',
+          authorAvatar: c.userAvatar,
+          content: c.content,
+          createdAt: c.createTime || c.createdAt,
+        }));
+
+        setComments(apiComments);
+      }
+    } catch (err: any) {
+      console.error('加载评论失败：', err);
+      // 不显示错误提示，静默失败
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+
+  /**
+   * 加载相关推荐帖子（最新帖子）
+   */
+  const loadRelatedPosts = async () => {
+    setRelatedLoading(true);
+
+    try {
+      // 🚀 调用真实后端 API 获取推荐帖子
+      const response = await postService.getPosts({
+        page: 0,
+        size: 5,
+        sortBy: 'createdAt',
+        sortDirection: 'DESC',
+      });
+
+      if (response.success && response.data) {
+        const posts: PostDetail[] = response.data.content
+          .filter((p: any) => p.id !== Number(id)) // 排除当前帖子
+          .slice(0, 4) // 取前4个
+          .map((p: any) => ({
+            id: p.id,
+            title: p.title || '',
+            content: p.content,
+            authorId: p.userId,
+            authorName: p.userName || '未知用户',
+            authorAvatar: p.userAvatar,
+            images: p.images || [],
+            likeCount: p.likeCount || 0,
+            collectCount: p.collectCount || 0,
+            viewCount: p.viewCount || 0,
+            replyCount: p.commentCount || 0,
+            isLiked: p.isLiked || false,
+            isCollected: p.isCollected || false,
+            createdAt: p.createTime || p.createdAt,
+            status: p.status || 'APPROVED',
+          }));
+
+        setRelatedPosts(posts);
+      }
+    } catch (err: any) {
+      console.error('加载推荐帖子失败：', err);
+      // 不显示错误提示
+    } finally {
+      setRelatedLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPostDetail();
+  }, [id]);
+
+  // ==================== 事件处理 ====================
+
+  /**
+   * 点赞/取消点赞
+   */
+  const handleToggleLike = async () => {
+    if (!isAuthenticated) {
+      toast.warning('请先登录！😰');
+      navigate('/login');
+      return;
+    }
+
+    if (!post) return;
+
+    try {
+      // 乐观更新 UI
+      const newIsLiked = !post.isLiked;
+      const newLikeCount = newIsLiked ? post.likeCount + 1 : post.likeCount - 1;
+
+      setPost({
+        ...post,
+        isLiked: newIsLiked,
+        likeCount: newLikeCount,
+      });
+
+      // 🚀 调用真实后端 API
+      if (post.isLiked) {
+        await communityService.unlikePost(post.id);
+        toast.success('取消点赞成功！👋');
+      } else {
+        await communityService.likePost(post.id);
+        toast.success('点赞成功！❤️');
+      }
+    } catch (err: any) {
+      console.error('点赞操作失败：', err);
+      toast.error(err.response?.data?.message || '操作失败！😭');
+
+      // 回滚 UI
+      setPost(post);
+    }
+  };
+
+  /**
+   * 收藏/取消收藏
+   */
+  const handleToggleCollect = async () => {
+    if (!isAuthenticated) {
+      toast.warning('请先登录！😰');
+      navigate('/login');
+      return;
+    }
+
+    if (!post) return;
+
+    try {
+      // 乐观更新 UI
+      const newIsCollected = !post.isCollected;
+      const newCollectCount = newIsCollected ? post.collectCount + 1 : post.collectCount - 1;
+
+      setPost({
+        ...post,
+        isCollected: newIsCollected,
+        collectCount: newCollectCount,
+      });
+
+      // 🚀 调用真实后端 API
+      if (post.isCollected) {
+        await communityService.uncollectPost(post.id);
+        toast.success('取消收藏成功！👋');
+      } else {
+        await communityService.collectPost(post.id);
+        toast.success('收藏成功！⭐');
+      }
+    } catch (err: any) {
+      console.error('收藏操作失败：', err);
+      toast.error(err.response?.data?.message || '操作失败！😭');
+
+      // 回滚 UI
+      setPost(post);
+    }
+  };
+
+  /**
+   * 发布评论
+   */
+  const handlePublishComment = async () => {
+    if (!isAuthenticated) {
+      toast.warning('请先登录！😰');
+      navigate('/login');
+      return;
+    }
+
+    if (!commentContent.trim()) {
+      toast.warning('请输入评论内容！😰');
+      return;
+    }
+
+    if (!post) return;
+
+    setCommenting(true);
+
+    try {
+      // 🚀 调用真实后端 API 发布评论
+      await postService.createReply({
+        postId: post.id,
+        content: commentContent,
+      });
+
+      toast.success('评论成功！💬');
+      setCommentContent('');
+
+      // 重新加载评论列表
+      loadComments(post.id);
+
+      // 更新帖子评论数
+      setPost({
+        ...post,
+        replyCount: post.replyCount + 1,
+      });
+    } catch (err: any) {
+      console.error('发布评论失败：', err);
+      toast.error(err.response?.data?.message || '发布评论失败！😭');
+    } finally {
+      setCommenting(false);
+    }
+  };
+
+  /**
+   * 查看作者主页
+   */
+  const handleViewAuthor = () => {
+    if (!post) return;
+    navigate(`/users/${post.authorId}`);
+  };
+
+  /**
+   * 返回社区
+   */
+  const handleBack = () => {
+    navigate('/community');
+  };
+
+  /**
+   * 查看相关帖子
+   */
+  const handleViewRelatedPost = (postId: number) => {
+    navigate(`/posts/${postId}`);
+    // 重新加载详情
+    window.scrollTo(0, 0);
+  };
+
+  /**
+   * 格式化时间
+   */
+  const formatTime = (time?: string) => {
+    if (!time) return '';
+    const date = new Date(time);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+
+    // 1分钟内
+    if (diff < 60 * 1000) {
+      return '刚刚';
+    }
+
+    // 1小时内
+    if (diff < 60 * 60 * 1000) {
+      const minutes = Math.floor(diff / (60 * 1000));
+      return `${minutes}分钟前`;
+    }
+
+    // 今天
+    if (date.toDateString() === now.toDateString()) {
+      return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // 昨天
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return `昨天 ${date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    // 其他
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  };
+
+  /**
+   * 打开图片预览
+   */
+  const handleImageClick = (index: number) => {
+    setPreviewImageIndex(index);
+    setShowImagePreview(true);
+  };
+
+  // ==================== 渲染 ====================
+
+  if (loading) {
+    return (
+      <div className="post-detail-page">
+        <div className="post-detail-container">
+          <Skeleton type="card" count={3} animation="wave" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="post-detail-page">
+        <div className="post-detail-container">
+          <div className="post-detail-error">
+            <div className="error-icon">⚠️</div>
+            <h3 className="error-text">{error || '帖子不存在'}</h3>
+            <Button type="primary" size="large" onClick={handleBack}>
+              返回社区 →
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="post-detail-page">
+      <div className="post-detail-container">
+        {/* ==================== 返回按钮 ==================== */}
+        <div className="post-detail-back">
+          <Button type="default" size="small" onClick={handleBack}>
+            ← 返回社区
+          </Button>
+        </div>
+
+        {/* ==================== 主内容区 ==================== */}
+        <div className="post-detail-main">
+          {/* 帖子内容 */}
+          <div className="post-detail-content">
+            {/* 标题 */}
+            {post.title && (
+              <h1 className="post-detail-title">{post.title}</h1>
+            )}
+
+            {/* 作者信息 */}
+            <div className="post-detail-author">
+              <div className="author-info" onClick={handleViewAuthor}>
+                <div className="author-avatar">
+                  {post.authorAvatar ? (
+                    <img src={post.authorAvatar} alt={post.authorName} />
+                  ) : (
+                    <span>👤</span>
+                  )}
+                </div>
+                <div className="author-details">
+                  <div className="author-name">{post.authorName}</div>
+                  <div className="author-meta">
+                    <span>{formatTime(post.createdAt)}</span>
+                    <span className="separator">·</span>
+                    <span>👀 {post.viewCount} 浏览</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 正文内容 */}
+            <div className="post-detail-body">
+              <p>{post.content}</p>
+            </div>
+
+            {/* 图片 */}
+            {post.images && post.images.length > 0 && (
+              <div className="post-detail-images">
+                {post.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`图片${index + 1}`}
+                    onClick={() => handleImageClick(index)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* 互动区 */}
+            <div className="post-detail-actions">
+              <button
+                className={`action-btn ${post.isLiked ? 'active' : ''}`}
+                onClick={handleToggleLike}
+              >
+                {post.isLiked ? '❤️' : '🤍'} {post.likeCount}
+              </button>
+              <button
+                className={`action-btn ${post.isCollected ? 'active' : ''}`}
+                onClick={handleToggleCollect}
+              >
+                {post.isCollected ? '⭐' : '☆'} {post.collectCount}
+              </button>
+              <button className="action-btn">
+                💬 {post.replyCount}
+              </button>
+            </div>
+          </div>
+
+          {/* 评论区 */}
+          <div className="post-detail-comments">
+            <div className="comments-header">
+              <h3 className="comments-title">💬 评论 ({post.replyCount})</h3>
+            </div>
+
+            {/* 评论输入框 */}
+            {isAuthenticated && (
+              <div className="comments-input">
+                <Input
+                  type="text"
+                  placeholder="说点什么..."
+                  value={commentContent}
+                  onChange={(e) => setCommentContent(e.target.value)}
+                  maxLength={200}
+                />
+                <Button
+                  type="primary"
+                  onClick={handlePublishComment}
+                  loading={commenting}
+                  disabled={!commentContent.trim()}
+                >
+                  {commenting ? '发送中...' : '发送'}
+                </Button>
+              </div>
+            )}
+
+            {/* 评论列表 */}
+            <div className="comments-list">
+              {commentsLoading ? (
+                <Skeleton type="list" count={3} animation="wave" />
+              ) : comments.length === 0 ? (
+                <div className="comments-empty">
+                  <div className="empty-icon">📭</div>
+                  <p className="empty-text">还没有评论</p>
+                  <p className="empty-tip">快来抢沙发吧！</p>
+                </div>
+              ) : (
+                comments.map((comment) => (
+                  <div key={comment.commentId} className="comment-item">
+                    <div className="comment-avatar">
+                      {comment.authorAvatar ? (
+                        <img src={comment.authorAvatar} alt={comment.authorName} />
+                      ) : (
+                        <span>👤</span>
+                      )}
+                    </div>
+                    <div className="comment-content">
+                      <div className="comment-header">
+                        <span className="comment-author">{comment.authorName}</span>
+                        <span className="comment-time">{formatTime(comment.createdAt)}</span>
+                      </div>
+                      <p className="comment-text">{comment.content}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ==================== 侧边栏 ==================== */}
+        <div className="post-detail-sidebar">
+          {/* 相关推荐 */}
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">📰 相关推荐</h3>
+            {relatedLoading ? (
+              <Skeleton type="card" count={3} animation="wave" />
+            ) : relatedPosts.length === 0 ? (
+              <div className="sidebar-empty">暂无推荐</div>
+            ) : (
+              <div className="related-posts">
+                {relatedPosts.map((relatedPost) => (
+                  <div
+                    key={relatedPost.id}
+                    className="related-post-item"
+                    onClick={() => handleViewRelatedPost(relatedPost.id)}
+                  >
+                    <div className="related-post-content">
+                      <h4 className="related-post-title">
+                        {relatedPost.title || relatedPost.content.substring(0, 30) + '...'}
+                      </h4>
+                      <div className="related-post-meta">
+                        <span>❤️ {relatedPost.likeCount}</span>
+                        <span>💬 {relatedPost.replyCount}</span>
+                      </div>
+                    </div>
+                    {relatedPost.images && relatedPost.images.length > 0 && (
+                      <div className="related-post-image">
+                        <img src={relatedPost.images[0]} alt="缩略图" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ==================== 图片预览弹窗 ==================== */}
+      {showImagePreview && post.images && post.images.length > 0 && (
+        <Modal
+          onClose={() => setShowImagePreview(false)}
+          title={`图片预览 (${previewImageIndex + 1}/${post.images.length})`}
+        >
+          <div className="image-preview-modal">
+            <img
+              src={post.images[previewImageIndex]}
+              alt={`预览图片${previewImageIndex + 1}`}
+              className="preview-image"
+            />
+            <div className="preview-controls">
+              {previewImageIndex > 0 && (
+                <Button
+                  type="default"
+                  onClick={() => setPreviewImageIndex(previewImageIndex - 1)}
+                >
+                  ← 上一张
+                </Button>
+              )}
+              {previewImageIndex < post.images.length - 1 && (
+                <Button
+                  type="default"
+                  onClick={() => setPreviewImageIndex(previewImageIndex + 1)}
+                >
+                  下一张 →
+                </Button>
+              )}
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+};
+
+export default PostDetail;

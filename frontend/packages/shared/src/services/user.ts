@@ -41,7 +41,8 @@ export class UserService {
    * 获取当前登录用户信息（别名方法）
    */
   async getCurrentUser(): Promise<User> {
-    return this.getProfile();
+    const profile = await this.getProfile();
+    return profile as User;
   }
 
   /**

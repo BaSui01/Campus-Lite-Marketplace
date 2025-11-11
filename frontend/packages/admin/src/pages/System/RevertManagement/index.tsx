@@ -8,7 +8,6 @@ import React, { useState, useCallback } from 'react';
 import {
   Table,
   Button,
-  Tag,
   Badge,
   Loading,
   toast,
@@ -21,6 +20,7 @@ import {
   type RevertRequestStatus,
   type RevertExecutionResult
 } from '@campus/shared';
+import { TagComponent as Tag } from '@campus/shared';
 import { revertService } from '@campus/shared';
 import { revertManagementService } from '@/services';
 import './index.css';

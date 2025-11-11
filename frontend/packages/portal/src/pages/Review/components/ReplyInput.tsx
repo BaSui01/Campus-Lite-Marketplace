@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/api';
+import { getApi } from '@campus/shared/utils/apiClient';
 
 interface ReplyInputProps {
   reviewId: number;

@@ -10,12 +10,15 @@ import {
   RevertPreviewModal,
   Loading,
   toast,
+  Services,
   type RevertableOperation,
   type RevertListParams,
   type RevertPreviewData
 } from '@campus/shared';
-import { revertService } from '@campus/shared';
 import './index.css';
+
+// 🔧 BaSui 修复：从 Services 命名空间解构
+const { revertService } = Services;
 
 /**
  * 可撤销操作页面

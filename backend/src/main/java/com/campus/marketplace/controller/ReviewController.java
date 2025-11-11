@@ -49,13 +49,15 @@ public class ReviewController {
     }
 
     @GetMapping("/goods/{goodsId}")
-    @Operation(summary = "获取商品评价列表", description = "查询指定商品的所有评价")
-    public ApiResponse<Page<Review>> getGoodsReviews(
+    @Operation(summary = "获取商品评价列表（旧路由）", description = "查询指定商品的所有评价，支持评分筛选和排序。推荐使用 GET /goods/{goodsId}/reviews")
+    public ApiResponse<Page<Review>> getGoodsReviewsOld(
             @Parameter(description = "商品ID") @PathVariable Long goodsId,
             @Parameter(description = "页码") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int size
+            @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int size,
+            @Parameter(description = "评分筛选（1-5星）") @RequestParam(required = false) Integer rating,
+            @Parameter(description = "排序方式（time/like/helpful）") @RequestParam(defaultValue = "time") String sortBy
     ) {
-        Page<Review> reviews = reviewService.getGoodsReviews(goodsId, page, size);
+        Page<Review> reviews = reviewService.getGoodsReviews(goodsId, page, size, rating, sortBy);
         return ApiResponse.success(reviews);
     }
 

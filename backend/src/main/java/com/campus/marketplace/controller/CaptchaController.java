@@ -72,44 +72,7 @@ public class CaptchaController {
         return ApiResponse.success("滑块验证码生成成功", response);
     }
 
-    /**
-     * 验证滑块验证码（简单版本）
-     *
-     * POST /api/captcha/slide/verify
-     */
-    @PostMapping("/slide/verify")
-    @Operation(
-            summary = "验证滑块验证码（简单版本）",
-            description = "验证用户滑动的位置是否正确（允许±5px误差）"
-    )
-    public ApiResponse<Boolean> verifySlideCaptcha(
-            @RequestParam String slideId,
-            @RequestParam int position
-    ) {
-        log.info("收到验证滑块请求: slideId={}, position={}", slideId, position);
-        boolean isValid = captchaService.verifySlideCaptcha(slideId, position);
-        return ApiResponse.success("验证完成", isValid);
-    }
 
-    /**
-     * 验证滑块验证码（完整版本，包含轨迹分析）
-     *
-     * POST /api/captcha/slide/verify/track
-     */
-    @PostMapping("/slide/verify/track")
-    @Operation(
-            summary = "验证滑块验证码（带轨迹分析）",
-            description = "验证用户滑动的位置和轨迹，防止机器人作弊"
-    )
-    public ApiResponse<Boolean> verifySlideCaptchaWithTrack(
-            @RequestBody @org.springframework.validation.annotation.Validated com.campus.marketplace.common.dto.request.SlideVerifyRequest request
-    ) {
-        log.info("收到验证滑块请求（带轨迹）: slideId={}, position={}, trackSize={}",
-                request.getSlideId(), request.getXPosition(),
-                request.getTrack() != null ? request.getTrack().size() : 0);
-        boolean isValid = captchaService.verifySlideCaptchaWithTrack(request);
-        return ApiResponse.success("验证完成", isValid);
-    }
 
     /**
      * 生成旋转验证码
@@ -127,23 +90,7 @@ public class CaptchaController {
         return ApiResponse.success("旋转验证码生成成功", response);
     }
 
-    /**
-     * 验证旋转验证码
-     *
-     * POST /api/captcha/rotate/verify
-     */
-    @PostMapping("/rotate/verify")
-    @Operation(
-            summary = "验证旋转验证码",
-            description = "验证用户旋转的角度是否正确（允许±10度误差）"
-    )
-    public ApiResponse<Boolean> verifyRotateCaptcha(
-            @RequestBody @org.springframework.validation.annotation.Validated com.campus.marketplace.common.dto.request.RotateVerifyRequest request
-    ) {
-        log.info("收到验证旋转请求: rotateId={}, angle={}", request.getRotateId(), request.getAngle());
-        boolean isValid = captchaService.verifyRotateCaptcha(request);
-        return ApiResponse.success("验证完成", isValid);
-    }
+
 
     /**
      * 生成点选验证码
@@ -161,23 +108,7 @@ public class CaptchaController {
         return ApiResponse.success("点选验证码生成成功", response);
     }
 
-    /**
-     * 验证点选验证码
-     *
-     * POST /api/captcha/click/verify
-     */
-    @PostMapping("/click/verify")
-    @Operation(
-            summary = "验证点选验证码",
-            description = "验证用户点击的位置是否正确（允许±20px误差）"
-    )
-    public ApiResponse<Boolean> verifyClickCaptcha(
-            @RequestBody @org.springframework.validation.annotation.Validated com.campus.marketplace.common.dto.request.ClickVerifyRequest request
-    ) {
-        log.info("收到验证点选请求: clickId={}, points={}", request.getClickId(), request.getClickPoints().size());
-        boolean isValid = captchaService.verifyClickCaptcha(request);
-        return ApiResponse.success("验证完成", isValid);
-    }
+
 
     /**
      * 统一验证码验证接口（新增 - BaSui 2025-11-11）

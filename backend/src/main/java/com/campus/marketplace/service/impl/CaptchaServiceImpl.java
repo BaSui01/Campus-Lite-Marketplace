@@ -30,18 +30,37 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
 
+    private final RedisTemplate<String, String> redisTemplate;
+    
+    /**
+     * 构造函数注入（推荐方式，避免循环依赖）
+     */
     @Autowired
-    @Qualifier("customStringRedisTemplate")
-    private RedisTemplate<String, String> redisTemplate;
+    public CaptchaServiceImpl(@Qualifier("customStringRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
+    // ========== 过期时间配置 ==========
     private static final int CAPTCHA_EXPIRE_SECONDS = 300; // 5分钟
     private static final int SLIDE_EXPIRE_SECONDS = 300; // 5分钟
     private static final int ROTATE_EXPIRE_SECONDS = 300; // 5分钟
     private static final int CLICK_EXPIRE_SECONDS = 300; // 5分钟
+    
+    // ========== Redis Key前缀 ==========
     private static final String CAPTCHA_KEY_PREFIX = "captcha:";
     private static final String SLIDE_KEY_PREFIX = "slide:";
     private static final String ROTATE_KEY_PREFIX = "rotate:";
     private static final String CLICK_KEY_PREFIX = "click:";
+    private static final String CAPTCHA_TOKEN_PREFIX = "captcha:token:";
+    
+    // ========== 验证容差配置（优化用户体验）==========
+    private static final int SLIDE_TOLERANCE_SIMPLE = 10;      // 滑块验证码简单版容差：±10px
+    private static final int SLIDE_TOLERANCE_WITH_TRACK = 15;  // 滑块验证码轨迹版容差：±15px
+    private static final int ROTATE_TOLERANCE = 15;            // 旋转验证码容差：±15度
+    private static final int CLICK_TOLERANCE = 30;             // 点选验证码容差：±30px
+    
+    // ========== 验证码通行证配置 ==========
+    private static final int CAPTCHA_TOKEN_EXPIRE_SECONDS = 60; // 验证码通行证有效期：60秒
 
     /**
      * 生成图形验证码
@@ -72,9 +91,8 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     /**
-     * 验证图形验证码
+     * 验证图形验证码（内部方法）
      */
-    @Override
     public boolean verifyImageCaptcha(String captchaId, String code) {
         if (captchaId == null || code == null) {
             log.warn("验证码参数为空: captchaId={}, code={}", captchaId, code);
@@ -130,9 +148,8 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     /**
-     * 验证滑块验证码
+     * 验证滑块验证码（内部方法）
      */
-    @Override
     public boolean verifySlideCaptcha(String slideId, int userPosition) {
         if (slideId == null) {
             log.warn("滑块ID为空");
@@ -152,10 +169,12 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         int targetPosition = Integer.parseInt(storedPosition);
 
-        // 允许±5px误差
-        boolean isValid = Math.abs(targetPosition - userPosition) <= 5;
-        log.info("滑块验证结果: slideId={}, targetPosition=, userPosition={}, isValid={}",
-                slideId, targetPosition, userPosition, isValid);
+        // 验证位置（使用配置的容差范围）
+        int diff = Math.abs(targetPosition - userPosition);
+        boolean isValid = diff <= SLIDE_TOLERANCE_SIMPLE;
+        
+        log.info("滑块验证结果: slideId={}, targetPosition={}, userPosition={}, diff={}, tolerance={}, isValid={}",
+                slideId, targetPosition, userPosition, diff, SLIDE_TOLERANCE_SIMPLE, isValid);
 
         return isValid;
     }
@@ -308,10 +327,9 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     /**
-     * 验证滑块验证码（完整版本，包含轨迹分析）
+     * 验证滑块验证码（完整版本，包含轨迹分析）内部方法
      */
-    @Override
-    public boolean verifySlideCaptchaWithTrack(com.campus.marketplace.common.dto.request.SlideVerifyRequest request) {
+    private boolean verifySlideCaptchaWithTrack(com.campus.marketplace.common.dto.request.SlideVerifyRequest request) {
         if (request.getSlideId() == null || request.getXPosition() == null) {
             log.warn("滑块验证参数为空");
             return false;
@@ -330,8 +348,9 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         int targetPosition = Integer.parseInt(storedPosition);
 
-        // 1. 验证X轴位置（允许±10px误差，前端精度优化后仍保持一定容差）
-        boolean positionValid = Math.abs(targetPosition - request.getXPosition()) <= 10;
+        // 1. 验证X轴位置（使用配置的容差范围）
+        int positionDiff = Math.abs(targetPosition - request.getXPosition());
+        boolean positionValid = positionDiff <= SLIDE_TOLERANCE_WITH_TRACK;
 
         // 2. 验证滑动轨迹（防作弊）
         boolean trackValid = true;
@@ -340,8 +359,8 @@ public class CaptchaServiceImpl implements CaptchaService {
         }
 
         boolean isValid = positionValid && trackValid;
-        log.info("滑块验证结果: slideId={}, targetPosition={}, userPosition={}, positionValid={}, trackValid={}, isValid={}",
-                request.getSlideId(), targetPosition, request.getXPosition(), positionValid, trackValid, isValid);
+        log.info("滑块验证结果（轨迹版）: slideId={}, targetPosition={}, userPosition={}, positionDiff={}, tolerance={}, positionValid={}, trackValid={}, isValid={}",
+                request.getSlideId(), targetPosition, request.getXPosition(), positionDiff, SLIDE_TOLERANCE_WITH_TRACK, positionValid, trackValid, isValid);
 
         return isValid;
     }
@@ -648,10 +667,9 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     /**
-     * 验证旋转验证码 ✅
+     * 验证旋转验证码（内部方法）
      */
-    @Override
-    public boolean verifyRotateCaptcha(com.campus.marketplace.common.dto.request.RotateVerifyRequest request) {
+    private boolean verifyRotateCaptcha(com.campus.marketplace.common.dto.request.RotateVerifyRequest request) {
         if (request.getRotateId() == null || request.getAngle() == null) {
             log.warn("旋转验证参数为空");
             return false;
@@ -670,16 +688,17 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         int targetAngle = Integer.parseInt(storedAngle);
 
-        // 允许±10度误差（因为手动旋转难以精确）
+        // 计算角度差（处理跨越0度的情况）
         int angleDiff = Math.abs(targetAngle - request.getAngle());
-        // 处理跨越0度的情况（例如：350度和10度实际只差20度）
+        // 例如：350度和10度实际只差20度
         if (angleDiff > 180) {
             angleDiff = 360 - angleDiff;
         }
 
-        boolean isValid = angleDiff <= 10;
-        log.info("旋转验证结果: rotateId={}, targetAngle={}, userAngle={}, angleDiff={}, isValid={}",
-                request.getRotateId(), targetAngle, request.getAngle(), angleDiff, isValid);
+        // 验证角度（使用配置的容差范围）
+        boolean isValid = angleDiff <= ROTATE_TOLERANCE;
+        log.info("旋转验证结果: rotateId={}, targetAngle={}, userAngle={}, angleDiff={}, tolerance={}, isValid={}",
+                request.getRotateId(), targetAngle, request.getAngle(), angleDiff, ROTATE_TOLERANCE, isValid);
 
         return isValid;
     }
@@ -803,10 +822,9 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     /**
-     * 验证点选验证码 ✅
+     * 验证点选验证码（内部方法）
      */
-    @Override
-    public boolean verifyClickCaptcha(com.campus.marketplace.common.dto.request.ClickVerifyRequest request) {
+    private boolean verifyClickCaptcha(com.campus.marketplace.common.dto.request.ClickVerifyRequest request) {
         if (request.getClickId() == null || request.getClickPoints() == null || request.getClickPoints().isEmpty()) {
             log.warn("点选验证参数为空");
             return false;
@@ -820,9 +838,6 @@ public class CaptchaServiceImpl implements CaptchaService {
             return false;
         }
 
-        // 验证后立即删除（防止重复使用）
-        redisTemplate.delete(key);
-
         // 解析存储的位置
         String[] positions = storedPositions.split(";");
         if (positions.length != request.getClickPoints().size()) {
@@ -830,7 +845,7 @@ public class CaptchaServiceImpl implements CaptchaService {
             return false;
         }
 
-        // 验证每个点击位置（允许±20px误差）
+        // 验证每个点击位置（使用配置的容差范围）
         for (int i = 0; i < positions.length; i++) {
             String[] xy = positions[i].split(",");
             int targetX = Integer.parseInt(xy[0]);
@@ -841,13 +856,18 @@ public class CaptchaServiceImpl implements CaptchaService {
             int diffX = Math.abs(targetX - userPoint.getX());
             int diffY = Math.abs(targetY - userPoint.getY());
 
-            if (diffX > 20 || diffY > 20) {
-                log.warn("点选位置不匹配: index={}, target=({},{}), user=({},{}), diff=({},{})",
-                        i, targetX, targetY, userPoint.getX(), userPoint.getY(), diffX, diffY);
+            if (diffX > CLICK_TOLERANCE || diffY > CLICK_TOLERANCE) {
+                log.warn("点选位置不匹配: index={}, target=({},{}), user=({},{}), diff=({},{}), tolerance={}",
+                        i, targetX, targetY, userPoint.getX(), userPoint.getY(), diffX, diffY, CLICK_TOLERANCE);
                 return false;
             }
+            
+            log.debug("点选位置匹配: index={}, target=({},{}), user=({},{}), diff=({},{})",
+                    i, targetX, targetY, userPoint.getX(), userPoint.getY(), diffX, diffY);
         }
 
+        // 验证成功后才删除（防止重复使用）
+        redisTemplate.delete(key);
         log.info("点选验证通过: clickId={}, points={}", request.getClickId(), request.getClickPoints().size());
         return true;
     }
@@ -919,9 +939,6 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     // ========== 统一验证码验证接口（新增 - BaSui 2025-11-11） ==========
-
-    private static final int CAPTCHA_TOKEN_EXPIRE_SECONDS = 60; // 验证码通行证有效期60秒
-    private static final String CAPTCHA_TOKEN_PREFIX = "captcha:token:";
 
     /**
      * 统一验证码验证接口（支持四种验证码类型）

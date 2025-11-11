@@ -40,6 +40,12 @@ export interface LoginRequest {
      * @type {string}
      * @memberof LoginRequest
      */
+    'captchaToken'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginRequest
+     */
     'captchaId'?: string;
     /**
      * 

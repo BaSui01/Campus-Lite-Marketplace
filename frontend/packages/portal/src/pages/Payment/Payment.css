@@ -1,0 +1,206 @@
+/**
+ * 支付页面样式
+ * @author BaSui 😎
+ */
+
+.payment-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.payment-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.payment-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1a202c;
+}
+
+/* 订单摘要 */
+.order-summary {
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.summary-item .label {
+  font-size: 0.95rem;
+  color: #718096;
+}
+
+.summary-item .value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.summary-item .value.price {
+  font-size: 1.5rem;
+  color: #f56565;
+}
+
+/* 支付操作按钮 */
+.payment-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-cancel,
+.btn-pay {
+  flex: 1;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.btn-cancel:hover {
+  background: #cbd5e0;
+}
+
+.btn-pay {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-pay:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-pay:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 温馨提示 */
+.payment-tips {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #fffaf0;
+  border-left: 4px solid #ed8936;
+  border-radius: 8px;
+}
+
+.payment-tips h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #c05621;
+  margin-bottom: 0.75rem;
+}
+
+.payment-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.payment-tips li {
+  font-size: 0.875rem;
+  color: #744210;
+  margin-bottom: 0.5rem;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.payment-tips li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #ed8936;
+  font-weight: bold;
+}
+
+/* Loading 状态 */
+.payment-loading,
+.payment-error {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.payment-error h2 {
+  font-size: 1.5rem;
+  color: #e53e3e;
+  margin-bottom: 1rem;
+}
+
+.payment-error button {
+  padding: 0.75rem 2rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.payment-error button:hover {
+  background: #5a67d8;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .payment-page {
+    padding: 1rem;
+  }
+
+  .payment-container {
+    padding: 1.5rem;
+  }
+
+  .payment-title {
+    font-size: 1.5rem;
+  }
+
+  .payment-actions {
+    flex-direction: column;
+  }
+}

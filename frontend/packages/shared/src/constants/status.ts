@@ -151,10 +151,11 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   [OrderStatus.PENDING_PAYMENT]: 'orange',
   [OrderStatus.PAID]: 'blue',
-  [OrderStatus.PENDING_DELIVERY]: 'cyan',
-  [OrderStatus.PENDING_RECEIPT]: 'purple',
+  [OrderStatus.SHIPPED]: 'cyan',
+  [OrderStatus.DELIVERED]: 'purple',
   [OrderStatus.COMPLETED]: 'green',
   [OrderStatus.CANCELLED]: 'gray',
+  [OrderStatus.REVIEWED]: 'blue',
   [OrderStatus.REFUNDING]: 'orange',
   [OrderStatus.REFUNDED]: 'red',
 };

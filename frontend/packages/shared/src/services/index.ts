@@ -128,6 +128,18 @@ export { batchService, BatchTaskStatus, BatchType } from './batch';
 export type { BatchService, BatchTaskListParams } from './batch';
 // 注意：PageBatchTaskResponse 应从 '@campus/shared/api' 导入，避免冲突
 
+// 校园活动服务
+export { eventService } from './event';
+export type { Event, EventListParams, EventService } from './event';
+
+// 学习资源服务
+export { resourceService } from './resource';
+export type { Resource, ResourceListParams, ResourceService } from './resource';
+
+// 营销活动服务
+export { marketingService, CampaignType, CampaignStatus, DiscountType, CAMPAIGN_TYPE_CONFIG, CAMPAIGN_STATUS_CONFIG } from './marketing';
+export type { MarketingCampaign, CreateCampaignRequest, CampaignListParams, CampaignStatistics, DiscountConfig } from './marketing';
+
 // ==================== ❌ 已移除的服务导出 ====================
 //
 // 以下服务已移至对应的包，不再从 shared 导出：

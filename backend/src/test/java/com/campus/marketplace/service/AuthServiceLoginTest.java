@@ -69,6 +69,9 @@ class AuthServiceLoginTest {
     @Mock
     private com.campus.marketplace.service.LoginNotificationService loginNotificationService;
 
+    @Mock
+    private CaptchaService captchaService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -85,8 +88,11 @@ class AuthServiceLoginTest {
         // 🎯 Mock CryptoUtil 行为：默认返回明文密码（兼容模式）
         when(cryptoUtil.isEncrypted(anyString())).thenReturn(false);
 
-        // 准备测试数据（新增验证码字段和2FA字段，测试中传 null）
-        validLoginRequest = new LoginRequest("testuser", "Password123", null, null, null, null, null, null, null);
+        // 🔐 Mock CaptchaService 行为：验证码通行证验证通过
+        when(captchaService.verifyCaptchaToken(anyString())).thenReturn(true);
+
+        // 准备测试数据（新增验证码字段和2FA字段，测试中传 "mock-captcha-token"）
+        validLoginRequest = new LoginRequest("testuser", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
         // 创建权限
         viewPermission = Permission.builder()
@@ -163,7 +169,7 @@ class AuthServiceLoginTest {
         when(userRepository.findByUsernameWithRoles("nonexistent"))
                 .thenReturn(Optional.empty());
 
-        LoginRequest request = new LoginRequest("nonexistent", "Password123", null, null, null, null, null, null, null);
+        LoginRequest request = new LoginRequest("nonexistent", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
@@ -184,7 +190,7 @@ class AuthServiceLoginTest {
         when(passwordEncoder.matches("WrongPassword", "$2a$10$encodedPassword"))
                 .thenReturn(false);
 
-        LoginRequest request = new LoginRequest("testuser", "WrongPassword", null, null, null, null, null, null, null);
+        LoginRequest request = new LoginRequest("testuser", "WrongPassword", "mock-captcha-token", null, null, null, null, null, null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {

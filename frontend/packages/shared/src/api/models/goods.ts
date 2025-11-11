@@ -187,13 +187,13 @@ export interface Goods {
      * @type {boolean}
      * @memberof Goods
      */
-    'sold'?: boolean;
+    'approved'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof Goods
      */
-    'approved'?: boolean;
+    'sold'?: boolean;
 }
 
 export const GoodsStatusEnum = {

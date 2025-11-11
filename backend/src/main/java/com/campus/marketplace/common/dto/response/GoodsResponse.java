@@ -105,6 +105,11 @@ public class GoodsResponse {
     private String coverImage;
 
     /**
+     * 所有图片列表（支持轮播，最多9张）
+     */
+    private String[] images;
+
+    /**
      * 发布时间
      */
     private LocalDateTime createdAt;

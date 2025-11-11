@@ -25,7 +25,14 @@ export * from './constants';
 // ==================== 自定义 Hooks ====================
 export * from './hooks';
 
-// ==================== API 服务（新增）====================
+// ==================== API 服务（命名空间隔离）====================
+// 🎯 Services 命名空间导出，避免与 API 类型冲突
+// 使用方式：import { Services } from '@campus/shared'; Services.eventService.list()
+export * as Services from './services';
+
+// ==================== API 服务（直接导出）====================
+// 🎯 同时提供直接导出，方便旧代码迁移
+// 使用方式：import { authService } from '@campus/shared'; authService.login()
 export * from './services';
 
 // ==================== 工厂方法（Store 等）====================

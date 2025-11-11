@@ -29,10 +29,15 @@ export const API_RETRY_DELAY = 1000;
 
 /**
  * WebSocket 连接URL（从环境变量读取）
- * 💡 BaSui：后端有两个 WebSocket 端点：
- * - /api/ws/message: 私信消息（默认）
- * - /api/ws/dispute: 纠纷系统
- * ⚠️ 注意：必须包含 /api 前缀（context-path）
+ * 💡 BaSui：后端有两个独立的 WebSocket 端点：
+ * - /api/ws/message: 私信消息端点（默认）- 由 MessageSessionManager 管理
+ * - /api/ws/dispute: 纠纷系统端点 - 由 DisputeSessionManager 管理
+ * 
+ * ⚠️ 重要说明：
+ * 1. 必须包含 /api 前缀（context-path）
+ * 2. 两个端点使用独立的SessionManager，用户可以同时连接
+ * 3. 连接时需要携带token参数：ws://host/api/ws/message?token=xxx
+ * 4. 心跳消息类型必须使用 'HEARTBEAT'（不是 'ping'）
  */
 export const WEBSOCKET_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8200/api/ws/message';
 

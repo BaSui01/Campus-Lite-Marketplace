@@ -121,6 +121,12 @@ export interface GoodsResponse {
     'coverImage'?: string;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof GoodsResponse
+     */
+    'images'?: Array<string>;
+    /**
+     * 
      * @type {string}
      * @memberof GoodsResponse
      */

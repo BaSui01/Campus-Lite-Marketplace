@@ -73,7 +73,7 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
            "(:categoryId IS NULL OR g.categoryId = :categoryId) AND " +
            "(:minPrice IS NULL OR g.price >= :minPrice) AND " +
            "(:maxPrice IS NULL OR g.price <= :maxPrice) AND " +
-           "(:keyword IS NULL OR g.title LIKE %:keyword% OR g.description LIKE %:keyword%) AND " +
+           "(:keyword IS NULL OR g.title LIKE CONCAT('%', :keyword, '%') OR g.description LIKE CONCAT('%', :keyword, '%')) AND " +
            "(:campusId IS NULL OR g.campusId = :campusId)")
     Page<Goods> findByConditionsWithCampus(
             @Param("status") GoodsStatus status,
@@ -90,7 +90,7 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
            "(:categoryId IS NULL OR g.categoryId = :categoryId) AND " +
            "(:minPrice IS NULL OR g.price >= :minPrice) AND " +
            "(:maxPrice IS NULL OR g.price <= :maxPrice) AND " +
-           "(:keyword IS NULL OR g.title LIKE %:keyword% OR g.description LIKE %:keyword%) AND " +
+           "(:keyword IS NULL OR g.title LIKE CONCAT('%', :keyword, '%') OR g.description LIKE CONCAT('%', :keyword, '%')) AND " +
            "(:campusId IS NULL OR g.campusId = :campusId) AND g.id IN (:goodsIds)")
     Page<Goods> findByConditionsWithCampusAndIds(
             @Param("status") GoodsStatus status,

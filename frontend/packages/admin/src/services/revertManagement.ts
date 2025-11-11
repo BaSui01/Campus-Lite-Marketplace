@@ -1,11 +1,30 @@
 /**
  * 撤销管理服务（管理员专属）
  * @author BaSui 😎
- * @description 基于 OpenAPI 生成的 DefaultApi
+ * @description 直接调用后端API（手动实现）
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
-import type { PageRevertRequest, RevertStatistics } from '@campus/shared/api';
+import { apiClient } from '@campus/shared/utils/apiClient';
+
+/**
+ * 分页结果接口
+ */
+interface PageRevertRequest {
+  content: any[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
+/**
+ * 统计数据接口
+ */
+interface RevertStatistics {
+  pendingCount: number;
+  todayRevertCount: number;
+  successRate: number;
+}
 
 /**
  * 撤销管理服务类
@@ -19,34 +38,70 @@ export class RevertManagementService {
     page: number = 0,
     size: number = 10
   ): Promise<PageRevertRequest> {
-    const api = getApi();
-    const response = await api.listRevertRequests({ status: status as any, page, size });
-    return response.data.data as PageRevertRequest;
+    try {
+      const params: any = { page, size };
+      if (status) {
+        params.status = status;
+      }
+      const response = await apiClient.get('/revert/admin/requests', { params });
+      return response.data.data as PageRevertRequest;
+    } catch (error) {
+      console.error('❌ 获取撤销请求列表失败:', error);
+      return {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        number: 0,
+        size: size,
+      };
+    }
   }
 
   /**
    * 获取撤销统计数据
    */
   async getStatistics(): Promise<RevertStatistics> {
-    const api = getApi();
-    const response = await api.getRevertStatistics();
-    return response.data.data as RevertStatistics;
+    try {
+      const response = await apiClient.get('/revert/admin/statistics');
+      return response.data.data as RevertStatistics;
+    } catch (error) {
+      console.error('❌ 获取撤销统计数据失败:', error);
+      return {
+        pendingCount: 0,
+        todayRevertCount: 0,
+        successRate: 0,
+      };
+    }
   }
 
   /**
    * 批准撤销请求
    */
   async approve(id: number, comment?: string): Promise<void> {
-    const api = getApi();
-    await api.approveRevert({ id, comment });
+    try {
+      const params: any = {};
+      if (comment) {
+        params.comment = comment;
+      }
+      await apiClient.post(`/revert/admin/${id}/approve`, null, { params });
+    } catch (error) {
+      console.error('❌ 批准撤销请求失败:', error);
+      throw error;
+    }
   }
 
   /**
    * 拒绝撤销请求
    */
   async reject(id: number, reason: string): Promise<void> {
-    const api = getApi();
-    await api.rejectRevert({ id, reason });
+    try {
+      await apiClient.post(`/revert/admin/${id}/reject`, null, { 
+        params: { reason }
+      });
+    } catch (error) {
+      console.error('❌ 拒绝撤销请求失败:', error);
+      throw error;
+    }
   }
 }
 

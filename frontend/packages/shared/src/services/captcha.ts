@@ -9,10 +9,8 @@ import { apiClient } from '../utils/apiClient';
 import type {
   ApiResponseCaptchaResponse,
   ApiResponseSlideCaptchaResponse,
-  ApiResponseBoolean,
   CaptchaResponse,
   SlideCaptchaResponse,
-  SlideVerifyRequest,
 } from '../api/models';
 
 /**
@@ -36,28 +34,7 @@ export const imageCaptchaService = {
     return response.data.data;
   },
 
-  /**
-   * 验证图形验证码
-   * @param {string} captchaId - 验证码ID
-   * @param {string} code - 用户输入的验证码
-   * @returns {Promise<boolean>} 验证是否通过
-   * @example
-   * const isValid = await imageCaptchaService.verify(captchaId, '3F4A');
-   * if (!isValid) {
-   *   console.log('❌ 验证码错误!');
-   * }
-   */
-  verify: async (captchaId: string, code: string): Promise<boolean> => {
-    const response = await apiClient.post<ApiResponseBoolean>(
-      '/api/captcha/image/verify',
-      null,
-      {
-        params: { captchaId, code },
-      }
-    );
 
-    return response.data.data === true;
-  },
 };
 
 /**
@@ -97,47 +74,7 @@ export const slideCaptchaService = {
     return response.data.data;
   },
 
-  /**
-   * 验证滑块验证码（简单版本，仅验证X轴位置）
-   * @param {string} slideId - 滑块ID
-   * @param {number} position - 用户滑动的X轴位置
-   * @returns {Promise<boolean>} 验证是否通过（允许±5px误差）
-   * @example
-   * const isValid = await slideCaptchaService.verify(slideId, 120);
-   */
-  verify: async (slideId: string, position: number): Promise<boolean> => {
-    const response = await apiClient.post<ApiResponseBoolean>(
-      '/api/captcha/slide/verify',
-      null,
-      {
-        params: { slideId, position },
-      }
-    );
 
-    return response.data.data === true;
-  },
-
-  /**
-   * 验证滑块验证码（完整版本，包含轨迹分析）
-   * @param {SlideVerifyRequest} request - 验证请求（slideId + xPosition + track）
-   * @returns {Promise<boolean>} 验证是否通过
-   * @example
-   * const track = [
-   *   { x: 0, y: 0, t: 0 },
-   *   { x: 10, y: 0, t: 100 },
-   *   { x: 120, y: 0, t: 500 },
-   * ];
-   * const isValid = await slideCaptchaService.verifyWithTrack({
-   *   slideId,
-   *   xPosition: 120,
-   *   track,
-   * });
-   */
-  verifyWithTrack: async (request: SlideVerifyRequest): Promise<boolean> => {
-    const response = await apiClient.post<ApiResponseBoolean>('/api/captcha/slide/verify/track', request);
-
-    return response.data.data === true;
-  },
 };
 
 /**
@@ -157,6 +94,8 @@ export const captchaService = {
 
 /**
  * 🎯 验证码Hook工具类型定义（供React组件使用）
+ * 
+ * @deprecated 推荐使用统一验证接口 verifyCaptcha()
  */
 export interface CaptchaHookResult {
   /** 验证码ID */
@@ -169,8 +108,6 @@ export interface CaptchaHookResult {
   error: string | null;
   /** 刷新验证码 */
   refresh: () => Promise<void>;
-  /** 验证验证码 */
-  verify: (code: string) => Promise<boolean>;
 }
 
 export interface SlideCaptchaHookResult {
@@ -188,8 +125,6 @@ export interface SlideCaptchaHookResult {
   error: string | null;
   /** 刷新滑块 */
   refresh: () => Promise<void>;
-  /** 验证滑块 */
-  verify: (position: number, track?: SlideVerifyRequest['track']) => Promise<boolean>;
 }
 
 // ========== 方案B：统一验证码验证接口（新增 - BaSui 2025-11-11） ==========

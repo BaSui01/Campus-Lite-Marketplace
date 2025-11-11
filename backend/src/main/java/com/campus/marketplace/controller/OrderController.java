@@ -44,7 +44,7 @@ public class OrderController {
      * @return 订单号
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "创建订单", description = "提交下单请求，返回订单号")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "创建订单的 JSON 请求体",
@@ -80,7 +80,7 @@ public class OrderController {
      * @return 订单列表
      */
     @GetMapping("/buyer")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "买家订单列表", description = "分页查询我作为买家的订单")
     public ApiResponse<Page<OrderResponse>> listBuyerOrders(
             @Parameter(description = "订单状态", example = "PENDING_PAYMENT") @RequestParam(required = false) String status,
@@ -103,7 +103,7 @@ public class OrderController {
      * @return 订单列表
      */
     @GetMapping("/seller")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "卖家订单列表", description = "分页查询我作为卖家的订单")
     public ApiResponse<Page<OrderResponse>> listSellerOrders(
             @Parameter(description = "订单状态", example = "PAID") @RequestParam(required = false) String status,
@@ -124,7 +124,7 @@ public class OrderController {
      * @return 订单详情
      */
     @GetMapping("/{orderNo}")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "订单详情", description = "根据订单号查询订单详情")
     public ApiResponse<Order> getOrderDetail(@Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo) {
         log.info("查询订单详情: orderNo={}", orderNo);
@@ -138,7 +138,7 @@ public class OrderController {
      * POST /api/orders/{orderNo}/cancel
      */
     @PostMapping("/{orderNo}/cancel")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "取消订单", description = "仅未支付订单可取消")
     public ApiResponse<Void> cancelOrder(@Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo) {
         log.info("取消订单: orderNo={}", orderNo);

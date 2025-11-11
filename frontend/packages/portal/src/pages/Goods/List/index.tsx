@@ -23,11 +23,13 @@ const transformGoodsData = (goods: GoodsResponse) => ({
   description: goods.description,
   price: goods.price || 0,
   imageUrl: goods.coverImage || '/placeholder.jpg',
+  images: goods.images || (goods.coverImage ? [goods.coverImage] : ['/placeholder.jpg']),  // ✅ 新增：所有图片（支持轮播）
   status: (goods.status?.toLowerCase() === 'on_sale' ? 'on_sale' : 
            goods.status?.toLowerCase() === 'sold_out' ? 'sold_out' :
            goods.status?.toLowerCase() === 'off_shelf' ? 'off_shelf' : 'pending') as any,
-  stock: 1,
-  soldCount: 0,
+  stock: goods.stock || 1,
+  soldCount: goods.soldCount || 0,
+  originalPrice: goods.originalPrice ? Number(goods.originalPrice) : undefined,  // ✅ 新增：原价
   tags: goods.tags?.map(t => t.name || '').filter(Boolean),
   seller: goods.sellerId ? {
     id: String(goods.sellerId),

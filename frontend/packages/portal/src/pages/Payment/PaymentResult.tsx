@@ -8,7 +8,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { orderService } from '../../../shared/src/services/order';
+import { Services } from '@campus/shared';
 import { ResultCard } from './components/ResultCard';
 import { validateOrderNo } from './utils/paymentUtils';
 
@@ -41,7 +41,7 @@ const PaymentResult: React.FC = () => {
     error
   } = useQuery({
     queryKey: ['order-detail', orderNo],
-    queryFn: () => orderService.getOrderDetail(orderNo!),
+    queryFn: () => Services.orderService.getOrderDetail(orderNo!),
     enabled: !!orderNo && validateOrderNo(orderNo),
   });
 

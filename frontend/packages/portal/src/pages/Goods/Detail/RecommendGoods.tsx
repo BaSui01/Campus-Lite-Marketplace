@@ -55,7 +55,7 @@ export const RecommendGoods: React.FC<RecommendGoodsProps> = ({
         page: 0,
         size: 4,
         sortBy: 'createdAt',
-        sortDirection: 'desc',
+        sortDirection: 'DESC',
       });
       
       // 过滤掉当前商品

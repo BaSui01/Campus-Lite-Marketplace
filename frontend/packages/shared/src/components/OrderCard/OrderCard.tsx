@@ -7,7 +7,6 @@
 import React from 'react';
 import { Card, type CardProps } from '../Card';
 import { Tag } from '../Tag';
-import { Badge } from '../Badge';
 import './OrderCard.css';
 
 /**

@@ -278,6 +278,10 @@ public class GoodsDetailServiceImpl implements GoodsDetailService {
      * 转换商品实体为响应 DTO
      */
     private GoodsResponse convertToResponse(Goods goods) {
+        String coverImage = goods.getImages() != null && goods.getImages().length > 0
+                ? goods.getImages()[0]
+                : null;
+
         return GoodsResponse.builder()
             .id(goods.getId())
             .title(goods.getTitle())
@@ -288,6 +292,8 @@ public class GoodsDetailServiceImpl implements GoodsDetailService {
             .status(goods.getStatus())
             .viewCount(goods.getViewCount())
             .favoriteCount(goods.getFavoriteCount())
+            .coverImage(coverImage)
+            .images(goods.getImages())  // ✅ 新增：所有图片（支持轮播）
             .createdAt(goods.getCreatedAt())
             .build();
     }

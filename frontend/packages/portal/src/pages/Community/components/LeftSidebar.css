@@ -1,0 +1,127 @@
+/**
+ * LeftSidebar 组件样式 - Linux.do 风格
+ * @author BaSui 😎
+ */
+
+/* ==================== 左侧边栏容器 ==================== */
+.left-sidebar {
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ==================== 区块样式 ==================== */
+.sidebar-section {
+  margin-bottom: 20px;
+}
+
+.sidebar-section:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar-section__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #00000073;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* ==================== 导航列表 ==================== */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.sidebar-nav__item:hover {
+  background: #f5f5f5;
+}
+
+.sidebar-nav__item.active {
+  background: #e6f4ff;
+  color: #1890ff;
+}
+
+.sidebar-nav__icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sidebar-nav__label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000d9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-nav__item.active .sidebar-nav__label {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.sidebar-nav__count {
+  font-size: 12px;
+  color: #00000073;
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 10px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.sidebar-nav__item.active .sidebar-nav__count {
+  background: #91caff;
+  color: #1890ff;
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 768px) {
+  .left-sidebar {
+    padding: 12px;
+  }
+
+  .sidebar-section {
+    margin-bottom: 16px;
+  }
+
+  .sidebar-section__title {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .sidebar-nav__item {
+    padding: 8px 10px;
+  }
+
+  .sidebar-nav__icon {
+    font-size: 16px;
+  }
+
+  .sidebar-nav__label {
+    font-size: 13px;
+  }
+}

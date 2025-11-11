@@ -47,4 +47,18 @@ public interface RevertNotificationService {
      * @param warningMessage 警告信息
      */
     void sendRevertWarningNotification(RevertRequest revertRequest, String warningMessage);
+
+    /**
+     * 发送批准通知
+     * 
+     * @param revertRequest 撤销请求
+     */
+    void sendRevertApprovalNotification(RevertRequest revertRequest);
+
+    /**
+     * 发送拒绝通知
+     * 
+     * @param revertRequest 撤销请求
+     */
+    void sendRevertRejectionNotification(RevertRequest revertRequest);
 }

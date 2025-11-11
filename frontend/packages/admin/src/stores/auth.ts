@@ -14,7 +14,7 @@ import {
   type ApiResponse,
 } from '@campus/shared';
 
-type RawUser = LoginResponse['user'] & {
+type RawUser = NonNullable<LoginResponse['userInfo']> & {
   permissions?: unknown;
   roles?: unknown;
 };

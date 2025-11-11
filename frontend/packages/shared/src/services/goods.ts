@@ -4,7 +4,7 @@
  * @description 商品发布、查询、更新、删除、收藏等接口（基于 OpenAPI 生成代码）
  */
 
-import { getApi } from '../utils/apiClient';
+import { getApi, apiClient } from '../utils/apiClient';
 import type {
   GoodsResponse,
   CreateGoodsRequest,
@@ -110,15 +110,19 @@ export class GoodsService {
     status?: string;
     page?: number;
     size?: number;
+    sortBy?: string;
+    sortDirection?: string;
   }): Promise<PageGoodsResponse> {
-    // ❌ API 中没有 getMyGoods 方法，使用 listGoods 并通过业务逻辑过滤
-    // 或者使用其他 API 方法（需要查看后端实际接口）
-    // 暂时使用 listGoods 作为替代
-    return this.listGoods({
-      page: params?.page,
-      size: params?.size,
-      // status: params?.status, // 根据实际 API 支持的参数调整
+    // ✅ 直接调用新的 /goods/my 接口（后端已添加）
+    const response = await apiClient.get('/goods/my', {
+      params: {
+        page: params?.page || 0,
+        size: params?.size || 10,
+        sortBy: params?.sortBy || 'createdAt',
+        sortDirection: params?.sortDirection || 'DESC',
+      },
     });
+    return response.data.data as PageGoodsResponse;
   }
 
   /**

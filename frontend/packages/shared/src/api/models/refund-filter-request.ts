@@ -76,10 +76,10 @@ export interface RefundFilterRequest {
     'orderNo'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof RefundFilterRequest
      */
-    'pageOrDefault'?: number;
+    'sortByOrDefault'?: string;
     /**
      * 
      * @type {number}
@@ -88,10 +88,10 @@ export interface RefundFilterRequest {
     'sizeOrDefault'?: number;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof RefundFilterRequest
      */
-    'sortByOrDefault'?: string;
+    'pageOrDefault'?: number;
     /**
      * 
      * @type {string}

@@ -40,13 +40,13 @@ export interface PageableObject {
      * @type {number}
      * @memberof PageableObject
      */
-    'pageSize'?: number;
+    'pageNumber'?: number;
     /**
      * 
-     * @type {boolean}
+     * @type {number}
      * @memberof PageableObject
      */
-    'paged'?: boolean;
+    'pageSize'?: number;
     /**
      * 
      * @type {boolean}
@@ -55,9 +55,9 @@ export interface PageableObject {
     'unpaged'?: boolean;
     /**
      * 
-     * @type {number}
+     * @type {boolean}
      * @memberof PageableObject
      */
-    'pageNumber'?: number;
+    'paged'?: boolean;
 }
 

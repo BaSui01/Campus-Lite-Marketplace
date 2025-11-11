@@ -79,4 +79,15 @@ public interface GoodsService {
      * @param rejectReason 拒绝原因（审核不通过时必填）
      */
     void approveGoods(Long id, boolean approved, String rejectReason);
+
+    /**
+     * 查询当前用户发布的物品列表
+     * 
+     * @param page 页码（从 0 开始）
+     * @param size 每页数量
+     * @param sortBy 排序字段
+     * @param sortDirection 排序方向
+     * @return 我的商品列表（分页）
+     */
+    Page<GoodsResponse> getMyGoods(int page, int size, String sortBy, String sortDirection);
 }

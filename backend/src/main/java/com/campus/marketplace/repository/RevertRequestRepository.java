@@ -53,4 +53,19 @@ public interface RevertRequestRepository extends JpaRepository<RevertRequest, Lo
      * 检查审计日志是否已有撤销请求
      */
     boolean existsByAuditLogId(Long auditLogId);
+
+    /**
+     * 管理员查询所有撤销请求（按创建时间倒序）
+     */
+    Page<RevertRequest> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    /**
+     * 管理员按状态查询撤销请求（按创建时间倒序）
+     */
+    Page<RevertRequest> findByStatusOrderByCreatedAtDesc(RevertRequestStatus status, Pageable pageable);
+
+    /**
+     * 统计指定状态和时间后的请求数量
+     */
+    Long countByStatusAndCreatedAtAfter(RevertRequestStatus status, java.time.LocalDateTime createdAt);
 }

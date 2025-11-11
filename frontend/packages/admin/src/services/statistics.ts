@@ -83,6 +83,26 @@ export interface TodayStatistics {
   revenue: number;    // 今日收入
 }
 
+/**
+ * 📦 订单统计
+ */
+export interface OrderStatistics {
+  totalOrders: number;      // 总订单数
+  completedOrders: number;  // 已完成订单数
+  completionRate: number;   // 完成率
+  todayNewOrders: number;   // 今日新增订单
+}
+
+/**
+ * 💸 退款统计
+ */
+export interface RefundStatistics {
+  totalRefunds: number;       // 总退款数
+  completedRefunds: number;   // 已完成退款数
+  approvalRate: number;       // 通过率
+  averageProcessTime: number; // 平均处理时长(小时)
+}
+
 // ==================== Service 类 ====================
 
 /**

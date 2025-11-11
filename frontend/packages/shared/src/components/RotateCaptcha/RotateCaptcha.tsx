@@ -69,15 +69,16 @@ export const RotateCaptcha: React.FC<RotateCaptchaProps> = ({
 
   // 开始旋转
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (isSuccess || !captchaData) return;
+    if (isSuccess || !captchaData || !trackRef.current) return;
     setIsRotating(true);
     setStartX(event.clientX);
   };
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    if (isSuccess || !captchaData) return;
+    const touch = event.touches[0];
+    if (isSuccess || !captchaData || !trackRef.current || !touch) return;
     setIsRotating(true);
-    setStartX(event.touches[0].clientX);
+    setStartX(touch.clientX);
   };
 
   // 旋转中
@@ -85,9 +86,10 @@ export const RotateCaptcha: React.FC<RotateCaptchaProps> = ({
     if (!isRotating) return;
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!trackRef.current) return;
+      const track = trackRef.current;
+      if (!track) return;
 
-      const trackWidth = trackRef.current.offsetWidth;
+      const trackWidth = track.offsetWidth;
       const distance = event.clientX - startX;
       
       // 计算旋转角度（滑动整个轨道 = 360度）
@@ -96,10 +98,12 @@ export const RotateCaptcha: React.FC<RotateCaptchaProps> = ({
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      if (!trackRef.current) return;
+      const track = trackRef.current;
+      const touch = event.touches[0];
+      if (!track || !touch) return;
 
-      const trackWidth = trackRef.current.offsetWidth;
-      const distance = event.touches[0].clientX - startX;
+      const trackWidth = track.offsetWidth;
+      const distance = touch.clientX - startX;
       
       const angle = Math.round((distance / trackWidth) * 360);
       setCurrentAngle((angle + 360) % 360);
@@ -185,8 +189,9 @@ export const RotateCaptcha: React.FC<RotateCaptchaProps> = ({
   };
 
   // 计算滑块位置（基于当前角度）
-  const sliderPosition = trackRef.current
-    ? (currentAngle / 360) * (trackRef.current.offsetWidth - 50)
+  const track = trackRef.current;
+  const sliderPosition = track
+    ? (currentAngle / 360) * (track.offsetWidth - 50)
     : 0;
 
   return (

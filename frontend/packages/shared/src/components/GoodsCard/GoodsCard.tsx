@@ -8,6 +8,7 @@ import React from 'react';
 import { Card, type CardProps } from '../Card';
 import { Tag } from '../Tag';
 import { Badge } from '../Badge';
+import { UserAvatar } from '../UserAvatar';
 import './GoodsCard.css';
 
 /**
@@ -45,9 +46,14 @@ export interface GoodsData {
   originalPrice?: number;
 
   /**
-   * 商品图片 URL
+   * 商品图片 URL（封面图）
    */
   imageUrl: string;
+
+  /**
+   * 所有商品图片 URL 列表（支持轮播）
+   */
+  images?: string[];
 
   /**
    * 商品状态
@@ -199,6 +205,11 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
   const isAvailable = goods.status === 'on_sale' && goods.stock > 0;
   const hasDiscount = goods.originalPrice && goods.originalPrice > goods.price;
 
+  // 图片轮播状态
+  const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
+  const images = goods.images && goods.images.length > 0 ? goods.images : [goods.imageUrl];
+  const hasMultipleImages = images.length > 1;
+
   /**
    * 处理卡片点击
    */
@@ -232,6 +243,20 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
     }
   };
 
+  /**
+   * 处理图片切换（上一张/下一张）
+   */
+  const handleImageChange = (direction: 'prev' | 'next', e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => {
+      if (direction === 'next') {
+        return (prev + 1) % images.length;
+      } else {
+        return (prev - 1 + images.length) % images.length;
+      }
+    });
+  };
+
   return (
     <Card
       {...cardProps}
@@ -240,13 +265,19 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
       onClick={handleCardClick}
       cover={
         <div className="campus-goods-card__image-wrapper">
-          <img src={goods.imageUrl} alt={goods.name} className="campus-goods-card__image" />
+          <img 
+            src={images[currentImageIndex]} 
+            alt={goods.name} 
+            className="campus-goods-card__image" 
+          />
+          
           {/* 状态标签 */}
           <div className="campus-goods-card__status">
             <Tag color={statusConfig.color} size="small">
               {statusConfig.label}
             </Tag>
           </div>
+          
           {/* 折扣标签 */}
           {hasDiscount && (
             <div className="campus-goods-card__discount">
@@ -255,6 +286,41 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
                 color="#ff4d4f"
               />
             </div>
+          )}
+
+          {/* 图片轮播控制 */}
+          {hasMultipleImages && (
+            <>
+              {/* 左箭头 */}
+              <button
+                className="campus-goods-card__image-arrow campus-goods-card__image-arrow--left"
+                onClick={(e) => handleImageChange('prev', e)}
+                aria-label="上一张"
+              >
+                ‹
+              </button>
+              
+              {/* 右箭头 */}
+              <button
+                className="campus-goods-card__image-arrow campus-goods-card__image-arrow--right"
+                onClick={(e) => handleImageChange('next', e)}
+                aria-label="下一张"
+              >
+                ›
+              </button>
+
+              {/* 图片指示器 */}
+              <div className="campus-goods-card__image-indicators">
+                {images.map((_, index) => (
+                  <span
+                    key={index}
+                    className={`campus-goods-card__image-indicator ${
+                      index === currentImageIndex ? 'active' : ''
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
       }
@@ -325,20 +391,18 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
 
         {/* 底部信息 */}
         <div className="campus-goods-card__footer">
-          {/* 卖家信息 */}
+          {/* 卖家信息 - 使用 UserAvatar 组件保持一致性 */}
           {showSeller && goods.seller && (
-            <div
-              className="campus-goods-card__seller"
-              onClick={handleSellerClick}
-            >
-              {goods.seller.avatar && (
-                <img
-                  src={goods.seller.avatar}
-                  alt={goods.seller.name}
-                  className="campus-goods-card__seller-avatar"
-                />
-              )}
-              <span className="campus-goods-card__seller-name">{goods.seller.name}</span>
+            <div className="campus-goods-card__seller">
+              <UserAvatar
+                userId={goods.seller.id}
+                username={goods.seller.name}
+                avatarUrl={goods.seller.avatar}
+                size="small"
+                onAvatarClick={onSellerClick}
+                showUsername
+                className="campus-goods-card__seller-avatar-wrapper"
+              />
             </div>
           )}
 

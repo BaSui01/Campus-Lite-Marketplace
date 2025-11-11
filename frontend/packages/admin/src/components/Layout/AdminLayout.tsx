@@ -408,10 +408,10 @@ export const AdminLayout: React.FC = () => {
                 <Space style={{ cursor: 'pointer' }}>
                   <UserAvatar
                     src={user?.avatar}
-                    alt={user?.nickname || user?.username}
+                    alt={user?.username}
                     size="small"
                   />
-                  {!isMobile && <span>{user?.nickname || user?.username}</span>}
+                  {!isMobile && <span>{user?.username}</span>}
                 </Space>
               </Dropdown>
             </Badge>

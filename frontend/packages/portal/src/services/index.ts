@@ -14,7 +14,41 @@ export * from './blacklist';
 export * from './credit';
 export * from './favorite';
 export * from './follow';
-export * from './marketing';
+// export * from './marketing'; // ❌ 已删除重复文件，使用 shared 的 marketing
 export * from './recommend';
 export * from './sellerStatistics';
 export * from './subscription';
+
+// ==================== 从 Shared 导入通用服务 ====================
+export {
+  marketingService,
+  CampaignType,
+  CampaignStatus,
+  DiscountType,
+  CAMPAIGN_TYPE_CONFIG,
+  CAMPAIGN_STATUS_CONFIG,
+} from '@campus/shared/services/marketing';
+export type {
+  MarketingCampaign,
+  CreateCampaignRequest,
+  CampaignListParams,
+  CampaignStatistics,
+  DiscountConfig,
+} from '@campus/shared/services/marketing';
+
+// ==================== 明确导出常用类型（避免模块解析问题）====================
+export type {
+  TodayOverview,
+  SalesTrend,
+  GoodsRanking,
+  GoodsRankingItem,
+  VisitorAnalysis,
+  VisitorSource,
+  SalesTrendPoint,
+  ReportType,
+  DataReport,
+  ReportSection,
+} from './sellerStatistics';
+
+// ==================== 确保运行时导出（Vite HMR 兼容）====================
+export { sellerStatisticsService } from './sellerStatistics';

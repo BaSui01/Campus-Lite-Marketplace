@@ -56,7 +56,7 @@ export const Hero: React.FC = () => {
   // 处理搜索
   const handleSearch = () => {
     if (searchKeyword.trim()) {
-      navigate(`/search?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+      navigate(`/search?q=${encodeURIComponent(searchKeyword.trim())}`);
     }
   };
 
@@ -134,7 +134,7 @@ export const Hero: React.FC = () => {
                   className="hero__hot-keyword"
                   onClick={() => {
                     setSearchKeyword(keyword);
-                    navigate(`/search?keyword=${encodeURIComponent(keyword)}`);
+                    navigate(`/search?q=${encodeURIComponent(keyword)}`);
                   }}
                 >
                   {keyword}

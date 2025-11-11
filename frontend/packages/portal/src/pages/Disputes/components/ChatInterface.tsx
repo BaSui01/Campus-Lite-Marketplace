@@ -153,8 +153,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [highlightedMessageIds, setHighlightedMessageIds] = useState<string[]>([]);
 
   // WebSocket 连接
+  // 🔧 BaSui: 修正WebSocket URL - 后端端点是 /ws/dispute（不带disputeId参数）
   const { lastMessage, send, readyState, reconnectCount } = useWebSocket(
-    `${process.env.REACT_APP_WS_URL || 'ws://localhost:8080'}/ws/disputes/${disputeId}/chat`,
+    `${process.env.REACT_APP_WS_URL || 'ws://localhost:8200/api'}/ws/dispute`,
     {
       onOpen: () => {
         setConnectionStatus('connected');
@@ -172,7 +173,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         handleWebSocketMessage(data);
       },
       heartbeatInterval: 30000,
-      heartbeatMessage: JSON.stringify({ type: 'ping' }),
+      heartbeatMessage: JSON.stringify({ type: 'HEARTBEAT' }), // 🔧 统一使用后端定义的类型常量
     }
   );
 
@@ -190,11 +191,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             setOtherUserTyping(data.isTyping);
           }
           break;
-        case 'ping':
+        case 'HEARTBEAT': // 🔧 统一使用后端定义的类型常量
           // 心跳消息，不需要处理
           break;
-        case 'error':
-          console.error('聊天室错误:', data.message);
+        case 'SYSTEM': // 🔧 处理系统消息
+          console.log('系统消息:', data.content);
+          break;
+        case 'ERROR': // 🔧 统一使用后端定义的错误类型
+          console.error('聊天室错误:', data.content);
           break;
         default:
           console.log('未知消息类型:', data.type);

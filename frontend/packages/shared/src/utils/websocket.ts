@@ -43,6 +43,7 @@ export interface WebSocketMessage<T = any> {
   messageId?: number;
   timestamp?: number;
   extra?: string;
+  id?: string; // 消息唯一标识符，用于追踪和去重
 }
 
 export interface WebSocketClientOptions {
@@ -97,8 +98,13 @@ export class WebSocketClient {
   }
 
   connect(): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      console.log('[WebSocket] 已连接，无需重复连接');
+    // 🔧 BaSui: 修复重连 bug - 如果正在连接中，不要重复创建连接
+    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+      console.log('[WebSocket] 已连接或正在连接，无需重复连接', {
+        readyState: this.ws.readyState,
+        CONNECTING: WebSocket.CONNECTING,
+        OPEN: WebSocket.OPEN,
+      });
       return;
     }
 
@@ -109,7 +115,18 @@ export class WebSocketClient {
       return;
     }
 
-    const wsUrl = `${this.url}?token=${encodeURIComponent(token)}`;
+    // 兼容已有查询参数，自动选择 ? 或 &
+    const sep = this.url.includes('?') ? '&' : '?';
+    let wsUrl = `${this.url}${sep}token=${encodeURIComponent(token)}`;
+
+    // 若当前页面为 HTTPS，自动切换 ws:// 为 wss://，避免混合内容问题
+    try {
+      if (typeof window !== 'undefined' && window.location?.protocol === 'https:' && wsUrl.startsWith('ws://')) {
+        wsUrl = wsUrl.replace(/^ws:\/\//, 'wss://');
+      }
+    } catch (_) {
+      // 忽略环境检测异常（如 SSR）
+    }
 
     try {
       console.log('[WebSocket] 🔌 正在连接...', wsUrl);
@@ -130,9 +147,15 @@ export class WebSocketClient {
           code: event.code,
           reason: event.reason || '无原因',
           wasClean: event.wasClean,
+          reconnectCount: this.reconnectCount,
+          manualClose: this.manualClose,
         });
         
         this.stopHeartbeat();
+        
+        // 🔧 BaSui: 清理当前连接对象，避免重连时检查失败
+        this.ws = null;
+        
         this.listeners.onClose?.(event);
         
         // 错误码处理和重连策略
@@ -179,12 +202,23 @@ export class WebSocketClient {
   }
 
   disconnect(): void {
+    console.log('[WebSocket] 🔌 手动断开连接');
     this.manualClose = true;
     this.stopHeartbeat();
+    
+    // 🔧 BaSui: 清理重连定时器
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    
     if (this.ws) {
       this.ws.close();
       this.ws = null;
     }
+    
+    // 重置重连计数器
+    this.reconnectCount = 0;
   }
 
   isConnected(): boolean {
@@ -200,7 +234,24 @@ export class WebSocketClient {
       this.ws.send(JSON.stringify(message));
       return;
     }
-    console.warn('[WebSocket] 未连接，消息加入队列', message);
+    
+    // 🔧 BaSui: 增强调试信息 - 输出详细的连接状态
+    const currentState = this.ws?.readyState ?? -1;
+    const stateNames = ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'];
+    console.warn('[WebSocket] 未连接，消息加入队列', {
+      message,
+      currentState,
+      stateName: stateNames[currentState] || 'NULL',
+      wsExists: !!this.ws,
+      manualClose: this.manualClose,
+    });
+    
+    // 🔧 BaSui: 如果是手动关闭，心跳消息直接丢弃，不加入队列
+    if (this.manualClose && message.type === WebSocketMessageType.HEARTBEAT) {
+      console.log('[WebSocket] 手动关闭中，丢弃心跳消息');
+      return;
+    }
+    
     this.messageQueue.push(message);
   }
 
@@ -233,7 +284,23 @@ export class WebSocketClient {
 
   private startHeartbeat(): void {
     this.stopHeartbeat();
+    
+    // 🔧 BaSui: 确保只在连接真正建立时才启动心跳
+    if (!this.isConnected()) {
+      console.warn('[WebSocket] 连接未建立，不启动心跳');
+      return;
+    }
+    
+    console.log('[WebSocket] 💓 启动心跳，间隔', this.heartbeatInterval, 'ms');
+    
     this.heartbeatTimer = setInterval(() => {
+      // 🔧 BaSui: 每次发送前再次检查连接状态
+      if (!this.isConnected()) {
+        console.warn('[WebSocket] 心跳检测发现连接已断开，停止心跳');
+        this.stopHeartbeat();
+        return;
+      }
+      
       this.send({
         type: WebSocketMessageType.HEARTBEAT,
         content: 'PING',
@@ -262,10 +329,22 @@ export class WebSocketClient {
   }
 
   private reconnect(): void {
+    // 🔧 BaSui: 修复重连 bug - 如果手动关闭了，不要重连
+    if (this.manualClose) {
+      console.log('[WebSocket] 手动关闭，不重连');
+      return;
+    }
+    
     if (this.reconnectCount >= this.maxReconnect) {
       console.error(`[WebSocket] ❌ 达到最大重连次数 (${this.maxReconnect})，停止重连`);
       console.error('[WebSocket] 💡 提示：请检查后端服务是否启动，或手动刷新页面重新连接');
       return;
+    }
+    
+    // 🔧 BaSui: 清理旧的重连定时器，避免重复重连
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
     }
     
     this.reconnectCount += 1;
@@ -280,11 +359,8 @@ export class WebSocketClient {
       `[WebSocket] 🔄 ${Math.round(backoffDelay / 1000)}秒后尝试第 ${this.reconnectCount}/${this.maxReconnect} 次重连`
     );
     
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-    }
-    
     this.reconnectTimer = setTimeout(() => {
+      console.log(`[WebSocket] 🔄 开始第 ${this.reconnectCount}/${this.maxReconnect} 次重连`);
       this.listeners.onReconnect?.(this.reconnectCount);
       this.connect();
     }, backoffDelay);
@@ -359,11 +435,12 @@ export class WebSocketService {
   }
 
   sendChatMessage(data: ChatMessageData): void {
-    this.client.send({
+    const message: WebSocketMessage<ChatMessageData> = {
       type: WebSocketMessageType.CHAT,
       data,
       id: `chat-${Date.now()}`,
-    });
+    };
+    this.client.send(message);
   }
 
   onChatMessage(callback: (message: any) => void): void {
@@ -407,11 +484,12 @@ export class WebSocketService {
   }
 
   sendCustomMessage<T = any>(type: string, data: T, id?: string): void {
-    this.client.send({
+    const message: WebSocketMessage<T> = {
       type,
       data,
       id: id || `custom-${Date.now()}`,
-    });
+    };
+    this.client.send(message);
   }
 
   onCustomMessage<T = any>(type: string, callback: (data: T) => void): void {

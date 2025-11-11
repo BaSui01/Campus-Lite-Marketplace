@@ -9,14 +9,14 @@ import { useNavigate } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption } from 'echarts';
 import { Button, Skeleton } from '@campus/shared/components';
-import { 
-  sellerStatisticsService, 
+import {
+  sellerStatisticsService,
   ReportType,
   TodayOverview,
   SalesTrend,
   GoodsRanking,
   VisitorAnalysis
-} from '../../services';
+} from '../../../services';
 import { useNotificationStore } from '../../../store';
 import './Dashboard.css';
 

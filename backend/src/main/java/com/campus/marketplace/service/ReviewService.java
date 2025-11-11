@@ -23,9 +23,16 @@ public interface ReviewService {
     Page<Review> getMyReviews(Long userId, int page, int size);
 
     /**
-     * 获取商品评价列表
+     * 获取商品评价列表（支持评分筛选和排序）
+     * 
+     * @param goodsId 商品ID
+     * @param page 页码
+     * @param size 每页数量
+     * @param rating 评分筛选（可选，1-5星）
+     * @param sortBy 排序方式（time=时间倒序, helpful=点赞数倒序）
+     * @return 评价分页列表
      */
-    Page<Review> getGoodsReviews(Long goodsId, int page, int size);
+    Page<Review> getGoodsReviews(Long goodsId, int page, int size, Integer rating, String sortBy);
 
     /**
      * 删除评价

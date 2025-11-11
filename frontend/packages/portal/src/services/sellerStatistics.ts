@@ -4,7 +4,7 @@
  * @description 商家销售数据、访客分析、商品排行统计
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 
 // ==================== 类型定义 ====================
 

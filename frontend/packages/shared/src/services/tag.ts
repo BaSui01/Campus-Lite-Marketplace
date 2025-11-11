@@ -5,7 +5,7 @@
  * @updated 2025-11-08 - 重构为使用 OpenAPI 生成的 DefaultApi ✅
  */
 
-import { getApi } from '../utils/apiClient';
+import { getApi, apiClient } from '../utils/apiClient';
 import type { TagResponse, CreateTagRequest, UpdateTagRequest, MergeTagRequest, TagStatisticsResponse } from '../api/models';
 
 // ==================== 类型重导出（使用 OpenAPI 生成的类型）====================
@@ -79,8 +79,8 @@ export class TagService {
    * @returns 热门标签列表
    */
   async getHotTags(limit: number = 20): Promise<HotTag[]> {
-    const api = getApi();
-    const response = await api.getHotTags({ limit });
+    // 🔧 修复：使用公开接口 /tags/hot 而不是需要权限的 /admin/tags/hot
+    const response = await apiClient.get('/tags/hot', { params: { limit } });
     const hotTags = response.data.data as any[];
 
     return hotTags.map(tag => ({

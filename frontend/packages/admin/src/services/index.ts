@@ -26,3 +26,6 @@ export * from './behavior';
 export * from './searchStatistics';
 export * from './recycleBin';
 export * from './revertManagement';
+
+// ========== 从共享层导出常用服务（避免重复导入）==========
+export { paymentService } from '@campus/shared';

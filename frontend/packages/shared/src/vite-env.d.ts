@@ -94,6 +94,11 @@ interface ImportMetaEnv {
   readonly VITE_ENABLE_MOCK?: string;
 
   /**
+   * 是否启用 WebSocket
+   */
+  readonly VITE_ENABLE_WEBSOCKET?: string;
+
+  /**
    * 高德地图 API Key
    */
   readonly VITE_AMAP_KEY?: string;

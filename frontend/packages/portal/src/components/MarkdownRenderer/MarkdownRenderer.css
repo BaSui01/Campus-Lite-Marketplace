@@ -1,0 +1,153 @@
+/**
+ * MarkdownRenderer 组件样式
+ * @author BaSui 😎
+ */
+
+.markdown-renderer {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #000000d9;
+  word-break: break-word;
+}
+
+/* 标题 */
+.markdown-renderer h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 16px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.markdown-renderer h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 14px 0 10px;
+}
+
+.markdown-renderer h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 12px 0 8px;
+}
+
+/* 段落 */
+.markdown-renderer p {
+  margin: 8px 0;
+}
+
+/* 加粗 */
+.markdown-renderer strong {
+  font-weight: 600;
+  color: #000000d9;
+}
+
+/* 斜体 */
+.markdown-renderer em {
+  font-style: italic;
+}
+
+/* 删除线 */
+.markdown-renderer del {
+  text-decoration: line-through;
+  color: #00000073;
+}
+
+/* 行内代码 */
+.markdown-renderer code {
+  padding: 2px 6px;
+  background: #f5f5f5;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  color: #d63384;
+}
+
+/* 代码块 */
+.markdown-renderer pre {
+  margin: 12px 0;
+  padding: 12px;
+  background: #282c34;
+  border-radius: 6px;
+  overflow-x: auto;
+  position: relative;
+}
+
+.markdown-renderer pre code {
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #abb2bf;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* 简单的语法高亮 */
+.markdown-renderer pre code .keyword {
+  color: #c678dd;
+}
+
+.markdown-renderer pre code .string {
+  color: #98c379;
+}
+
+.markdown-renderer pre code .number {
+  color: #d19a66;
+}
+
+.markdown-renderer pre code .comment {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.markdown-renderer pre code .function {
+  color: #61afef;
+}
+
+/* 链接 */
+.markdown-renderer a {
+  color: #1890ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.markdown-renderer a:hover {
+  color: #0960bd;
+  text-decoration: underline;
+}
+
+/* 图片 */
+.markdown-renderer img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 8px 0;
+}
+
+/* 列表 */
+.markdown-renderer ul {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.markdown-renderer li {
+  margin: 4px 0;
+}
+
+/* 引用 */
+.markdown-renderer blockquote {
+  margin: 12px 0;
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border-left: 4px solid #1890ff;
+  color: #00000073;
+  font-style: italic;
+}
+
+/* 换行 */
+.markdown-renderer br {
+  content: '';
+  display: block;
+  margin: 4px 0;
+}

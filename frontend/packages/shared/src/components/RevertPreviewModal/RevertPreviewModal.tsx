@@ -7,12 +7,10 @@
 import React, { useState } from 'react';
 import { Modal } from '../Modal';
 import { Button } from '../Button';
-import { Form, FormItem } from '../Form';
 import { Input } from '../Input';
 import { Tag } from '../Tag';
 import { Badge } from '../Badge';
 import { toast } from '../Toast';
-import type { RevertableOperation } from '../RevertOperationsList';
 import './RevertPreviewModal.css';
 
 /**
@@ -115,12 +113,6 @@ export const RevertPreviewModal: React.FC<RevertPreviewModalProps> = ({
 
   // 渲染验证结果
   const renderValidationResult = (validation: ValidationResult) => {
-    const levelColors = {
-      SUCCESS: 'green',
-      WARNING: 'orange',
-      ERROR: 'red'
-    };
-    
     const levelIcons = {
       SUCCESS: '✓',
       WARNING: '⚠',
@@ -289,14 +281,12 @@ export const RevertPreviewModal: React.FC<RevertPreviewModalProps> = ({
                 撤销原因 <span className="required">*</span>
               </h4>
               <Input
-                type="textarea"
                 value={reason}
                 onChange={(e) => {
                   setReason(e.target.value);
                   setError('');
                 }}
                 placeholder="请详细说明撤销原因（至少10个字符，最多500字符）"
-                rows={4}
                 maxLength={500}
               />
               {error && (
@@ -319,6 +309,3 @@ export const RevertPreviewModal: React.FC<RevertPreviewModalProps> = ({
     </Modal>
   );
 };
-
-// 类型导出
-export type { ValidationResult, RevertPreviewData, ValidationLevel };

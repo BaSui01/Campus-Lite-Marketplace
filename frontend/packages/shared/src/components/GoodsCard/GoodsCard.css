@@ -61,6 +61,80 @@
   color: var(--text-tertiary, #999);
 }
 
+/* ==================== 图片轮播控制 ==================== */
+/* 轮播箭头 */
+.campus-goods-card__image-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  line-height: 1;
+  color: #333;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.campus-goods-card__image-arrow:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.campus-goods-card__image-arrow--left {
+  left: 8px;
+}
+
+.campus-goods-card__image-arrow--right {
+  right: 8px;
+}
+
+.campus-goods-card__image-wrapper:hover .campus-goods-card__image-arrow {
+  opacity: 1;
+}
+
+/* 图片指示器 */
+.campus-goods-card__image-indicators {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.campus-goods-card__image-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.campus-goods-card__image-indicator.active {
+  width: 20px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.campus-goods-card__image-indicator:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
 /* ==================== 徽章区域 ==================== */
 .goods-card__badges {
   position: absolute;
@@ -194,23 +268,30 @@
 .goods-card__seller {
   display: flex;
   align-items: center;
-  gap: 8px;
   padding-top: 12px;
   border-top: 1px solid var(--border-light, #e5e7eb);
 }
 
-.goods-card__seller-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba(102, 126, 234, 0.2);
+/* 卖家头像容器 - 使用 UserAvatar 组件 */
+.campus-goods-card__seller-avatar-wrapper {
+  cursor: pointer;
+  transition: transform var(--transition-base, 0.2s ease-in-out);
 }
 
-.goods-card__seller-name {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 600;
+.campus-goods-card__seller-avatar-wrapper:hover {
+  transform: scale(1.05);
+}
+
+/* UserAvatar 组件内部样式调整 */
+.campus-goods-card__seller-avatar-wrapper .campus-user-avatar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.campus-goods-card__seller-avatar-wrapper .campus-user-avatar__username {
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-secondary, #666);
   overflow: hidden;
   text-overflow: ellipsis;

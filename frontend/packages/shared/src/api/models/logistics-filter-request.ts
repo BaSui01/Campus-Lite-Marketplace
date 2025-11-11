@@ -70,10 +70,10 @@ export interface LogisticsFilterRequest {
     'status'?: LogisticsFilterRequestStatusEnum;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof LogisticsFilterRequest
      */
-    'pageOrDefault'?: number;
+    'sortByOrDefault'?: string;
     /**
      * 
      * @type {number}
@@ -82,10 +82,10 @@ export interface LogisticsFilterRequest {
     'sizeOrDefault'?: number;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof LogisticsFilterRequest
      */
-    'sortByOrDefault'?: string;
+    'pageOrDefault'?: number;
     /**
      * 
      * @type {string}

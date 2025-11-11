@@ -29,40 +29,42 @@ export const FilterField: React.FC<FilterFieldProps> = ({ config, value, onChang
     showTime,
   } = config;
 
-  const commonProps = {
-    placeholder,
-    allowClear,
-    style: { width: width || 200 },
-  };
+  const baseStyle = { width: width || 200 };
 
   switch (type) {
     case 'input':
       return (
         <Input
-          {...commonProps}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          placeholder={typeof placeholder === 'string' ? placeholder : undefined}
+          allowClear={allowClear}
+          style={baseStyle}
         />
       );
 
     case 'select':
       return (
         <Select
-          {...commonProps}
           value={value}
           onChange={onChange}
           options={options}
+          placeholder={typeof placeholder === 'string' ? placeholder : undefined}
+          allowClear={allowClear}
+          style={baseStyle}
         />
       );
 
     case 'multiSelect':
       return (
         <Select
-          {...commonProps}
           mode="multiple"
           value={value}
           onChange={onChange}
           options={options}
+          placeholder={typeof placeholder === 'string' ? placeholder : undefined}
+          allowClear={allowClear}
+          style={baseStyle}
         />
       );
 
@@ -102,21 +104,29 @@ export const FilterField: React.FC<FilterFieldProps> = ({ config, value, onChang
     case 'dateRange':
       return (
         <RangePicker
-          {...commonProps}
           value={value}
           onChange={onChange}
           format={format}
           showTime={showTime}
+          placeholder={
+            Array.isArray(placeholder) 
+              ? (placeholder as [string, string]) 
+              : ['开始日期', '结束日期']
+          }
+          allowClear={allowClear}
+          style={{ width: width || 200 }}
         />
       );
 
     case 'cascader':
       return (
         <Cascader
-          {...commonProps}
           options={options}
           value={value}
           onChange={onChange}
+          placeholder={typeof placeholder === 'string' ? placeholder : undefined}
+          allowClear={allowClear}
+          style={baseStyle}
         />
       );
 

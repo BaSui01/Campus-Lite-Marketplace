@@ -139,52 +139,84 @@
 .goods-filter__price {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 12px;
+  width: 100%; /* 确保容器铺满 */
 }
 
 .goods-filter__price-input {
   flex: 1;
-  padding: 8px 12px;
+  min-width: 0; /* 防止flex子元素溢出 */
+  padding: 10px 14px;
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   color: #333;
   transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.goods-filter__price-input:hover {
+  border-color: #667eea;
 }
 
 .goods-filter__price-input:focus {
   outline: none;
   border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .goods-filter__price-input::placeholder {
-  color: #ccc;
+  color: #bbb;
+}
+
+/* 移除 number 类型输入框的箭头（Chrome/Safari） */
+.goods-filter__price-input::-webkit-outer-spin-button,
+.goods-filter__price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.goods-filter__price-input[type='number'] {
+  -moz-appearance: textfield;
 }
 
 .goods-filter__price-separator {
   color: #999;
+  font-weight: 500;
+  flex-shrink: 0;
 }
 
 .goods-filter__price-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
 }
 
 .goods-filter__price-btn {
   flex: 1;
-  padding: 8px 16px;
+  padding: 10px 16px;
   background: #667eea;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   color: white;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .goods-filter__price-btn:hover {
   background: #5568d3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.goods-filter__price-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
 }
 
 .goods-filter__price-btn--clear {
@@ -193,7 +225,9 @@
 }
 
 .goods-filter__price-btn--clear:hover {
-  background: #e0e0e0;
+  background: #ff4d4f;
+  color: white;
+  box-shadow: 0 4px 8px rgba(255, 77, 79, 0.3);
 }
 
 /* ==================== 标签筛选 ==================== */

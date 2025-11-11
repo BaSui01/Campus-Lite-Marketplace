@@ -23,6 +23,7 @@ models/api-response-campus-migration-validation-response.ts
 models/api-response-campus-statistics-response.ts
 models/api-response-campus.ts
 models/api-response-captcha-response.ts
+models/api-response-captcha-verify-response.ts
 models/api-response-category-statistics-response.ts
 models/api-response-category.ts
 models/api-response-check-blacklist-relation-response.ts
@@ -36,6 +37,7 @@ models/api-response-coupon.ts
 models/api-response-dispute-detail-dto.ts
 models/api-response-dispute-statistics-dto.ts
 models/api-response-double.ts
+models/api-response-event.ts
 models/api-response-evidence-summary-dto.ts
 models/api-response-export-task-response.ts
 models/api-response-feature-flag.ts
@@ -53,6 +55,7 @@ models/api-response-list-category.ts
 models/api-response-list-coupon-statistics-response.ts
 models/api-response-list-endpoint-stats.ts
 models/api-response-list-error-log.ts
+models/api-response-list-event.ts
 models/api-response-list-evidence-dto.ts
 models/api-response-list-export-job.ts
 models/api-response-list-feature-flag.ts
@@ -61,6 +64,7 @@ models/api-response-list-goods-response.ts
 models/api-response-list-health-check-record.ts
 models/api-response-list-long.ts
 models/api-response-list-map-string-object.ts
+models/api-response-list-marketing-campaign.ts
 models/api-response-list-message-search-history.ts
 models/api-response-list-message-search-suggestion.ts
 models/api-response-list-negotiation-message-dto.ts
@@ -88,6 +92,7 @@ models/api-response-map-error-severity-long.ts
 models/api-response-map-string-long.ts
 models/api-response-map-string-object.ts
 models/api-response-map-string-string.ts
+models/api-response-marketing-campaign.ts
 models/api-response-material-upload-response.ts
 models/api-response-message-search-statistics.ts
 models/api-response-notification-template.ts
@@ -107,6 +112,7 @@ models/api-response-page-conversation-response.ts
 models/api-response-page-coupon-response.ts
 models/api-response-page-coupon-user-relation.ts
 models/api-response-page-dispute-dto.ts
+models/api-response-page-event.ts
 models/api-response-page-goods-response.ts
 models/api-response-page-logistics-dto.ts
 models/api-response-page-message-response.ts
@@ -119,6 +125,7 @@ models/api-response-page-post-response.ts
 models/api-response-page-refund-request.ts
 models/api-response-page-reply-response.ts
 models/api-response-page-report-response.ts
+models/api-response-page-resource.ts
 models/api-response-page-review.ts
 models/api-response-page-search-result-item.ts
 models/api-response-page-tag-response.ts
@@ -133,6 +140,7 @@ models/api-response-recommend-statistics-dto.ts
 models/api-response-refund-request.ts
 models/api-response-refund-response-dto.ts
 models/api-response-refund-statistics-dto.ts
+models/api-response-resource.ts
 models/api-response-revert-execution-result.ts
 models/api-response-review-media-dto.ts
 models/api-response-review-reply-dto.ts
@@ -182,6 +190,7 @@ models/campus-statistics-response.ts
 models/campus-update-request.ts
 models/campus.ts
 models/captcha-response.ts
+models/captcha-verify-response.ts
 models/category-batch-sort-request.ts
 models/category-node-response.ts
 models/category-statistics-response.ts
@@ -227,6 +236,7 @@ models/dispute-statistics-dto.ts
 models/endpoint-stats.ts
 models/error-log.ts
 models/error-statistics.ts
+models/event.ts
 models/evidence-dto.ts
 models/evidence-summary-dto.ts
 models/export-job.ts
@@ -252,6 +262,7 @@ models/logistics-dto.ts
 models/logistics-filter-request.ts
 models/logistics-statistics-dto.ts
 models/logistics-track-record.ts
+models/marketing-campaign.ts
 models/material-upload-response.ts
 models/merge-tag-request.ts
 models/message-response.ts
@@ -278,6 +289,7 @@ models/page-conversation-response.ts
 models/page-coupon-response.ts
 models/page-coupon-user-relation.ts
 models/page-dispute-dto.ts
+models/page-event.ts
 models/page-goods-response.ts
 models/page-logistics-dto.ts
 models/page-message-response.ts
@@ -290,6 +302,7 @@ models/page-post-response.ts
 models/page-refund-request.ts
 models/page-reply-response.ts
 models/page-report-response.ts
+models/page-resource.ts
 models/page-review.ts
 models/page-search-result-item.ts
 models/page-tag-response.ts
@@ -319,6 +332,7 @@ models/reply-response.ts
 models/report-response.ts
 models/reset-password-by-email-request.ts
 models/reset-password-by-sms-request.ts
+models/resource.ts
 models/respond-proposal-request.ts
 models/revert-execution-result.ts
 models/review-media-dto.ts
@@ -353,6 +367,7 @@ models/topic.ts
 models/track-point.ts
 models/trend-data-point.ts
 models/two-factor-request.ts
+models/unified-captcha-verify-request.ts
 models/update-category-request.ts
 models/update-password-request.ts
 models/update-post-request.ts

@@ -7,28 +7,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button, Skeleton, Modal, Tabs, TagSelector, TopicSelector } from '@campus/shared/components';
-import type { TagOption, TopicOption } from '@campus/shared/components';
+import { Button, Skeleton, Modal, Tabs, Input } from '@campus/shared/components';
 import { postService, tagService, topicService } from '@campus/shared/services';
 import type { Tag } from '@campus/shared/services/tag';
 import type { Topic } from '@campus/shared/services/topic';
 import { useAuthStore, useNotificationStore } from '../../store';
+import LeftSidebar from './components/LeftSidebar';
+import PostCard from './components/PostCard';
+import type { Post } from './components/PostCard';
+import RightSidebar from './components/RightSidebar';
+import MarkdownEditor from '../../components/MarkdownEditor';
 import './Community.css';
 
 // ==================== 类型定义 ====================
-
-interface Post {
-  postId: string;
-  authorId: string;
-  authorName: string;
-  authorAvatar?: string;
-  content: string;
-  images?: string[];
-  likeCount: number;
-  commentCount: number;
-  isLiked: boolean;
-  createdAt: string;
-}
 
 interface Comment {
   commentId: string;
@@ -64,6 +55,55 @@ const Community: React.FC = () => {
   const [publishTopicIds, setPublishTopicIds] = useState<number[]>([]); // 新增：话题ID列表
   const [publishing, setPublishing] = useState(false);
 
+  // 草稿保存
+  const DRAFT_KEY = 'community_post_draft';
+
+  /**
+   * 从 localStorage 加载草稿
+   */
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_KEY);
+      if (savedDraft) {
+        const draft = JSON.parse(savedDraft);
+        // 仅在内容不为空时提示
+        if (draft.content && !publishContent) {
+          const shouldRestore = window.confirm('检测到未发布的草稿，是否恢复？');
+          if (shouldRestore) {
+            setPublishContent(draft.content);
+            setPublishTagIds(draft.tagIds || []);
+          } else {
+            localStorage.removeItem(DRAFT_KEY);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('加载草稿失败：', error);
+    }
+  }, []);
+
+  /**
+   * 自动保存草稿（每 5 秒）
+   */
+  useEffect(() => {
+    if (!publishContent) return;
+
+    const timer = setTimeout(() => {
+      try {
+        const draft = {
+          content: publishContent,
+          tagIds: publishTagIds,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch (error) {
+        console.error('保存草稿失败：', error);
+      }
+    }, 5000); // 5秒后保存
+
+    return () => clearTimeout(timer);
+  }, [publishContent, publishTagIds]);
+
   // 评论弹窗
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [currentPost, setCurrentPost] = useState<Post | null>(null);
@@ -79,8 +119,8 @@ const Community: React.FC = () => {
 
   // 话题列表
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [hotTags, setHotTags] = useState<TagOption[]>([]);
-  const [hotTopics, setHotTopics] = useState<TopicOption[]>([]);
+  const [hotTags, setHotTags] = useState<Array<{ id: number; name: string; usageCount?: number }>>([]);
+  const [hotTopics, setHotTopics] = useState<Array<{ id: number; name: string; description?: string; postCount?: number; followerCount?: number }>>([]);
 
   // ==================== 数据加载 ====================
 
@@ -240,6 +280,8 @@ const Community: React.FC = () => {
     setPublishImages([]);
     setPublishTagIds([]);
     setPublishTopicIds([]);
+    // 清除草稿
+    localStorage.removeItem(DRAFT_KEY);
   };
 
   /**
@@ -263,6 +305,8 @@ const Community: React.FC = () => {
       });
 
       toast.success('发布成功！🎉');
+      // 清除草稿
+      localStorage.removeItem(DRAFT_KEY);
       handleClosePublishModal();
       loadPosts(); // 重新加载帖子列表
     } catch (err: any) {
@@ -429,7 +473,7 @@ const Community: React.FC = () => {
     setPage(1);
     setHasMore(true);
     setPosts([]);
-    loadPosts(false, tagId); // 立即加载该标签的帖子
+    loadPosts(); // 立即加载该标签的帖子
   };
 
   /**
@@ -487,18 +531,33 @@ const Community: React.FC = () => {
     return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
   };
 
+  // 选择话题
+  const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null);
+
   // ==================== 渲染 ====================
 
   return (
     <div className="community-page">
       <div className="community-container">
-        {/* ==================== 顶部操作栏 ==================== */}
-        <div className="community-header">
-          <h1 className="community-header__title">🌐 校园社区</h1>
-          <Button type="primary" size="large" onClick={handleOpenPublishModal}>
-            ✍️ 发布动态
-          </Button>
+        {/* ==================== 左侧边栏 ==================== */}
+        <div className="community-sidebar-left">
+          <LeftSidebar
+            topics={topics}
+            selectedTopicId={selectedTopicId}
+            onSelectTopic={setSelectedTopicId}
+            isAuthenticated={!!currentUser}
+          />
         </div>
+
+        {/* ==================== 主内容区 ==================== */}
+        <div className="community-main">
+          {/* 顶部操作栏 */}
+          <div className="community-header">
+            <h1 className="community-header__title">🌐 校园社区</h1>
+            <Button type="primary" size="large" onClick={handleOpenPublishModal}>
+              ✍️ 发布动态
+            </Button>
+          </div>
 
         {/* ==================== 热门标签 ==================== */}
         {tags.length > 0 && (
@@ -547,76 +606,27 @@ const Community: React.FC = () => {
           />
         </div>
 
-        {/* ==================== 帖子列表 ==================== */}
-        <div className="community-posts">
-          {loading ? (
-            <Skeleton type="card" count={3} animation="wave" />
-          ) : posts.length === 0 ? (
-            <div className="community-empty">
-              <div className="empty-icon">📭</div>
-              <p className="empty-text">还没有动态</p>
-              <p className="empty-tip">快来发布第一条动态吧！</p>
-            </div>
-          ) : (
-            <>
-              {posts.map((post) => (
-                <div
-                  key={post.postId}
-                  className="post-card"
-                  onClick={() => handleViewPost(post.postId)}
-                >
-                  {/* 用户信息 */}
-                  <div className="post-card__header">
-                    <div className="post-card__avatar">
-                      {post.authorAvatar ? (
-                        <img src={post.authorAvatar} alt={post.authorName} />
-                      ) : (
-                        <span>👤</span>
-                      )}
-                    </div>
-                    <div className="post-card__info">
-                      <div className="post-card__name">{post.authorName}</div>
-                      <div className="post-card__time">{formatTime(post.createdAt)}</div>
-                    </div>
-                  </div>
-
-                  {/* 帖子内容 */}
-                  <div className="post-card__content">
-                    <p>{post.content}</p>
-                  </div>
-
-                  {/* 图片 */}
-                  {post.images && post.images.length > 0 && (
-                    <div className="post-card__images">
-                      {post.images.map((image, index) => (
-                        <img key={index} src={image} alt={`图片${index + 1}`} />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 操作栏 */}
-                  <div className="post-card__actions">
-                    <button
-                      className={`post-card__action ${post.isLiked ? 'active' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleLike(post);
-                      }}
-                    >
-                      {post.isLiked ? '❤️' : '🤍'} {post.likeCount}
-                    </button>
-                    <button
-                      className="post-card__action"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenCommentModal(post);
-                      }}
-                    >
-                      💬 {post.commentCount}
-                    </button>
-                  </div>
-                </div>
-              ))}
+          {/* ==================== 帖子列表 ==================== */}
+          <div className="community-posts">
+            {loading ? (
+              <Skeleton type="card" count={3} animation="wave" />
+            ) : posts.length === 0 ? (
+              <div className="community-empty">
+                <div className="empty-icon">📭</div>
+                <p className="empty-text">还没有动态</p>
+                <p className="empty-tip">快来发布第一条动态吧！</p>
+              </div>
+            ) : (
+              <>
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.postId}
+                    post={post}
+                    onLike={handleToggleLike}
+                    onComment={handleOpenCommentModal}
+                    onView={handleViewPost}
+                  />
+                ))}
 
               {/* 加载更多 */}
               {hasMore && (
@@ -627,13 +637,24 @@ const Community: React.FC = () => {
                 </div>
               )}
 
-              {!hasMore && (
-                <div className="community-no-more">
-                  <p>已经到底啦！😊</p>
-                </div>
-              )}
-            </>
-          )}
+                {!hasMore && (
+                  <div className="community-no-more">
+                    <p>已经到底啦！😊</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ==================== 右侧边栏 ==================== */}
+        <div className="community-sidebar-right">
+          <RightSidebar
+            hotTopics={topics.filter(t => t.isHot).slice(0, 8)}
+            hotTags={tags.slice(0, 12)}
+            onSelectTopic={setSelectedTopicId}
+            onSelectTag={(tagId) => handleSelectTag(tagId)}
+          />
         </div>
       </div>
 
@@ -641,13 +662,15 @@ const Community: React.FC = () => {
       {showPublishModal && (
         <Modal onClose={handleClosePublishModal} title="✍️ 发布动态">
           <div className="publish-modal">
-            <textarea
-              className="publish-modal__textarea"
-              placeholder="分享你的生活...（最多500字）"
+            {/* Markdown 编辑器 */}
+            <MarkdownEditor
               value={publishContent}
-              onChange={(e) => setPublishContent(e.target.value)}
-              maxLength={500}
-              rows={6}
+              onChange={setPublishContent}
+              placeholder="分享你的生活... 支持 Markdown 语法哦！✨"
+              maxLength={5000}
+              minHeight={200}
+              showToolbar={true}
+              showEmojiPicker={true}
             />
 
             {/* 标签选择区域 */}

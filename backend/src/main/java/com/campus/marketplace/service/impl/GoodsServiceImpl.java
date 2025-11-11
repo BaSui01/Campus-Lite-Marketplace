@@ -144,12 +144,13 @@ public class GoodsServiceImpl implements GoodsService {
 
     /**
      * 查询物品列表
+     * 
+     * 🔧 缓存策略优化：不缓存 Page 对象（避免 Pageable 序列化问题）
+     * 原因：Spring Data 的 Sort.Order 内部字段变更会导致 Redis 反序列化失败
+     * 解决方案：分页查询不适合缓存，因为参数组合过多，缓存命中率低
      */
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "goods:list",
-            key = "T(java.util.Objects).hash(#keyword,#categoryId,#minPrice,#maxPrice,#status,#page,#size,#sortBy,#sortDirection,#tagIds)",
-            unless = "#result == null")
     public Page<GoodsResponse> listGoods(
             String keyword,
             Long categoryId,
@@ -312,6 +313,7 @@ public class GoodsServiceImpl implements GoodsService {
                 .soldCount(goods.getSoldCount())  // ✅ 新增：已售数量
                 .originalPrice(goods.getOriginalPrice())  // ✅ 新增：原价
                 .coverImage(coverImage)
+                .images(goods.getImages())  // ✅ 新增：所有图片（支持轮播）
                 .createdAt(goods.getCreatedAt())
                 .build();
     }
@@ -587,5 +589,43 @@ public class GoodsServiceImpl implements GoodsService {
         GoodsResponse base = convertToResponse(goods);
         base.setTags(tagsMap.getOrDefault(goods.getId(), List.of()));
         return base;
+    }
+
+    /**
+     * 查询当前用户发布的物品列表
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<GoodsResponse> getMyGoods(int page, int size, String sortBy, String sortDirection) {
+        log.info("查询我的发布: page={}, size={}, sortBy={}, sortDirection={}", page, size, sortBy, sortDirection);
+
+        // 1. 获取当前登录用户
+        String username = SecurityUtil.getCurrentUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        // 2. 构建排序参数
+        Sort.Direction direction = "ASC".equalsIgnoreCase(sortDirection)
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+        
+        String sortField = switch (sortBy == null ? "createdAt" : sortBy.toLowerCase()) {
+            case "price" -> "price";
+            case "viewcount" -> "viewCount";
+            default -> "createdAt";
+        };
+
+        Sort sort = Sort.by(direction, sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // 3. 查询我的商品（所有状态）
+        Page<Goods> goodsPage = goodsRepository.findBySellerId(user.getId(), pageable);
+
+        Map<Long, List<TagResponse>> tagsMap = loadTagsForGoods(
+                goodsPage.getContent().stream().map(Goods::getId).toList()
+        );
+
+        // 4. 转换为响应 DTO
+        return goodsPage.map(goods -> convertToResponse(goods, tagsMap));
     }
 }

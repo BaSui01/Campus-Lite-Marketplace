@@ -420,10 +420,11 @@ export const GoodsStatusLabel: Record<GoodsStatus, string> = {
 export const OrderStatusLabel: Record<OrderStatus, string> = {
   [OrderStatus.PENDING_PAYMENT]: '待支付',
   [OrderStatus.PAID]: '已支付',
-  [OrderStatus.PENDING_DELIVERY]: '待发货',
-  [OrderStatus.PENDING_RECEIPT]: '待收货',
+  [OrderStatus.SHIPPED]: '已发货',
+  [OrderStatus.DELIVERED]: '已送达',
   [OrderStatus.COMPLETED]: '已完成',
   [OrderStatus.CANCELLED]: '已取消',
+  [OrderStatus.REVIEWED]: '已评价',
   [OrderStatus.REFUNDING]: '退款中',
   [OrderStatus.REFUNDED]: '已退款',
 };

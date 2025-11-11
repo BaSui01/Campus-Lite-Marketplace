@@ -74,47 +74,27 @@ export const ClickCaptcha: React.FC<ClickCaptchaProps> = ({
     if (!captchaData || isSuccess || isFailed) return;
 
     const rect = imageRef.current?.getBoundingClientRect();
-    const imgElement = imageRef.current?.querySelector('img');
-    if (!rect || !imgElement) return;
+    if (!rect) return;
 
-    // 🎯 获取点击位置（相对于容器）
-    const clickX = event.clientX - rect.left;
-    const clickY = event.clientY - rect.top;
+    // 🎯 获取点击位置（相对于容器左上角）
+    // 由于图片固定为300x200，与后端生成的尺寸完全一致，直接使用原始坐标即可
+    const clickX = Math.round(event.clientX - rect.left);
+    const clickY = Math.round(event.clientY - rect.top);
 
-    // 🎯 获取图片的实际尺寸和显示尺寸
-    const naturalWidth = imgElement.naturalWidth;   // 图片原始宽度（后端生成：300px）
-    const naturalHeight = imgElement.naturalHeight; // 图片原始高度（后端生成：200px）
-    const displayWidth = imgElement.clientWidth;    // 图片显示宽度（前端可能放大）
-    const displayHeight = imgElement.clientHeight;  // 图片显示高度（前端可能放大）
+    console.log('👆 [ClickCaptcha] 点击坐标:', { clickX, clickY });
 
-    // 🎯 计算缩放比例
-    const scaleX = naturalWidth / displayWidth;
-    const scaleY = naturalHeight / displayHeight;
+    // ✅ 保存坐标（前后端使用相同坐标系，无需转换）
+    const newClickedPoints = [...clickedPoints, { x: clickX, y: clickY }];
+    const newDisplayPoints = [...displayPoints, { x: clickX, y: clickY }];
 
-    // 🎯 转换为图片原始坐标（用于传给后端）
-    const scaledX = Math.round(clickX * scaleX);
-    const scaledY = Math.round(clickY * scaleY);
-
-    console.log('👆 [ClickCaptcha] 坐标转换:', {
-      点击位置: { clickX, clickY },
-      图片原始尺寸: { naturalWidth, naturalHeight },
-      图片显示尺寸: { displayWidth, displayHeight },
-      缩放比例: { scaleX, scaleY },
-      后端坐标: { scaledX, scaledY },
-    });
-
-    // ✅ 保存两组坐标
-    const newScaledPoints = [...clickedPoints, { x: scaledX, y: scaledY }]; // 后端坐标
-    const newDisplayPoints = [...displayPoints, { x: clickX, y: clickY }];  // 显示坐标
-
-    setClickedPoints(newScaledPoints);
+    setClickedPoints(newClickedPoints);
     setDisplayPoints(newDisplayPoints);
 
-    console.log('👆 [ClickCaptcha] 点击位置 - 后端:', { x: scaledX, y: scaledY }, '显示:', { x: clickX, y: clickY }, '总共:', newScaledPoints.length);
+    console.log('👆 [ClickCaptcha] 已记录点击:', { x: clickX, y: clickY }, '总共:', newClickedPoints.length);
 
     // 如果点击数量达到目标数量，自动验证
-    if (newScaledPoints.length === captchaData.targetWords.length) {
-      await verifyClick(newScaledPoints);
+    if (newClickedPoints.length === captchaData.targetWords.length) {
+      await verifyClick(newClickedPoints);
     }
   };
 

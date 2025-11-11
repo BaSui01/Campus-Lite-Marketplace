@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserAvatar } from '@campus/shared/components';
 import './SellerCard.css';
 
 interface SellerCardProps {
@@ -36,19 +37,16 @@ export const SellerCard: React.FC<SellerCardProps> = ({
       <h3 className="seller-card__title">卖家信息</h3>
       
       <div className="seller-card__content">
-        {/* 卖家头像 */}
-        <div className="seller-card__avatar-wrapper" onClick={handleViewProfile}>
-          {sellerAvatar ? (
-            <img
-              src={sellerAvatar}
-              alt={sellerName}
-              className="seller-card__avatar"
-            />
-          ) : (
-            <div className="seller-card__avatar seller-card__avatar--placeholder">
-              {sellerName.charAt(0).toUpperCase()}
-            </div>
-          )}
+        {/* 卖家头像 - 使用 UserAvatar 组件保持一致性 */}
+        <div className="seller-card__avatar-wrapper">
+          <UserAvatar
+            userId={sellerId.toString()}
+            username={sellerName}
+            avatarUrl={sellerAvatar}
+            size="large"
+            onAvatarClick={() => handleViewProfile()}
+            showUsername={false}
+          />
         </div>
 
         {/* 卖家信息 */}

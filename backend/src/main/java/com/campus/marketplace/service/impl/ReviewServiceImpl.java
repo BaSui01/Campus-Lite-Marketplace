@@ -66,9 +66,25 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Page<Review> getGoodsReviews(Long goodsId, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return reviewRepository.findAll(pageRequest);
+    public Page<Review> getGoodsReviews(Long goodsId, int page, int size, Integer rating, String sortBy) {
+        // 确定排序字段（支持前端传来的 time/like/helpful）
+        String sortField;
+        if ("like".equalsIgnoreCase(sortBy) || "helpful".equalsIgnoreCase(sortBy)) {
+            sortField = "likeCount"; // 按点赞数排序
+        } else {
+            sortField = "createdAt"; // 默认按时间排序（time 或其他值）
+        }
+        Sort.Direction sortDirection = Sort.Direction.DESC;
+
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sortField));
+
+        // 如果有评分筛选，使用自定义查询
+        if (rating != null) {
+            return reviewRepository.findByOrderGoodsIdAndRatingAndStatus(goodsId, rating, ReviewStatus.NORMAL, pageRequest);
+        }
+
+        // 否则查询所有正常状态的评价
+        return reviewRepository.findByOrderGoodsIdAndStatus(goodsId, ReviewStatus.NORMAL, pageRequest);
     }
 
     @Override

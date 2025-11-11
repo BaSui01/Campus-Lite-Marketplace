@@ -230,6 +230,7 @@ public class RecommendServiceImpl implements RecommendService {
                 .soldCount(goods.getSoldCount())  // ✅ 新增
                 .originalPrice(goods.getOriginalPrice())  // ✅ 新增
                 .coverImage(coverImage)
+                .images(goods.getImages())  // ✅ 新增：所有图片（支持轮播）
                 .createdAt(goods.getCreatedAt())
                 .build();
     }

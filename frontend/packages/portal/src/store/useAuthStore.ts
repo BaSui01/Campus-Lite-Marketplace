@@ -7,7 +7,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, LoginRequest, RegisterRequest } from '@campus/shared';
-import { authService, setItem, getItem, removeItem, TOKEN_KEY, REFRESH_TOKEN_KEY } from '@campus/shared';
+import { Services } from '@campus/shared';
+import { setItem, getItem, removeItem, TOKEN_KEY, REFRESH_TOKEN_KEY } from '@campus/shared';
+
+// 🔧 BaSui 修复：从 Services 命名空间解构 authService
+const { authService } = Services;
 
 /**
  * 认证状态接口

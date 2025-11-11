@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -28,7 +27,8 @@ import java.time.Duration;
  * @date 2025-10-25
  */
 @Configuration
-@ConditionalOnProperty(name = "app.redis.mode", havingValue = "redis", matchIfMissing = true)
+// 🔧 临时移除条件注解，确保Redis配置一定会被加载
+// @ConditionalOnProperty(name = "app.redis.mode", havingValue = "redis", matchIfMissing = true)
 public class RedisConfig {
 
     /**

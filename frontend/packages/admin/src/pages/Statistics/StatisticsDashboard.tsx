@@ -36,8 +36,7 @@ import type {
   OrderStatistics,
   RefundStatistics,
 } from '../../services/statistics';
-import { paymentService } from '@/services';
-import type { PaymentStatistics } from '@campus/shared';
+import { paymentService, type PaymentStatistics } from '@campus/shared';
 import TrendChart from './components/TrendChart';
 import RevenueChart from './components/RevenueChart';
 import RankingList from './components/RankingList';
@@ -79,7 +78,7 @@ const StatisticsDashboard: React.FC = () => {
     setLoading(true);
     try {
       // 并行加载所有数据（包括P2新增的统计）
-      const [overview, trend, revenue, goods, users, categories, payment, order, refund] = await Promise.all([
+      const [overview, trend, revenue, goods, users, categories, payment] = await Promise.all([
         statisticsService.getSystemOverview(),
         statisticsService.getTrendStatistics(trendDays),
         statisticsService.getRevenueTrend(revenueMonths),
@@ -87,8 +86,6 @@ const StatisticsDashboard: React.FC = () => {
         statisticsService.getTopUsers(10),
         statisticsService.getCategoryStatistics(),
         paymentService.getPaymentStatistics(),
-        statisticsService.getOrderStatistics(),
-        statisticsService.getRefundStatistics(),
       ]);
 
       setOverviewData(overview);
@@ -98,8 +95,20 @@ const StatisticsDashboard: React.FC = () => {
       setTopUsers(users);
       setCategoryStats(categories);
       setPaymentStats(payment);
-      setOrderStats(order);
-      setRefundStats(refund);
+      
+      // TODO: 订单和退款统计暂时使用模拟数据，等待后端接口
+      setOrderStats({
+        totalOrders: overview.totalOrders,
+        completedOrders: 0,
+        completionRate: 0,
+        todayNewOrders: overview.todayNewOrders,
+      });
+      setRefundStats({
+        totalRefunds: 0,
+        completedRefunds: 0,
+        approvalRate: 0,
+        averageProcessTime: 0,
+      });
 
       message.success('数据加载成功！');
     } catch (error: any) {

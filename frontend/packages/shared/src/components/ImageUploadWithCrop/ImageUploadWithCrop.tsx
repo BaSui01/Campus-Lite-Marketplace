@@ -132,7 +132,7 @@ export const ImageUploadWithCrop: React.FC<ImageUploadWithCropProps> = ({
 
     // 如果启用裁剪，显示裁剪器
     if (enableCrop && files.length === 1) {
-      setCropImage(files[0]);
+      setCropImage(files[0] || null);
       setShowCropper(true);
     } else {
       // 直接上传

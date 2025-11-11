@@ -61,4 +61,29 @@ public interface MarketingCampaignService {
      * 扣减活动库存（秒杀）
      */
     boolean deductStock(Long campaignId, int quantity);
+
+    /**
+     * 获取活动详情
+     */
+    MarketingCampaign getCampaignById(Long campaignId);
+
+    /**
+     * 更新活动信息
+     */
+    MarketingCampaign updateCampaign(Long campaignId, MarketingCampaign campaign);
+
+    /**
+     * 删除活动（软删除）
+     */
+    void deleteCampaign(Long campaignId);
+
+    /**
+     * 检查商品是否参与活动
+     */
+    MarketingCampaign checkGoodsInCampaign(Long goodsId);
+
+    /**
+     * 获取活动统计信息
+     */
+    java.util.Map<String, Object> getCampaignStatistics(Long merchantId);
 }

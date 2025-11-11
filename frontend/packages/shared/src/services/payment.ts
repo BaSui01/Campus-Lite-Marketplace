@@ -175,9 +175,10 @@ class PaymentServiceImpl implements PaymentService {
   async listPayments(params?: PaymentListParams): Promise<PageOrderResponse> {
     const api = getApi();
     // 调用 PaymentAdminController 的 listPayments 接口
-    const response = await api.listPaymentsAdmin({
+    // TODO: API 方法待后端生成后更新
+    const response = await api.listPayments({
       keyword: params?.keyword,
-      status: params?.status,
+      status: params?.status as any,
       paymentMethod: params?.paymentMethod,
       startDate: params?.startDate,
       endDate: params?.endDate,
@@ -219,7 +220,8 @@ class PaymentServiceImpl implements PaymentService {
   async getPaymentStatistics(startDate?: string, endDate?: string): Promise<PaymentStatistics> {
     const api = getApi();
     // 调用 PaymentAdminController 的 getStatistics 接口
-    const response = await api.getPaymentStatistics({
+    // TODO: API 方法待后端生成后更新
+    const response = await api.getStatistics1({
       startDate,
       endDate
     });
