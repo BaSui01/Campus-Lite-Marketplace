@@ -67,6 +67,12 @@ export interface PagePaymentRecordDTO {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PagePaymentRecordDTO
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PagePaymentRecordDTO
      */
@@ -83,12 +89,6 @@ export interface PagePaymentRecordDTO {
      * @memberof PagePaymentRecordDTO
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PagePaymentRecordDTO
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

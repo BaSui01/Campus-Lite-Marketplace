@@ -73,4 +73,39 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         @org.springframework.data.repository.query.Param("status") ReviewStatus status,
         Pageable pageable
     );
+
+    /**
+     * 根据商品ID、评分区间和状态查询评价（分页）
+     */
+    @org.springframework.data.jpa.repository.Query("""
+        SELECT r FROM Review r
+        WHERE r.orderId IN (SELECT o.id FROM Order o WHERE o.goodsId = :goodsId)
+          AND r.rating BETWEEN :minRating AND :maxRating
+          AND r.status = :status
+        """)
+    Page<Review> findByOrderGoodsIdAndRatingBetweenAndStatus(
+        @org.springframework.data.repository.query.Param("goodsId") Long goodsId,
+        @org.springframework.data.repository.query.Param("minRating") Integer minRating,
+        @org.springframework.data.repository.query.Param("maxRating") Integer maxRating,
+        @org.springframework.data.repository.query.Param("status") ReviewStatus status,
+        Pageable pageable
+    );
+
+    /**
+     * 只看有图：根据商品ID和状态查询“包含图片”的评价（分页）
+     */
+    @org.springframework.data.jpa.repository.Query("""
+        SELECT r FROM Review r
+        WHERE r.orderId IN (SELECT o.id FROM Order o WHERE o.goodsId = :goodsId)
+          AND r.status = :status
+          AND EXISTS (
+              SELECT 1 FROM ReviewMedia m
+              WHERE m.reviewId = r.id AND m.mediaType = com.campus.marketplace.common.enums.MediaType.IMAGE
+          )
+        """)
+    Page<Review> findHasImageByOrderGoodsIdAndStatus(
+        @org.springframework.data.repository.query.Param("goodsId") Long goodsId,
+        @org.springframework.data.repository.query.Param("status") ReviewStatus status,
+        Pageable pageable
+    );
 }

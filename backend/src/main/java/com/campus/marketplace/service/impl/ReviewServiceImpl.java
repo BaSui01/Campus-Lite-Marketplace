@@ -66,19 +66,37 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Page<Review> getGoodsReviews(Long goodsId, int page, int size, Integer rating, String sortBy) {
+    public Page<Review> getGoodsReviews(Long goodsId, int page, int size, Integer rating, String sortBy, Boolean hasImages, String group) {
         // 确定排序字段（支持前端传来的 time/like/helpful）
         String sortField;
         if ("like".equalsIgnoreCase(sortBy) || "helpful".equalsIgnoreCase(sortBy)) {
             sortField = "likeCount"; // 按点赞数排序
         } else {
-            sortField = "createdAt"; // 默认按时间排序（time 或其他值）
+            // image_first 仍按时间排序，前端进行页内重排（有图优先）
+            sortField = "createdAt"; // 默认按时间排序（time/image_first/其他值）
         }
         Sort.Direction sortDirection = Sort.Direction.DESC;
 
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortDirection, sortField));
 
-        // 如果有评分筛选，使用自定义查询
+        // 只看有图
+        if (Boolean.TRUE.equals(hasImages)) {
+            return reviewRepository.findHasImageByOrderGoodsIdAndStatus(goodsId, ReviewStatus.NORMAL, pageRequest);
+        }
+
+        // 评分分组（好评/中评/差评）
+        if (group != null) {
+            String g = group.toLowerCase();
+            if ("positive".equals(g)) {
+                return reviewRepository.findByOrderGoodsIdAndRatingBetweenAndStatus(goodsId, 4, 5, ReviewStatus.NORMAL, pageRequest);
+            } else if ("neutral".equals(g)) {
+                return reviewRepository.findByOrderGoodsIdAndRatingBetweenAndStatus(goodsId, 3, 3, ReviewStatus.NORMAL, pageRequest);
+            } else if ("negative".equals(g)) {
+                return reviewRepository.findByOrderGoodsIdAndRatingBetweenAndStatus(goodsId, 1, 2, ReviewStatus.NORMAL, pageRequest);
+            }
+        }
+
+        // 如果有精确评分筛选，使用自定义查询
         if (rating != null) {
             return reviewRepository.findByOrderGoodsIdAndRatingAndStatus(goodsId, rating, ReviewStatus.NORMAL, pageRequest);
         }

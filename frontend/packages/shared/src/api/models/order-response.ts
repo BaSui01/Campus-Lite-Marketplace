@@ -15,7 +15,7 @@
 
 
 /**
- * 
+ * 业务数据载荷
  * @export
  * @interface OrderResponse
  */
@@ -116,6 +116,18 @@ export interface OrderResponse {
      * @memberof OrderResponse
      */
     'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'paymentExpireAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof OrderResponse
+     */
+    'timeoutMinutes'?: number;
 }
 
 export const OrderResponseStatusEnum = {

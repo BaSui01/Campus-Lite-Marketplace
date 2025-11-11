@@ -136,6 +136,25 @@ export interface GoodsCardProps extends Omit<CardProps, 'children'> {
    * 卖家点击回调
    */
   onSellerClick?: (sellerId: string) => void;
+
+  // ===== 兼容旧版调用方式（可选）=====
+  id?: string | number;
+  title?: string;
+  name?: string;
+  price?: number;
+  originalPrice?: number;
+  coverImage?: string;
+  imageUrl?: string;
+  images?: string[];
+  status?: GoodsStatus;
+  stock?: number;
+  soldCount?: number;
+  tags?: string[];
+  sellerName?: string;
+  sellerId?: string | number;
+  sellerAvatar?: string;
+  seller?: { id: string; name: string; avatar?: string };
+  createdAt?: string;
 }
 
 /**
@@ -201,20 +220,51 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
   onSellerClick,
   ...cardProps
 }) => {
-  const statusConfig = getStatusConfig(goods.status);
-  const isAvailable = goods.status === 'on_sale' && goods.stock > 0;
-  const hasDiscount = goods.originalPrice && goods.originalPrice > goods.price;
+  // 兼容：若未传入 goods，则从旧版扁平 props 构造
+  const normalizedGoods: GoodsData = goods || {
+    id: String(cardProps.id ?? ''),
+    name: (cardProps.name || cardProps.title || '未命名商品') as string,
+    price: Number(cardProps.price ?? 0),
+    originalPrice: cardProps.originalPrice,
+    imageUrl: (cardProps.coverImage || cardProps.imageUrl || '') as string,
+    images: cardProps.images,
+    status: (cardProps.status || 'on_sale') as GoodsStatus,
+    stock: Number(cardProps.stock ?? 1),
+    soldCount: cardProps.soldCount,
+    tags: cardProps.tags,
+    seller:
+      cardProps.seller ||
+      (cardProps.sellerName
+        ? {
+            id: String(cardProps.sellerId ?? ''),
+            name: cardProps.sellerName,
+            avatar: cardProps.sellerAvatar,
+          }
+        : undefined),
+    createdAt: cardProps.createdAt,
+  } as GoodsData;
+
+  const g = normalizedGoods;
+  const statusConfig = getStatusConfig(g.status);
+  const isAvailable = g.status === 'on_sale' && g.stock > 0;
+  const hasDiscount = !!g.originalPrice && g.originalPrice > g.price;
 
   // 图片轮播状态
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
-  const images = goods.images && goods.images.length > 0 ? goods.images : [goods.imageUrl];
+  const images = g.images && g.images.length > 0 ? g.images : [g.imageUrl].filter(Boolean);
+  const safeImages = images.length > 0 ? images : [''];
+  const imageList = safeImages;
   const hasMultipleImages = images.length > 1;
 
   /**
    * 处理卡片点击
    */
-  const handleCardClick = () => {
-    onCardClick?.(goods);
+  const handleCardClick = (e?: React.MouseEvent) => {
+    // 先透传旧版 onClick（CardProps）
+    if (cardProps.onClick) {
+      cardProps.onClick(e as any);
+    }
+    onCardClick?.(g);
   };
 
   /**
@@ -222,7 +272,7 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
    */
   const handleBuyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onBuyClick?.(goods);
+    onBuyClick?.(g);
   };
 
   /**
@@ -230,7 +280,7 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
    */
   const handleCartClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onCartClick?.(goods);
+    onCartClick?.(g);
   };
 
   /**
@@ -238,8 +288,8 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
    */
   const handleSellerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (goods.seller) {
-      onSellerClick?.(goods.seller.id);
+    if (g.seller) {
+      onSellerClick?.(g.seller.id);
     }
   };
 
@@ -266,8 +316,8 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
       cover={
         <div className="campus-goods-card__image-wrapper">
           <img 
-            src={images[currentImageIndex]} 
-            alt={goods.name} 
+            src={imageList[currentImageIndex]} 
+            alt={g.name} 
             className="campus-goods-card__image" 
           />
           
@@ -311,7 +361,7 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
 
               {/* 图片指示器 */}
               <div className="campus-goods-card__image-indicators">
-                {images.map((_, index) => (
+                {imageList.map((_, index) => (
                   <span
                     key={index}
                     className={`campus-goods-card__image-indicator ${
@@ -352,38 +402,38 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
       {/* 商品信息 */}
       <div className="campus-goods-card__content">
         {/* 商品名称 */}
-        <h3 className="campus-goods-card__name" title={goods.name}>
-          {goods.name}
+        <h3 className="campus-goods-card__name" title={g.name}>
+          {g.name}
         </h3>
 
         {/* 商品描述 */}
-        {goods.description && (
-          <p className="campus-goods-card__description" title={goods.description}>
-            {goods.description}
+        {g.description && (
+          <p className="campus-goods-card__description" title={g.description}>
+            {g.description}
           </p>
         )}
 
         {/* 价格信息 */}
         <div className="campus-goods-card__price-wrapper">
-          <span className="campus-goods-card__price">{formatPrice(goods.price)}</span>
+          <span className="campus-goods-card__price">{formatPrice(g.price)}</span>
           {hasDiscount && (
             <span className="campus-goods-card__original-price">
-              {formatPrice(goods.originalPrice!)}
+              {formatPrice(g.originalPrice!)}
             </span>
           )}
         </div>
 
         {/* 标签 */}
-        {showTags && goods.tags && goods.tags.length > 0 && (
+        {showTags && g.tags && g.tags.length > 0 && (
           <div className="campus-goods-card__tags">
-            {goods.tags.slice(0, 3).map((tag, index) => (
+            {g.tags.slice(0, 3).map((tag, index) => (
               <Tag key={index} size="small" color="default">
                 {tag}
               </Tag>
             ))}
-            {goods.tags.length > 3 && (
+            {g.tags.length > 3 && (
               <Tag size="small" color="default">
-                +{goods.tags.length - 3}
+                +{g.tags.length - 3}
               </Tag>
             )}
           </div>
@@ -392,12 +442,12 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
         {/* 底部信息 */}
         <div className="campus-goods-card__footer">
           {/* 卖家信息 - 使用 UserAvatar 组件保持一致性 */}
-          {showSeller && goods.seller && (
+          {showSeller && g.seller && (
             <div className="campus-goods-card__seller">
               <UserAvatar
-                userId={goods.seller.id}
-                username={goods.seller.name}
-                avatarUrl={goods.seller.avatar}
+                userId={g.seller.id}
+                username={g.seller.name}
+                avatarUrl={g.seller.avatar}
                 size="small"
                 onAvatarClick={onSellerClick}
                 showUsername
@@ -407,8 +457,8 @@ export const GoodsCard: React.FC<GoodsCardProps> = ({
           )}
 
           {/* 已售数量 */}
-          {showSoldCount && goods.soldCount !== undefined && (
-            <span className="campus-goods-card__sold-count">已售 {goods.soldCount}</span>
+          {showSoldCount && g.soldCount !== undefined && (
+            <span className="campus-goods-card__sold-count">已售 {g.soldCount}</span>
           )}
         </div>
       </div>

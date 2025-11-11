@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import type { Topic } from '@campus/shared/services/topic';
 import './LeftSidebar.css';
 
@@ -22,31 +22,29 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onSelectTopic,
   isAuthenticated,
 }) => {
-  const navigate = useNavigate();
-
   // 快捷导航项
   const quickNavItems = [
-    { icon: '🏠', label: '全部话题', key: 'all', onClick: () => onSelectTopic(null) },
-    { icon: '🔥', label: '热门', key: 'hot', onClick: () => navigate('/community?tab=hot') },
-    { icon: '📝', label: '最新', key: 'new', onClick: () => navigate('/community?tab=new') },
-    { icon: '📌', label: '精华', key: 'featured', onClick: () => navigate('/community?tab=featured') },
+    { icon: '🏠', label: '全部话题', key: 'all', to: '/community', onClick: () => onSelectTopic(null) },
+    { icon: '🔥', label: '热门', key: 'hot', to: '/community?tab=hot' },
+    { icon: '📝', label: '最新', key: 'new', to: '/community?tab=new' },
+    { icon: '📌', label: '精华', key: 'featured', to: '/community?tab=featured' },
   ];
 
   // 用户导航项（需要登录）
   const userNavItems = isAuthenticated
     ? [
-        { icon: '⭐', label: '我的关注', onClick: () => navigate('/community?tab=followed') },
-        { icon: '📬', label: '我的帖子', onClick: () => navigate('/profile/posts') },
-        { icon: '💬', label: '我的评论', onClick: () => navigate('/profile/comments') },
-        { icon: '🔖', label: '我的收藏', onClick: () => navigate('/profile/favorites') },
+        { icon: '⭐', label: '我的关注', to: '/community?tab=followed' },
+        { icon: '📬', label: '我的帖子', to: '/profile/posts' },
+        { icon: '💬', label: '我的评论', to: '/profile/comments' },
+        { icon: '🔖', label: '我的收藏', to: '/profile/favorites' },
       ]
     : [];
 
   // 资源导航项
   const resourceNavItems = [
-    { icon: '🛍️', label: '商品市场', onClick: () => navigate('/goods') },
-    { icon: '🎉', label: '校园活动', onClick: () => navigate('/events') },
-    { icon: '🎓', label: '学习资源', onClick: () => navigate('/resources') },
+    { icon: '🛍️', label: '商品市场', to: '/goods' },
+    { icon: '🎉', label: '校园活动', to: '/events' },
+    { icon: '🎓', label: '学习资源', to: '/resources' },
   ];
 
   return (
@@ -56,14 +54,15 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         <div className="sidebar-section__title">快速导航</div>
         <nav className="sidebar-nav">
           {quickNavItems.map((item) => (
-            <button
+            <NavLink
               key={item.key}
+              to={item.to as string}
               className={`sidebar-nav__item ${item.key === 'all' && selectedTopicId === null ? 'active' : ''}`}
               onClick={item.onClick}
             >
               <span className="sidebar-nav__icon">{item.icon}</span>
               <span className="sidebar-nav__label">{item.label}</span>
-            </button>
+            </NavLink>
           ))}
         </nav>
       </section>
@@ -96,14 +95,14 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           <div className="sidebar-section__title">我的</div>
           <nav className="sidebar-nav">
             {userNavItems.map((item, index) => (
-              <button
+              <NavLink
                 key={index}
+                to={item.to as string}
                 className="sidebar-nav__item"
-                onClick={item.onClick}
               >
                 <span className="sidebar-nav__icon">{item.icon}</span>
                 <span className="sidebar-nav__label">{item.label}</span>
-              </button>
+              </NavLink>
             ))}
           </nav>
         </section>
@@ -114,14 +113,14 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         <div className="sidebar-section__title">更多</div>
         <nav className="sidebar-nav">
           {resourceNavItems.map((item, index) => (
-            <button
+            <NavLink
               key={index}
+              to={item.to as string}
               className="sidebar-nav__item"
-              onClick={item.onClick}
             >
               <span className="sidebar-nav__icon">{item.icon}</span>
               <span className="sidebar-nav__label">{item.label}</span>
-            </button>
+            </NavLink>
           ))}
         </nav>
       </section>

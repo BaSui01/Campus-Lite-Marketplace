@@ -67,6 +67,12 @@ export interface PageCouponResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageCouponResponse
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageCouponResponse
      */
@@ -83,12 +89,6 @@ export interface PageCouponResponse {
      * @memberof PageCouponResponse
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageCouponResponse
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

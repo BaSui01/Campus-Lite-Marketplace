@@ -99,8 +99,8 @@ models/api-response-notification-template.ts
 models/api-response-object.ts
 models/api-response-optional-arbitration-dto.ts
 models/api-response-optional-negotiation-message-dto.ts
+models/api-response-order-response.ts
 models/api-response-order-statistics-dto.ts
-models/api-response-order.ts
 models/api-response-page-appeal-material.ts
 models/api-response-page-appeal.ts
 models/api-response-page-audit-log-response.ts
@@ -111,6 +111,7 @@ models/api-response-page-compliance-audit-log.ts
 models/api-response-page-conversation-response.ts
 models/api-response-page-coupon-response.ts
 models/api-response-page-coupon-user-relation.ts
+models/api-response-page-credit-history-response.ts
 models/api-response-page-dispute-dto.ts
 models/api-response-page-event.ts
 models/api-response-page-goods-response.ts
@@ -126,11 +127,13 @@ models/api-response-page-refund-request.ts
 models/api-response-page-reply-response.ts
 models/api-response-page-report-response.ts
 models/api-response-page-resource.ts
+models/api-response-page-revert-request.ts
 models/api-response-page-review.ts
 models/api-response-page-search-result-item.ts
 models/api-response-page-tag-response.ts
 models/api-response-page-user-profile-response.ts
 models/api-response-payment-record-dto.ts
+models/api-response-payment-response.ts
 models/api-response-payment-statistics-dto.ts
 models/api-response-performance-report-response.ts
 models/api-response-post-response.ts
@@ -142,8 +145,10 @@ models/api-response-refund-response-dto.ts
 models/api-response-refund-statistics-dto.ts
 models/api-response-resource.ts
 models/api-response-revert-execution-result.ts
+models/api-response-revert-statistics.ts
 models/api-response-review-media-dto.ts
 models/api-response-review-reply-dto.ts
+models/api-response-review-statistics-dto.ts
 models/api-response-role-detail-response.ts
 models/api-response-rotate-captcha-response.ts
 models/api-response-search-suggestion-dto.ts
@@ -155,6 +160,7 @@ models/api-response-tag-statistics-response.ts
 models/api-response-tag.ts
 models/api-response-topic.ts
 models/api-response-user-behavior-log-dto.ts
+models/api-response-user-credit-info-response.ts
 models/api-response-user-persona-dto.ts
 models/api-response-user-profile-response.ts
 models/api-response-void.ts
@@ -198,7 +204,6 @@ models/category.ts
 models/check-blacklist-relation-response.ts
 models/click-captcha-response.ts
 models/click-point.ts
-models/click-verify-request.ts
 models/complete-privacy-request.ts
 models/compliance-audit-log.ts
 models/compliance-whitelist.ts
@@ -228,6 +233,8 @@ models/create-review-request.ts
 models/create-role-request.ts
 models/create-subscription-request.ts
 models/create-tag-request.ts
+models/credit-history-response.ts
+models/credit-level-info.ts
 models/disable2-farequest.ts
 models/dispute-detail-dto.ts
 models/dispute-dto.ts
@@ -249,8 +256,6 @@ models/goods-batch-request.ts
 models/goods-detail-dto.ts
 models/goods-detail-response.ts
 models/goods-response.ts
-models/goods-tag.ts
-models/goods.ts
 models/health-check-record.ts
 models/health-check-response.ts
 models/health-overview.ts
@@ -277,7 +282,6 @@ models/notification-template.ts
 models/optimization-suggestion.ts
 models/order-response.ts
 models/order-statistics-dto.ts
-models/order.ts
 models/page-appeal-material.ts
 models/page-appeal.ts
 models/page-audit-log-response.ts
@@ -288,6 +292,7 @@ models/page-compliance-audit-log.ts
 models/page-conversation-response.ts
 models/page-coupon-response.ts
 models/page-coupon-user-relation.ts
+models/page-credit-history-response.ts
 models/page-dispute-dto.ts
 models/page-event.ts
 models/page-goods-response.ts
@@ -303,6 +308,7 @@ models/page-refund-request.ts
 models/page-reply-response.ts
 models/page-report-response.ts
 models/page-resource.ts
+models/page-revert-request.ts
 models/page-review.ts
 models/page-search-result-item.ts
 models/page-tag-response.ts
@@ -311,6 +317,7 @@ models/pageable-object.ts
 models/pageable.ts
 models/pay-order-request.ts
 models/payment-record-dto.ts
+models/payment-response.ts
 models/payment-statistics-dto.ts
 models/performance-report-response.ts
 models/permission.ts
@@ -335,6 +342,8 @@ models/reset-password-by-sms-request.ts
 models/resource.ts
 models/respond-proposal-request.ts
 models/revert-execution-result.ts
+models/revert-request.ts
+models/revert-statistics.ts
 models/review-media-dto.ts
 models/review-reply-dto.ts
 models/review-request.ts
@@ -344,7 +353,6 @@ models/role-detail-response.ts
 models/role-summary-response.ts
 models/role.ts
 models/rotate-captcha-response.ts
-models/rotate-verify-request.ts
 models/scheduled-task.ts
 models/search-result-item.ts
 models/search-suggestion-dto.ts
@@ -353,7 +361,6 @@ models/seller-info.ts
 models/send-message-request.ts
 models/send-negotiation-request.ts
 models/slide-captcha-response.ts
-models/slide-verify-request.ts
 models/sort-item.ts
 models/sort-object.ts
 models/subscription-response.ts
@@ -369,6 +376,7 @@ models/trend-data-point.ts
 models/two-factor-request.ts
 models/unified-captcha-verify-request.ts
 models/update-category-request.ts
+models/update-order-delivery-request.ts
 models/update-password-request.ts
 models/update-post-request.ts
 models/update-profile-request.ts
@@ -378,6 +386,7 @@ models/update-user-roles-request.ts
 models/upload-evidence-request.ts
 models/user-behavior-log-dto.ts
 models/user-brief-info.ts
+models/user-credit-info-response.ts
 models/user-feed.ts
 models/user-info.ts
 models/user-persona-dto.ts

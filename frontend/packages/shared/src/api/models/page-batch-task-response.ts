@@ -67,6 +67,12 @@ export interface PageBatchTaskResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageBatchTaskResponse
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageBatchTaskResponse
      */
@@ -83,12 +89,6 @@ export interface PageBatchTaskResponse {
      * @memberof PageBatchTaskResponse
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageBatchTaskResponse
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

@@ -12,6 +12,7 @@ import type {
   PayOrderRequest,
   Order,
   PageOrderResponse,
+  UpdateOrderDeliveryRequest,
 } from '../api/models';
 
 /**
@@ -49,6 +50,25 @@ export class OrderService {
     const api = getApi();
     const response = await api.createOrder({ createOrderRequest: data });
     return response.data.data as string;
+  }
+
+  /**
+   * 更新订单配送/收货信息
+   * @param orderNo 订单号
+   * @param data 配送方式与收货信息
+   */
+  async updateOrderDelivery(orderNo: string, data: {
+    deliveryMethod: 'FACE_TO_FACE' | 'EXPRESS',
+    receiverName?: string,
+    receiverPhone?: string,
+    receiverAddress?: string,
+    note?: string,
+  }): Promise<void> {
+    const api = getApi();
+    await api.updateOrderDelivery({
+      orderNo,
+      updateOrderDeliveryRequest: data as UpdateOrderDeliveryRequest,
+    });
   }
 
   /**
@@ -112,9 +132,7 @@ export class OrderService {
    */
   async payOrder(orderNo: string, data: PayOrderRequest): Promise<PaymentResponseData> {
     const api = getApi();
-    // 使用新的支付接口：POST /api/orders/{orderNo}/pay
-    // 注意：这里暂时直接调用 axios，等 OpenAPI 重新生成后可以改用 api.payOrder
-    const response = await api['axios'].post(`/orders/${orderNo}/pay`, data);
+    const response = await api.payOrder({ orderNo, payOrderRequest: data });
     return response.data.data as PaymentResponseData;
   }
 

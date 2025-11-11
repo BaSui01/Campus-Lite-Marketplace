@@ -12,6 +12,10 @@ import com.campus.marketplace.repository.FollowRepository;
 import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.FollowService;
 import com.campus.marketplace.service.NotificationService;
+import com.campus.marketplace.repository.UserFeedRepository;
+import com.campus.marketplace.common.entity.UserFeed;
+import com.campus.marketplace.common.enums.FeedType;
+import com.campus.marketplace.common.enums.TargetType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +40,7 @@ public class FollowServiceImpl implements FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final UserFeedRepository userFeedRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -106,5 +111,21 @@ public class FollowServiceImpl implements FollowService {
                 "/goods/" + goods.getId()
         ));
         log.info("通知关注者成功 goodsId={}, followers={}", goods.getId(), followers.size());
+
+        // 同步写入用户动态流（targetType=GOODS，feedType=POST）
+        try {
+            List<UserFeed> feeds = followers.stream().map(f -> UserFeed.builder()
+                    .userId(f.getFollowerId())
+                    .actorId(goods.getSellerId())
+                    .feedType(FeedType.POST)
+                    .targetType(TargetType.GOODS)
+                    .targetId(goods.getId())
+                    .build()
+            ).toList();
+            userFeedRepository.saveAll(feeds);
+            log.info("已为关注者生成商品上架动态: goodsId={}, 动态数={}", goods.getId(), feeds.size());
+        } catch (Exception e) {
+            log.error("生成用户动态失败（商品上架）: goodsId={}, sellerId={}", goods.getId(), goods.getSellerId(), e);
+        }
     }
 }

@@ -55,7 +55,7 @@ export interface GoodsDetailDTO {
      * @type {ReviewStatisticsDTO}
      * @memberof GoodsDetailDTO
      */
-    'reviewStatistics'?: ReviewStatisticsDTO;
+    'reviewStatistics'?: ReviewStatisticsDTO | null;
     /**
      * 
      * @type {Array<Review>}

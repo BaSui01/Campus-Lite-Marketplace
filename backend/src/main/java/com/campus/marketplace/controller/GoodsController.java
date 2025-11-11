@@ -192,15 +192,17 @@ public class GoodsController {
      * @return 评价列表（分页）
      */
     @GetMapping("/{goodsId}/reviews")
-    @Operation(summary = "获取商品评价列表", description = "查询指定商品的所有评价，支持评分筛选和排序（time=按时间，like=按点赞数）")
+    @Operation(summary = "获取商品评价列表", description = "筛选：rating（精确星级）、group（positive/neutral/negative）、hasImages；排序：time/like/image_first")
     public ApiResponse<Page<Review>> getGoodsReviews(
             @Parameter(description = "商品ID") @PathVariable Long goodsId,
             @Parameter(description = "页码") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "评分筛选（1-5星）") @RequestParam(required = false) Integer rating,
-            @Parameter(description = "排序方式（time=按时间，like=按点赞数，helpful=按点赞数）") @RequestParam(defaultValue = "time") String sortBy
+            @Parameter(description = "排序方式（time/like/image_first）") @RequestParam(defaultValue = "time") String sortBy,
+            @Parameter(description = "只看有图") @RequestParam(required = false) Boolean hasImages,
+            @Parameter(description = "评分分组（positive=4-5，neutral=3，negative=1-2）") @RequestParam(required = false) String group
     ) {
-        Page<Review> reviews = reviewService.getGoodsReviews(goodsId, page, size, rating, sortBy);
+        Page<Review> reviews = reviewService.getGoodsReviews(goodsId, page, size, rating, sortBy, hasImages, group);
         return ApiResponse.success(reviews);
     }
 }

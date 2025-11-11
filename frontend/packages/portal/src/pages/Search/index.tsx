@@ -539,7 +539,8 @@ const Search: React.FC = () => {
    */
   const formatPrice = (price?: number) => {
     if (!price) return '¥0.00';
-    return `¥${(price / 100).toFixed(2)}`;
+    // ✅ 后端金额单位为“元”（BigDecimal），无需再除以 100
+    return `¥${price.toFixed(2)}`;
   };
 
   // ==================== 渲染 ====================

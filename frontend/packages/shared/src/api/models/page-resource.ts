@@ -67,6 +67,12 @@ export interface PageResource {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageResource
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageResource
      */
@@ -83,12 +89,6 @@ export interface PageResource {
      * @memberof PageResource
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageResource
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

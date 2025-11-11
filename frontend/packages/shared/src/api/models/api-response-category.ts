@@ -40,6 +40,6 @@ export interface ApiResponseCategory {
      * @type {Category}
      * @memberof ApiResponseCategory
      */
-    'data'?: Category;
+    'data'?: Category | null;
 }
 

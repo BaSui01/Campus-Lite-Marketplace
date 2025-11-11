@@ -38,7 +38,8 @@ export class FavoriteService {
    */
   async addFavorite(goodsId: number): Promise<void> {
     const api = getApi();
-    await api.addFavorite(goodsId);
+    // ✅ OpenAPI 客户端需要对象参数
+    await api.addFavorite({ goodsId });
   }
 
   /**
@@ -47,7 +48,8 @@ export class FavoriteService {
    */
   async removeFavorite(goodsId: number): Promise<void> {
     const api = getApi();
-    await api.removeFavorite(goodsId);
+    // ✅ OpenAPI 客户端需要对象参数
+    await api.removeFavorite({ goodsId });
   }
 
   /**
@@ -57,10 +59,11 @@ export class FavoriteService {
    */
   async listFavorites(params?: FavoriteListParams): Promise<PageGoodsResponse> {
     const api = getApi();
-    const response = await api.listFavorites(
-      params?.page ?? 0,
-      params?.size ?? 20
-    );
+    // ✅ OpenAPI 客户端需要对象参数
+    const response = await api.listFavorites({
+      page: params?.page ?? 0,
+      size: params?.size ?? 20,
+    });
     
     // 如果需要客户端排序（后端不支持时）
     let content = response.data.data?.content || [];
@@ -86,7 +89,8 @@ export class FavoriteService {
    */
   async isFavorited(goodsId: number): Promise<boolean> {
     const api = getApi();
-    const response = await api.isFavorited(goodsId);
+    // ✅ OpenAPI 客户端需要对象参数
+    const response = await api.isFavorited({ goodsId });
     return response.data.data as boolean;
   }
 

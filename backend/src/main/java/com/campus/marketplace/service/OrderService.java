@@ -91,4 +91,11 @@ public interface OrderService {
      * @return 订单详情
      */
     OrderResponse getOrderDetail(String orderNo);
+
+    /**
+     * 更新订单的配送与收货信息
+     * @param orderNo 订单号
+     * @param request 配送信息
+     */
+    void updateOrderDelivery(String orderNo, com.campus.marketplace.common.dto.request.UpdateOrderDeliveryRequest request);
 }

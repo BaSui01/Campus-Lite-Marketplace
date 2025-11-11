@@ -32,7 +32,7 @@ public interface ReviewService {
      * @param sortBy 排序方式（time=时间倒序, helpful=点赞数倒序）
      * @return 评价分页列表
      */
-    Page<Review> getGoodsReviews(Long goodsId, int page, int size, Integer rating, String sortBy);
+    Page<Review> getGoodsReviews(Long goodsId, int page, int size, Integer rating, String sortBy, Boolean hasImages, String group);
 
     /**
      * 删除评价

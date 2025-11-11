@@ -64,6 +64,7 @@ declare module '@campus/shared/services' {
   export const campusService: any;
   export const topicService: any;
   export const postService: any;
+  export const communityService: any;
   export const refundService: any;
   export const marketingService: any;
 

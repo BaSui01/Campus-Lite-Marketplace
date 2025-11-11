@@ -2,6 +2,7 @@ package com.campus.marketplace.service;
 
 import com.campus.marketplace.common.entity.Topic;
 import com.campus.marketplace.common.entity.UserFeed;
+import com.campus.marketplace.common.dto.UserFeedDTO;
 
 import java.util.List;
 
@@ -74,6 +75,12 @@ public interface CommunityService {
      * @return 动态列表
      */
     List<UserFeed> getUserFeed(Long userId);
+
+    /**
+     * 获取用户动态流（DTO版）
+     * 返回精简后的展示数据，包含发起人头像与显示名，以及目标类型。
+     */
+    List<UserFeedDTO> getUserFeedV2(Long userId);
 
     /**
      * 获取话题下的帖子ID列表

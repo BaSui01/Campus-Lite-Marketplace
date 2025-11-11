@@ -67,6 +67,12 @@ export interface PageNotificationResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageNotificationResponse
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageNotificationResponse
      */
@@ -83,12 +89,6 @@ export interface PageNotificationResponse {
      * @memberof PageNotificationResponse
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageNotificationResponse
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

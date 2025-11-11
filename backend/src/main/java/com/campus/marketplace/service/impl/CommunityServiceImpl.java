@@ -1,7 +1,9 @@
 package com.campus.marketplace.service.impl;
 
 import com.campus.marketplace.common.entity.*;
+import com.campus.marketplace.common.dto.UserFeedDTO;
 import com.campus.marketplace.common.enums.NotificationType;
+import com.campus.marketplace.common.enums.TargetType;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.repository.*;
@@ -217,7 +219,35 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public List<UserFeed> getUserFeed(Long userId) {
         log.info("获取用户动态流: userId={}", userId);
-        return userFeedRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        // 关键修复：联查加载 actor，确保前端能拿到头像与昵称（nickname 为空时由前端做用户名兜底）
+        return userFeedRepository.findByUserIdOrderByCreatedAtDescWithActor(userId);
+    }
+
+    @Override
+    public List<UserFeedDTO> getUserFeedV2(Long userId) {
+        log.info("获取用户动态流(v2 DTO): userId={}", userId);
+        List<UserFeed> feeds = userFeedRepository.findByUserIdOrderByCreatedAtDescWithActor(userId);
+        return feeds.stream().map(f -> {
+            User actor = f.getActor();
+            String displayName = null;
+            String avatarUrl = null;
+            if (actor != null) {
+                avatarUrl = actor.getAvatar();
+                String nickname = actor.getNickname();
+                displayName = (nickname != null && !nickname.trim().isEmpty()) ? nickname : actor.getUsername();
+            }
+            TargetType targetType = f.getTargetType() != null ? f.getTargetType() : TargetType.POST;
+            return UserFeedDTO.builder()
+                .id(f.getId())
+                .actorId(f.getActorId())
+                .displayName(displayName)
+                .avatarUrl(avatarUrl)
+                .feedType(f.getFeedType())
+                .targetType(targetType)
+                .targetId(f.getTargetId())
+                .createdAt(f.getCreatedAt())
+                .build();
+        }).toList();
     }
 
     @Override

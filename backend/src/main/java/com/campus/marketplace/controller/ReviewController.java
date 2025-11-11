@@ -55,9 +55,11 @@ public class ReviewController {
             @Parameter(description = "页码") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int size,
             @Parameter(description = "评分筛选（1-5星）") @RequestParam(required = false) Integer rating,
-            @Parameter(description = "排序方式（time/like/helpful）") @RequestParam(defaultValue = "time") String sortBy
+            @Parameter(description = "排序方式（time/like/image_first）") @RequestParam(defaultValue = "time") String sortBy,
+            @Parameter(description = "只看有图") @RequestParam(required = false) Boolean hasImages,
+            @Parameter(description = "评分分组（positive=4-5，neutral=3，negative=1-2）") @RequestParam(required = false) String group
     ) {
-        Page<Review> reviews = reviewService.getGoodsReviews(goodsId, page, size, rating, sortBy);
+        Page<Review> reviews = reviewService.getGoodsReviews(goodsId, page, size, rating, sortBy, hasImages, group);
         return ApiResponse.success(reviews);
     }
 

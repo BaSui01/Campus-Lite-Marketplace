@@ -17,6 +17,12 @@ import com.campus.marketplace.repository.PostTagRepository;
 import com.campus.marketplace.repository.TagRepository;
 import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.PostService;
+import com.campus.marketplace.repository.UserFollowRepository;
+import com.campus.marketplace.repository.UserFeedRepository;
+import com.campus.marketplace.common.entity.UserFollow;
+import com.campus.marketplace.common.entity.UserFeed;
+import com.campus.marketplace.common.enums.FeedType;
+import com.campus.marketplace.common.enums.TargetType;
 import com.campus.marketplace.service.MessageService;
 import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.dto.request.UpdatePostRequest;
@@ -62,6 +68,8 @@ public class PostServiceImpl implements PostService {
     private final com.campus.marketplace.service.ComplianceService complianceService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final MessageService messageService;
+    private final UserFollowRepository userFollowRepository;
+    private final UserFeedRepository userFeedRepository;
 
     /**
      * 每日发帖限制（可配置化）
@@ -96,35 +104,52 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(ErrorCode.POST_LIMIT_EXCEEDED);
         }
 
-        // 3. 文本合规
+        // 3. 文本合规模块：命中 BLOCK 直接拒绝；命中 REVIEW 进入待审；均未命中则自动通过
         String filteredTitle;
         String filteredContent;
+        GoodsStatus initStatus = GoodsStatus.APPROVED; // 默认自动通过
         if (complianceService != null) {
             var titleMod = complianceService.moderateText(request.title(), "POST_TITLE");
             var contentMod = complianceService.moderateText(request.content(), "POST_CONTENT");
-            if (titleMod.hit() && titleMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK
-                    || contentMod.hit() && contentMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK) {
+
+            // 任一 BLOCK → 拒绝发布
+            boolean block = (titleMod.hit() && titleMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK)
+                    || (contentMod.hit() && contentMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK);
+            if (block) {
                 throw new com.campus.marketplace.common.exception.BusinessException(
                         com.campus.marketplace.common.exception.ErrorCode.INVALID_PARAM, "包含敏感词，请修改后再发布");
             }
+
+            // 任一 REVIEW → 待审核；否则自动通过
+            boolean review = (titleMod.hit() && titleMod.action() == com.campus.marketplace.common.enums.ComplianceAction.REVIEW)
+                    || (contentMod.hit() && contentMod.action() == com.campus.marketplace.common.enums.ComplianceAction.REVIEW);
+            if (review) {
+                initStatus = GoodsStatus.PENDING;
+            }
+
             filteredTitle = titleMod.filteredText();
             filteredContent = contentMod.filteredText();
         } else {
+            boolean titleHas = sensitiveWordFilter.contains(request.title());
+            boolean contentHas = sensitiveWordFilter.contains(request.content());
+            if (titleHas || contentHas) {
+                initStatus = GoodsStatus.PENDING; // 命中敏感词 → 待审核
+            }
             filteredTitle = sensitiveWordFilter.filter(request.title());
             filteredContent = sensitiveWordFilter.filter(request.content());
         }
 
-        // 4. 创建帖子
+        // 4. 创建帖子（图片合规可能将状态降级为待审）
         Post post = Post.builder()
                 .title(filteredTitle)
                 .content(filteredContent)
                 .authorId(user.getId())
                 .campusId(user.getCampusId())
-                .status(GoodsStatus.PENDING) // 默认待审核；命中REVIEW保持待审核
+                .status(initStatus)
                 .viewCount(0)
                 .replyCount(0)
-                .images(request.images() != null && !request.images().isEmpty() 
-                        ? request.images().toArray(new String[0]) 
+                .images(request.images() != null && !request.images().isEmpty()
+                        ? request.images().toArray(new String[0])
                         : null)
                 .build();
 
@@ -135,7 +160,10 @@ public class PostServiceImpl implements PostService {
                 throw new com.campus.marketplace.common.exception.BusinessException(
                         com.campus.marketplace.common.exception.ErrorCode.INVALID_PARAM, "图片未通过安全检测");
             }
-            // REVIEW 情况保留 PENDING 状态
+            // 图片 REVIEW → 将状态降级为待审
+            if (imgRes.action() == com.campus.marketplace.service.ComplianceService.ImageAction.REVIEW) {
+                post.setStatus(GoodsStatus.PENDING);
+            }
         }
 
         // 5. 保存帖子
@@ -148,6 +176,25 @@ public class PostServiceImpl implements PostService {
         redisTemplate.expire(limitKey, 1, TimeUnit.DAYS);
 
         log.info("帖子发布成功: postId={}, authorId={}, title={}", post.getId(), user.getId(), post.getTitle());
+
+        // 7. 生成用户动态：推送给作者的粉丝（targetType=POST）
+        try {
+            List<UserFollow> followers = userFollowRepository.findByFollowingId(user.getId());
+            if (!followers.isEmpty()) {
+                List<UserFeed> feeds = followers.stream().map(f -> UserFeed.builder()
+                        .userId(f.getFollowerId())
+                        .actorId(user.getId())
+                        .feedType(FeedType.POST)
+                        .targetType(TargetType.POST)
+                        .targetId(post.getId())
+                        .build()
+                ).collect(Collectors.toList());
+                userFeedRepository.saveAll(feeds);
+                log.info("已为粉丝生成发帖动态: postId={}, 粉丝数={}", post.getId(), feeds.size());
+            }
+        } catch (Exception e) {
+            log.error("生成用户动态失败（发帖）: postId={}, authorId={}", post.getId(), user.getId(), e);
+        }
 
         return post.getId();
     }

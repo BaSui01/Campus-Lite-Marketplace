@@ -35,7 +35,10 @@ public class NotificationTemplateInitializer {
                     "ORDER_PAID", new String[]{"tpl.order.paid.title", "tpl.order.paid.content", "IN_APP,EMAIL,WEB_PUSH"},
                     "ORDER_CANCELLED", new String[]{"tpl.order.cancelled.title", "tpl.order.cancelled.content", "IN_APP,EMAIL,WEB_PUSH"},
                     "POST_REPLIED", new String[]{"tpl.post.replied.title", "tpl.post.replied.content", "IN_APP,EMAIL,WEB_PUSH"},
-                    "POST_MENTIONED", new String[]{"tpl.post.mentioned.title", "tpl.post.mentioned.content", "IN_APP,EMAIL,WEB_PUSH"}
+                    "POST_MENTIONED", new String[]{"tpl.post.mentioned.title", "tpl.post.mentioned.content", "IN_APP,EMAIL,WEB_PUSH"},
+                    // 新增：下单锁定期提醒（买家/卖家）
+                    "ORDER_CREATED_LOCKED_BUYER", new String[]{"tpl.order.locked.buyer.title", "tpl.order.locked.buyer.content", "IN_APP,WEB_PUSH"},
+                    "ORDER_CREATED_LOCKED_SELLER", new String[]{"tpl.order.locked.seller.title", "tpl.order.locked.seller.content", "IN_APP,WEB_PUSH"}
             );
             for (var e : presets.entrySet()) {
                 String code = e.getKey();

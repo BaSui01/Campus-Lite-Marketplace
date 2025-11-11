@@ -90,6 +90,7 @@ export interface NotificationResponse {
 
 export const NotificationResponseTypeEnum = {
     OrderCreated: 'ORDER_CREATED',
+    OrderPending: 'ORDER_PENDING',
     OrderPaid: 'ORDER_PAID',
     OrderCancelled: 'ORDER_CANCELLED',
     OrderCompleted: 'ORDER_COMPLETED',

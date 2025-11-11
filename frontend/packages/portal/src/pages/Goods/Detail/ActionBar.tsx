@@ -14,6 +14,7 @@ interface ActionBarProps {
   onFavorite: () => void;
   onBuy: () => void;
   onContact: () => void;
+  onReview: () => void;
   onShare: () => void;
   onReport: () => void;
 }
@@ -25,6 +26,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   onFavorite,
   onBuy,
   onContact,
+  onReview,
   onShare,
   onReport,
 }) => {
@@ -54,6 +56,15 @@ export const ActionBar: React.FC<ActionBarProps> = ({
             >
               <span className="action-bar__btn-icon">💬</span>
               <span className="action-bar__btn-text">联系卖家</span>
+            </button>
+
+            <button
+              className="action-bar__btn action-bar__btn--review"
+              onClick={onReview}
+              title="对该商品发表你的评价"
+            >
+              <span className="action-bar__btn-icon">✍️</span>
+              <span className="action-bar__btn-text">评价</span>
             </button>
 
             <button

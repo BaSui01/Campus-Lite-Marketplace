@@ -42,10 +42,20 @@ public class AuditLogServiceImpl implements AuditLogService {
                           String targetType, Long targetId, String details, String result,
                           String ipAddress, String userAgent) {
         try {
+            String entityName = (targetType != null && !targetType.isBlank()) ? targetType : actionType.name();
+            AuditEntityType entityType;
+            try {
+                entityType = AuditEntityType.valueOf(entityName.toUpperCase());
+            } catch (Exception ignore) {
+                // 默认归类到系统设置，避免因未覆盖的实体类型导致持久化失败
+                entityType = AuditEntityType.SYSTEM_SETTING;
+            }
             AuditLog log = AuditLog.builder()
                     .operatorId(operatorId)
                     .operatorName(operatorName)
                     .actionType(actionType)
+                    .entityName(entityName)
+                    .entityType(entityType)
                     .targetType(targetType)
                     .targetId(targetId)
                     .details(details)
@@ -155,10 +165,19 @@ public class AuditLogServiceImpl implements AuditLogService {
                                   String targetType, String targetIds, String details, 
                                   boolean isReversible) {
         try {
+            String entityName = (targetType != null && !targetType.isBlank()) ? targetType : "BATCH_OPERATION";
+            AuditEntityType entityType;
+            try {
+                entityType = AuditEntityType.valueOf(entityName.toUpperCase());
+            } catch (Exception ignore) {
+                entityType = AuditEntityType.BATCH_OPERATION;
+            }
             AuditLog auditLog = AuditLog.builder()
                     .operatorId(operatorId)
                     .operatorName(operatorName)
                     .actionType(actionType)
+                    .entityName(entityName)
+                    .entityType(entityType)
                     .targetType(targetType)
                     .targetIds(targetIds)
                     .details(details)

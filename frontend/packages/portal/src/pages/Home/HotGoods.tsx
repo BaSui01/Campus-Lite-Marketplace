@@ -20,9 +20,14 @@ const transformGoodsData = (goods: GoodsResponse) => ({
   description: goods.description,
   price: goods.price || 0,
   imageUrl: goods.coverImage || '/placeholder.jpg',
-  status: (goods.status?.toLowerCase() === 'on_sale' ? 'on_sale' : 
-           goods.status?.toLowerCase() === 'sold_out' ? 'sold_out' :
-           goods.status?.toLowerCase() === 'off_shelf' ? 'off_shelf' : 'pending') as any,
+  // 后端状态（APPROVED/SOLD/OFFLINE/PENDING/REJECTED/LOCKED）→ 卡片状态
+  status: (() => {
+    const s = (goods.status || '').toUpperCase();
+    if (s === 'APPROVED') return 'on_sale';
+    if (s === 'SOLD') return 'sold_out';
+    if (s === 'OFFLINE' || s === 'REJECTED') return 'off_shelf';
+    return 'pending';
+  })() as any,
   stock: 1, // 二手商品通常是1
   soldCount: 0,
   tags: goods.tags?.map(t => t.name || '').filter(Boolean),

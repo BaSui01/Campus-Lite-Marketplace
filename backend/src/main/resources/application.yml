@@ -261,6 +261,7 @@ app:
       user: PT15M      # 用户缓存15分钟
       "goods:list": PT5M      # 商品列表5分钟
       "goods:detail": PT30M   # 商品详情30分钟
+      "favorite:v2:list": PT10M  # 🆕 我的收藏列表缓存10分钟（用户维度，读多写少，且增删收藏会主动失效）
       category: PT1H  # 分类缓存1小时
       campus: PT1H    # 校区缓存1小时
       "notification:template": PT2H # 通知模板2小时

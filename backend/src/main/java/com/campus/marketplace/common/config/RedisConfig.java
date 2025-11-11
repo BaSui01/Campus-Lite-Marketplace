@@ -3,6 +3,7 @@ package com.campus.marketplace.common.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -118,6 +119,8 @@ public class RedisConfig {
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        // ✅ 关键修复：全局忽略未知字段，兼容老版本缓存结构
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         // 🔧 修复 PageImpl 反序列化问题: 添加 PageImpl 的 MixIn
         mapper.addMixIn(org.springframework.data.domain.PageImpl.class, PageImplMixin.class);
@@ -125,6 +128,8 @@ public class RedisConfig {
         mapper.addMixIn(org.springframework.data.domain.PageRequest.class, PageRequestMixin.class);
         // 🔧 修复 Sort 反序列化问题: 添加 Sort 的 MixIn
         mapper.addMixIn(org.springframework.data.domain.Sort.class, SortMixin.class);
+        // 🔧 修复 Sort.Order 反序列化问题: 添加 Sort.Order 的 MixIn（与 RedisCacheConfig 保持一致）
+        mapper.addMixIn(org.springframework.data.domain.Sort.Order.class, SortOrderMixin.class);
 
         return mapper;
     }
@@ -166,6 +171,21 @@ public class RedisConfig {
         @com.fasterxml.jackson.annotation.JsonCreator
         SortMixin(
                 @com.fasterxml.jackson.annotation.JsonProperty("orders") java.util.List<org.springframework.data.domain.Sort.Order> orders) {
+        }
+    }
+
+    /**
+     * Sort.Order 的 Jackson MixIn 类,提供反序列化所需的构造函数信息
+     * 🎯 忽略未知字段（如 empty/sorted/unsorted/ascending 等历史缓存产物）
+     */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+    private abstract static class SortOrderMixin {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        SortOrderMixin(
+                @com.fasterxml.jackson.annotation.JsonProperty("direction") org.springframework.data.domain.Sort.Direction direction,
+                @com.fasterxml.jackson.annotation.JsonProperty("property") String property,
+                @com.fasterxml.jackson.annotation.JsonProperty("ignoreCase") boolean ignoreCase,
+                @com.fasterxml.jackson.annotation.JsonProperty("nullHandling") org.springframework.data.domain.Sort.NullHandling nullHandling) {
         }
     }
 }

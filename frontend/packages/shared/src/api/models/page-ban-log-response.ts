@@ -67,6 +67,12 @@ export interface PageBanLogResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageBanLogResponse
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageBanLogResponse
      */
@@ -83,12 +89,6 @@ export interface PageBanLogResponse {
      * @memberof PageBanLogResponse
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageBanLogResponse
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

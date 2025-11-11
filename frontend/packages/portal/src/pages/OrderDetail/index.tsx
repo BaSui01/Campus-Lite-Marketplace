@@ -391,8 +391,8 @@ const OrderDetail: React.FC = () => {
    */
   const formatPrice = (price?: number) => {
     if (!price) return '¥0.00';
-    // 后端价格单位是分，需要除以100
-    return `¥${(price / 100).toFixed(2)}`;
+    // ✅ 后端金额单位为“元”（BigDecimal），无需再除以 100
+    return `¥${price.toFixed(2)}`;
   };
 
   /**
@@ -463,6 +463,28 @@ const OrderDetail: React.FC = () => {
         return '支付宝';
       case 'POINTS':
         return '积分支付';
+      default:
+        return '—';
+    }
+  };
+
+  const getDeliveryMethodText = (method?: string) => {
+    switch (method) {
+      case 'FACE_TO_FACE':
+        return '面交';
+      case 'EXPRESS':
+        return '快递';
+      default:
+        return '—';
+    }
+  };
+
+  const getDeliveryMethodText = (method?: string) => {
+    switch (method) {
+      case 'FACE_TO_FACE':
+        return '面交';
+      case 'EXPRESS':
+        return '快递';
       default:
         return '—';
     }
@@ -635,9 +657,61 @@ const OrderDetail: React.FC = () => {
               <span className="info-value price">{formatPrice(order.amount)}</span>
             </div>
             <div className="info-item">
+              <span className="info-label">配送方式：</span>
+              <span className="info-value">{getDeliveryMethodText((order as any)?.deliveryMethod)}</span>
+            </div>
+            {(order as any)?.deliveryMethod === 'EXPRESS' && (
+              <>
+                <div className="info-item">
+                  <span className="info-label">收货人：</span>
+                  <span className="info-value">{(order as any)?.receiverName || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">手机号：</span>
+                  <span className="info-value">{(order as any)?.receiverPhone || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">收货地址：</span>
+                  <span className="info-value">{(order as any)?.receiverAddress || '—'}</span>
+                </div>
+              </>
+            )}
+            {(order as any)?.buyerNote && (
+              <div className="info-item">
+                <span className="info-label">买家备注：</span>
+                <span className="info-value">{(order as any).buyerNote}</span>
+              </div>
+            )}
+            <div className="info-item">
               <span className="info-label">支付方式：</span>
               <span className="info-value">{getPaymentMethodText(order.paymentMethod)}</span>
             </div>
+            <div className="info-item">
+              <span className="info-label">配送方式：</span>
+              <span className="info-value">{getDeliveryMethodText((order as any)?.deliveryMethod)}</span>
+            </div>
+            {(order as any)?.deliveryMethod === 'EXPRESS' && (
+              <>
+                <div className="info-item">
+                  <span className="info-label">收货人：</span>
+                  <span className="info-value">{(order as any)?.receiverName || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">手机号：</span>
+                  <span className="info-value">{(order as any)?.receiverPhone || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">收货地址：</span>
+                  <span className="info-value">{(order as any)?.receiverAddress || '—'}</span>
+                </div>
+              </>
+            )}
+            {(order as any)?.buyerNote && (
+              <div className="info-item">
+                <span className="info-label">买家备注：</span>
+                <span className="info-value">{(order as any).buyerNote}</span>
+              </div>
+            )}
             <div className="info-item">
               <span className="info-label">创建时间：</span>
               <span className="info-value">{formatTime(order.createdAt)}</span>

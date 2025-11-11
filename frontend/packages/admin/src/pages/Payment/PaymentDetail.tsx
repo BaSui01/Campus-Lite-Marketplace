@@ -138,7 +138,7 @@ export const PaymentDetail: React.FC = () => {
             </Tag>
           </h2>
           <p style={{ fontSize: 32, fontWeight: 'bold', color: '#f5222d', margin: '16px 0' }}>
-            ¥{payment.amount / 100}
+            ¥{(payment.amount || 0).toFixed(2)}
           </p>
           <p style={{ color: '#8c8c8c' }}>订单号：{payment.orderNo}</p>
         </div>
@@ -153,7 +153,7 @@ export const PaymentDetail: React.FC = () => {
           </Descriptions.Item>
           <Descriptions.Item label="支付金额">
             <span style={{ color: '#f5222d', fontWeight: 'bold', fontSize: 16 }}>
-              ¥{payment.amount / 100}
+              ¥{(payment.amount || 0).toFixed(2)}
             </span>
           </Descriptions.Item>
           <Descriptions.Item label="支付状态">
@@ -279,7 +279,7 @@ export const PaymentDetail: React.FC = () => {
                       <>
                         <p>已退款</p>
                         <p style={{ color: '#8c8c8c', fontSize: 12 }}>
-                          退款金额：¥{payment.amount / 100}
+                          退款金额：¥{(payment.amount || 0).toFixed(2)}
                         </p>
                       </>
                     ),

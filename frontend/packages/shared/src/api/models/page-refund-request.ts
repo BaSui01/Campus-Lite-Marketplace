@@ -67,6 +67,12 @@ export interface PageRefundRequest {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageRefundRequest
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageRefundRequest
      */
@@ -83,12 +89,6 @@ export interface PageRefundRequest {
      * @memberof PageRefundRequest
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageRefundRequest
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

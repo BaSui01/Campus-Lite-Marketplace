@@ -1,6 +1,7 @@
 package com.campus.marketplace.common.dto.response;
 
 import com.campus.marketplace.common.enums.OrderStatus;
+import com.campus.marketplace.common.enums.DeliveryMethod;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -32,6 +33,12 @@ public record OrderResponse(
         String paymentMethod,
         LocalDateTime paymentTime,
         LocalDateTime createdAt,
+        // ==================== 配送/收货信息 ====================
+        DeliveryMethod deliveryMethod,
+        String receiverName,
+        String receiverPhone,
+        String receiverAddress,
+        String buyerNote,
         /**
          * 支付截止时间（由后端根据配置计算），用于前端倒计时显示
          */

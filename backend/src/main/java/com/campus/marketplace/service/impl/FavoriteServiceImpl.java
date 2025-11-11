@@ -48,7 +48,8 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "favorite:list", key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId()")
+    // 🆙 升级缓存空间：favorite:list → favorite:v2:list
+    @CacheEvict(value = {"favorite:list", "favorite:v2:list"}, key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId()")
     public void addFavorite(Long goodsId) {
         log.info("添加收藏: goodsId={}", goodsId);
 
@@ -103,7 +104,8 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "favorite:list", key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId()")
+    // 同时清理老版本与新版本缓存键，保证兼容
+    @CacheEvict(value = {"favorite:list", "favorite:v2:list"}, key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId()")
     public void removeFavorite(Long goodsId) {
         log.info("取消收藏: goodsId={}", goodsId);
 
@@ -133,7 +135,8 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "favorite:list", key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId() + ':' + #page + ':' + #size")
+    // 读取新版本缓存空间，避免读取历史不兼容数据
+    @Cacheable(value = "favorite:v2:list", key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId() + ':' + #page + ':' + #size")
     public Page<GoodsResponse> listFavorites(int page, int size) {
         log.info("查询收藏列表: page={}, size={}", page, size);
 

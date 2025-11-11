@@ -1,6 +1,7 @@
 package com.campus.marketplace.common.entity;
 
 import com.campus.marketplace.common.enums.OrderStatus;
+import com.campus.marketplace.common.enums.DeliveryMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -132,6 +133,30 @@ public class Order extends BaseEntity {
      */
     @Column(name = "coupon_id")
     private Long couponId;
+
+    /**
+     * 配送方式（面交/快递）
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_method", length = 20)
+    @Builder.Default
+    private DeliveryMethod deliveryMethod = DeliveryMethod.FACE_TO_FACE;
+
+    /** 收货人姓名（快递时必填） */
+    @Column(name = "receiver_name", length = 50)
+    private String receiverName;
+
+    /** 收货人手机号（快递时必填） */
+    @Column(name = "receiver_phone", length = 20)
+    private String receiverPhone;
+
+    /** 收货地址（快递时必填） */
+    @Column(name = "receiver_address", length = 255)
+    private String receiverAddress;
+
+    /** 买家备注（可选） */
+    @Column(name = "buyer_note", length = 500)
+    private String buyerNote;
 
     /**
      * 检查是否待支付

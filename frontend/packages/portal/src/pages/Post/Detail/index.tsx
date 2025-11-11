@@ -50,6 +50,7 @@ const PostDetail: React.FC = () => {
   const navigate = useNavigate();
   const toast = useNotificationStore();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const currentUser = useAuthStore((state) => state.user);
 
   // ==================== 状态管理 ====================
 
@@ -72,6 +73,28 @@ const PostDetail: React.FC = () => {
   const [previewImageIndex, setPreviewImageIndex] = useState(0);
 
   // ==================== 数据加载 ====================
+
+  /**
+   * 获取状态文本（用于轻提示）
+   */
+  const getStatusText = (status?: string) => {
+    switch (status) {
+      case 'PENDING':
+        return '待审核';
+      case 'APPROVED':
+        return '已通过';
+      case 'REJECTED':
+        return '未通过';
+      case 'LOCKED':
+        return '锁定中';
+      case 'SOLD':
+        return '已售出';
+      case 'OFFLINE':
+        return '已下架';
+      default:
+        return '未知';
+    }
+  };
 
   /**
    * 加载帖子详情
@@ -136,11 +159,12 @@ const PostDetail: React.FC = () => {
         const apiComments: Comment[] = response.data.content.map((c: any) => ({
           commentId: String(c.id),
           postId: String(postId),
-          authorId: String(c.userId),
-          authorName: c.userName || '未知用户',
-          authorAvatar: c.userAvatar,
+          // 兼容后端字段：优先 authorId/authorName，其次 userId/userName
+          authorId: String(c.authorId ?? c.userId),
+          authorName: c.authorName ?? c.userName ?? '未知用户',
+          authorAvatar: c.authorAvatar ?? c.userAvatar,
           content: c.content,
-          createdAt: c.createTime || c.createdAt,
+          createdAt: c.createdAt ?? c.createTime,
         }));
 
         setComments(apiComments);
@@ -152,6 +176,45 @@ const PostDetail: React.FC = () => {
       setCommentsLoading(false);
     }
   };
+  /**
+   * 判断是否管理员角色
+   */
+  const hasAdminRole = (): boolean => {
+    const roles = (currentUser as any)?.roles;
+    if (!roles) return false;
+    // roles 可能是字符串数组或包含 name 的对象数组
+    if (Array.isArray(roles)) {
+      return roles.some((r: any) => {
+        const name = typeof r === 'string' ? r : r?.name;
+        return name === 'ROLE_ADMIN' || name === 'ADMIN';
+      });
+    }
+    return false;
+  };
+
+  /** 删除评论 */
+  const handleDeleteComment = async (commentId: string) => {
+    if (!isAuthenticated) {
+      toast.warning('请先登录！');
+      navigate('/login');
+      return;
+    }
+    try {
+      await postService.deleteReply(Number(commentId));
+      setComments((prev) => prev.filter((c) => c.commentId !== commentId));
+      if (post && post.replyCount > 0) {
+        setPost({ ...post, replyCount: post.replyCount - 1 });
+      }
+      toast.success('已删除评论');
+    } catch (err: any) {
+      if (err?.response?.status === 403) {
+        toast.warning('无权限删除该评论');
+      } else {
+        toast.error(err?.response?.data?.message || '删除失败');
+      }
+    }
+  };
+
 
   /**
    * 加载相关推荐帖子（最新帖子）
@@ -306,6 +369,13 @@ const PostDetail: React.FC = () => {
     setCommenting(true);
 
     try {
+      // ⛔ 前置校验（放宽）：未审核且非作者（管理员放行由后端兜底）
+      const isAuthor = currentUser?.id === post.authorId;
+      if (post.status !== 'APPROVED' && !isAuthor) {
+        toast.warning(`该帖子${getStatusText(post.status)}，仅作者或管理员可评论。`);
+        return;
+      }
+
       // 🚀 调用真实后端 API 发布评论
       await postService.createReply({
         postId: post.id,
@@ -450,6 +520,13 @@ const PostDetail: React.FC = () => {
               <h1 className="post-detail-title">{post.title}</h1>
             )}
 
+            {/* 状态提示条（仅非已通过时展示，避免误操作评论） */}
+            {post.status !== 'APPROVED' && (
+              <div className="post-status-banner" style={{margin:'8px 0 16px', padding:'10px 12px', borderRadius:8, background:'#fff7e6', color:'#ad6800', fontSize:14}}>
+                ⚠️ 当前帖子状态为「{getStatusText(post.status)}」，暂不开放评论。
+              </div>
+            )}
+
             {/* 作者信息 */}
             <div className="post-detail-author">
               <div className="author-info" onClick={handleViewAuthor}>
@@ -517,7 +594,7 @@ const PostDetail: React.FC = () => {
             </div>
 
             {/* 评论输入框 */}
-            {isAuthenticated && (
+            {isAuthenticated && (post.status === 'APPROVED' || currentUser?.id === post.authorId) && (
               <div className="comments-input">
                 <Input
                   type="text"
@@ -536,6 +613,11 @@ const PostDetail: React.FC = () => {
                 </Button>
               </div>
             )}
+            {isAuthenticated && post.status !== 'APPROVED' && currentUser?.id !== post.authorId && (
+              <div className="comments-input-disabled" style={{marginTop:12, padding:'10px 12px', border:'1px dashed #ffd591', borderRadius:8, color:'#ad6800', background:'#fffbe6'}}>
+                暂不可评论：帖子{getStatusText(post.status)}。仅作者或管理员可评论。
+              </div>
+            )}
 
             {/* 评论列表 */}
             <div className="comments-list">
@@ -548,7 +630,15 @@ const PostDetail: React.FC = () => {
                   <p className="empty-tip">快来抢沙发吧！</p>
                 </div>
               ) : (
-                comments.map((comment) => (
+                comments.map((comment) => {
+                  const uid = Number(currentUser?.id);
+                  const canDelete =
+                    isAuthenticated && (
+                      uid === Number(comment.authorId) ||
+                      uid === post.authorId ||
+                      hasAdminRole()
+                    );
+                  return (
                   <div key={comment.commentId} className="comment-item">
                     <div className="comment-avatar">
                       {comment.authorAvatar ? (
@@ -561,11 +651,21 @@ const PostDetail: React.FC = () => {
                       <div className="comment-header">
                         <span className="comment-author">{comment.authorName}</span>
                         <span className="comment-time">{formatTime(comment.createdAt)}</span>
+                        {canDelete && (
+                          <button
+                            className="comment-action-delete"
+                            onClick={() => handleDeleteComment(comment.commentId)}
+                            style={{ marginLeft: 8, color: '#ff4d4f', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                          >
+                            删除
+                          </button>
+                        )}
                       </div>
                       <p className="comment-text">{comment.content}</p>
                     </div>
                   </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

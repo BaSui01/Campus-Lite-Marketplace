@@ -295,6 +295,14 @@ public class NotificationServiceImpl implements NotificationService {
         // 🎯 软删除通知
         int deletedCount = notificationRepository.deleteByIds(currentUserId, notificationIds);
 
+        // 🎯 清理 Redis 未读数缓存，避免前端角标不更新
+        try {
+            String redisKey = UNREAD_COUNT_KEY + currentUserId;
+            redisTemplate.delete(redisKey);
+        } catch (Exception e) {
+            log.warn("删除通知后清理未读数缓存失败: userId={}, err={}", currentUserId, e.getMessage());
+        }
+
         log.info("删除通知: userId={}, count={}", currentUserId, deletedCount);
     }
 

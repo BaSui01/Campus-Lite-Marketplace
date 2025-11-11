@@ -244,15 +244,17 @@ public class PaymentController {
             // 2. 验证签名
             boolean verified = alipayPaymentService != null && alipayPaymentService.verifySignature(params);
             if (!verified) {
-                log.error("💥 支付宝回调验签失败");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("fail");
+                // 按支付宝规范，无论内部处理是否成功，一律返回 success，避免重复回调压力
+                log.error("💥 支付宝回调验签失败，仍返回 success 以避免重复通知");
+                return ResponseEntity.ok("success");
             }
 
             // 3. 解析回调并获取订单号、交易号
             String[] result = alipayPaymentService.handleNotify(params);
             if (result == null || result.length < 2) {
-                log.error("💥 支付宝回调解析失败，必要参数缺失");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("fail");
+                // 解析不到成功态，同样按规范返回 success，内部落日志供排查
+                log.error("💥 支付宝回调解析失败，必要参数缺失或状态非成功，仍返回 success");
+                return ResponseEntity.ok("success");
             }
             String orderNo = result[0];
             String tradeNo = result[1];
@@ -265,7 +267,8 @@ public class PaymentController {
                     throw new IllegalStateException("订单不存在");
                 }
 
-                java.math.BigDecimal amount = orderResponse.amount();
+                // 使用实付金额进行校验，避免折扣场景下误判
+                java.math.BigDecimal amount = orderResponse.actualAmount();
 
                 PaymentCallbackRequest callbackRequest = new PaymentCallbackRequest(
                         orderNo,
@@ -282,7 +285,7 @@ public class PaymentController {
                 }
             } catch (Exception e) {
                 // 不要向支付宝返回失败，否则会反复重试；记录错误并返回 success，后续人工/任务修复
-                log.error("💥 处理支付宝回调更新订单异常: {}", orderNo, e);
+                log.error("💥 处理支付宝回调更新订单异常", e);
             }
 
             // 5. 按支付宝规范返回 "success"

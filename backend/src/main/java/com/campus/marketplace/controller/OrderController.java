@@ -161,6 +161,22 @@ public class OrderController {
     }
 
     /**
+     * 更新订单配送/收货信息
+     *
+     * POST /api/orders/{orderNo}/delivery
+     */
+    @PostMapping("/{orderNo}/delivery")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "更新订单配送/收货信息", description = "设置配送方式（面交/快递）及收货信息")
+    public ApiResponse<Void> updateOrderDelivery(
+            @Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo,
+            @Valid @RequestBody com.campus.marketplace.common.dto.request.UpdateOrderDeliveryRequest request
+    ) {
+        orderService.updateOrderDelivery(orderNo, request);
+        return ApiResponse.success(null);
+    }
+
+    /**
      * 取消订单（未支付）
      *
      * POST /api/orders/{orderNo}/cancel

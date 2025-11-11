@@ -6,9 +6,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Skeleton, Modal, Tabs, Input } from '@campus/shared/components';
-import { postService, tagService, topicService } from '@campus/shared/services';
+import { postService, tagService, topicService, communityService } from '@campus/shared/services';
 import type { Tag } from '@campus/shared/services/tag';
 import type { Topic } from '@campus/shared/services/topic';
 import { useAuthStore, useNotificationStore } from '../../store';
@@ -36,6 +36,7 @@ interface Comment {
  */
 const Community: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const toast = useNotificationStore();
   const currentUser = useAuthStore((state) => state.user);
 
@@ -121,6 +122,9 @@ const Community: React.FC = () => {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [hotTags, setHotTags] = useState<Array<{ id: number; name: string; usageCount?: number }>>([]);
   const [hotTopics, setHotTopics] = useState<Array<{ id: number; name: string; description?: string; postCount?: number; followerCount?: number }>>([]);
+  // 关注流缓存与游标
+  const [followedPostIds, setFollowedPostIds] = useState<number[]>([]);
+  const [followedCursor, setFollowedCursor] = useState(0);
 
   // ==================== 数据加载 ====================
 
@@ -206,13 +210,102 @@ const Community: React.FC = () => {
     try {
       // 🚀 调用真实后端 API 获取帖子列表
       const currentPage = isLoadMore ? page : 0;
-      const response = await postService.getPosts({
+
+      // 根据 tab 选择排序规则
+      const tab = (activeTab || 'all').toLowerCase();
+      // 关注流（使用后端 /community/feed）
+      if (tab === 'followed') {
+        const PAGE_SIZE = 10;
+
+        let idsSource = followedPostIds;
+        if (!isLoadMore && followedPostIds.length === 0) {
+          try {
+            const feed = await communityService.getUserFeed();
+            const ids = Array.from(new Set((feed || [])
+              .filter((f: any) => (f.feedType === 'POST' || f.feedType === 'Post') && f.targetId)
+              .map((f: any) => Number(f.targetId))
+              .filter((id: any) => Number.isFinite(id))));
+            setFollowedPostIds(ids);
+            setFollowedCursor(0);
+            idsSource = ids;
+          } catch (e) {
+            console.error('加载关注流失败：', e);
+          }
+        }
+
+        const start = isLoadMore ? followedCursor : 0;
+        const end = Math.min(start + PAGE_SIZE, idsSource.length);
+        const batchIds = idsSource.slice(start, end);
+
+        if (batchIds.length > 0) {
+          const details = await Promise.all(batchIds.map(async (id) => {
+            try {
+              return await postService.getPostById(id);
+            } catch (e) {
+              console.warn('获取帖子失败，跳过：', id, e);
+              return null;
+            }
+          }));
+
+          const apiPosts: Post[] = details.filter(Boolean).map((p: any) => ({
+            postId: String(p.id),
+            authorId: String(p.userId),
+            authorName: p.userName || '未知用户',
+            authorAvatar: p.userAvatar,
+            content: p.content,
+            images: p.images || [],
+            likeCount: p.likeCount || 0,
+            commentCount: p.commentCount || 0,
+            isLiked: p.isLiked || false,
+            createdAt: p.createTime,
+          }));
+
+          if (isLoadMore) {
+            setPosts((prev) => [...prev, ...apiPosts]);
+          } else {
+            setPosts(apiPosts);
+          }
+
+          setHasMore(end < idsSource.length);
+          setFollowedCursor(end);
+        } else {
+          if (!isLoadMore) setPosts([]);
+          setHasMore(false);
+        }
+
+        return; // 关注流已处理
+      }
+
+      let sortBy: string | undefined;
+      let sortDirection: string | undefined;
+      switch (tab) {
+        case 'hot':
+          sortBy = 'replyCount';
+          sortDirection = 'DESC';
+          break;
+        case 'new':
+          sortBy = 'createdAt';
+          sortDirection = 'DESC';
+          break;
+        case 'featured':
+          sortBy = 'viewCount';
+          sortDirection = 'DESC';
+          break;
+        default:
+          sortBy = 'createdAt';
+          sortDirection = 'DESC';
+      }
+
+      const pageData = await postService.getPosts({
         page: currentPage,
-        pageSize: 10,
+        size: 10,
+        sortBy,
+        sortDirection,
       });
 
-      if (response.success && response.data) {
-        const apiPosts: Post[] = response.data.content.map((p: any) => ({
+      if (pageData) {
+        const list = Array.isArray(pageData.content) ? pageData.content : [];
+        const apiPosts: Post[] = list.map((p: any) => ({
           postId: String(p.id),
           authorId: String(p.userId),
           authorName: p.userName || '未知用户',
@@ -231,8 +324,12 @@ const Community: React.FC = () => {
           setPosts(apiPosts);
         }
 
-        // 判断是否还有更多
-        setHasMore(response.data.content.length >= 10);
+        // 判断是否还有更多（优先用 last 字段，没有则用条数回退判断）
+        if (typeof pageData.last === 'boolean') {
+          setHasMore(!pageData.last);
+        } else {
+          setHasMore(list.length >= 10);
+        }
       }
     } catch (err: any) {
       console.error('加载帖子失败：', err);
@@ -246,6 +343,21 @@ const Community: React.FC = () => {
   useEffect(() => {
     loadPosts();
   }, [activeTab]);
+
+  // 监听 URL 中的 tab 参数变化，联动筛选
+  useEffect(() => {
+    const tabFromUrl = (searchParams.get('tab') || 'all').toLowerCase();
+    if (tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+      setPage(1);
+      setHasMore(true);
+      setPosts([]);
+      if (tabFromUrl === 'followed') {
+        setFollowedCursor(0);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   useEffect(() => {
     loadTags(); // 初始化加载标签
@@ -364,16 +476,29 @@ const Community: React.FC = () => {
    * 打开评论弹窗
    */
   const handleOpenCommentModal = async (post: Post) => {
+    // 先校验帖子状态，未审核不允许评论（与后端一致）
+    try {
+      const detail = await postService.getPostById(Number(post.postId));
+      const isAuthor = !!detail && currentUser?.id === detail.authorId;
+      if (detail?.status && detail.status !== 'APPROVED' && !isAuthor) {
+        toast.info(`该帖子当前为「${detail.status === 'PENDING' ? '待审核' : detail.status === 'REJECTED' ? '未通过' : '非可评论状态'}」，仅作者或管理员可评论。`);
+        return;
+      }
+    } catch (e) {
+      // 若详情拉取失败，不阻断弹窗，但后续发布会因后端校验失败而提示
+    }
+
     setCurrentPost(post);
     setShowCommentModal(true);
     setCommentContent('');
 
     try {
       // 🚀 调用真实后端 API 获取评论列表
-      const response = await postService.getReplies(Number(post.postId), { page: 0, pageSize: 50 });
+      const pageReply = await postService.getReplies(Number(post.postId), { page: 0, size: 50 });
 
-      if (response.success && response.data) {
-        const apiComments: Comment[] = response.data.content.map((c: any) => ({
+      if (pageReply) {
+        const list = Array.isArray(pageReply.content) ? pageReply.content : [];
+        const apiComments: Comment[] = list.map((c: any) => ({
           commentId: String(c.id),
           postId: post.postId,
           authorId: String(c.userId),
@@ -415,6 +540,16 @@ const Community: React.FC = () => {
     setCommenting(true);
 
     try {
+      // 再次兜底校验（避免打开后状态有变化）
+      try {
+        const detail = await postService.getPostById(Number(currentPost.postId));
+        const isAuthor = !!detail && currentUser?.id === detail.authorId;
+        if (detail?.status && detail.status !== 'APPROVED' && !isAuthor) {
+          toast.warning('该帖子未处于可评论状态，仅作者或管理员可评论。');
+          return;
+        }
+      } catch {}
+
       // 🚀 调用真实后端 API 发布评论
       await postService.createReply({
         postId: Number(currentPost.postId),
@@ -463,6 +598,11 @@ const Community: React.FC = () => {
     setActiveTab(value);
     setPage(1);
     setHasMore(true);
+    setPosts([]);
+    if (value === 'followed') {
+      setFollowedCursor(0);
+    }
+    setSearchParams(value && value !== 'all' ? { tab: value } : {});
   };
 
   /**
@@ -660,7 +800,7 @@ const Community: React.FC = () => {
 
       {/* ==================== 发布动态弹窗 ==================== */}
       {showPublishModal && (
-        <Modal onClose={handleClosePublishModal} title="✍️ 发布动态">
+        <Modal visible={showPublishModal} onClose={handleClosePublishModal} title="✍️ 发布动态" footer={null}>
           <div className="publish-modal">
             {/* Markdown 编辑器 */}
             <MarkdownEditor

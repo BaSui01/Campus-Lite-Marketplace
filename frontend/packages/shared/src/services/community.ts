@@ -4,14 +4,20 @@
  * @description 社区广场话题标签、动态流、互动功能（基于 OpenAPI 生成代码）
  */
 
-import { getApi } from '../utils/apiClient';
+import { getApi, apiClient, getApiBaseUrl } from '../utils/apiClient';
+// 引入 OpenAPI 生成的类型，避免与本文件中的视图模型命名冲突
+import type { UserFeed as ApiUserFeed, UserFeedFeedTypeEnum } from '../api/models/user-feed';
+// 兼容层：在未生成 OpenAPI DTO 之前，使用本地定义；生成后可切换为 '../api/models/user-feed-dto'
+import type { UserFeedDTO } from '../api/compat/user-feed-dto';
 
 // ==================== 类型定义 ====================
 
 /**
- * 用户动态
+ * 用户动态（视图模型）
+ * 说明：由 OpenAPI 的 UserFeed 模型映射而来，
+ *      补充了头像/昵称与兜底逻辑，前端直接用于展示。
  */
-export interface UserFeed {
+export interface UserFeedView {
   id: number;
   userId: number;
   userName: string;
@@ -70,7 +76,7 @@ export interface CommunityService {
   uncollectPost(postId: number): Promise<void>;
 
   /** 获取用户动态流 */
-  getUserFeed(): Promise<UserFeed[]>;
+  getUserFeed(): Promise<UserFeedView[]>;
 
   /** 获取话题下的帖子 */
   getPostsByTopic(topicId: number): Promise<number[]>;
@@ -127,10 +133,42 @@ class CommunityServiceImpl implements CommunityService {
     await api.uncollectPost({ postId });
   }
 
-  async getUserFeed(): Promise<UserFeed[]> {
-    const api = getApi();
-    const response = await api.getUserFeed();
-    return response.data.data as UserFeed[];
+  async getUserFeed(): Promise<UserFeedView[]> {
+    // 优先调用 v2（DTO 精简版），失败则回退旧接口，保证兼容
+    try {
+      const base = getApiBaseUrl();
+      const { data } = await apiClient.get(`${base}/community/feed/v2`);
+      const list = (data?.data as UserFeedDTO[]) ?? [];
+      return list.map((f) => ({
+        id: Number(f.id ?? 0),
+        userId: Number(f.actorId ?? 0),
+        userName: f.displayName ?? '',
+        userAvatar: f.avatarUrl || undefined,
+        actionType: mapActionType(f.feedType as any),
+        targetType: f.targetType === 'GOODS' ? 'GOODS' : 'POST',
+        targetId: Number(f.targetId ?? 0),
+        content: undefined,
+        createdAt: f.createdAt || ''
+      }));
+    } catch (e) {
+      // 回退至旧接口（实体返回）
+      const api = getApi();
+      const response = await api.getUserFeed();
+      const list = (response.data.data as ApiUserFeed[]) ?? [];
+      return list.map((f) => ({
+        id: Number(f.id || 0),
+        // 展示以发起人（actor）为准
+        userId: Number(f.actorId || 0),
+        userName: (f.actor?.nickname?.trim()?.length ? f.actor!.nickname! : (f.actor?.username || '')) || '',
+        userAvatar: f.actor?.avatar || undefined,
+        actionType: mapActionType(f.feedType),
+        // 旧接口暂无目标类型，默认 POST
+        targetType: 'POST',
+        targetId: Number(f.targetId || 0),
+        content: undefined,
+        createdAt: f.createdAt || ''
+      }));
+    }
   }
 
   async getPostsByTopic(topicId: number): Promise<number[]> {
@@ -177,3 +215,24 @@ class CommunityServiceImpl implements CommunityService {
 // ==================== 导出服务实例 ====================
 
 export const communityService = new CommunityServiceImpl();
+
+// ==================== 私有工具方法 ====================
+
+/**
+ * 将后端的 FeedType 映射为前端展示枚举
+ * REVIEW → COMMENT（语义一致）
+ */
+function mapActionType(t?: ApiUserFeed['feedType']): 'POST' | 'LIKE' | 'COLLECT' | 'COMMENT' {
+  switch (t) {
+    case UserFeedFeedTypeEnum.Post:
+      return 'POST';
+    case UserFeedFeedTypeEnum.Like:
+      return 'LIKE';
+    case UserFeedFeedTypeEnum.Collect:
+      return 'COLLECT';
+    case UserFeedFeedTypeEnum.Review:
+      return 'COMMENT';
+    default:
+      return 'POST';
+  }
+}

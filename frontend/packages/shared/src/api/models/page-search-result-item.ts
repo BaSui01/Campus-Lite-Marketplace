@@ -67,6 +67,12 @@ export interface PageSearchResultItem {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageSearchResultItem
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageSearchResultItem
      */
@@ -83,12 +89,6 @@ export interface PageSearchResultItem {
      * @memberof PageSearchResultItem
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageSearchResultItem
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

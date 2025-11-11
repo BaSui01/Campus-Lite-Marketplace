@@ -94,10 +94,10 @@ export interface DisputeFilterRequest {
     'maxAmount'?: number;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof DisputeFilterRequest
      */
-    'sortByOrDefault'?: string;
+    'pageOrDefault'?: number;
     /**
      * 
      * @type {number}
@@ -106,10 +106,10 @@ export interface DisputeFilterRequest {
     'sizeOrDefault'?: number;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof DisputeFilterRequest
      */
-    'pageOrDefault'?: number;
+    'sortByOrDefault'?: string;
     /**
      * 
      * @type {string}

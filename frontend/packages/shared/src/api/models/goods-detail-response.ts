@@ -139,6 +139,7 @@ export interface GoodsDetailResponse {
 export const GoodsDetailResponseStatusEnum = {
     Pending: 'PENDING',
     Approved: 'APPROVED',
+    Locked: 'LOCKED',
     Rejected: 'REJECTED',
     Sold: 'SOLD',
     Offline: 'OFFLINE'

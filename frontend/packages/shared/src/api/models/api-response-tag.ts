@@ -40,6 +40,6 @@ export interface ApiResponseTag {
      * @type {Tag}
      * @memberof ApiResponseTag
      */
-    'data'?: Tag;
+    'data'?: Tag | null;
 }
 

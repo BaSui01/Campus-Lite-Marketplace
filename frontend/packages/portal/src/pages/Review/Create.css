@@ -135,6 +135,47 @@
   margin-top: 4px;
 }
 
+/* 表情开关按钮与面板 */
+.emoji-toggle-btn {
+  padding: 6px 10px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.emoji-toggle-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.emoji-panel {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  background: #fff;
+  margin-top: 8px;
+}
+
+.emoji-item {
+  font-size: 20px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.emoji-item:hover {
+  background: #f5f5f5;
+}
+
 /* 匿名选项 */
 .review-create__checkbox {
   display: flex;

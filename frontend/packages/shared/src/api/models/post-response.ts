@@ -139,6 +139,7 @@ export interface PostResponse {
 export const PostResponseStatusEnum = {
     Pending: 'PENDING',
     Approved: 'APPROVED',
+    Locked: 'LOCKED',
     Rejected: 'REJECTED',
     Sold: 'SOLD',
     Offline: 'OFFLINE'

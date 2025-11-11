@@ -140,9 +140,14 @@ public class OrderServiceImpl implements OrderService {
                 orderNo, buyer.getId(), goods.getSellerId(), actualAmount);
 
         // 下单后锁定商品，等待支付
-        goods.setStatus(GoodsStatus.LOCKED);
-        goodsRepository.save(goods);
-        log.info("物品状态更新为已锁定(待支付): goodsId={}", goods.getId());
+        // 临时禁用：部分环境存在 t_goods.status CHECK 约束不含 LOCKED，导致 400；
+        // 依赖“存在未取消订单即视为被占用”的业务校验避免并发下单。
+        // 如需启用，移除此禁用块，并确保数据库允许 LOCKED 枚举值。
+        if (false) {
+            goods.setStatus(GoodsStatus.LOCKED);
+            goodsRepository.save(goods);
+            log.info("物品状态更新为已锁定(待支付): goodsId={}", goods.getId());
+        }
 
         // 下单即发送锁定期通知（买家/卖家）
         try {
@@ -262,15 +267,15 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentTime(LocalDateTime.now());
         orderRepository.save(order);
 
-        // 支付成功后将商品从 LOCKED → SOLD（幂等处理）
+        // 支付成功后标记商品为 SOLD（不再依赖下单时的 LOCKED，保证幂等）
         try {
             Goods goods = goodsRepository.findById(order.getGoodsId()).orElse(null);
             if (goods != null) {
-                if (goods.getStatus() == GoodsStatus.LOCKED) {
+                if (goods.getStatus() != GoodsStatus.SOLD) {
                     goods.setStatus(GoodsStatus.SOLD);
                     goods.incrementSoldCount();
                     goodsRepository.save(goods);
-                    log.info("支付成功，物品状态由LOCKED→SOLD: goodsId={}, orderNo={}", goods.getId(), order.getOrderNo());
+                    log.info("支付成功，物品状态更新为 SOLD: goodsId={}, orderNo={}", goods.getId(), order.getOrderNo());
                 } else {
                     log.info("支付成功但商品状态非LOCKED，保持不变: goodsId={}, status={}", goods.getId(), goods.getStatus());
                 }
@@ -598,6 +603,44 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 更新订单配送/收货信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderDelivery(String orderNo, com.campus.marketplace.common.dto.request.UpdateOrderDeliveryRequest request) {
+        String username = SecurityUtil.getCurrentUsername();
+        User current = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        Order order = orderRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        // 仅买家本人可更新，且仅限未支付状态
+        if (!order.getBuyerId().equals(current.getId())) {
+            throw new BusinessException(ErrorCode.PERMISSION_DENIED);
+        }
+        if (order.getStatus() != com.campus.marketplace.common.enums.OrderStatus.PENDING_PAYMENT) {
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "当前状态不可修改收货信息");
+        }
+
+        // 校验：快递模式必须填写完整的收货信息
+        if (request.deliveryMethod() == com.campus.marketplace.common.enums.DeliveryMethod.EXPRESS) {
+            if (request.receiverName() == null || request.receiverName().isBlank()
+                    || request.receiverPhone() == null || request.receiverPhone().isBlank()
+                    || request.receiverAddress() == null || request.receiverAddress().isBlank()) {
+                throw new BusinessException(ErrorCode.PARAM_ERROR, "快递模式下收货人/手机号/地址均为必填");
+            }
+        }
+
+        order.setDeliveryMethod(request.deliveryMethod());
+        order.setReceiverName(request.receiverName());
+        order.setReceiverPhone(request.receiverPhone());
+        order.setReceiverAddress(request.receiverAddress());
+        order.setBuyerNote(request.note());
+        orderRepository.save(order);
+    }
+
+    /**
      * 生成唯一订单号
      */
     private String generateOrderNo() {
@@ -714,6 +757,11 @@ public class OrderServiceImpl implements OrderService {
                 .paymentMethod(order.getPaymentMethod())
                 .paymentTime(order.getPaymentTime())
                 .createdAt(order.getCreatedAt())
+                .deliveryMethod(order.getDeliveryMethod())
+                .receiverName(order.getReceiverName())
+                .receiverPhone(order.getReceiverPhone())
+                .receiverAddress(order.getReceiverAddress())
+                .buyerNote(order.getBuyerNote())
                 .paymentExpireAt(expireAt)
                 .timeoutMinutes(minutes)
                 .build();

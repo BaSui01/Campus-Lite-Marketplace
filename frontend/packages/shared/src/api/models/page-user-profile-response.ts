@@ -67,6 +67,12 @@ export interface PageUserProfileResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageUserProfileResponse
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageUserProfileResponse
      */
@@ -83,12 +89,6 @@ export interface PageUserProfileResponse {
      * @memberof PageUserProfileResponse
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageUserProfileResponse
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

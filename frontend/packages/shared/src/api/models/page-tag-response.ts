@@ -67,6 +67,12 @@ export interface PageTagResponse {
     'sort'?: Array<SortObject>;
     /**
      * 
+     * @type {PageableObject}
+     * @memberof PageTagResponse
+     */
+    'pageable'?: PageableObject;
+    /**
+     * 
      * @type {number}
      * @memberof PageTagResponse
      */
@@ -83,12 +89,6 @@ export interface PageTagResponse {
      * @memberof PageTagResponse
      */
     'last'?: boolean;
-    /**
-     * 
-     * @type {PageableObject}
-     * @memberof PageTagResponse
-     */
-    'pageable'?: PageableObject;
     /**
      * 
      * @type {boolean}

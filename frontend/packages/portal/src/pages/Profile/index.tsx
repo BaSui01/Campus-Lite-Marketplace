@@ -281,8 +281,8 @@ const Profile: React.FC = () => {
    */
   const formatPrice = (price?: number) => {
     if (!price) return '¥0.00';
-    // 后端价格单位是分，需要除以100
-    return `¥${(price / 100).toFixed(2)}`;
+    // ✅ 后端已使用元（BigDecimal，scale=2），不需要再除以 100
+    return `¥${price.toFixed(2)}`;
   };
 
   /**

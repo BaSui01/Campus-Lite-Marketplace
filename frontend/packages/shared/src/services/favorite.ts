@@ -38,7 +38,7 @@ export class FavoriteService {
    */
   async addFavorite(goodsId: number): Promise<void> {
     const api = getApi();
-    await api.addFavorite(goodsId);
+    await api.addFavorite({ goodsId });
   }
 
   /**
@@ -47,7 +47,7 @@ export class FavoriteService {
    */
   async removeFavorite(goodsId: number): Promise<void> {
     const api = getApi();
-    await api.removeFavorite(goodsId);
+    await api.removeFavorite({ goodsId });
   }
 
   /**
@@ -57,10 +57,10 @@ export class FavoriteService {
    */
   async listFavorites(params?: FavoriteListParams): Promise<PageGoodsResponse> {
     const api = getApi();
-    const response = await api.listFavorites(
-      params?.page ?? 0,
-      params?.size ?? 20
-    );
+    const response = await api.listFavorites({
+      page: params?.page ?? 0,
+      size: params?.size ?? 20,
+    });
     
     // 如果需要客户端排序（后端不支持时）
     let content = response.data.data?.content || [];
@@ -86,7 +86,7 @@ export class FavoriteService {
    */
   async isFavorited(goodsId: number): Promise<boolean> {
     const api = getApi();
-    const response = await api.isFavorited(goodsId);
+    const response = await api.isFavorited({ goodsId });
     return response.data.data as boolean;
   }
 

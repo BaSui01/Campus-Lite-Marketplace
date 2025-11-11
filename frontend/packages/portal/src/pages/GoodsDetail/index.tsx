@@ -6,13 +6,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Skeleton } from '@campus/shared/components';
+import { Skeleton, Modal } from '@campus/shared/components';
 import { goodsService } from '@campus/shared/services/goods';
 import { orderService } from '@campus/shared/services/order';
 import { creditService, CreditLevel, CREDIT_LEVEL_CONFIG } from '../../services';
 import { UserCreditInfo } from '@campus/shared/services';;
 import { useNotificationStore } from '../../store';
-import type { GoodsDetailResponse } from '@campus/shared/api/models';
+import type { GoodsDetailResponse, Order, PageOrderResponse, OrderResponse } from '@campus/shared/api/models';
 import './GoodsDetail.css';
 
 /**
@@ -33,6 +33,11 @@ const GoodsDetail: React.FC = () => {
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [purchasing, setPurchasing] = useState(false);
   const [sellerCredit, setSellerCredit] = useState<UserCreditInfo | null>(null);
+
+  // ===== 评价：选择订单弹窗相关状态 =====
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [eligibleOrders, setEligibleOrders] = useState<OrderResponse[]>([]);
+  const [loadingEligible, setLoadingEligible] = useState(false);
 
   // ==================== 数据加载 ====================
 
@@ -83,6 +88,71 @@ const GoodsDetail: React.FC = () => {
   }, [id]);
 
   // ==================== 事件处理 ====================
+
+  /**
+   * 打开“选择订单进行评价”弹窗
+   */
+  const handleOpenReview = async () => {
+    if (!goods?.id) return;
+    setLoadingEligible(true);
+    try {
+      // 1) 查询已完成订单
+      const respCompleted: PageOrderResponse = await orderService.listBuyerOrders({
+        status: 'COMPLETED',
+        page: 0,
+        size: 50,
+      });
+      const listCompleted = (respCompleted.content || []).filter(
+        (o) => o.goodsId === goods.id
+      );
+
+      // 2) 查询已送达订单（部分系统允许评价）
+      const respDelivered: PageOrderResponse = await orderService.listBuyerOrders({
+        status: 'DELIVERED',
+        page: 0,
+        size: 50,
+      });
+      const listDelivered = (respDelivered.content || []).filter(
+        (o) => o.goodsId === goods.id
+      );
+
+      const candidates = [...listCompleted, ...listDelivered];
+
+      if (candidates.length === 0) {
+        toast.info('暂无可评价的相关订单，请完成交易后再来评价～');
+        return;
+      }
+
+      // 只有一个订单时，直接进入评价页（补齐订单详情用于展示）
+      if (candidates.length === 1) {
+        const orderNo = candidates[0].orderNo!;
+        const detail: Order = await orderService.getOrderDetail(orderNo);
+        navigate('/review/create', { state: { order: detail } });
+        return;
+      }
+
+      setEligibleOrders(candidates);
+      setReviewModalVisible(true);
+    } catch (e: any) {
+      console.error('获取可评价订单失败：', e);
+      toast.error(e?.message || '获取可评价订单失败，请稍后再试');
+    } finally {
+      setLoadingEligible(false);
+    }
+  };
+
+  /**
+   * 在弹窗中选择订单并跳转到评价页
+   */
+  const handleSelectOrderForReview = async (orderNo: string) => {
+    try {
+      const detail: Order = await orderService.getOrderDetail(orderNo);
+      setReviewModalVisible(false);
+      navigate('/review/create', { state: { order: detail } });
+    } catch (e: any) {
+      toast.error(e?.message || '获取订单详情失败，请稍后再试');
+    }
+  };
 
   /**
    * 收藏/取消收藏商品
@@ -391,6 +461,14 @@ const GoodsDetail: React.FC = () => {
               {favoriteLoading ? '⏳' : isFavorited ? '💖' : '🤍'} {isFavorited ? '已收藏' : '收藏'}
             </button>
             <button
+              className="btn-review"
+              onClick={handleOpenReview}
+              disabled={!goods || loadingEligible}
+              title="对该商品发表你的真实评价～"
+            >
+              {loadingEligible ? '⏳ 加载订单...' : '✍️ 评价'}
+            </button>
+            <button
               className="btn-contact"
               onClick={handleContactSeller}
             >
@@ -475,6 +553,45 @@ const GoodsDetail: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 选择订单进行评价 - 弹窗 */}
+      <Modal
+        visible={reviewModalVisible}
+        title="选择订单进行评价"
+        onClose={() => setReviewModalVisible(false)}
+        onCancel={() => setReviewModalVisible(false)}
+        footer={null}
+        size="medium"
+      >
+        {eligibleOrders.length === 0 ? (
+          <div style={{ padding: 12, color: '#8c8c8c' }}>暂无可评价订单</div>
+        ) : (
+          <div className="review-order-list">
+            {eligibleOrders.map((o) => (
+              <div key={o.orderNo} className="review-order-item">
+                <div className="review-order-thumb">
+                  <img src={o.goodsImage || '/placeholder.png'} alt={o.goodsTitle || '商品'} />
+                </div>
+                <div className="review-order-info">
+                  <div className="review-order-title">{o.goodsTitle || `订单 ${o.orderNo}`}</div>
+                  <div className="review-order-meta">
+                    <span>订单号：{o.orderNo}</span>
+                    <span>状态：{o.status}</span>
+                  </div>
+                </div>
+                <div className="review-order-action">
+                  <button
+                    className="review-order-choose-btn"
+                    onClick={() => handleSelectOrderForReview(o.orderNo!)}
+                  >
+                    选择
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

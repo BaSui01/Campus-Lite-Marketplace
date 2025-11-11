@@ -63,12 +63,14 @@ class PostServiceImplTest {
     @Mock private MessageService messageService;
     @Mock private com.campus.marketplace.common.utils.SensitiveWordFilter sensitiveWordFilter;
     @Mock private com.campus.marketplace.service.ComplianceService complianceService;
+    @Mock private com.campus.marketplace.repository.UserFollowRepository userFollowRepository;
+    @Mock private com.campus.marketplace.repository.UserFeedRepository userFeedRepository;
 
     private PostServiceImpl postService;
 
     @BeforeEach
     void setUp() {
-        postService = new PostServiceImpl(postRepository, postTagRepository, tagRepository, userRepository, postLikeRepository, postCollectRepository, sensitiveWordFilter, complianceService, redisTemplate, messageService);
+        postService = new PostServiceImpl(postRepository, postTagRepository, tagRepository, userRepository, postLikeRepository, postCollectRepository, sensitiveWordFilter, complianceService, redisTemplate, messageService, userFollowRepository, userFeedRepository);
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
