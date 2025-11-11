@@ -1,7 +1,7 @@
 package com.campus.marketplace.common.dto.request;
 
 import com.campus.marketplace.common.enums.PaymentMethod;
-import com.campus.marketplace.common.enums.PaymentStatus;
+import com.campus.marketplace.common.enums.OrderStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,10 +27,10 @@ import java.math.BigDecimal;
 public class PaymentFilterRequest extends BaseFilterRequest {
 
     /**
-     * 支付状态
+     * 订单状态（用于支付筛选）
      */
-    @Schema(description = "支付状态（PENDING/SUCCESS/FAILED/REFUNDED）", example = "SUCCESS")
-    private PaymentStatus status;
+    @Schema(description = "订单状态（PENDING_PAYMENT/PAID/COMPLETED/REFUNDED）", example = "PAID")
+    private OrderStatus status;
 
     /**
      * 支付方式

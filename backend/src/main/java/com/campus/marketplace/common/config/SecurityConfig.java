@@ -75,16 +75,14 @@ public class SecurityConfig {
                         .requestMatchers(matchersWithContext("/actuator/health")).permitAll()
                         
                         // 验证码接口（登录前需要访问，必须公开）
+                        // 🎯 统一验证接口（方案B - 推荐）
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/verify")).permitAll()
+                        // 🎨 验证码生成接口（四种类型）
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/image")).permitAll()
-                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/image/verify")).permitAll()
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/slide")).permitAll()
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/slide/image")).permitAll()
-                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/slide/verify")).permitAll()
-                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/slide/verify/track")).permitAll()
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/rotate")).permitAll()
-                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/rotate/verify")).permitAll()
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/click")).permitAll()
-                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/click/verify")).permitAll()
                         
                         // 公共查询接口
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/search", "/search/**")).permitAll()
