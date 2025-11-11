@@ -38,7 +38,7 @@ import { paymentService } from '@campus/shared';
 import type { OrderResponse } from '@campus/shared/api';
 import { FilterPanel } from '@campus/shared/components';
 import type { FilterConfig, FilterValues } from '@campus/shared/types/filter';
-import { PAYMENT_STATUS_OPTIONS, PAYMENT_METHOD_OPTIONS } from '@campus/shared/constants';
+import { ORDER_STATUS_OPTIONS, PAYMENT_METHOD_OPTIONS } from '@campus/shared/constants';
 import dayjs from 'dayjs';
 
 /**
@@ -98,9 +98,9 @@ const paymentFilters: FilterConfig[] = [
   {
     type: 'select',
     field: 'status',
-    label: '支付状态',
+    label: '订单状态',
     placeholder: '选择状态',
-    options: PAYMENT_STATUS_OPTIONS,
+    options: ORDER_STATUS_OPTIONS,
     width: 130,
   },
   {

@@ -67,12 +67,9 @@ public class PaymentAdminServiceImpl implements PaymentAdminService {
         // 使用 Criteria API 构建动态查询
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         
-        // 查询总数
+        // 查询总数（注意：count 查询不能使用 fetch join）
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Order> countRoot = countQuery.from(Order.class);
-        countRoot.fetch("goods");
-        countRoot.fetch("buyer");
-        countRoot.fetch("seller");
         countQuery.select(cb.count(countRoot));
         countQuery.where(buildPredicates(cb, countRoot, keyword, status, paymentMethod, startDate, endDate));
         Long total = entityManager.createQuery(countQuery).getSingleResult();

@@ -11,8 +11,7 @@
  * @author BaSui 😎
  * @date 2025-11-08
  */
-
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Form,
@@ -157,7 +156,7 @@ export const RecommendConfig: React.FC = () => {
   };
 
   // 初始化表单值
-  React.useEffect(() => {
+  useEffect(() => {
     if (config) {
       form.setFieldsValue(config);
     }

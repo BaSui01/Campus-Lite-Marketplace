@@ -16,6 +16,7 @@ import type {
   ReviewListQuery,
   ReviewListResponse,
 } from './types';
+import type { ReviewStatisticsDTO } from '../../api/models';
 
 // 导出类型供外部使用
 export type {
@@ -46,6 +47,13 @@ export interface ReviewService {
    * @returns 评价列表（分页）
    */
   listReviews(goodsId: number, params: ReviewListQuery): Promise<ReviewListResponse>;
+
+  /**
+   * 获取商品评价统计
+   * @param goodsId 商品ID
+   * @returns 评价统计数据
+   */
+  getGoodsReviewStatistics(goodsId: number): Promise<ReviewStatisticsDTO>;
 
   /**
    * 获取我的评价列表
@@ -218,7 +226,25 @@ class ReviewServiceImpl implements ReviewService {
       `/goods/${goodsId}/reviews`,
       { params }
     );
-    return response.data;
+    // 若选择了 image_first，则在当前页内做“有图优先”的稳定重排（不影响总数和分页）
+    if (params.sortBy === 'image_first' && (response.data as any)?.content) {
+      const data = { ...(response.data as any) };
+      data.content = [...data.content].sort((a: any, b: any) => {
+        const aHasImg = Array.isArray(a.media) && a.media.some((m: any) => m.mediaType === 'IMAGE');
+        const bHasImg = Array.isArray(b.media) && b.media.some((m: any) => m.mediaType === 'IMAGE');
+        if (aHasImg === bHasImg) return 0;
+        return aHasImg ? -1 : 1;
+      });
+      return data as ReviewListResponse;
+    }
+    return response.data as ReviewListResponse;
+  }
+
+  async getGoodsReviewStatistics(goodsId: number): Promise<ReviewStatisticsDTO> {
+    const response = await axiosInstance.get<{ data: ReviewStatisticsDTO }>(
+      `/goods/${goodsId}/reviews/stats`
+    );
+    return response.data.data;
   }
 
   async getMyReviews(params: {
@@ -368,10 +394,11 @@ class ReviewServiceImpl implements ReviewService {
   // ==================== 管理员审核接口实现 ====================
 
   async listPendingReviews(params?: { page?: number; size?: number }): Promise<ReviewListResponse> {
-    const response = await axiosInstance.get<ReviewListResponse>('/admin/reviews/pending', {
-      params,
-    });
-    return response.data;
+    const response = await axiosInstance.get<{ code: number; message: string; data: ReviewListResponse }>(
+      '/reviews/admin/pending',
+      { params }
+    );
+    return response.data.data;
   }
 
   async auditReview(reviewId: number, data: { approved: boolean; reason?: string }): Promise<void> {

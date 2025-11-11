@@ -43,6 +43,14 @@ export interface CampusListParams {
   size?: number;
 }
 
+export interface CampusListPage {
+  content: Campus[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
 /**
  * 校园 API 服务类
  */
@@ -52,7 +60,7 @@ export class CampusService {
    * @param params 查询参数
    * @returns 校园列表
    */
-  async list(params?: CampusListParams): Promise<Campus[]> {
+  async list(params?: CampusListParams): Promise<CampusListPage> {
     const api = getApi();
     const response = await api.listCampuses();
     let campuses = response.data.data as Campus[];
@@ -69,7 +77,20 @@ export class CampusService {
       campuses = campuses.filter(c => c.status === params.status);
     }
 
-    return campuses;
+    const page = params?.page ?? 0;
+    const size = params?.size ?? campuses.length;
+    const total = campuses.length;
+    const start = page * size;
+    const end = start + size;
+    const content = campuses.slice(start, end);
+
+    return {
+      content,
+      totalElements: total,
+      totalPages: size > 0 ? Math.ceil(total / size) : 1,
+      size,
+      number: page,
+    };
   }
 
   /**

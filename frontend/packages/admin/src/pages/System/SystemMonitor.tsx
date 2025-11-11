@@ -576,3 +576,5 @@ export const SystemMonitor: React.FC = () => {
     </div>
   );
 };
+
+export default SystemMonitor;

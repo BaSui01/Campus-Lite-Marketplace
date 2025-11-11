@@ -153,19 +153,30 @@ const Notifications: React.FC = () => {
       title: '发送渠道',
       dataIndex: 'channels',
       key: 'channels',
-      render: (channels: string[] | undefined) => (
-        <Space>
-          {channels?.map(channel => (
-            <Tag 
-              key={channel} 
-              color={channelColors[channel] || 'default'}
-              icon={channelIcons[channel]}
-            >
-              {channel}
-            </Tag>
-          )) || <span style={{ color: '#999' }}>未设置</span>}
-        </Space>
-      ),
+      render: (channels: unknown) => {
+        const list: string[] = Array.isArray(channels)
+          ? (channels as string[])
+          : (typeof channels === 'string' && (channels as string))
+          ? [(channels as string)]
+          : [];
+        return (
+          <Space>
+            {list.length > 0 ? (
+              list.map((channel) => (
+                <Tag
+                  key={channel}
+                  color={channelColors[channel] || 'default'}
+                  icon={channelIcons[channel]}
+                >
+                  {channel}
+                </Tag>
+              ))
+            ) : (
+              <span style={{ color: '#999' }}>未设置</span>
+            )}
+          </Space>
+        );
+      },
     },
     {
       title: '标题模板',
@@ -440,7 +451,12 @@ const Notifications: React.FC = () => {
               <div>
                 <strong>渠道：</strong>
                 <Space style={{ marginLeft: 8 }}>
-                  {selectedTemplate.channels?.map(channel => (
+                  {(Array.isArray(selectedTemplate.channels)
+                    ? selectedTemplate.channels
+                    : (typeof selectedTemplate.channels === 'string'
+                        ? [selectedTemplate.channels]
+                        : [])
+                  ).map((channel) => (
                     <Tag key={channel} color={channelColors[channel] || 'default'}>
                       {channel}
                     </Tag>

@@ -40,7 +40,7 @@ public class FeatureFlagAdminController {
     private final FeatureFlagService featureFlagService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_FEATURE_FLAG_VIEW)")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "查询功能开关列表", description = "获取所有功能开关列表")
     public ApiResponse<List<FeatureFlag>> listFeatureFlags() {
         List<FeatureFlag> flags = featureFlagService.listAll();
@@ -48,7 +48,7 @@ public class FeatureFlagAdminController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_FEATURE_FLAG_CREATE)")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "创建功能开关", description = "创建新的功能开关")
     public ApiResponse<Long> createFeatureFlag(@Valid @RequestBody FeatureFlagCreateRequest request) {
         Long id = featureFlagService.create(
@@ -61,7 +61,7 @@ public class FeatureFlagAdminController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_FEATURE_FLAG_VIEW)")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "获取功能开关详情", description = "根据ID获取功能开关详细信息")
     public ApiResponse<FeatureFlag> getFeatureFlagById(
             @Parameter(description = "功能开关ID", example = "1") @PathVariable Long id
@@ -71,7 +71,7 @@ public class FeatureFlagAdminController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_FEATURE_FLAG_EDIT)")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "编辑功能开关", description = "更新功能开关配置（自动刷新缓存）")
     public ApiResponse<Void> updateFeatureFlag(
             @Parameter(description = "功能开关ID", example = "1") @PathVariable Long id,
@@ -87,7 +87,7 @@ public class FeatureFlagAdminController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_FEATURE_FLAG_DELETE)")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "删除功能开关", description = "删除指定功能开关（自动刷新缓存）")
     public ApiResponse<Void> deleteFeatureFlag(
             @Parameter(description = "功能开关ID", example = "1") @PathVariable Long id
@@ -97,7 +97,7 @@ public class FeatureFlagAdminController {
     }
 
     @PutMapping("/{id}/toggle")
-    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_FEATURE_FLAG_EDIT)")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "切换启用状态", description = "切换功能开关的启用/禁用状态（自动刷新缓存）")
     public ApiResponse<Void> toggleEnabled(
             @Parameter(description = "功能开关ID", example = "1") @PathVariable Long id
@@ -107,7 +107,7 @@ public class FeatureFlagAdminController {
     }
 
     @PostMapping("/refresh")
-    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_FEATURE_FLAG_EDIT)")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "刷新全部缓存", description = "刷新所有功能开关的本地缓存")
     public ApiResponse<Void> refreshAllCache() {
         featureFlagService.refreshAll();
@@ -115,7 +115,7 @@ public class FeatureFlagAdminController {
     }
 
     @PostMapping("/{id}/refresh")
-    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_FEATURE_FLAG_EDIT)")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_RATE_LIMIT_MANAGE)")
     @Operation(summary = "刷新单个缓存", description = "刷新指定功能开关的本地缓存")
     public ApiResponse<Void> refreshCache(
             @Parameter(description = "功能开关ID", example = "1") @PathVariable Long id
