@@ -139,16 +139,18 @@ export const PostAuditList: React.FC = () => {
       dataIndex: 'images',
       key: 'images',
       width: 80,
-      render: (images: string[]) => images.length > 0 ? `${images.length}张` : '-',
+      render: (images: string[] | undefined) => Array.isArray(images) && images.length > 0 ? `${images.length}张` : '-',
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status: string) => {
-        const info = STATUS_MAP[status];
-        return <Tag color={info.color}>{info.text}</Tag>;
+      render: (status: string | undefined) => {
+        const info = status ? STATUS_MAP[status] : undefined;
+        const text = info?.text ?? (status || '未知');
+        const color = info?.color || undefined;
+        return <Tag color={color}>{text}</Tag>;
       },
     },
     {
