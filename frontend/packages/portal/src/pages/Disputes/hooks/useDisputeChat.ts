@@ -104,8 +104,9 @@ export const useDisputeChat = (options: UseDisputeChatOptions) => {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // WebSocket连接
+  // 🔧 BaSui: 修正WebSocket URL - 后端端点是 /ws/dispute（不带disputeId参数）
   const { lastMessage, send, readyState, reconnectCount } = useWebSocket(
-    `${process.env.REACT_APP_WS_URL || 'ws://localhost:8080'}/ws/disputes/${disputeId}/chat`,
+    `${process.env.REACT_APP_WS_URL || 'ws://localhost:8200/api'}/ws/dispute`,
     {
       onOpen: () => {
         setChatState(prev => ({
@@ -141,7 +142,7 @@ export const useDisputeChat = (options: UseDisputeChatOptions) => {
       },
       reconnect: autoReconnect,
       heartbeatInterval: 30000,
-      heartbeatMessage: JSON.stringify({ type: 'ping' }),
+      heartbeatMessage: JSON.stringify({ type: 'HEARTBEAT' }), // 🔧 统一使用后端定义的类型常量
     }
   );
 
@@ -160,11 +161,14 @@ export const useDisputeChat = (options: UseDisputeChatOptions) => {
         case 'read_receipt':
           handleReadReceipt(data.payload);
           break;
-        case 'ping':
+        case 'HEARTBEAT': // 🔧 统一使用后端定义的类型常量
           // 心跳消息，不需要处理
           break;
-        case 'error':
-          handleError(data.payload);
+        case 'SYSTEM': // 🔧 处理系统消息
+          console.log('系统消息:', data.content);
+          break;
+        case 'ERROR': // 🔧 统一使用后端定义的错误类型
+          handleError(data.payload || data.content);
           break;
         case 'status_update':
           handleStatusUpdate(data.payload);

@@ -14,7 +14,7 @@ import {
   Modal,
   Form,
   Input,
-  message,
+  App,
   Typography,
   Tooltip,
 } from 'antd';
@@ -34,6 +34,7 @@ const { Text } = Typography;
 const { TextArea } = Input;
 
 const ReportList: React.FC = () => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);

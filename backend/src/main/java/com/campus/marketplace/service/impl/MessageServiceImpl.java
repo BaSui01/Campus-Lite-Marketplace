@@ -31,8 +31,8 @@ import com.campus.marketplace.common.dto.websocket.WebSocketMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -65,7 +65,6 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
     private final UserRepository userRepository;
@@ -78,6 +77,36 @@ public class MessageServiceImpl implements MessageService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final com.campus.marketplace.repository.MessageSearchHistoryRepository searchHistoryRepository;
+
+    /**
+     * 构造函数 - 显式注入依赖
+     * 
+     * 注意：sessionManager 使用 @Qualifier 指定注入 messageSessionManager
+     * 避免与 disputeSessionManager 和 webSocketSessionManager 冲突
+     */
+    public MessageServiceImpl(
+            UserRepository userRepository,
+            MessageRepository messageRepository,
+            ConversationRepository conversationRepository,
+            BlacklistRepository blacklistRepository,
+            SensitiveWordFilter sensitiveWordFilter,
+            ComplianceService complianceService,
+            @Qualifier("messageSessionManager") WebSocketSessionManager sessionManager,
+            RedisTemplate<String, Object> redisTemplate,
+            ObjectMapper objectMapper,
+            com.campus.marketplace.repository.MessageSearchHistoryRepository searchHistoryRepository
+    ) {
+        this.userRepository = userRepository;
+        this.messageRepository = messageRepository;
+        this.conversationRepository = conversationRepository;
+        this.blacklistRepository = blacklistRepository;
+        this.sensitiveWordFilter = sensitiveWordFilter;
+        this.complianceService = complianceService;
+        this.sessionManager = sessionManager;
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
+        this.searchHistoryRepository = searchHistoryRepository;
+    }
 
     /**
      * Redis Key 前缀：未读消息数

@@ -15,7 +15,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Select, Button, Spin, message, DatePicker } from 'antd';
+import { Card, Row, Col, Statistic, Select, Button, Spin, App, DatePicker } from 'antd';
 import {
   UserOutlined,
   ShoppingOutlined,
@@ -33,7 +33,10 @@ import type {
   TrendStatistics,
   RankingItem,
   CategoryStat,
+  OrderStatistics,
+  RefundStatistics,
 } from '../../services/statistics';
+import { paymentService, type PaymentStatistics } from '@campus/shared';
 import TrendChart from './components/TrendChart';
 import RevenueChart from './components/RevenueChart';
 import RankingList from './components/RankingList';
@@ -45,6 +48,9 @@ const { RangePicker } = DatePicker;
  * 统计 Dashboard 主页面
  */
 const StatisticsDashboard: React.FC = () => {
+  // ========== Ant Design 静态方法实例 ==========
+  const { message } = App.useApp();
+
   // ========== 状态管理 ==========
   const [loading, setLoading] = useState(false);
   const [overviewData, setOverviewData] = useState<SystemOverview | null>(null);
@@ -53,6 +59,11 @@ const StatisticsDashboard: React.FC = () => {
   const [topGoods, setTopGoods] = useState<RankingItem[]>([]);
   const [topUsers, setTopUsers] = useState<RankingItem[]>([]);
   const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
+  
+  // P2 新增：支付/订单/退款统计
+  const [paymentStats, setPaymentStats] = useState<PaymentStatistics | null>(null);
+  const [orderStats, setOrderStats] = useState<OrderStatistics | null>(null);
+  const [refundStats, setRefundStats] = useState<RefundStatistics | null>(null);
 
   // 筛选条件
   const [trendDays, setTrendDays] = useState(7); // 趋势天数
@@ -66,14 +77,15 @@ const StatisticsDashboard: React.FC = () => {
   const loadAllStatistics = async () => {
     setLoading(true);
     try {
-      // 并行加载所有数据
-      const [overview, trend, revenue, goods, users, categories] = await Promise.all([
+      // 并行加载所有数据（包括P2新增的统计）
+      const [overview, trend, revenue, goods, users, categories, payment] = await Promise.all([
         statisticsService.getSystemOverview(),
         statisticsService.getTrendStatistics(trendDays),
         statisticsService.getRevenueTrend(revenueMonths),
         statisticsService.getTopGoods(10),
         statisticsService.getTopUsers(10),
         statisticsService.getCategoryStatistics(),
+        paymentService.getPaymentStatistics(),
       ]);
 
       setOverviewData(overview);
@@ -82,6 +94,21 @@ const StatisticsDashboard: React.FC = () => {
       setTopGoods(goods);
       setTopUsers(users);
       setCategoryStats(categories);
+      setPaymentStats(payment);
+      
+      // TODO: 订单和退款统计暂时使用模拟数据，等待后端接口
+      setOrderStats({
+        totalOrders: overview.totalOrders,
+        completedOrders: 0,
+        completionRate: 0,
+        todayNewOrders: overview.todayNewOrders,
+      });
+      setRefundStats({
+        totalRefunds: 0,
+        completedRefunds: 0,
+        approvalRate: 0,
+        averageProcessTime: 0,
+      });
 
       message.success('数据加载成功！');
     } catch (error: any) {
@@ -213,6 +240,131 @@ const StatisticsDashboard: React.FC = () => {
                 precision={2}
                 valueStyle={{ color: '#fa8c16' }}
               />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* P2 新增：支付/订单/退款统计卡片 */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={24} sm={12} lg={8}>
+            <Card 
+              title="💰 支付统计" 
+              bordered={false}
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+            >
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Statistic
+                    title="总金额"
+                    value={(paymentStats?.totalAmount || 0) / 100}
+                    precision={2}
+                    prefix="¥"
+                    valueStyle={{ color: '#3f8600', fontSize: 20 }}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="总笔数"
+                    value={paymentStats?.totalCount || 0}
+                    valueStyle={{ fontSize: 20 }}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: 16 }}>
+                <Col span={12}>
+                  <div style={{ fontSize: 14, color: '#666' }}>成功率</div>
+                  <div style={{ fontSize: 20, color: '#1890ff', fontWeight: 600 }}>
+                    {paymentStats?.totalCount 
+                      ? ((paymentStats.successCount / paymentStats.totalCount) * 100).toFixed(1)
+                      : '0.0'
+                    }%
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 14, color: '#666' }}>退款笔数</div>
+                  <div style={{ fontSize: 20, color: '#ff4d4f', fontWeight: 600 }}>
+                    {paymentStats?.refundCount || 0}
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+
+          <Col xs={24} sm={12} lg={8}>
+            <Card 
+              title="📦 订单统计" 
+              bordered={false}
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+            >
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Statistic
+                    title="总订单"
+                    value={orderStats?.totalOrders || 0}
+                    valueStyle={{ fontSize: 20 }}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="已完成"
+                    value={orderStats?.completedOrders || 0}
+                    valueStyle={{ color: '#3f8600', fontSize: 20 }}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: 16 }}>
+                <Col span={12}>
+                  <div style={{ fontSize: 14, color: '#666' }}>完成率</div>
+                  <div style={{ fontSize: 20, color: '#52c41a', fontWeight: 600 }}>
+                    {(orderStats?.completionRate || 0).toFixed(1)}%
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 14, color: '#666' }}>今日新增</div>
+                  <div style={{ fontSize: 20, color: '#1890ff', fontWeight: 600 }}>
+                    {orderStats?.todayNewOrders || 0}
+                  </div>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+
+          <Col xs={24} sm={12} lg={8}>
+            <Card 
+              title="💸 退款统计" 
+              bordered={false}
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+            >
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Statistic
+                    title="总退款"
+                    value={refundStats?.totalRefunds || 0}
+                    valueStyle={{ fontSize: 20 }}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="已完成"
+                    value={refundStats?.completedRefunds || 0}
+                    valueStyle={{ color: '#3f8600', fontSize: 20 }}
+                  />
+                </Col>
+              </Row>
+              <Row gutter={16} style={{ marginTop: 16 }}>
+                <Col span={12}>
+                  <div style={{ fontSize: 14, color: '#666' }}>通过率</div>
+                  <div style={{ fontSize: 20, color: '#52c41a', fontWeight: 600 }}>
+                    {(refundStats?.approvalRate || 0).toFixed(1)}%
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontSize: 14, color: '#666' }}>平均时长</div>
+                  <div style={{ fontSize: 20, color: '#faad14', fontWeight: 600 }}>
+                    {(refundStats?.avgCompletionTime || 0).toFixed(1)}h
+                  </div>
+                </Col>
+              </Row>
             </Card>
           </Col>
         </Row>

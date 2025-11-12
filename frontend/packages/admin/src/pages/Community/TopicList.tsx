@@ -18,14 +18,14 @@ import {
   Input,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Card,
   Row,
   Col,
   Statistic,
   Tooltip,
+  App,
+  Modal,
 } from 'antd';
 import {
   PlusOutlined,
@@ -46,6 +46,7 @@ import dayjs from 'dayjs';
 const { TextArea } = Input;
 
 export const TopicList: React.FC = () => {
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
 
   // 搜索关键词
@@ -158,7 +159,7 @@ export const TopicList: React.FC = () => {
    * 删除话题
    */
   const handleDelete = (topicId: number) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除',
       content: '删除话题后无法恢复，确定要删除吗？',
       onOk: () => deleteMutation.mutate(topicId),
@@ -472,3 +473,6 @@ export const TopicList: React.FC = () => {
     </div>
   );
 };
+
+// ✅ 添加默认导出
+export default TopicList;

@@ -172,13 +172,13 @@ export interface Order {
      * @type {boolean}
      * @memberof Order
      */
-    'paid'?: boolean;
+    'pendingPayment'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof Order
      */
-    'pendingPayment'?: boolean;
+    'paid'?: boolean;
 }
 
 export const OrderStatusEnum = {
@@ -188,7 +188,9 @@ export const OrderStatusEnum = {
     Delivered: 'DELIVERED',
     Completed: 'COMPLETED',
     Cancelled: 'CANCELLED',
-    Reviewed: 'REVIEWED'
+    Reviewed: 'REVIEWED',
+    Refunding: 'REFUNDING',
+    Refunded: 'REFUNDED'
 } as const;
 
 export type OrderStatusEnum = typeof OrderStatusEnum[keyof typeof OrderStatusEnum];

@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +33,6 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/subscribe")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "新增订阅", description = "订阅关键词，符合条件的商品上架会提醒")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
@@ -57,7 +55,6 @@ public class SubscriptionController {
     }
 
     @DeleteMapping("/subscribe/{id}")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "取消订阅", description = "取消关键词订阅")
     public ApiResponse<Void> unsubscribe(@Parameter(description = "订阅ID", example = "1001") @PathVariable Long id) {
         subscriptionService.unsubscribe(id);
@@ -65,7 +62,6 @@ public class SubscriptionController {
     }
 
     @GetMapping("/subscribe")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "订阅列表", description = "查看我订阅的关键词")
     public ApiResponse<List<SubscriptionResponse>> listSubscriptions() {
         return ApiResponse.success(subscriptionService.listMySubscriptions());

@@ -1,19 +1,14 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
+ * ✅ 重构完成：已使用 OpenAPI 生成的 API 客户端
+ * 📋 使用方法：listFeatureFlags, getFeatureFlagById, createFeatureFlag, updateFeatureFlag, deleteFeatureFlag
  */
 /**
  * 功能开关管理 API 服务
  * @author BaSui 😎
- * @description 功能开关列表、添加、编辑、删除、灰度策略等接口
+ * @description 功能开关列表、添加、编辑、删除、灰度策略等接口（基于 OpenAPI 生成代码）
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
+import { getApi } from '@campus/shared/utils/apiClient';
 import type { BaseResponse } from '@campus/shared/api';
 
 /**
@@ -121,21 +116,13 @@ export interface FeatureFlagLog {
  */
 export class FeatureFlagService {
   /**
-   * 获取功能开关列表（分页）
-   * @param params 查询参数
-   * @returns 功能开关列表（分页）
+   * 获取功能开关列表
+   * @returns 功能开关列表
    */
-  async list(params?: FeatureFlagListParams): Promise<PageResponse<FeatureFlag>> {
-    const response = await http.get<PageResponse<FeatureFlag>>('/api/admin/feature-flags', {
-      params: {
-        keyword: params?.keyword,
-        status: params?.status,
-        environment: params?.environment,
-        page: params?.page ?? 0,
-        size: params?.size ?? 20
-      }
-    });
-    return response.data;
+  async list(): Promise<FeatureFlag[]> {
+    const api = getApi();
+    const response = await api.listFeatureFlags();
+    return response.data.data as FeatureFlag[];
   }
 
   /**
@@ -144,8 +131,9 @@ export class FeatureFlagService {
    * @returns 功能开关详情
    */
   async getDetail(id: number): Promise<FeatureFlag> {
-    const response = await http.get<FeatureFlag>(`/api/admin/feature-flags/${id}`);
-    return response.data;
+    const api = getApi();
+    const response = await api.getFeatureFlagById({ id });
+    return response.data.data as FeatureFlag;
   }
 
   /**
@@ -154,14 +142,16 @@ export class FeatureFlagService {
    * @returns 创建的功能开关ID
    */
   async create(data: FeatureFlagRequest): Promise<number> {
+    const api = getApi();
+
     // 处理灰度规则
     const requestData = {
       ...data,
       grayRule: data.grayRule ? JSON.stringify(data.grayRule) : undefined
     };
-    
-    const response = await http.post<number>('/api/admin/feature-flags', requestData);
-    return response.data;
+
+    const response = await api.createFeatureFlag({ createFeatureFlagRequest: requestData });
+    return response.data.data as number;
   }
 
   /**
@@ -171,14 +161,19 @@ export class FeatureFlagService {
    * @returns 更新后的功能开关信息
    */
   async update(id: number, data: Partial<FeatureFlagRequest>): Promise<FeatureFlag> {
+    const api = getApi();
+
     // 处理灰度规则
     const requestData = {
       ...data,
       grayRule: data.grayRule ? JSON.stringify(data.grayRule) : undefined
     };
-    
-    const response = await http.put<FeatureFlag>(`/api/admin/feature-flags/${id}`, requestData);
-    return response.data;
+
+    const response = await api.updateFeatureFlag({
+      id,
+      updateFeatureFlagRequest: requestData,
+    });
+    return response.data.data as FeatureFlag;
   }
 
   /**
@@ -186,7 +181,8 @@ export class FeatureFlagService {
    * @param id 功能开关ID
    */
   async delete(id: number): Promise<void> {
-    await http.delete(`/api/admin/feature-flags/${id}`);
+    const api = getApi();
+    await api.deleteFeatureFlag({ id });
   }
 
   /**
@@ -197,39 +193,6 @@ export class FeatureFlagService {
    */
   async updateStatus(id: number, status: FeatureFlagStatus): Promise<FeatureFlag> {
     return this.update(id, { status });
-  }
-
-  /**
-   * 获取功能开关使用日志
-   * @param id 功能开关ID
-   * @param page 页码
-   * @param size 每页大小
-   * @returns 使用日志列表
-   */
-  async getLogs(id: number, page: number = 0, size: number = 20): Promise<PageResponse<FeatureFlagLog>> {
-    const response = await http.get<PageResponse<FeatureFlagLog>>(
-      `/api/admin/feature-flags/${id}/logs`,
-      { params: { page, size } }
-    );
-    return response.data;
-  }
-
-  /**
-   * 批量删除功能开关
-   * @param ids 功能开关ID列表
-   */
-  async batchDelete(ids: number[]): Promise<void> {
-    await http.post('/api/admin/feature-flags/batch/delete', { ids });
-  }
-
-  /**
-   * 检查功能开关是否启用（客户端调用）
-   * @param key 功能Key
-   * @returns 是否启用
-   */
-  async isEnabled(key: string): Promise<boolean> {
-    const response = await http.get<boolean>(`/api/admin/feature-flags/${key}/enabled`);
-    return response.data;
   }
 
   /**

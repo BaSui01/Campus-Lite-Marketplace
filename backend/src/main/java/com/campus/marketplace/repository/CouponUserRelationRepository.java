@@ -43,4 +43,9 @@ public interface CouponUserRelationRepository extends JpaRepository<CouponUserRe
      * 根据订单ID查找已使用的优惠券记录
      */
     Optional<CouponUserRelation> findFirstByOrderIdAndStatus(Long orderId, CouponStatus status);
+
+    /**
+     * 根据优惠券ID和状态查询关联记录
+     */
+    List<CouponUserRelation> findByCouponIdAndStatus(Long couponId, CouponStatus status);
 }

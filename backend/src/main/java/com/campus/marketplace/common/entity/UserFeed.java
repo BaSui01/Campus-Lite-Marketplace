@@ -1,6 +1,7 @@
 package com.campus.marketplace.common.entity;
 
 import com.campus.marketplace.common.enums.FeedType;
+import com.campus.marketplace.common.enums.TargetType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,6 +44,13 @@ public class UserFeed extends BaseEntity {
      */
     @Column(name = "target_id", nullable = false)
     private Long targetId;
+
+    /**
+     * 目标类型（POST/GOODS 等）
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "target_type", length = 20)
+    private TargetType targetType;
 
     /**
      * 动态发起人 ID（被关注的用户）

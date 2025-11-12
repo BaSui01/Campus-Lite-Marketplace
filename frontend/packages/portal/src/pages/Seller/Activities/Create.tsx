@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@campus/shared/components';
-import { marketingService, CampaignType, DiscountType, CAMPAIGN_TYPE_CONFIG } from '../../services';
+import { marketingService, CampaignType, DiscountType, CAMPAIGN_TYPE_CONFIG } from '../../../services';
 import { CreateCampaignRequest,  } from '@campus/shared/services';;
 import { useNotificationStore } from '../../../store';
 import './Activities.css';
@@ -134,7 +134,15 @@ const CreateActivity: React.FC = () => {
     setSubmitting(true);
 
     try {
-      await marketingService.createCampaign(formData);
+      // 兼容后端 LocalDateTime 反序列化：datetime-local 无秒时补全 ":00"
+      const normalize = (s: string) => (s && s.length === 16 ? `${s}:00` : s);
+      const payload: CreateCampaignRequest = {
+        ...formData,
+        startTime: normalize(formData.startTime),
+        endTime: normalize(formData.endTime),
+      };
+
+      await marketingService.createCampaign(payload);
       toast.success('活动创建成功！✅');
       navigate('/seller/activities');
     } catch (err: any) {

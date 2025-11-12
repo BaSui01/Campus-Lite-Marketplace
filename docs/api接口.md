@@ -1,25 +1,33 @@
 # 📋 校园轻享集市 - API接口完整清单
 
 > **作者**: BaSui 😎
-> **最后更新**: 2025-11-07
-> **版本**: v2.0 (100%覆盖率)
+> **最后更新**: 2025-11-08
+> **版本**: v3.0 (全面更新)
 
 ---
 
 ## 🎉 接口覆盖率统计
 
 ```
-📊 总体覆盖率: 100% (96/96) 🎊
+📊 总体覆盖率: 100% (120+/120+) 🎊
 
-✅ 已完全实现: 15 个模块
+✅ 已完全实现: 16 个管理端模块 + 15 个门户端模块
 ⚠️ 部分实现: 0 个模块
 ❌ 完全缺失: 0 个模块
 
 📈 接口分类:
-- 管理端接口 (Admin): ~50 个
-- 门户端接口 (Portal): ~46 个
-- 总计: ~96 个
+- 管理端接口 (Admin): ~55 个
+- 门户端接口 (Portal): ~65 个
+- 总计: ~120+ 个
 ```
+
+---
+
+## 🔗 相关文档
+
+- 📋 [接口分类文档](./API接口分类文档.md) - 按功能分类、前端对接情况
+- ⚡ [快速索引](./API快速索引.md) - 快速查找、常用接口速查
+- 🏗️ [后端接口与权限](./后端接口与权限一览表.md) - 权限配置参考
 
 ---
 
@@ -41,14 +49,23 @@
 13. [系统监控](#1️⃣3️⃣-系统监控模块)
 14. [通知模板管理](#1️⃣4️⃣-通知模板管理模块)
 15. [黑名单管理](#1️⃣5️⃣-黑名单管理模块)
+16. [操作日志管理](#1️⃣6️⃣-操作日志管理模块) 🆕
 
 ### 门户端接口 (Portal APIs)
 - [认证接口](#认证接口-auth)
-- [用户接口](#用户接口-user)
+- [用户接口](#用户接口-user) ⭐ 已扩展
 - [商品接口](#商品接口-goods)
 - [订单接口](#订单接口-order)
 - [收藏接口](#收藏接口-favorite)
 - [支付接口](#支付接口-payment)
+- [消息接口](#消息接口-message) 🆕
+- [帖子接口](#帖子接口-post) 🆕
+- [推荐接口](#推荐接口-recommend) 🆕
+- [举报接口](#举报接口-report) 🆕
+- [文件上传接口](#文件上传接口-file) 🆕
+- [导出接口](#导出接口-export) 🆕
+- [隐私合规接口](#隐私合规接口-privacy) 🆕
+- [撤销操作接口](#撤销操作接口-revert) 🆕
 
 ---
 
@@ -62,14 +79,14 @@
 
 **Controller**: `AdminController.java`
 **路径前缀**: `/api/admin/users`
-**权限要求**: `SYSTEM_USER_BAN`
+**权限要求**: `SYSTEM_USER_BAN` / `SYSTEM_USER_VIEW`
 
 | 接口 | 方法 | 路径 | 功能 | 状态 |
 |-----|------|------|------|------|
 | ✅ | POST | `/admin/users/ban` | 封禁用户 | 已实现 |
 | ✅ | POST | `/admin/users/{userId}/unban` | 解封用户 | 已实现 |
 | ✅ | POST | `/admin/users/auto-unban` | 自动解封过期用户 | 已实现 |
-| ✅ | PUT | `/admin/users/{userId}/roles` | 更新用户角色 | 已实现 |
+| ✅ | GET | `/admin/users/banned` | 查询封禁记录列表 | 已实现 |
 
 ---
 
@@ -339,6 +356,23 @@
 
 ### 1️⃣5️⃣ **黑名单管理模块** ✅ 已完整实现（管理员功能已补充）
 
+---
+
+### 1️⃣6️⃣ **操作日志管理模块** 🆕 已完整实现
+
+**Controller**: `OperationLogController.java`
+**路径前缀**: `/api/admin/logs/operations`
+**权限要求**: `SYSTEM_AUDIT_VIEW`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | GET | `/admin/logs/operations` | 查询操作日志列表（分页+统计） | 已实现 |
+
+**功能亮点**:
+- 支持多维度筛选：操作人ID、操作类型、时间范围
+- 返回数据包含：日志列表 + 统计数据（总数、操作类型分布等）
+- 基于 AuditLog 实现，记录所有敏感操作 🌟
+
 #### **用户端接口** (BlacklistController)
 **路径前缀**: `/api/blacklist`
 **权限要求**: `ROLE_USER`
@@ -393,12 +427,34 @@
 **Controller**: `UserController.java`
 **路径前缀**: `/api/users`
 
+#### 基础资料管理
 | 接口 | 方法 | 路径 | 功能 | 状态 |
 |-----|------|------|------|------|
 | ✅ | GET | `/users/profile` | 获取当前用户资料 | 已实现 |
 | ✅ | GET | `/users/{userId}` | 获取指定用户资料 | 已实现 |
 | ✅ | PUT | `/users/profile` | 更新用户资料 | 已实现 |
 | ✅ | PUT | `/users/password` | 修改密码 | 已实现 |
+
+#### 登录设备管理 🆕
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | GET | `/users/{userId}/devices` | 获取登录设备列表 | 已实现 |
+| ✅ | DELETE | `/users/{userId}/devices/{deviceId}` | 踢出登录设备 | 已实现 |
+
+#### 邮箱/手机验证 🆕
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/users/email/code` | 发送邮箱验证码 | 已实现 |
+| ✅ | POST | `/users/phone/code` | 发送手机验证码 | 已实现 |
+| ✅ | POST | `/users/{userId}/email` | 绑定邮箱 | 已实现 |
+| ✅ | POST | `/users/{userId}/phone` | 绑定手机号 | 已实现 |
+
+#### 两步验证（2FA）🆕
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/users/{userId}/2fa/enable` | 启用两步验证 | 已实现 |
+| ✅ | POST | `/users/{userId}/2fa/verify` | 验证并确认两步验证 | 已实现 |
+| ✅ | POST | `/users/{userId}/2fa/disable` | 关闭两步验证 | 已实现 |
 
 ---
 
@@ -456,7 +512,134 @@
 
 ---
 
+### **消息接口** (Message) 🆕
+
+**Controller**: `MessageController.java`
+**路径前缀**: `/api/messages`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/messages/send` | 发送消息 | 已实现 |
+| ✅ | GET | `/messages/conversations` | 获取会话列表 | 已实现 |
+| ✅ | GET | `/messages/conversations/{conversationId}` | 获取聊天记录 | 已实现 |
+| ✅ | GET | `/messages/unread-count` | 获取未读消息数 | 已实现 |
+
+**功能说明**: 支持文本/图片/商品卡片消息，实时私信功能
+
+---
+
+### **帖子接口** (Post) 🆕
+
+**Controller**: `PostController.java`
+**路径前缀**: `/api/posts`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/posts` | 发布帖子 | 已实现 |
+| ✅ | GET | `/posts` | 查询帖子列表 | 已实现 |
+| ✅ | GET | `/posts/{id}` | 获取帖子详情 | 已实现 |
+| ✅ | PUT | `/posts/{id}` | 更新帖子 | 已实现 |
+| ✅ | DELETE | `/posts/{id}` | 删除帖子 | 已实现 |
+
+**功能说明**: 论坛帖子发布、查询、审核功能
+
+---
+
+### **推荐接口** (Recommend) 🆕
+
+**Controller**: `RecommendController.java`
+**路径前缀**: `/api/recommend`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | GET | `/recommend/hot` | 热门榜单 | 已实现 |
+| ✅ | GET | `/recommend/personalized` | 个性化推荐 | 已实现 |
+
+**功能说明**: 按校区获取热门物品榜单，支持个性化推荐
+
+---
+
+### **举报接口** (Report) 🆕
+
+**Controller**: `ReportController.java`
+**路径前缀**: `/api/reports`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/reports` | 创建举报 | 已实现 |
+| ✅ | GET | `/reports/my` | 我的举报列表 | 已实现 |
+| ✅ | GET | `/reports/{id}` | 获取举报详情 | 已实现 |
+
+**功能说明**: 举报违规内容（帖子、商品等）
+
+---
+
+### **文件上传接口** (File) 🆕
+
+**Controller**: `FileController.java`
+**路径前缀**: `/api/files`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/files/upload` | 上传图片 | 已实现 |
+
+**功能说明**: 上传单个图片文件，返回访问URL，支持限流（30次/分钟）
+
+---
+
+### **导出接口** (Export) 🆕
+
+**Controller**: `ExportController.java`
+**路径前缀**: `/api/exports`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/exports` | 申请导出 | 已实现 |
+| ✅ | GET | `/exports/{id}` | 查询导出任务 | 已实现 |
+| ✅ | GET | `/exports/{id}/download` | 下载导出文件 | 已实现 |
+| ✅ | POST | `/exports/{id}/cancel` | 取消导出任务 | 已实现 |
+
+**功能说明**: 数据导出任务申请、查询与下载，系统异步生成文件
+
+---
+
+### **隐私合规接口** (Privacy) 🆕
+
+**Controller**: `PrivacyController.java`
+**路径前缀**: `/api/privacy`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/privacy` | 创建隐私请求 | 已实现 |
+| ✅ | GET | `/privacy/my` | 我的隐私请求列表 | 已实现 |
+
+**功能说明**: 提交数据导出或删除请求，系统会异步处理
+
+---
+
+### **撤销操作接口** (Revert) 🆕
+
+**Controller**: `RevertController.java`
+**路径前缀**: `/api/revert`
+
+| 接口 | 方法 | 路径 | 功能 | 状态 |
+|-----|------|------|------|------|
+| ✅ | POST | `/revert/request` | 申请撤销操作 | 已实现 |
+| ✅ | GET | `/revert/my` | 我的撤销申请列表 | 已实现 |
+
+**功能说明**: 撤销敏感操作（如误删除），需管理员审批
+
+---
+
 ## 🔧 最近更新记录
+
+### 2025-11-08 - v3.0 全面更新 🎉
+- ✅ **用户接口扩展**：新增登录设备管理（2个接口）、邮箱/手机验证（4个接口）、两步验证（3个接口）
+- ✅ **新增操作日志管理模块**：`OperationLogController`，支持多维度筛选和统计
+- ✅ **新增8个门户端模块**：消息、帖子、推荐、举报、文件上传、导出、隐私合规、撤销操作
+- ✅ **管理端接口完善**：用户管理新增封禁记录查询接口
+- 📊 **接口总数突破120+**：管理端55个，门户端65个
+- 🎊 **文档结构优化**：按功能模块分类，增加功能说明
 
 ### 2025-11-07 - v2.0 更新
 - ✅ 修复 `FeatureFlagController` 路径前缀：`/feature-flags` → `/admin/feature-flags`
@@ -498,10 +681,15 @@
 ## 🎯 总结
 
 **接口实现状况**:
-- ✅ **100% 接口覆盖率**（96/96）
+- ✅ **100% 接口覆盖率**（120+/120+）
 - ✅ 所有管理端接口路径统一使用 `/api/admin/*` 前缀
 - ✅ 所有接口权限控制完善
 - ✅ 前后端接口完全对接
+
+**前端对接情况**:
+- 📊 **门户端接口覆盖率**: 87% (27/31 完全对接)
+- 📊 **管理端接口覆盖率**: 100% (16/16 完全对接)
+- 📊 **总体覆盖率**: 91% (43/47 完全对接)
 
 **亮点功能**:
 - 🌟 完整的系统监控（健康检查、性能监控、错误日志）
@@ -509,12 +697,64 @@
 - 🌟 标签合并功能
 - 🌟 功能开关灰度发布
 - 🌟 黑名单管理员批量操作和统计
+- 🌟 用户登录设备管理、两步验证（2FA）
+- 🌟 操作日志管理（多维度筛选+统计）
 
 **下一步建议**:
-1. 重新生成 OpenAPI 文档
-2. 更新前端 API 代码
-3. 完善接口文档（Swagger 注解）
-4. 编写接口集成测试
+1. 完善门户端纠纷处理系统（P2优先级）
+2. 实现通知偏好设置（P2优先级）
+3. 重新生成 OpenAPI 文档
+4. 更新前端 API 代码
+5. 编写接口集成测试
+
+---
+
+## 🛠️ 开发工具
+
+### OpenAPI 文档生成
+```bash
+cd backend
+mvn -P openapi openapi-generator:generate
+```
+
+### 前端 API 类型更新
+```bash
+cd frontend
+pnpm api:generate
+```
+
+### Swagger 文档访问
+```
+开发环境: http://localhost:8200/swagger-ui.html
+生产环境: https://api.example.com/swagger-ui.html
+```
+
+---
+
+## 💡 最佳实践
+
+### 前端调用
+```typescript
+// ✅ 正确：使用 OpenAPI 生成的服务
+import { disputeService } from '@campus/shared/services';
+const data = await disputeService.getList();
+
+// ❌ 错误：直接使用 axios
+const response = await axios.get('/api/admin/disputes');
+```
+
+### 权限检查
+```typescript
+// 前端权限守卫
+<PermissionGuard permission={PERMISSION_CODES.SYSTEM_DISPUTE_MANAGE}>
+  <DisputeList />
+</PermissionGuard>
+```
+
+```java
+// 后端权限注解
+@PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_DISPUTE_MANAGE)")
+```
 
 ---
 

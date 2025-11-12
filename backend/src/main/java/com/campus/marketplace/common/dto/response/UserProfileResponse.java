@@ -35,6 +35,12 @@ public class UserProfileResponse {
     private String username;
 
     /**
+     * 昵称
+     */
+    @Schema(description = "昵称", example = "小爱同学")
+    private String nickname;
+
+    /**
      * 邮箱（脱敏）
      */
     @Schema(description = "邮箱（脱敏后）", example = "a***@example.com")
@@ -71,6 +77,24 @@ public class UserProfileResponse {
     private Integer points;
 
     /**
+     * 校区 ID
+     */
+    @Schema(description = "校区ID", example = "1")
+    private Long campusId;
+
+    /**
+     * 校区名称
+     */
+    @Schema(description = "校区名称", example = "北京校区")
+    private String campusName;
+
+    /**
+     * 封禁原因
+     */
+    @Schema(description = "封禁原因（仅封禁状态时有值）", example = "违规发布信息")
+    private String banReason;
+
+    /**
      * 角色列表
      */
     @Schema(description = "角色列表", example = "[\"ROLE_USER\",\"ROLE_SELLER\"]")
@@ -81,4 +105,40 @@ public class UserProfileResponse {
      */
     @Schema(description = "注册时间", example = "2024-03-01T12:00:00")
     private LocalDateTime createdAt;
+
+    /**
+     * 最后登录时间
+     */
+    @Schema(description = "最后登录时间", example = "2024-03-15T10:30:00")
+    private LocalDateTime lastLoginAt;
+
+    /**
+     * 个人简介
+     */
+    @Schema(description = "个人简介", example = "热爱分享的大学生 🎓")
+    private String bio;
+
+    /**
+     * 信誉分
+     */
+    @Schema(description = "信誉分（0-200）", example = "150")
+    private Integer creditScore;
+
+    /**
+     * 邮箱是否已验证
+     */
+    @Schema(description = "邮箱是否已验证", example = "true")
+    private Boolean emailVerified;
+
+    /**
+     * 手机号是否已验证
+     */
+    @Schema(description = "手机号是否已验证", example = "false")
+    private Boolean phoneVerified;
+
+    /**
+     * 是否启用两步验证（2FA）
+     */
+    @Schema(description = "是否启用两步验证", example = "false")
+    private Boolean twoFactorEnabled;
 }

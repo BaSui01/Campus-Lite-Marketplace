@@ -101,7 +101,7 @@ class SearchService {
   /**
    * 获取搜索建议
    */
-  async getSearchSuggestions(keyword: string): Promise<SearchSuggestion[]> => {
+  async getSearchSuggestions(keyword: string): Promise<SearchSuggestion[]> {
     if (!keyword.trim()) {
       return [];
     }

@@ -63,6 +63,21 @@ class AuthServiceMultiLoginTest {
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
+    @Mock
+    private com.campus.marketplace.common.utils.CryptoUtil cryptoUtil;
+
+    @Mock
+    private VerificationCodeService verificationCodeService;
+
+    @Mock
+    private jakarta.servlet.http.HttpServletRequest httpRequest;
+
+    @Mock
+    private com.campus.marketplace.service.LoginNotificationService loginNotificationService;
+
+    @Mock
+    private CaptchaService captchaService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -74,6 +89,12 @@ class AuthServiceMultiLoginTest {
     void setUp() {
         // 设置 JWT 过期时间
         ReflectionTestUtils.setField(authService, "jwtExpiration", 7200000L);
+
+        // 🎯 Mock CryptoUtil 行为：默认返回明文密码（兼容模式）
+        when(cryptoUtil.isEncrypted(anyString())).thenReturn(false);
+
+        // 🔐 Mock CaptchaService 行为：验证码通行证验证通过
+        when(captchaService.verifyCaptchaToken(anyString())).thenReturn(true);
 
         // 创建权限
         viewPermission = Permission.builder()
@@ -118,7 +139,7 @@ class AuthServiceMultiLoginTest {
             // 🔴 红灯：这个测试会失败，因为 AuthServiceImpl.login() 还不支持邮箱登录
 
             // Arrange
-            LoginRequest request = new LoginRequest("basui@campus.edu", "Password123");
+            LoginRequest request = new LoginRequest("basui@campus.edu", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByEmail("basui@campus.edu"))
                     .thenReturn(Optional.of(testUser));
@@ -128,11 +149,11 @@ class AuthServiceMultiLoginTest {
                     .thenReturn("mock-jwt-token");
 
             // Act
-            LoginResponse response = authService.login(request);
+            LoginResponse response = authService.login(request, httpRequest);
 
             // Assert
             assertNotNull(response);
-            assertEquals("mock-jwt-token", response.getToken());
+            assertEquals("mock-jwt-token", response.getAccessToken());
             assertEquals("basui", response.getUserInfo().getUsername());
             assertEquals("basui@campus.edu", response.getUserInfo().getEmail());
 
@@ -146,14 +167,14 @@ class AuthServiceMultiLoginTest {
         @DisplayName("失败 - 邮箱不存在")
         void loginByEmail_Fail_EmailNotFound() {
             // Arrange
-            LoginRequest request = new LoginRequest("notexist@campus.edu", "Password123");
+            LoginRequest request = new LoginRequest("notexist@campus.edu", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByEmail("notexist@campus.edu"))
                     .thenReturn(Optional.empty());
 
             // Act & Assert
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> authService.login(request));
+                    () -> authService.login(request, httpRequest));
 
             assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
             verify(userRepository).findByEmail("notexist@campus.edu");
@@ -163,7 +184,7 @@ class AuthServiceMultiLoginTest {
         @DisplayName("失败 - 邮箱正确但密码错误")
         void loginByEmail_Fail_WrongPassword() {
             // Arrange
-            LoginRequest request = new LoginRequest("basui@campus.edu", "WrongPassword");
+            LoginRequest request = new LoginRequest("basui@campus.edu", "WrongPassword", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByEmail("basui@campus.edu"))
                     .thenReturn(Optional.of(testUser));
@@ -172,7 +193,7 @@ class AuthServiceMultiLoginTest {
 
             // Act & Assert
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> authService.login(request));
+                    () -> authService.login(request, httpRequest));
 
             assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
         }
@@ -190,7 +211,7 @@ class AuthServiceMultiLoginTest {
             // 🔴 红灯：这个测试会失败，因为 AuthServiceImpl.login() 还不支持手机号登录
 
             // Arrange
-            LoginRequest request = new LoginRequest("13800138000", "Password123");
+            LoginRequest request = new LoginRequest("13800138000", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByPhone("13800138000"))
                     .thenReturn(Optional.of(testUser));
@@ -200,11 +221,11 @@ class AuthServiceMultiLoginTest {
                     .thenReturn("mock-jwt-token");
 
             // Act
-            LoginResponse response = authService.login(request);
+            LoginResponse response = authService.login(request, httpRequest);
 
             // Assert
             assertNotNull(response);
-            assertEquals("mock-jwt-token", response.getToken());
+            assertEquals("mock-jwt-token", response.getAccessToken());
             assertEquals("13800138000", testUser.getPhone());
 
             // Verify
@@ -217,14 +238,14 @@ class AuthServiceMultiLoginTest {
         @DisplayName("失败 - 手机号不存在")
         void loginByPhone_Fail_PhoneNotFound() {
             // Arrange
-            LoginRequest request = new LoginRequest("13900139000", "Password123");
+            LoginRequest request = new LoginRequest("13900139000", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByPhone("13900139000"))
                     .thenReturn(Optional.empty());
 
             // Act & Assert
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> authService.login(request));
+                    () -> authService.login(request, httpRequest));
 
             assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
         }
@@ -242,7 +263,7 @@ class AuthServiceMultiLoginTest {
             // 🟢 绿灯：这个测试会通过，因为现有代码已支持用户名登录
 
             // Arrange
-            LoginRequest request = new LoginRequest("basui", "Password123");
+            LoginRequest request = new LoginRequest("basui", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByUsernameWithRoles("basui"))
                     .thenReturn(Optional.of(testUser));
@@ -252,11 +273,11 @@ class AuthServiceMultiLoginTest {
                     .thenReturn("mock-jwt-token");
 
             // Act
-            LoginResponse response = authService.login(request);
+            LoginResponse response = authService.login(request, httpRequest);
 
             // Assert
             assertNotNull(response);
-            assertEquals("mock-jwt-token", response.getToken());
+            assertEquals("mock-jwt-token", response.getAccessToken());
             assertEquals("basui", response.getUserInfo().getUsername());
 
             // Verify
@@ -274,7 +295,7 @@ class AuthServiceMultiLoginTest {
         @DisplayName("识别邮箱格式 - 包含 @ 符号")
         void detectEmail_WithAtSymbol() {
             // Arrange
-            LoginRequest request = new LoginRequest("test@campus.edu", "Password123");
+            LoginRequest request = new LoginRequest("test@campus.edu", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByEmail("test@campus.edu"))
                     .thenReturn(Optional.of(testUser));
@@ -283,7 +304,7 @@ class AuthServiceMultiLoginTest {
                     .thenReturn("token");
 
             // Act
-            authService.login(request);
+            authService.login(request, httpRequest);
 
             // Assert - 应该调用 findByEmail 而不是 findByUsernameWithRoles
             verify(userRepository).findByEmail("test@campus.edu");
@@ -294,7 +315,7 @@ class AuthServiceMultiLoginTest {
         @DisplayName("识别手机号格式 - 11位纯数字")
         void detectPhone_ElevenDigits() {
             // Arrange
-            LoginRequest request = new LoginRequest("13800138000", "Password123");
+            LoginRequest request = new LoginRequest("13800138000", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByPhone("13800138000"))
                     .thenReturn(Optional.of(testUser));
@@ -303,7 +324,7 @@ class AuthServiceMultiLoginTest {
                     .thenReturn("token");
 
             // Act
-            authService.login(request);
+            authService.login(request, httpRequest);
 
             // Assert - 应该调用 findByPhone
             verify(userRepository).findByPhone("13800138000");
@@ -314,7 +335,7 @@ class AuthServiceMultiLoginTest {
         @DisplayName("识别用户名 - 不符合邮箱和手机号规则")
         void detectUsername_NotEmailOrPhone() {
             // Arrange
-            LoginRequest request = new LoginRequest("basui", "Password123");
+            LoginRequest request = new LoginRequest("basui", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByUsernameWithRoles("basui"))
                     .thenReturn(Optional.of(testUser));
@@ -323,7 +344,7 @@ class AuthServiceMultiLoginTest {
                     .thenReturn("token");
 
             // Act
-            authService.login(request);
+            authService.login(request, httpRequest);
 
             // Assert - 应该调用 findByUsernameWithRoles
             verify(userRepository).findByUsernameWithRoles("basui");
@@ -345,7 +366,7 @@ class AuthServiceMultiLoginTest {
                     .build();
             chineseUser.setId(2L);
 
-            LoginRequest request = new LoginRequest("八岁啊", "Password123");
+            LoginRequest request = new LoginRequest("八岁啊", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByUsernameWithRoles("八岁啊"))
                     .thenReturn(Optional.of(chineseUser));
@@ -354,7 +375,7 @@ class AuthServiceMultiLoginTest {
                     .thenReturn("token");
 
             // Act
-            authService.login(request);
+            authService.login(request, httpRequest);
 
             // Assert - 中文用户名应该识别为用户名
             verify(userRepository).findByUsernameWithRoles("八岁啊");
@@ -371,11 +392,11 @@ class AuthServiceMultiLoginTest {
         @DisplayName("空字符串凭证")
         void emptyCredential() {
             // Arrange
-            LoginRequest request = new LoginRequest("", "Password123");
+            LoginRequest request = new LoginRequest("", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             // Act & Assert
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> authService.login(request));
+                    () -> authService.login(request, httpRequest));
 
             assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
         }
@@ -384,11 +405,11 @@ class AuthServiceMultiLoginTest {
         @DisplayName("null 凭证 - 应该抛出 BusinessException")
         void nullCredential() {
             // Arrange
-            LoginRequest request = new LoginRequest(null, "Password123");
+            LoginRequest request = new LoginRequest(null, "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             // Act & Assert - 预期抛出 BusinessException 而不是 NullPointerException
             BusinessException exception = assertThrows(BusinessException.class,
-                    () -> authService.login(request));
+                    () -> authService.login(request, httpRequest));
 
             assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
         }
@@ -397,13 +418,13 @@ class AuthServiceMultiLoginTest {
         @DisplayName("手机号格式错误 - 10位数字应识别为用户名")
         void invalidPhoneFormat_TenDigits() {
             // Arrange
-            LoginRequest request = new LoginRequest("1380013800", "Password123");
+            LoginRequest request = new LoginRequest("1380013800", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByUsernameWithRoles("1380013800"))
                     .thenReturn(Optional.empty());
 
             // Act & Assert
-            assertThrows(BusinessException.class, () -> authService.login(request));
+            assertThrows(BusinessException.class, () -> authService.login(request, httpRequest));
 
             // Verify - 10位数字不符合手机号规则,应识别为用户名
             verify(userRepository).findByUsernameWithRoles("1380013800");
@@ -414,13 +435,13 @@ class AuthServiceMultiLoginTest {
         @DisplayName("邮箱格式边界 - 无域名部分（test@ 也识别为邮箱）")
         void invalidEmailFormat_NoDomain() {
             // Arrange
-            LoginRequest request = new LoginRequest("test@", "Password123");
+            LoginRequest request = new LoginRequest("test@", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
             when(userRepository.findByEmail("test@"))
                     .thenReturn(Optional.empty());
 
             // Act & Assert - 因为包含 @ 所以识别为邮箱（虽然格式不完整）
-            assertThrows(BusinessException.class, () -> authService.login(request));
+            assertThrows(BusinessException.class, () -> authService.login(request, httpRequest));
 
             // Verify - 应该调用 findByEmail 而不是 findByUsernameWithRoles
             verify(userRepository).findByEmail("test@");

@@ -11,11 +11,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -124,6 +127,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理参数类型不匹配（如枚举/数字等转换失败）
+     */
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, org.springframework.beans.TypeMismatchException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleTypeMismatch(Exception e) {
+        String message = e.getMessage();
+        log.warn("参数类型不匹配: {}", message);
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), "请求参数格式有误，请检查后重试"));
+    }
+
+    /**
      * 处理缺少请求参数异常
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -181,6 +196,28 @@ public class GlobalExceptionHandler {
         log.warn("非法参数: {}", e.getMessage());
         return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
                 resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), e.getMessage()));
+    }
+
+    /**
+     * 处理请求体反序列化失败（JSON格式/日期格式等）
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.warn("请求体解析失败: {}", e.getMostSpecificCause() != null ? e.getMostSpecificCause().getMessage() : e.getMessage());
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), "请求体格式有误，请检查字段与格式"));
+    }
+
+    /**
+     * 处理数据约束异常（如非空、唯一键、外键约束等），避免误报500
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.warn("数据约束违反: {}", e.getMostSpecificCause() != null ? e.getMostSpecificCause().getMessage() : e.getMessage());
+        return ApiResponse.error(ErrorCode.PARAM_ERROR.getCode(),
+                resolveErrorMessage(ErrorCode.PARAM_ERROR.getCode(), "参数不合法或缺少必填字段"));
     }
 
     /**

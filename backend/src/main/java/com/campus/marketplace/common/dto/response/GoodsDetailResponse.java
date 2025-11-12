@@ -95,6 +95,33 @@ public class GoodsDetailResponse {
     private LocalDateTime updatedAt;
 
     /**
+     * 当前用户是否已收藏（前端需要）
+     */
+    private Boolean isFavorited;
+
+    /**
+     * 商品成色（前端需要）
+     * BRAND_NEW: 全新
+     * LIKE_NEW: 几乎全新
+     * LIGHTLY_USED: 轻微使用痕迹
+     * WELL_USED: 明显使用痕迹
+     * HEAVILY_USED: 重度使用痕迹
+     */
+    private String condition;
+
+    /**
+     * 交易方式（前端需要）
+     * MEET: 校园面交
+     * MAIL: 快递邮寄
+     */
+    private String deliveryMethod;
+
+    /**
+     * 原价（用于显示折扣，前端需要）
+     */
+    private BigDecimal originalPrice;
+
+    /**
      * 卖家信息
      */
     @Data
@@ -131,5 +158,16 @@ public class GoodsDetailResponse {
          * 卖家邮箱（脱敏）
          */
         private String email;
+
+        /**
+         * 卖家评分（前端需要）
+         * 0-5分，保留一位小数
+         */
+        private Double rating;
+
+        /**
+         * 在售商品数量（前端需要）
+         */
+        private Integer goodsCount;
     }
 }

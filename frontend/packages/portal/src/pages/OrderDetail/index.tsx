@@ -6,12 +6,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Skeleton } from '@campus/shared/components';
+import { Skeleton, Timeline } from '@campus/shared/components';
 import { orderService } from '@campus/shared/services/order';
+import { userService } from '@campus/shared/services';
 import { websocketService } from '@campus/shared/utils';
 import { useNotificationStore } from '../../store';
 import { LogisticsCard } from '../../components/LogisticsCard';
 import type { Order, PaymentMethod, OrderStatus } from '@campus/shared/types';
+import { toUiStage, displayLabelForStatus } from '@campus/shared/utils';
+import type { OrderStatus as BackendOrderStatus } from '@campus/shared/types/enum';
 import './OrderDetail.css';
 
 /**
@@ -27,10 +30,18 @@ const OrderDetail: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // 买卖双方用户资料（用于头像/手机号等）
+  const [buyerProfile, setBuyerProfile] = useState<any | null>(null);
+  const [sellerProfile, setSellerProfile] = useState<any | null>(null);
   const [paying, setPaying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [shipping, setShipping] = useState(false);
   const [refunding, setRefunding] = useState(false);
+
+  // 倒计时（待支付）
+  const [expireAt, setExpireAt] = useState<Date | null>(null);
+  const [timeLeftSec, setTimeLeftSec] = useState<number | null>(null);
 
   // 支付弹窗相关
   const [showPayModal, setShowPayModal] = useState(false);
@@ -60,10 +71,41 @@ const OrderDetail: React.FC = () => {
     setError(null);
 
     try {
-      // 🚀 调用真实后端 API 获取订单详情
-      const response = await orderService.getOrderByNo(orderNo);
-      const orderData = response.data;
+      // 🚀 调用真实后端 API 获取订单详情（统一接口）
+      const orderData: any = await orderService.getOrderDetail(orderNo);
       setOrder(orderData);
+      // 异步加载买卖双方资料（头像、手机号等）
+      try {
+        const tasks: Promise<any>[] = [];
+        if (orderData?.buyerId) tasks.push(userService.getUserById(orderData.buyerId));
+        else tasks.push(Promise.resolve(null));
+        if (orderData?.sellerId) tasks.push(userService.getUserById(orderData.sellerId));
+        else tasks.push(Promise.resolve(null));
+        const [buyer, seller] = await Promise.all(tasks);
+        setBuyerProfile(buyer);
+        setSellerProfile(seller);
+      } catch (_) {}
+
+      // 计算倒计时截止时间（优先使用后端返回的 paymentExpireAt；否则用 createdAt + timeoutMinutes）
+      try {
+        let expire: Date | null = null;
+        if ((orderData as any).paymentExpireAt) {
+          expire = new Date((orderData as any).paymentExpireAt as string);
+        } else if (orderData.createdAt) {
+          const minutes = (orderData as any).timeoutMinutes ?? 30;
+          expire = new Date(new Date(orderData.createdAt).getTime() + minutes * 60 * 1000);
+        }
+        setExpireAt(expire);
+        if (expire) {
+          const left = Math.max(0, Math.floor((expire.getTime() - Date.now()) / 1000));
+          setTimeLeftSec(left);
+        } else {
+          setTimeLeftSec(null);
+        }
+      } catch (e) {
+        setExpireAt(null);
+        setTimeLeftSec(null);
+      }
     } catch (err: any) {
       console.error('加载订单详情失败：', err);
       setError(err.response?.data?.message || '加载订单详情失败，请稍后重试！😭');
@@ -75,6 +117,26 @@ const OrderDetail: React.FC = () => {
   useEffect(() => {
     loadOrderDetail();
   }, [orderNo]);
+
+  // 待支付倒计时
+  useEffect(() => {
+    if (!order || order.status !== 'PENDING_PAYMENT' || !expireAt) {
+      return;
+    }
+    const timer = setInterval(() => {
+      const left = Math.floor((expireAt.getTime() - Date.now()) / 1000);
+      if (left <= 0) {
+        setTimeLeftSec(0);
+        clearInterval(timer);
+        // 到点后刷新一次订单，便于看到“已取消/仍待支付”的最新状态
+        setTimeout(() => loadOrderDetail(), 1500);
+      } else {
+        setTimeLeftSec(left);
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.status, expireAt?.getTime?.()]);
 
   // ==================== 📦 实时订单状态更新（WebSocket）====================
 
@@ -139,8 +201,8 @@ const OrderDetail: React.FC = () => {
    * 打开支付弹窗
    */
   const handleOpenPayModal = () => {
-    setShowPayModal(true);
-    setSelectedPaymentMethod(null);
+    if (!orderNo) return;
+    navigate(`/payment?orderNo=${encodeURIComponent(orderNo)}`);
   };
 
   /**
@@ -168,10 +230,9 @@ const OrderDetail: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 支付订单
-      const response = await orderService.payOrder({
-        orderNo: order.orderNo,
+      const response = await orderService.payOrder(order.orderNo, {
         paymentMethod: selectedPaymentMethod,
-      });
+      } as any);
 
       const payData = response.data;
 
@@ -204,14 +265,13 @@ const OrderDetail: React.FC = () => {
 
     const pollInterval = setInterval(async () => {
       try {
-        const response = await orderService.getPaymentStatus(order.orderNo);
-        const status = response.data?.status;
+        const status = await orderService.queryPaymentStatus(order.orderNo);
 
-        if (status === 'PAID') {
+        if (status === 'PAID' || status === 'PENDING_DELIVERY' || status === 'PAID_SUCCESS') {
           clearInterval(pollInterval);
           toast.success('支付成功！🎉');
           loadOrderDetail(); // 重新加载订单详情
-        } else if (status === 'FAILED') {
+        } else if (status === 'FAILED' || status === 'PAY_FAILED') {
           clearInterval(pollInterval);
           toast.error('支付失败，请重试！😭');
         }
@@ -254,11 +314,8 @@ const OrderDetail: React.FC = () => {
     setCancelling(true);
 
     try {
-      // 🚀 调用真实后端 API 取消订单
-      await orderService.cancelOrder({
-        orderNo: order.orderNo,
-        reason: cancelReason,
-      });
+      // 🚀 调用真实后端 API 取消订单（简化：后端已忽略原因）
+      await orderService.cancelOrder(order.orderNo);
 
       toast.success('订单已取消！🚫');
       handleCloseCancelModal();
@@ -296,6 +353,28 @@ const OrderDetail: React.FC = () => {
       toast.error(err.response?.data?.message || '确认收货失败，请稍后重试！😭');
     } finally {
       setConfirming(false);
+    }
+  };
+
+  /**
+   * 卖家发货（简版：弹窗输入快递单号，默认顺丰）
+   */
+  const handleShipOrder = async () => {
+    if (!order) return;
+
+    const tracking = window.prompt('请输入快递单号（顺丰示例）：');
+    if (!tracking) return;
+
+    setShipping(true);
+    try {
+      await orderService.shipOrder(order.orderNo, { trackingNumber: tracking, company: 'SHUNFENG' });
+      toast.success('发货成功！📦');
+      loadOrderDetail();
+    } catch (err: any) {
+      console.error('发货失败：', err);
+      toast.error(err.response?.data?.message || '发货失败，请稍后重试！😭');
+    } finally {
+      setShipping(false);
     }
   };
 
@@ -352,8 +431,8 @@ const OrderDetail: React.FC = () => {
    */
   const formatPrice = (price?: number) => {
     if (!price) return '¥0.00';
-    // 后端价格单位是分，需要除以100
-    return `¥${(price / 100).toFixed(2)}`;
+    // ✅ 后端金额单位为“元”（BigDecimal），无需再除以 100
+    return `¥${price.toFixed(2)}`;
   };
 
   /**
@@ -367,49 +446,23 @@ const OrderDetail: React.FC = () => {
   /**
    * 获取订单状态文本
    */
-  const getStatusText = (status?: OrderStatus) => {
-    switch (status) {
-      case 'PENDING_PAYMENT':
-        return '待支付';
-      case 'PAID':
-        return '已支付';
-      case 'PENDING_DELIVERY':
-        return '待发货';
-      case 'PENDING_RECEIPT':
-        return '待收货';
-      case 'COMPLETED':
-        return '已完成';
-      case 'CANCELLED':
-        return '已取消';
-      case 'REFUNDING':
-        return '退款中';
-      case 'REFUNDED':
-        return '已退款';
-      default:
-        return '未知';
-    }
-  };
+  const getStatusText = (status?: OrderStatus) =>
+    status ? displayLabelForStatus(status as unknown as BackendOrderStatus) : '未知';
 
   /**
    * 获取订单状态样式类
    */
   const getStatusClass = (status?: OrderStatus) => {
-    switch (status) {
-      case 'PENDING_PAYMENT':
-        return 'status-pending';
-      case 'PAID':
-      case 'PENDING_DELIVERY':
-      case 'PENDING_RECEIPT':
-        return 'status-processing';
-      case 'COMPLETED':
-        return 'status-completed';
-      case 'CANCELLED':
-      case 'REFUNDED':
-        return 'status-cancelled';
-      case 'REFUNDING':
-        return 'status-refunding';
-      default:
-        return '';
+    if (!status) return '';
+    const stage = toUiStage(status as unknown as BackendOrderStatus);
+    switch (stage) {
+      case 'PENDING_PAYMENT': return 'status-pending';
+      case 'PENDING_SHIPMENT':
+      case 'PENDING_RECEIPT': return 'status-processing';
+      case 'COMPLETED': return 'status-completed';
+      case 'CANCELLED': return 'status-cancelled';
+      case 'AFTER_SALES': return status === 'REFUNDING' ? 'status-refunding' : 'status-cancelled';
+      default: return '';
     }
   };
 
@@ -427,6 +480,91 @@ const OrderDetail: React.FC = () => {
       default:
         return '—';
     }
+  };
+
+  const getDeliveryMethodText = (method?: string) => {
+    switch (method) {
+      case 'FACE_TO_FACE':
+        return '面交';
+      case 'EXPRESS':
+        return '快递';
+      default:
+        return '—';
+    }
+  };
+
+  /**
+   * 渲染待支付倒计时+锁定提示
+   */
+  const renderPendingCountdown = () => {
+    if (!order || order.status !== 'PENDING_PAYMENT') return null;
+    const minutes = Math.floor((timeLeftSec ?? 0) / 60);
+    const seconds = Math.max(0, (timeLeftSec ?? 0) % 60);
+    const mm = String(minutes).padStart(2, '0');
+    const ss = String(seconds).padStart(2, '0');
+
+    return (
+      <div className="pending-countdown">
+        <div className="countdown-title">请尽快完成支付</div>
+        <div className="countdown-timer">
+          <span className="time">{mm}</span>
+          <span className="colon">:</span>
+          <span className="time">{ss}</span>
+        </div>
+        <div className="lock-hint">
+          🔒 已为你锁定该商品
+          { (order as any)?.timeoutMinutes ? `（剩余${(order as any).timeoutMinutes}分钟内有效）` : '' }
+        </div>
+        { timeLeftSec === 0 && <div className="countdown-expired">已到期，订单可能已自动取消或即将取消…</div> }
+      </div>
+    );
+  };
+
+  /**
+   * 构建订单流程时间线
+   */
+  const buildTimelineItems = () => {
+    if (!order) return [];
+    const stage = toUiStage(order.status as unknown as BackendOrderStatus);
+    const items: any[] = [
+      {
+        title: '创建订单',
+        description: '待支付',
+        time: formatTime(order.createdAt),
+        status: 'success',
+      },
+      {
+        title: '支付成功',
+        description: '等待卖家发货',
+        time: order.paymentTime ? formatTime(order.paymentTime) : undefined,
+        status: ['PENDING_SHIPMENT','PENDING_RECEIPT','COMPLETED'].includes(stage) ? 'success' : 'default',
+      },
+      {
+        title: '卖家发货',
+        description: '物流运输中',
+        time: undefined, // 需要后端物流时间，暂无
+        status: ['PENDING_RECEIPT','COMPLETED'].includes(stage) ? 'success' : 'default',
+      },
+      {
+        title: '确认收货',
+        description: '待确认',
+        time: undefined, // 需要后端 delivered/received 时间，暂无
+        status: stage === 'COMPLETED' ? 'success' : 'default',
+      },
+      {
+        title: order.status === 'CANCELLED' ? '订单已取消' : '交易完成',
+        description: order.status === 'CANCELLED' ? '超时或主动取消' : '感谢你的购买',
+        time: undefined,
+        status: order.status === 'COMPLETED' ? 'success' : (order.status === 'CANCELLED' ? 'error' : 'default'),
+      },
+    ];
+
+    // 计算当前激活节点
+    let activeIndex = 0;
+    activeIndex = ['PENDING_PAYMENT','PENDING_SHIPMENT','PENDING_RECEIPT','COMPLETED','CANCELLED']
+      .indexOf(stage);
+    if (activeIndex < 0) activeIndex = 0;
+    return { items, activeIndex };
   };
 
   // ==================== 渲染 ====================
@@ -462,10 +600,12 @@ const OrderDetail: React.FC = () => {
   }
 
   // 判断按钮可见性
-  const canPay = order.status === 'PENDING_PAYMENT';
-  const canCancel = order.status === 'PENDING_PAYMENT' || order.status === 'PAID';
-  const canConfirmReceipt = order.status === 'PENDING_RECEIPT';
-  const canRefund = order.status === 'PAID' || order.status === 'PENDING_DELIVERY';
+  const stage = toUiStage(order.status as unknown as BackendOrderStatus);
+  const canPay = stage === 'PENDING_PAYMENT';
+  const canCancel = stage === 'PENDING_PAYMENT' || stage === 'PENDING_SHIPMENT';
+  const canConfirmReceipt = stage === 'PENDING_RECEIPT';
+  const canRefund = stage === 'PENDING_SHIPMENT' || stage === 'PENDING_RECEIPT';
+  const canShip = stage === 'PENDING_SHIPMENT' && (order as any)?.deliveryMethod === 'EXPRESS';
 
   return (
     <div className="order-detail-page">
@@ -477,6 +617,9 @@ const OrderDetail: React.FC = () => {
           </div>
           <h1 className="order-title">订单详情</h1>
           <p className="order-no">订单号：{order.orderNo}</p>
+
+          {/* 待支付倒计时与锁定提示 */}
+          {renderPendingCountdown()}
         </div>
 
         {/* ==================== 商品信息 ==================== */}
@@ -484,15 +627,17 @@ const OrderDetail: React.FC = () => {
           <h2 className="section-title">商品信息</h2>
           <div className="goods-card" onClick={() => order.goodsId && navigate(`/goods/${order.goodsId}`)}>
             <div className="goods-image">
-              {order.goods?.images?.[0] ? (
+              {((order as any)?.goodsImage) ? (
+                <img src={(order as any).goodsImage} alt={(order as any).goodsTitle || '商品'} />
+              ) : order.goods?.images?.[0] ? (
                 <img src={order.goods.images[0]} alt={order.goods.title} />
               ) : (
                 <div className="image-placeholder">📦</div>
               )}
             </div>
             <div className="goods-info">
-              <h3 className="goods-title">{order.goods?.title || '未知商品'}</h3>
-              <p className="goods-desc">{order.goods?.description || '暂无描述'}</p>
+              <h3 className="goods-title">{(order as any)?.goodsTitle || order.goods?.title || '未知商品'}</h3>
+              <p className="goods-desc">{order.goods?.description || ''}</p>
               <div className="goods-price">{formatPrice(order.amount)}</div>
             </div>
           </div>
@@ -507,9 +652,61 @@ const OrderDetail: React.FC = () => {
               <span className="info-value price">{formatPrice(order.amount)}</span>
             </div>
             <div className="info-item">
+              <span className="info-label">配送方式：</span>
+              <span className="info-value">{getDeliveryMethodText((order as any)?.deliveryMethod)}</span>
+            </div>
+            {(order as any)?.deliveryMethod === 'EXPRESS' && (
+              <>
+                <div className="info-item">
+                  <span className="info-label">收货人：</span>
+                  <span className="info-value">{(order as any)?.receiverName || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">手机号：</span>
+                  <span className="info-value">{(order as any)?.receiverPhone || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">收货地址：</span>
+                  <span className="info-value">{(order as any)?.receiverAddress || '—'}</span>
+                </div>
+              </>
+            )}
+            {(order as any)?.buyerNote && (
+              <div className="info-item">
+                <span className="info-label">买家备注：</span>
+                <span className="info-value">{(order as any).buyerNote}</span>
+              </div>
+            )}
+            <div className="info-item">
               <span className="info-label">支付方式：</span>
               <span className="info-value">{getPaymentMethodText(order.paymentMethod)}</span>
             </div>
+            <div className="info-item">
+              <span className="info-label">配送方式：</span>
+              <span className="info-value">{getDeliveryMethodText((order as any)?.deliveryMethod)}</span>
+            </div>
+            {(order as any)?.deliveryMethod === 'EXPRESS' && (
+              <>
+                <div className="info-item">
+                  <span className="info-label">收货人：</span>
+                  <span className="info-value">{(order as any)?.receiverName || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">手机号：</span>
+                  <span className="info-value">{(order as any)?.receiverPhone || '—'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">收货地址：</span>
+                  <span className="info-value">{(order as any)?.receiverAddress || '—'}</span>
+                </div>
+              </>
+            )}
+            {(order as any)?.buyerNote && (
+              <div className="info-item">
+                <span className="info-label">买家备注：</span>
+                <span className="info-value">{(order as any).buyerNote}</span>
+              </div>
+            )}
             <div className="info-item">
               <span className="info-label">创建时间：</span>
               <span className="info-value">{formatTime(order.createdAt)}</span>
@@ -531,6 +728,15 @@ const OrderDetail: React.FC = () => {
           </div>
         </div>
 
+        {/* ==================== 订单进度（时间线） ==================== */}
+        <div className="order-timeline-section">
+          <h2 className="section-title">订单进度</h2>
+          {(() => {
+            const timelineData = buildTimelineItems();
+            return <Timeline items={timelineData.items as any} activeIndex={timelineData.activeIndex} />;
+          })()}
+        </div>
+
         {/* ==================== 物流信息 ==================== */}
         {(order.status === 'SHIPPED' || order.status === 'PENDING_RECEIPT' || order.status === 'COMPLETED') && order.id && (
           <LogisticsCard orderId={order.id} />
@@ -544,11 +750,20 @@ const OrderDetail: React.FC = () => {
             <div className="user-card">
               <div className="user-label">买家</div>
               <div className="user-info">
-                <div className="user-avatar">👤</div>
+                <div className="user-avatar">
+                  {buyerProfile?.avatar ? (
+                    <img src={buyerProfile.avatar} alt="buyer" style={{ width: 36, height: 36, borderRadius: '50%' }} />
+                  ) : (
+                    <span>👤</span>
+                  )}
+                </div>
                 <div className="user-details">
-                  <div className="user-name">{order.buyer?.username || '未知用户'}</div>
-                  {order.buyer?.phone && (
-                    <div className="user-contact">📱 {order.buyer.phone}</div>
+                  <div className="user-name">{buyerProfile?.username || (order as any)?.buyerUsername || '未知用户'}</div>
+                  {(buyerProfile?.id || (order as any)?.buyerId) && (
+                    <div className="user-contact">ID：{buyerProfile?.id || (order as any)?.buyerId}</div>
+                  )}
+                  {buyerProfile?.phone && (
+                    <div className="user-contact">📱 {buyerProfile.phone}</div>
                   )}
                 </div>
               </div>
@@ -558,11 +773,20 @@ const OrderDetail: React.FC = () => {
             <div className="user-card">
               <div className="user-label">卖家</div>
               <div className="user-info">
-                <div className="user-avatar">👤</div>
+                <div className="user-avatar">
+                  {sellerProfile?.avatar ? (
+                    <img src={sellerProfile.avatar} alt="seller" style={{ width: 36, height: 36, borderRadius: '50%' }} />
+                  ) : (
+                    <span>👤</span>
+                  )}
+                </div>
                 <div className="user-details">
-                  <div className="user-name">{order.seller?.username || '未知用户'}</div>
-                  {order.seller?.phone && (
-                    <div className="user-contact">📱 {order.seller.phone}</div>
+                  <div className="user-name">{sellerProfile?.username || (order as any)?.sellerUsername || '未知用户'}</div>
+                  {(sellerProfile?.id || (order as any)?.sellerId) && (
+                    <div className="user-contact">ID：{sellerProfile?.id || (order as any)?.sellerId}</div>
+                  )}
+                  {sellerProfile?.phone && (
+                    <div className="user-contact">📱 {sellerProfile.phone}</div>
                   )}
                 </div>
               </div>
@@ -585,6 +809,11 @@ const OrderDetail: React.FC = () => {
           {canRefund && (
             <button className="btn-warning" onClick={handleOpenRefundModal}>
               🔄 申请退款
+            </button>
+          )}
+          {canShip && (
+            <button className="btn-primary" onClick={handleShipOrder} disabled={shipping}>
+              {shipping ? '⏳ 发货中...' : '📦 立即发货'}
             </button>
           )}
           {canCancel && (

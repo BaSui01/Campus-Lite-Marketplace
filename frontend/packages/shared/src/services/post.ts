@@ -1,29 +1,43 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * 帖子 API 服务
+ * ✅ 帖子 API 服务 - 完全重构版
  * @author BaSui 😎
- * @description 社区帖子、回复、点赞等接口
+ * @description 基于 OpenAPI 生成的 DefaultApi,零手写路径！
+ *
+ * 功能:
+ * - 帖子 CRUD(创建/查询/更新/删除)
+ * - 帖子点赞/取消点赞
+ * - 帖子置顶/取消置顶
+ * - 回复 CRUD
+ * - 回复点赞/取消点赞
  */
 
 import { getApi } from '../utils/apiClient';
 import type {
-  ApiResponse,
-  PageInfo,
-  Post,
-  Reply,
+  PostResponse,
   CreatePostRequest,
   UpdatePostRequest,
-  PostListQuery,
-  CreateReplyRequest,
-} from '../types';
+  CreatePostReplyRequest,
+  PagePostResponse,
+  PageReplyResponse,
+} from '../api';
+
+/**
+ * 帖子列表查询参数
+ */
+export interface PostListParams {
+  page?: number;
+  size?: number;
+  sortBy?: string;
+  sortDirection?: string;
+}
+
+/**
+ * 回复列表查询参数
+ */
+export interface ReplyListParams {
+  page?: number;
+  size?: number;
+}
 
 /**
  * 帖子 API 服务类
@@ -34,91 +48,116 @@ export class PostService {
   /**
    * 创建帖子
    * @param data 创建帖子请求参数
-   * @returns 帖子信息
+   * @returns 帖子ID
    */
-  async createPost(data: CreatePostRequest): Promise<ApiResponse<Post>> {
-    return http.post('/posts', data);
+  async createPost(data: CreatePostRequest): Promise<number> {
+    const api = getApi();
+    const response = await api.createPost({ createPostRequest: data });
+    return response.data.data as number;
   }
 
   /**
    * 更新帖子
+   * @param id 帖子ID
    * @param data 更新帖子请求参数
    * @returns 更新后的帖子信息
    */
-  async updatePost(data: UpdatePostRequest): Promise<ApiResponse<Post>> {
-    return http.put(`/posts/${data.id}`, data);
+  async updatePost(id: number, data: UpdatePostRequest): Promise<PostResponse> {
+    const api = getApi();
+    const response = await api.updatePost({ id, updatePostRequest: data });
+    return response.data.data as PostResponse;
   }
 
   /**
    * 删除帖子
-   * @param postId 帖子ID
-   * @returns 删除结果
+   * @param id 帖子ID
    */
-  async deletePost(postId: number): Promise<ApiResponse<void>> {
-    return http.delete(`/posts/${postId}`);
+  async deletePost(id: number): Promise<void> {
+    const api = getApi();
+    await api.deletePost({ id });
   }
 
   /**
    * 获取帖子详情
-   * @param postId 帖子ID
+   * @param id 帖子ID
    * @returns 帖子详情
    */
-  async getPostById(postId: number): Promise<ApiResponse<Post>> {
-    return http.get(`/posts/${postId}`);
+  async getPostById(id: number): Promise<PostResponse> {
+    const api = getApi();
+    const response = await api.getPostDetail({ id });
+    return response.data.data as PostResponse;
   }
 
   /**
-   * 获取帖子列表
+   * 获取帖子列表(分页)
    * @param params 查询参数
-   * @returns 帖子列表
+   * @returns 帖子列表(分页)
    */
-  async getPosts(params?: PostListQuery): Promise<ApiResponse<PageInfo<Post>>> {
-    return http.get('/posts', { params });
+  async getPosts(params?: PostListParams): Promise<PagePostResponse> {
+    const api = getApi();
+    const response = await api.listPosts({
+      page: params?.page,
+      size: params?.size,
+      sortBy: params?.sortBy,
+      sortDirection: params?.sortDirection,
+    });
+    return response.data.data as PagePostResponse;
   }
 
   /**
-   * 获取我的帖子
+   * 获取作者的帖子列表
+   * @param authorId 作者ID
    * @param params 查询参数
-   * @returns 帖子列表
+   * @returns 帖子列表(分页)
    */
-  async getMyPosts(params?: { page?: number; pageSize?: number }): Promise<ApiResponse<PageInfo<Post>>> {
-    return http.get('/posts/my', { params });
+  async getPostsByAuthor(authorId: number, params?: PostListParams): Promise<PagePostResponse> {
+    const api = getApi();
+    const response = await api.listPostsByAuthor({
+      authorId,
+      page: params?.page,
+      size: params?.size,
+    });
+    return response.data.data as PagePostResponse;
   }
 
   /**
    * 点赞帖子
    * @param postId 帖子ID
-   * @returns 点赞结果
    */
-  async likePost(postId: number): Promise<ApiResponse<void>> {
-    return http.post(`/posts/${postId}/like`);
+  async likePost(postId: number): Promise<void> {
+    const api = getApi();
+    await api.likePost({ postId });
   }
 
   /**
-   * 取消点赞
+   * 取消点赞帖子
    * @param postId 帖子ID
-   * @returns 取消结果
    */
-  async unlikePost(postId: number): Promise<ApiResponse<void>> {
-    return http.delete(`/posts/${postId}/like`);
+  async unlikePost(postId: number): Promise<void> {
+    const api = getApi();
+    await api.unlikePost({ postId });
   }
 
   /**
-   * 置顶帖子（管理员）
+   * 获取帖子点赞数
    * @param postId 帖子ID
-   * @returns 置顶结果
+   * @returns 点赞数
    */
-  async pinPost(postId: number): Promise<ApiResponse<void>> {
-    return http.post(`/posts/${postId}/pin`);
+  async getPostLikeCount(postId: number): Promise<number> {
+    const api = getApi();
+    const response = await api.getPostLikeCount({ postId });
+    return response.data.data as number;
   }
 
   /**
-   * 取消置顶（管理员）
+   * 获取帖子收藏数
    * @param postId 帖子ID
-   * @returns 取消结果
+   * @returns 收藏数
    */
-  async unpinPost(postId: number): Promise<ApiResponse<void>> {
-    return http.delete(`/posts/${postId}/pin`);
+  async getPostCollectCount(postId: number): Promise<number> {
+    const api = getApi();
+    const response = await api.getPostCollectCount({ postId });
+    return response.data.data as number;
   }
 
   // ==================== 回复相关接口 ====================
@@ -126,50 +165,58 @@ export class PostService {
   /**
    * 创建回复
    * @param data 创建回复请求参数
-   * @returns 回复信息
+   * @returns 回复ID
    */
-  async createReply(data: CreateReplyRequest): Promise<ApiResponse<Reply>> {
-    return http.post('/replies', data);
+  async createReply(data: CreatePostReplyRequest): Promise<number> {
+    const api = getApi();
+    const response = await api.createReply1({ createPostReplyRequest: data });
+    return response.data.data as number;
   }
 
   /**
    * 删除回复
-   * @param replyId 回复ID
-   * @returns 删除结果
+   * @param id 回复ID
    */
-  async deleteReply(replyId: number): Promise<ApiResponse<void>> {
-    return http.delete(`/replies/${replyId}`);
+  async deleteReply(id: number): Promise<void> {
+    const api = getApi();
+    await api.deleteReply1({ id });
   }
 
   /**
    * 获取帖子的回复列表
    * @param postId 帖子ID
    * @param params 查询参数
-   * @returns 回复列表
+   * @returns 回复列表(分页)
    */
-  async getReplies(postId: number, params?: { page?: number; pageSize?: number }): Promise<ApiResponse<PageInfo<Reply>>> {
-    return http.get(`/posts/${postId}/replies`, { params });
+  async getReplies(postId: number, params?: ReplyListParams): Promise<PageReplyResponse> {
+    const api = getApi();
+    const response = await api.listReplies({
+      postId,
+      page: params?.page,
+      size: params?.size,
+    });
+    return response.data.data as PageReplyResponse;
   }
 
   /**
-   * 点赞回复
-   * @param replyId 回复ID
-   * @returns 点赞结果
+   * 审核帖子（管理员）
+   * @param postId 帖子ID
+   * @param data 审核数据
+   * TODO: 等待后端实现帖子审核API
    */
-  async likeReply(replyId: number): Promise<ApiResponse<void>> {
-    return http.post(`/replies/${replyId}/like`);
-  }
-
-  /**
-   * 取消点赞回复
-   * @param replyId 回复ID
-   * @returns 取消结果
-   */
-  async unlikeReply(replyId: number): Promise<ApiResponse<void>> {
-    return http.delete(`/replies/${replyId}/like`);
+  async auditPost(_postId: number, _data: { approved: boolean; reason?: string }): Promise<void> {
+    // const api = getApi();
+    // await api.auditPost({ postId, auditPostRequest: data });
+    throw new Error('帖子审核功能暂未实现');
   }
 }
 
-// 导出单例
+/**
+ * 帖子服务实例
+ */
 export const postService = new PostService();
+
+/**
+ * 导出单例
+ */
 export default postService;

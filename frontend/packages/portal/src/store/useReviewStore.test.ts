@@ -7,11 +7,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useReviewStore } from './useReviewStore';
-import { reviewService } from '@campus/shared';
+import { Services } from '@campus/shared';
+
+// 🔧 BaSui 修复：从 Services 命名空间解构
+const { reviewService } = Services;
 
 // Mock reviewService
 vi.mock('@campus/shared', () => ({
-  reviewService: {
+  Services: {
+    reviewService: {
     getMyReviews: vi.fn(),
     listReviews: vi.fn(),
     createReview: vi.fn(),
@@ -19,6 +23,7 @@ vi.mock('@campus/shared', () => ({
     likeReview: vi.fn(),
     unlikeReview: vi.fn(),
     replyReview: vi.fn(),
+    },
   },
 }));
 

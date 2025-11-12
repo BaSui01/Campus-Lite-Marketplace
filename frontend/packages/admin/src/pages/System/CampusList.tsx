@@ -21,8 +21,6 @@ import {
   Select,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Card,
   Statistic,
@@ -30,6 +28,8 @@ import {
   Col,
   Descriptions,
   Popconfirm,
+  App,
+  Modal,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -52,6 +52,7 @@ const { Option } = Select;
  */
 export const CampusList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<CampusRequest>();
 
   // 查询参数
@@ -182,7 +183,7 @@ export const CampusList: React.FC = () => {
       ? CampusStatus.DISABLED 
       : CampusStatus.ENABLED;
     
-    Modal.confirm({
+    modal.confirm({
       title: `确认${newStatus === CampusStatus.ENABLED ? '启用' : '禁用'}校园`,
       content: `${newStatus === CampusStatus.DISABLED ? '禁用后该校园的用户将无法登录，' : ''}确定要继续吗？`,
       onOk: () => {

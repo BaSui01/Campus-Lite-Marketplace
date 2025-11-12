@@ -18,28 +18,24 @@ import { useNavigate } from 'react-router-dom';
 import {
   Table,
   Button,
-  Input,
-  Select,
   Space,
   Tag,
   Card,
   Row,
   Col,
   Statistic,
-  DatePicker,
 } from 'antd';
 import {
-  SearchOutlined,
   EyeOutlined,
   DollarOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { orderService } from '@campus/shared/services/order';
 import type { OrderResponse } from '@campus/shared/api';
-import dayjs, { Dayjs } from 'dayjs';
-
-const { Option } = Select;
-const { RangePicker } = DatePicker;
+import { FilterPanel } from '@campus/shared/components';
+import type { FilterConfig, FilterValues } from '@campus/shared';
+import { ORDER_STATUS_OPTIONS } from '@campus/shared/constants';
+import dayjs from 'dayjs';
 
 /**
  * 订单状态映射
@@ -54,30 +50,50 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
   REFUNDED: { text: '已退款', color: 'red' },
 };
 
+// 订单筛选配置
+const orderFilters: FilterConfig[] = [
+  {
+    type: 'input',
+    field: 'keyword',
+    label: '关键词',
+    placeholder: '搜索订单号/商品名/买家/卖家',
+    width: 250,
+  },
+  {
+    type: 'select',
+    field: 'status',
+    label: '订单状态',
+    placeholder: '选择状态',
+    options: ORDER_STATUS_OPTIONS,
+    width: 150,
+  },
+  {
+    type: 'dateRange',
+    field: 'dateRange',
+    label: '时间范围',
+    format: 'YYYY-MM-DD',
+  },
+];
+
 export const OrderList: React.FC = () => {
   const navigate = useNavigate();
 
-  // 查询参数
-  const [keyword, setKeyword] = useState<string>('');
-  const [status, setStatus] = useState<string | undefined>();
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
+  // 筛选参数（使用 FilterPanel 统一管理）
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [page, setPage] = useState<number>(0);
   const [size, setSize] = useState<number>(20);
 
-  // 构建查询参数
-  const queryParams = {
-    keyword,
-    status,
-    startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
-    endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
-    page,
-    size,
-  };
-
   // 查询订单列表（管理员视角）
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['orders', 'admin', 'list', queryParams],
-    queryFn: () => orderService.listOrdersAdmin(queryParams),
+    queryKey: ['orders', 'admin', 'list', filterValues, page, size],
+    queryFn: () => orderService.listOrdersAdmin({
+      keyword: filterValues.keyword,
+      status: filterValues.status,
+      startDate: filterValues.dateRange?.[0],
+      endDate: filterValues.dateRange?.[1],
+      page,
+      size,
+    }),
     staleTime: 5 * 60 * 1000, // 缓存5分钟
   });
 
@@ -85,14 +101,6 @@ export const OrderList: React.FC = () => {
   const handleSearch = () => {
     setPage(0);
     refetch();
-  };
-
-  // 重置筛选
-  const handleReset = () => {
-    setKeyword('');
-    setStatus(undefined);
-    setDateRange(null);
-    setPage(0);
   };
 
   // 查看详情
@@ -103,21 +111,30 @@ export const OrderList: React.FC = () => {
   // 快速筛选今日订单
   const handleToday = () => {
     const today = dayjs();
-    setDateRange([today.startOf('day'), today.endOf('day')]);
+    setFilterValues({
+      ...filterValues,
+      dateRange: [today.startOf('day').format('YYYY-MM-DD'), today.endOf('day').format('YYYY-MM-DD')]
+    });
     setPage(0);
   };
 
   // 快速筛选近7天
   const handleLast7Days = () => {
     const today = dayjs();
-    setDateRange([today.subtract(6, 'day').startOf('day'), today.endOf('day')]);
+    setFilterValues({
+      ...filterValues,
+      dateRange: [today.subtract(6, 'day').startOf('day').format('YYYY-MM-DD'), today.endOf('day').format('YYYY-MM-DD')]
+    });
     setPage(0);
   };
 
   // 快速筛选近30天
   const handleLast30Days = () => {
     const today = dayjs();
-    setDateRange([today.subtract(29, 'day').startOf('day'), today.endOf('day')]);
+    setFilterValues({
+      ...filterValues,
+      dateRange: [today.subtract(29, 'day').startOf('day').format('YYYY-MM-DD'), today.endOf('day').format('YYYY-MM-DD')]
+    });
     setPage(0);
   };
 
@@ -148,7 +165,7 @@ export const OrderList: React.FC = () => {
       render: (_: any, record: OrderResponse) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <img
-            src={record.goodsImage || 'https://via.placeholder.com/40'}
+            src={record.goodsImage || 'https://picsum.photos/40/40?random=3'}
             alt={record.goodsTitle}
             style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }}
           />
@@ -242,43 +259,21 @@ export const OrderList: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 搜索和筛选栏 */}
+      {/* 筛选面板 */}
+      <FilterPanel
+        config={{ filters: orderFilters }}
+        values={filterValues}
+        onChange={setFilterValues}
+        onSearch={handleSearch}
+        onReset={() => {
+          setFilterValues({});
+          setPage(0);
+        }}
+        style={{ marginBottom: 16 }}
+      />
+
+      {/* 快捷筛选按钮 */}
       <Card style={{ marginBottom: 16 }}>
-        <Space wrap style={{ width: '100%', marginBottom: 16 }}>
-          <Input
-            placeholder="搜索订单号/商品名/买家/卖家"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            onPressEnter={handleSearch}
-            style={{ width: 250 }}
-            prefix={<SearchOutlined />}
-          />
-          <Select
-            placeholder="选择状态"
-            value={status}
-            onChange={setStatus}
-            allowClear
-            style={{ width: 150 }}
-          >
-            <Option value="PENDING_PAYMENT">待支付</Option>
-            <Option value="PAID">已支付</Option>
-            <Option value="SHIPPED">已发货</Option>
-            <Option value="COMPLETED">已完成</Option>
-            <Option value="CANCELLED">已取消</Option>
-            <Option value="REFUNDING">退款中</Option>
-            <Option value="REFUNDED">已退款</Option>
-          </Select>
-          <RangePicker
-            value={dateRange}
-            onChange={setDateRange}
-            style={{ width: 280 }}
-            format="YYYY-MM-DD"
-          />
-          <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-            搜索
-          </Button>
-          <Button onClick={handleReset}>重置</Button>
-        </Space>
         <Space>
           <Button size="small" onClick={handleToday}>
             今日

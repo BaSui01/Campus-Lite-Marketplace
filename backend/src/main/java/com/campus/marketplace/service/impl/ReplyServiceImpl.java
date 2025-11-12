@@ -62,8 +62,11 @@ public class ReplyServiceImpl implements ReplyService {
         Post post = postRepository.findById(request.postId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
-        if (!post.isApproved()) {
-            throw new BusinessException(ErrorCode.INVALID_PARAM, "帖子未审核通过，无法回复");
+        // 放宽策略：作者或管理员可在未审核状态下回复；其他用户禁止
+        if (!post.isApproved()
+                && !post.getAuthorId().equals(user.getId())
+                && !user.isAdmin()) {
+            throw new BusinessException(ErrorCode.INVALID_PARAM, "帖子未审核通过，仅作者或管理员可回复");
         }
 
         String rateLimitKey = REPLY_RATE_KEY_PREFIX + user.getId();
@@ -185,14 +188,24 @@ public class ReplyServiceImpl implements ReplyService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        if (!reply.getAuthorId().equals(user.getId()) && !user.isAdmin()) {
+        // 允许 管理员、帖主、回复作者 删除
+        Post post = postRepository.findById(reply.getPostId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        boolean isReplyAuthor = reply.getAuthorId().equals(user.getId());
+        boolean isPostAuthor = post.getAuthorId().equals(user.getId());
+        boolean isAdmin = user.isAdmin();
+
+        if (!(isReplyAuthor || isPostAuthor || isAdmin)) {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
 
-        replyRepository.delete(reply);
+        // 软删除：打标并保存
+        if (!reply.isDeleted()) {
+            reply.markDeleted();
+            replyRepository.save(reply);
+        }
 
-        Post post = postRepository.findById(reply.getPostId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        // 同步可见计数
         if (post.getReplyCount() > 0) {
             post.setReplyCount(post.getReplyCount() - 1);
             postRepository.save(post);

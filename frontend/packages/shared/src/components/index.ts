@@ -39,8 +39,9 @@ export { Loading, type LoadingProps, type LoadingType, type LoadingSize } from '
 /**
  * Skeleton - 骨架屏组件
  * @description 更专业的骨架屏组件，支持多种预设布局（文本、头像、图片、卡片、列表、表单等）
+ * @note AvatarShape 从 Avatar 组件导出，此处不重复导出
  */
-export { Skeleton, type SkeletonProps, type SkeletonType, type AvatarShape, type AnimationType } from './Skeleton';
+export { Skeleton, type SkeletonProps, type SkeletonType, type AnimationType } from './Skeleton';
 
 /**
  * Toast - 消息提示组件
@@ -111,8 +112,10 @@ export { Avatar, type AvatarProps, type AvatarSize, type AvatarShape } from './A
 /**
  * Tag - 标签组件
  * @description 支持多种颜色、尺寸、可关闭、带图标
+ * @note ✅ 导出为 TagComponent 以避免与 API Tag 类型冲突
+ * @note 📝 使用方式：import { TagComponent } from '@campus/shared/components';
  */
-export { Tag, type TagProps, type TagColor, type TagSize } from './Tag';
+export { Tag as TagComponent, type TagProps, type TagColor, type TagSize } from './Tag';
 
 // ==================== P2 业务组件（已完成）====================
 
@@ -141,10 +144,103 @@ export { UserAvatar, type UserAvatarProps, type UserOnlineStatus } from './UserA
 export { ImageUpload, type ImageUploadProps } from './ImageUpload';
 
 /**
+ * ImageCropper - 图片裁剪组件
+ * @description 基于 react-image-crop 的图片裁剪组件，支持裁剪、缩放、旋转
+ */
+export { ImageCropper, type ImageCropperProps } from './ImageCropper';
+
+/**
+ * ImageUploadWithCrop - 带裁剪功能的图片上传组件
+ * @description 集成图片上传和裁剪功能，支持裁剪后上传、粘贴板上传
+ */
+export { ImageUploadWithCrop, type ImageUploadWithCropProps } from './ImageUploadWithCrop';
+
+/**
  * RichTextEditor - 富文本编辑器组件
  * @description 基于 contentEditable 实现，支持基础格式化功能（粗体、斜体、对齐、列表等）
  */
 export { RichTextEditor, type RichTextEditorProps } from './RichTextEditor';
+
+/**
+ * ImageCaptcha - 图形验证码组件 🤖🚫
+ * @description 用于人机验证，支持图形验证码生成、刷新、自动验证（4位数字字母）
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @example
+ * ```tsx
+ * <ImageCaptcha
+ *   onSuccess={(captchaId, code) => {
+ *     // 验证成功，提交表单
+ *     console.log('验证码:', captchaId, code);
+ *   }}
+ *   onFail={() => {
+ *     // 验证失败
+ *     message.error('验证码错误！');
+ *   }}
+ * />
+ * ```
+ */
+export { ImageCaptcha, type ImageCaptchaProps } from './ImageCaptcha/ImageCaptcha';
+
+/**
+ * RotateCaptcha - 旋转验证码组件 🔄
+ * @description 旋转图片到正确角度的验证码组件
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @example
+ * ```tsx
+ * <RotateCaptcha
+ *   onSuccess={(rotateId, angle) => {
+ *     console.log('验证成功:', rotateId, angle);
+ *   }}
+ *   onFail={() => {
+ *     console.log('验证失败');
+ *   }}
+ * />
+ * ```
+ */
+export { RotateCaptcha, type RotateCaptchaProps } from './RotateCaptcha/RotateCaptcha';
+
+/**
+ * ClickCaptcha - 点选验证码组件 👆
+ * @description 按顺序点击指定文字的验证码组件
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @example
+ * ```tsx
+ * <ClickCaptcha
+ *   onSuccess={(clickId, points) => {
+ *     console.log('验证成功:', clickId, points);
+ *   }}
+ *   onFail={() => {
+ *     console.log('验证失败');
+ *   }}
+ * />
+ * ```
+ */
+export { ClickCaptcha, type ClickCaptchaProps } from './ClickCaptcha/ClickCaptcha';
+
+/**
+ * TwoFactorVerify - 2FA 验证组件 🔐
+ * @description 双因素认证验证码输入组件，登录时输入 6 位 TOTP 验证码
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @example
+ * ```tsx
+ * <TwoFactorVerify
+ *   onVerify={(code) => {
+ *     // 提交 6 位验证码
+ *     console.log('验证码:', code);
+ *   }}
+ *   onCancel={() => {
+ *     // 取消验证
+ *   }}
+ *   loading={false}
+ *   error="验证码错误"
+ * />
+ * ```
+ */
+export { TwoFactorVerify } from './TwoFactorVerify';
 
 // ==================== P3 数据撤销组件（新增）====================
 
@@ -258,3 +354,82 @@ export { StatCard, type StatCardProps } from './StatCard';
  * ```
  */
 export { LineChart, BarChart, type ChartData, type ChartProps } from './Charts';
+
+// ==================== 社区组件（新增 2025-11-09）====================
+
+/**
+ * TagSelector - 标签选择器组件
+ * @description 支持多选、搜索、热门标签推荐的标签选择器
+ * @example
+ * ```tsx
+ * <TagSelector
+ *   options={tags}
+ *   hotTags={hotTags}
+ *   value={selectedTagIds}
+ *   maxCount={10}
+ *   onChange={(ids) => setSelectedTagIds(ids)}
+ * />
+ * ```
+ */
+export { TagSelector, type TagSelectorProps, type TagOption } from './TagSelector';
+
+/**
+ * TopicSelector - 话题选择器组件
+ * @description 支持单选/多选、搜索、热门话题推荐的话题选择器
+ * @example
+ * ```tsx
+ * // 单选模式
+ * <TopicSelector
+ *   options={topics}
+ *   value={selectedTopicId}
+ *   onChange={(id) => setSelectedTopicId(id as number)}
+ * />
+ * 
+ * // 多选模式
+ * <TopicSelector
+ *   multiple
+ *   options={topics}
+ *   value={selectedTopicIds}
+ *   onChange={(ids) => setSelectedTopicIds(ids as number[])}
+ * />
+ * ```
+ */
+export { TopicSelector, type TopicSelectorProps, type TopicOption } from './TopicSelector';
+
+// ==================== 通用筛选组件（新增 2025-11-10）====================
+
+/**
+ * FilterPanel - 通用筛选面板组件
+ * @description 提供统一的筛选面板，支持多种筛选类型（input、select、numberRange、dateRange等）
+ * @example
+ * ```tsx
+ * const filters: FilterConfig[] = [
+ *   { type: 'input', field: 'keyword', label: '关键词', placeholder: '搜索...' },
+ *   { type: 'select', field: 'status', label: '状态', options: STATUS_OPTIONS },
+ *   { type: 'numberRange', field: 'price', label: '价格', prefix: '¥' },
+ * ];
+ *
+ * <FilterPanel
+ *   config={{ filters }}
+ *   values={filterValues}
+ *   onChange={setFilterValues}
+ *   onSearch={handleSearch}
+ *   onReset={handleReset}
+ * />
+ * ```
+ */
+export {
+  FilterPanel,
+  FilterField,
+  type FilterPanelProps,
+  type FilterFieldProps,
+  type FilterConfig,
+  type FilterPanelConfig,
+  type FilterValues,
+  type FilterOption,
+  type FilterFieldType,
+  type DateRangeValue,
+  type NumberRangeValue,
+  type FilterValueTransformer,
+  type FilterValueValidator,
+} from './FilterPanel';

@@ -4,6 +4,7 @@ import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.entity.Topic;
 import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.entity.UserFeed;
+import com.campus.marketplace.common.dto.UserFeedDTO;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.common.utils.SecurityUtil;
@@ -117,6 +118,15 @@ public class CommunityController {
         Long userId = getCurrentUserId();
         log.info("获取用户动态流: userId={}", userId);
         List<UserFeed> feeds = communityService.getUserFeed(userId);
+        return ApiResponse.success(feeds);
+    }
+
+        @GetMapping("/feed/v2")
+    @Operation(summary = "获取用户动态流（v2）", description = "返回精简 DTO，包含头像与显示名，支持目标类型")
+    public ApiResponse<List<UserFeedDTO>> getUserFeedV2() {
+        Long userId = getCurrentUserId();
+        log.info("获取用户动态流(v2): userId={}", userId);
+        List<UserFeedDTO> feeds = communityService.getUserFeedV2(userId);
         return ApiResponse.success(feeds);
     }
 

@@ -1,0 +1,186 @@
+/**
+ * 学习资源页面样式
+ * @author BaSui 😎
+ */
+
+.resources-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.resources-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.resources-header h1 {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.resources-header p {
+  font-size: 16px;
+  color: #8c8c8c;
+}
+
+.resources-controls {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.type-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.type-btn {
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 20px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.type-btn:hover {
+  border-color: #11998e;
+  color: #11998e;
+}
+
+.type-btn.active {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border-color: transparent;
+  color: #fff;
+}
+
+.resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resource-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  transition: all 0.3s;
+}
+
+.resource-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.resource-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.resource-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.resource-content h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.resource-category {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #e6f7ff;
+  color: #1890ff;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.resource-desc {
+  font-size: 14px;
+  color: #595959;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.resource-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.resource-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.resource-tags .tag {
+  padding: 2px 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #595959;
+}
+
+.resource-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.download-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.download-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8c8c8c;
+}
+
+@media (max-width: 768px) {
+  .resource-card {
+    flex-direction: column;
+  }
+
+  .resource-icon {
+    text-align: center;
+  }
+
+  .resource-actions {
+    width: 100%;
+  }
+
+  .download-btn {
+    width: 100%;
+  }
+}

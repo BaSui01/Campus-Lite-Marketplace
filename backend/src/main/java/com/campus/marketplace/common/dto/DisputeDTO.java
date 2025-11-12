@@ -5,6 +5,7 @@ import com.campus.marketplace.common.enums.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -42,6 +43,11 @@ public class DisputeDTO implements Serializable {
      * 订单号
      */
     private String orderNo;
+
+    /**
+     * 涉及金额（从订单中获取）
+     */
+    private BigDecimal amount;
 
     /**
      * 发起人ID
@@ -127,6 +133,7 @@ public class DisputeDTO implements Serializable {
                 .disputeCode(dispute.getDisputeCode())
                 .orderId(dispute.getOrderId())
                 .orderNo(dispute.getOrder() != null ? dispute.getOrder().getOrderNo() : null)
+                .amount(dispute.getOrder() != null ? dispute.getOrder().getAmount() : null)
                 .initiatorId(dispute.getInitiatorId())
                 .initiatorNickname(dispute.getInitiator() != null ? dispute.getInitiator().getNickname() : null)
                 .initiatorRole(dispute.getInitiatorRole())

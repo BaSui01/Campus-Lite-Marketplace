@@ -76,6 +76,12 @@ export interface GoodsResponse {
      * @type {string}
      * @memberof GoodsResponse
      */
+    'sellerAvatar'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GoodsResponse
+     */
     'status'?: GoodsResponseStatusEnum;
     /**
      * 
@@ -91,10 +97,34 @@ export interface GoodsResponse {
     'favoriteCount'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof GoodsResponse
+     */
+    'stock'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GoodsResponse
+     */
+    'soldCount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GoodsResponse
+     */
+    'originalPrice'?: number;
+    /**
+     * 
      * @type {string}
      * @memberof GoodsResponse
      */
     'coverImage'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GoodsResponse
+     */
+    'images'?: Array<string>;
     /**
      * 
      * @type {string}
@@ -112,6 +142,7 @@ export interface GoodsResponse {
 export const GoodsResponseStatusEnum = {
     Pending: 'PENDING',
     Approved: 'APPROVED',
+    Locked: 'LOCKED',
     Rejected: 'REJECTED',
     Sold: 'SOLD',
     Offline: 'OFFLINE'

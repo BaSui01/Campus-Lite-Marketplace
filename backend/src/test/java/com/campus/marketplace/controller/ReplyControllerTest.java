@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.CreatePostReplyRequest;
 import com.campus.marketplace.common.dto.response.ReplyResponse;
 import com.campus.marketplace.service.ReplyService;
@@ -55,7 +54,7 @@ class ReplyControllerTest {
         CreatePostReplyRequest request = new CreatePostReplyRequest(100L, "不错", null, null);
         when(replyService.createReply(request)).thenReturn(321L);
 
-        mockMvc.perform(post("/api/replies")
+        mockMvc.perform(post("/replies")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(status().isOk())
@@ -71,7 +70,7 @@ class ReplyControllerTest {
     void createReply_forbidden() throws Exception {
         CreatePostReplyRequest request = new CreatePostReplyRequest(101L, "评论", null, null);
 
-        mockMvc.perform(post("/api/replies")
+        mockMvc.perform(post("/replies")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(status().isForbidden());
@@ -92,7 +91,7 @@ class ReplyControllerTest {
         when(replyService.listReplies(200L, 1, 5))
                 .thenReturn(new PageImpl<>(List.of(resp)));
 
-        mockMvc.perform(get("/api/replies/post/{postId}", 200L)
+        mockMvc.perform(get("/replies/post/{postId}", 200L)
                         .param("page", "1")
                         .param("size", "5"))
                 .andExpect(status().isOk())
@@ -114,7 +113,7 @@ class ReplyControllerTest {
                 .build();
         when(replyService.listSubReplies(1L)).thenReturn(List.of(child));
 
-        mockMvc.perform(get("/api/replies/{parentId}/sub", 1L))
+        mockMvc.perform(get("/replies/{parentId}/sub", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0].content").value("子回复"));
@@ -126,7 +125,7 @@ class ReplyControllerTest {
     @DisplayName("学生删除回复成功")
     @WithMockUser(roles = "STUDENT")
     void deleteReply_success() throws Exception {
-        mockMvc.perform(delete("/api/replies/{id}", 88L))
+        mockMvc.perform(delete("/replies/{id}", 88L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

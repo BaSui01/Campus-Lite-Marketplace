@@ -1,0 +1,740 @@
+/**
+ * 个人中心页面样式
+ * @author BaSui 😎
+ * @date 2025-11-10
+ * @description 现代化卡片式布局 + 柔和配色 + 微交互动画
+ */
+
+/* ==================== 全局容器 ==================== */
+.profile-page-container {
+  padding: 24px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+  min-height: calc(100vh - 64px);
+}
+
+/* ==================== 主卡片样式 ==================== */
+.profile-main-card {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-main-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+.profile-main-card .ant-card-head {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border-bottom: none;
+  padding: 20px 24px;
+}
+
+.profile-main-card .ant-card-head-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-main-card .ant-card-head-title .anticon {
+  font-size: 22px;
+}
+
+.profile-main-card .ant-card-body {
+  padding: 0;
+}
+
+/* ==================== Tab 样式优化 ==================== */
+.profile-main-card .ant-tabs {
+  padding: 0 24px;
+}
+
+.profile-main-card .ant-tabs-nav {
+  margin-bottom: 0;
+  padding-top: 16px;
+}
+
+.profile-main-card .ant-tabs-tab {
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #595959;
+  transition: all 0.3s ease;
+  border-radius: 8px 8px 0 0;
+}
+
+.profile-main-card .ant-tabs-tab:hover {
+  color: #1890ff;
+  background: rgba(24, 144, 255, 0.05);
+}
+
+.profile-main-card .ant-tabs-tab-active {
+  color: #1890ff !important;
+  background: rgba(24, 144, 255, 0.08);
+}
+
+.profile-main-card .ant-tabs-ink-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #1890ff 0%, #096dd9 100%);
+  border-radius: 3px 3px 0 0;
+}
+
+.profile-main-card .ant-tabs-content {
+  padding: 24px 0;
+}
+
+/* ==================== 内容卡片样式 ==================== */
+.profile-content-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.profile-content-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== 头像上传区域 ==================== */
+.profile-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 0;
+  background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-avatar-wrapper .ant-avatar {
+  border: 4px solid #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.profile-avatar-wrapper:hover .ant-avatar {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.profile-avatar-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-avatar-badge:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.6);
+}
+
+/* ==================== 表单样式优化 ==================== */
+.profile-form .ant-form-item-label > label {
+  font-weight: 600;
+  color: #262626;
+  font-size: 14px;
+}
+
+.profile-form .ant-input,
+.profile-form .ant-input-password,
+.profile-form .ant-input-textarea textarea {
+  border-radius: 8px;
+  border: 1.5px solid #d9d9d9;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.profile-form .ant-input:hover,
+.profile-form .ant-input-password:hover,
+.profile-form .ant-input-textarea textarea:hover {
+  border-color: #40a9ff;
+}
+
+.profile-form .ant-input:focus,
+.profile-form .ant-input-password:focus,
+.profile-form .ant-input-textarea textarea:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+}
+
+/* ==================== 按钮样式优化 ==================== */
+.profile-btn-primary {
+  height: 40px;
+  padding: 0 24px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border: none;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-btn-primary:hover {
+  background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.profile-btn-primary:active {
+  transform: translateY(0);
+}
+
+.profile-btn-default {
+  height: 40px;
+  padding: 0 24px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1.5px solid #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+.profile-btn-default:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+  background: rgba(24, 144, 255, 0.05);
+}
+
+.profile-btn-danger {
+  height: 40px;
+  padding: 0 24px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
+  border: none;
+  box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+  transition: all 0.3s ease;
+}
+
+.profile-btn-danger:hover {
+  background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%);
+  box-shadow: 0 4px 16px rgba(255, 77, 79, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ==================== 联系方式卡片 ==================== */
+.profile-contact-item {
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1.5px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.profile-contact-item:hover {
+  background: #ffffff;
+  border-color: #1890ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
+  transform: translateX(4px);
+}
+
+.profile-contact-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.profile-contact-info {
+  flex: 1;
+}
+
+.profile-contact-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.profile-contact-value {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.profile-contact-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 12px;
+  color: #52c41a;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.profile-contact-badge .anticon {
+  font-size: 14px;
+}
+
+/* ==================== 安全设置卡片 ==================== */
+.profile-security-item {
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1.5px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.profile-security-item:hover {
+  background: #ffffff;
+  border-color: #52c41a;
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.1);
+}
+
+.profile-security-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.3);
+}
+
+/* ==================== 登录设备表格 ==================== */
+.profile-device-table .ant-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.profile-device-table .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+  color: #262626;
+  font-weight: 600;
+  border-bottom: 2px solid #1890ff;
+}
+
+.profile-device-table .ant-table-tbody > tr {
+  transition: all 0.3s ease;
+}
+
+.profile-device-table .ant-table-tbody > tr:hover {
+  background: #f0f5ff;
+  transform: scale(1.01);
+}
+
+.profile-device-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.profile-device-current-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 12px;
+  color: #52c41a;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ==================== 账号信息卡片 ==================== */
+.profile-info-section {
+  padding: 24px;
+  background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.profile-info-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-info-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border-radius: 2px;
+}
+
+.profile-info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.profile-info-item:last-child {
+  border-bottom: none;
+}
+
+.profile-info-label {
+  font-size: 14px;
+  color: #8c8c8c;
+  min-width: 100px;
+}
+
+.profile-info-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+}
+
+.profile-info-tag {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.profile-info-tag.status-active {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+.profile-info-tag.status-banned {
+  background: #fff1f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+.profile-info-tag.status-deleted {
+  background: #fafafa;
+  border: 1px solid #d9d9d9;
+  color: #8c8c8c;
+}
+
+/* ==================== Alert 样式优化 ==================== */
+.profile-alert {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.profile-alert.ant-alert-info {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+  border-left: 4px solid #1890ff;
+}
+
+.profile-alert.ant-alert-warning {
+  background: linear-gradient(135deg, #fffbe6 0%, #fff1b8 100%);
+  border-left: 4px solid #faad14;
+}
+
+.profile-alert.ant-alert-success {
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+  border-left: 4px solid #52c41a;
+}
+
+/* ==================== Modal 样式优化 ==================== */
+.profile-modal .ant-modal-content {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.profile-modal .ant-modal-header {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border-bottom: none;
+  padding: 20px 24px;
+}
+
+.profile-modal .ant-modal-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.profile-modal .ant-modal-body {
+  padding: 24px;
+}
+
+.profile-modal .ant-modal-footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+/* ==================== Steps 样式优化 ==================== */
+.profile-steps .ant-steps-item-process .ant-steps-item-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border-color: #1890ff;
+}
+
+.profile-steps .ant-steps-item-finish .ant-steps-item-icon {
+  background: #52c41a;
+  border-color: #52c41a;
+}
+
+.profile-steps .ant-steps-item-finish .ant-steps-item-icon > .ant-steps-icon {
+  color: #ffffff;
+}
+
+/* ==================== QRCode 样式优化 ==================== */
+.profile-qrcode-wrapper {
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+}
+
+/* ==================== Divider 样式优化 ==================== */
+.profile-divider {
+  margin: 24px 0;
+  border-top: 1px dashed #d9d9d9;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 平板端 (768px - 1024px) */
+@media (max-width: 1024px) {
+  .profile-page-container {
+    padding: 16px;
+  }
+
+  .profile-main-card .ant-tabs {
+    padding: 0 16px;
+  }
+
+  .profile-content-card {
+    padding: 20px;
+  }
+
+  .profile-info-label {
+    min-width: 80px;
+  }
+}
+
+/* 移动端 (< 768px) */
+@media (max-width: 768px) {
+  .profile-page-container {
+    padding: 12px;
+    background: #ffffff;
+  }
+
+  .profile-main-card {
+    border-radius: 12px !important;
+  }
+
+  .profile-main-card .ant-card-head {
+    padding: 16px;
+  }
+
+  .profile-main-card .ant-card-head-title {
+    font-size: 16px;
+  }
+
+  .profile-main-card .ant-tabs {
+    padding: 0 12px;
+  }
+
+  .profile-main-card .ant-tabs-tab {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .profile-content-card {
+    padding: 16px;
+  }
+
+  .profile-avatar-section {
+    padding: 24px 0;
+  }
+
+  .profile-avatar-wrapper .ant-avatar {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  .profile-contact-item,
+  .profile-security-item {
+    padding: 16px;
+  }
+
+  .profile-contact-icon,
+  .profile-security-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .profile-info-section {
+    padding: 16px;
+  }
+
+  .profile-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .profile-info-label {
+    min-width: auto;
+  }
+
+  .profile-btn-primary,
+  .profile-btn-default,
+  .profile-btn-danger {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+/* 小屏手机 (< 480px) */
+@media (max-width: 480px) {
+  .profile-page-container {
+    padding: 8px;
+  }
+
+  .profile-main-card {
+    border-radius: 8px !important;
+  }
+
+  .profile-main-card .ant-card-head {
+    padding: 12px;
+  }
+
+  .profile-main-card .ant-tabs {
+    padding: 0 8px;
+  }
+
+  .profile-content-card {
+    padding: 12px;
+  }
+
+  .profile-avatar-wrapper .ant-avatar {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .profile-contact-item,
+  .profile-security-item {
+    padding: 12px;
+  }
+
+  .profile-info-section {
+    padding: 12px;
+  }
+}
+
+/* ==================== 动画效果 ==================== */
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-content-card {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* 脉冲动画（用于强调） */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.profile-avatar-badge:active {
+  animation: pulse 0.3s ease;
+}
+
+/* 滑入动画 */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.profile-contact-item,
+.profile-security-item {
+  animation: slideIn 0.4s ease-out;
+}
+
+/* ==================== 打印样式 ==================== */
+@media print {
+  .profile-page-container {
+    background: #ffffff;
+    padding: 0;
+  }
+
+  .profile-main-card {
+    box-shadow: none !important;
+  }
+
+  .profile-btn-primary,
+  .profile-btn-default,
+  .profile-btn-danger {
+    display: none;
+  }
+
+  .profile-avatar-badge {
+    display: none;
+  }
+}
+
+/* ==================== 深色模式支持（预留） ==================== */
+@media (prefers-color-scheme: dark) {
+  /* 深色模式样式可以在这里添加 */
+  /* 目前暂不实现，预留接口 */
+}

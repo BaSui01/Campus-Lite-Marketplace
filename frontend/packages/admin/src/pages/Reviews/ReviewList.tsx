@@ -4,40 +4,65 @@
  */
 
 import { useState } from 'react';
-import { Table, Button, Input, Select, Space, Tag, Card, Row, Col, Statistic, Rate, Modal, Image } from 'antd';
-import { SearchOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Card, Row, Col, Statistic, Rate, Modal, Image, App } from 'antd';
+import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { reviewService } from '@campus/shared/services/goods/review';
+import { FilterPanel } from '@campus/shared/components';
+import type { FilterConfig, FilterValues } from '@campus/shared/types/filter';
 
-const { Option } = Select;
+// 评分选项
+const RATING_OPTIONS = [
+  { label: '1星', value: 1 },
+  { label: '2星', value: 2 },
+  { label: '3星', value: 3 },
+  { label: '4星', value: 4 },
+  { label: '5星', value: 5 },
+];
+
+// 评价筛选配置
+const reviewFilters: FilterConfig[] = [
+  {
+    type: 'input',
+    field: 'keyword',
+    label: '关键词',
+    placeholder: '搜索商品/买家',
+    width: 200,
+  },
+  {
+    type: 'select',
+    field: 'rating',
+    label: '评分',
+    placeholder: '选择评分',
+    options: RATING_OPTIONS,
+    width: 120,
+  },
+];
 
 export const ReviewList: React.FC = () => {
   const queryClient = useQueryClient();
-  const [keyword, setKeyword] = useState('');
-  const [rating, setRating] = useState<number | undefined>();
+  const { modal } = App.useApp();
+
+  // 筛选参数（使用 FilterPanel 统一管理）
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(20);
   const [detailVisible, setDetailVisible] = useState(false);
   const [currentReview, setCurrentReview] = useState<any>(null);
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['reviews', { keyword, rating, page, size }],
-    queryFn: async () => ({
-      content: Array.from({ length: 15 }, (_, i) => ({
-        id: page * 20 + i + 1,
-        orderId: 1000 + i,
-        goodsTitle: `商品${i + 1}`,
-        buyerName: `用户${i + 1}`,
-        rating: [1, 2, 3, 4, 5][i % 5],
-        content: `评价内容...`.repeat(2),
-        images: i % 2 === 0 ? ['https://via.placeholder.com/100'] : [],
-        createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-      })),
-      totalElements: 50,
+    queryKey: ['reviews', filterValues, page, size],
+    queryFn: () => reviewService.getMyReviews({
+      keyword: filterValues.keyword,
+      rating: filterValues.rating,
+      page,
+      size,
     }),
+    staleTime: 5 * 60 * 1000, // 缓存5分钟
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => { await new Promise(r => setTimeout(r, 500)); },
+    mutationFn: (id: number) => reviewService.deleteReview(id),
     onSuccess: () => { refetch(); queryClient.invalidateQueries({ queryKey: ['reviews'] }); },
   });
 
@@ -57,7 +82,7 @@ export const ReviewList: React.FC = () => {
       render: (_: any, record: any) => (
         <Space size="small">
           <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => { setCurrentReview(record); setDetailVisible(true); }}>查看</Button>
-          <Button type="link" danger size="small" icon={<DeleteOutlined />} onClick={() => Modal.confirm({ title: '确认删除？', onOk: () => deleteMutation.mutate(record.id) })}>删除</Button>
+          <Button type="link" danger size="small" icon={<DeleteOutlined />} onClick={() => modal.confirm({ title: '确认删除？', onOk: () => deleteMutation.mutate(record.id) })}>删除</Button>
         </Space>
       ),
     },
@@ -71,16 +96,20 @@ export const ReviewList: React.FC = () => {
         <Col span={8}><Card><Statistic title="差评数" value={5} valueStyle={{ color: '#f5222d' }} /></Card></Col>
       </Row>
 
-      <Card style={{ marginBottom: 16 }}>
-        <Space>
-          <Input placeholder="搜索商品/买家" value={keyword} onChange={(e) => setKeyword(e.target.value)} style={{ width: 200 }} prefix={<SearchOutlined />} />
-          <Select placeholder="评分" value={rating} onChange={setRating} allowClear style={{ width: 120 }}>
-            {[1, 2, 3, 4, 5].map(r => <Option key={r} value={r}>{r}星</Option>)}
-          </Select>
-          <Button type="primary" icon={<SearchOutlined />} onClick={() => { setPage(0); refetch(); }}>搜索</Button>
-          <Button onClick={() => { setKeyword(''); setRating(undefined); setPage(0); }}>重置</Button>
-        </Space>
-      </Card>
+      {/* 筛选面板 */}
+      <FilterPanel
+        config={{ filters: reviewFilters }}
+        values={filterValues}
+        onChange={setFilterValues}
+        onSearch={() => {
+          setPage(0);
+          refetch();
+        }}
+        onReset={() => {
+          setFilterValues({});
+          setPage(0);
+        }}
+      />
 
       <Table
         rowKey="id"

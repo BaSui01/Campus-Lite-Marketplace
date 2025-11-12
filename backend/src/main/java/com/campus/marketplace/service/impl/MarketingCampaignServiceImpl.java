@@ -380,4 +380,155 @@ public class MarketingCampaignServiceImpl implements MarketingCampaignService {
             throw new BusinessException(ErrorCode.INVALID_PARAMETER, "活动商品列表不能为空");
         }
     }
+
+    @Override
+    public MarketingCampaign getCampaignById(Long campaignId) {
+        log.debug("获取活动详情: campaignId={}", campaignId);
+        
+        return marketingCampaignRepository.findById(campaignId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "活动不存在"));
+    }
+
+    @Override
+    @Transactional
+    public MarketingCampaign updateCampaign(Long campaignId, MarketingCampaign campaign) {
+        log.debug("更新活动: campaignId={}", campaignId);
+        
+        MarketingCampaign existingCampaign = marketingCampaignRepository.findById(campaignId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "活动不存在"));
+        
+        // 只有待审核和已拒绝的活动可以修改
+        if (!"PENDING".equals(existingCampaign.getStatus()) && !"REJECTED".equals(existingCampaign.getStatus())) {
+            throw new BusinessException(ErrorCode.INVALID_PARAMETER, "只有待审核和已拒绝的活动可以修改");
+        }
+        
+        // 更新字段
+        if (campaign.getCampaignName() != null) {
+            existingCampaign.setCampaignName(campaign.getCampaignName());
+        }
+        if (campaign.getCampaignType() != null) {
+            existingCampaign.setCampaignType(campaign.getCampaignType());
+        }
+        if (campaign.getStartTime() != null) {
+            existingCampaign.setStartTime(campaign.getStartTime());
+        }
+        if (campaign.getEndTime() != null) {
+            existingCampaign.setEndTime(campaign.getEndTime());
+        }
+        if (campaign.getDiscountConfig() != null) {
+            existingCampaign.setDiscountConfig(campaign.getDiscountConfig());
+        }
+        if (campaign.getGoodsIds() != null) {
+            existingCampaign.setGoodsIds(campaign.getGoodsIds());
+        }
+        if (campaign.getStockLimit() != null) {
+            existingCampaign.setStockLimit(campaign.getStockLimit());
+            existingCampaign.setStockRemaining(campaign.getStockLimit());
+        }
+        
+        // 重新校验
+        validateCampaign(existingCampaign);
+        
+        // 重置状态为待审核
+        existingCampaign.setStatus("PENDING");
+        
+        return marketingCampaignRepository.save(existingCampaign);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCampaign(Long campaignId) {
+        log.debug("删除活动: campaignId={}", campaignId);
+        
+        MarketingCampaign campaign = marketingCampaignRepository.findById(campaignId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "活动不存在"));
+        
+        // 只有待审核、已拒绝、已结束的活动可以删除
+        if ("RUNNING".equals(campaign.getStatus()) || "APPROVED".equals(campaign.getStatus())) {
+            throw new BusinessException(ErrorCode.INVALID_PARAMETER, "进行中或已通过的活动不能删除");
+        }
+        
+        // 软删除（BaseEntity 已包含 @SQLRestriction(\"deleted = false\")）
+        marketingCampaignRepository.delete(campaign);
+        
+        log.info("活动{}已删除", campaignId);
+    }
+
+    @Override
+    public MarketingCampaign checkGoodsInCampaign(Long goodsId) {
+        log.debug("检查商品{}是否参与活动", goodsId);
+        
+        LocalDateTime now = LocalDateTime.now();
+        
+        // 查询进行中的活动
+        List<MarketingCampaign> runningCampaigns = marketingCampaignRepository.findRunningCampaigns(now);
+        
+        // 检查商品是否在活动商品列表中
+        for (MarketingCampaign campaign : runningCampaigns) {
+            if (campaign.getGoodsIds() != null && campaign.getGoodsIds().contains(goodsId)) {
+                log.info("商品{}参与活动: {}", goodsId, campaign.getCampaignName());
+                return campaign;
+            }
+        }
+        
+        log.debug("商品{}未参与任何活动", goodsId);
+        return null;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getCampaignStatistics(Long merchantId) {
+        log.debug("获取活动统计: merchantId={}", merchantId);
+        
+        List<MarketingCampaign> campaigns;
+        if (merchantId != null) {
+            campaigns = marketingCampaignRepository.findByMerchantIdOrderByCreatedAtDesc(merchantId);
+        } else {
+            campaigns = marketingCampaignRepository.findAll();
+        }
+        
+        java.util.Map<String, Object> statistics = new java.util.HashMap<>();
+        
+        // 总活动数
+        statistics.put("totalCampaigns", campaigns.size());
+        
+        // 按状态统计
+        long pendingCount = campaigns.stream().filter(c -> "PENDING".equals(c.getStatus())).count();
+        long approvedCount = campaigns.stream().filter(c -> "APPROVED".equals(c.getStatus())).count();
+        long runningCount = campaigns.stream().filter(c -> "RUNNING".equals(c.getStatus())).count();
+        long pausedCount = campaigns.stream().filter(c -> "PAUSED".equals(c.getStatus())).count();
+        long endedCount = campaigns.stream().filter(c -> "ENDED".equals(c.getStatus())).count();
+        long rejectedCount = campaigns.stream().filter(c -> "REJECTED".equals(c.getStatus())).count();
+        
+        java.util.Map<String, Long> statusStats = new java.util.HashMap<>();
+        statusStats.put("PENDING", pendingCount);
+        statusStats.put("APPROVED", approvedCount);
+        statusStats.put("RUNNING", runningCount);
+        statusStats.put("PAUSED", pausedCount);
+        statusStats.put("ENDED", endedCount);
+        statusStats.put("REJECTED", rejectedCount);
+        statistics.put("statusStats", statusStats);
+        
+        // 总销售额
+        java.math.BigDecimal totalSalesAmount = campaigns.stream()
+            .filter(c -> c.getSalesAmount() != null)
+            .map(MarketingCampaign::getSalesAmount)
+            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        statistics.put("totalSalesAmount", totalSalesAmount);
+        
+        // 总参与人数
+        int totalParticipation = campaigns.stream()
+            .filter(c -> c.getParticipationCount() != null)
+            .mapToInt(MarketingCampaign::getParticipationCount)
+            .sum();
+        statistics.put("totalParticipation", totalParticipation);
+        
+        // 平均转化率（简化计算：参与人数 / 总活动数）
+        double avgConversionRate = campaigns.isEmpty() ? 0.0 : (double) totalParticipation / campaigns.size();
+        statistics.put("avgConversionRate", avgConversionRate);
+        
+        log.info("活动统计完成: totalCampaigns={}, runningCampaigns={}, totalSalesAmount={}", 
+            campaigns.size(), runningCount, totalSalesAmount);
+        
+        return statistics;
+    }
 }

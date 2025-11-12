@@ -1,12 +1,10 @@
 package com.campus.marketplace.service.impl;
 
+import com.campus.marketplace.service.EmailTemplateService;
 import com.campus.marketplace.service.VerificationCodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -25,12 +23,9 @@ import java.time.Duration;
 public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final JavaMailSender mailSender;
+    private final EmailTemplateService emailTemplateService;
     private final com.campus.marketplace.service.SmsService smsService;
     private final com.campus.marketplace.common.config.SmsProperties smsTemplates;
-
-    @Value("${spring.mail.from:${spring.mail.username:}}")
-    private String mailFrom;
 
     private static final SecureRandom RND = new SecureRandom();
     private static final Duration CODE_TTL = Duration.ofMinutes(10);
@@ -75,13 +70,9 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         String k = keyEmail(email, purpose);
         redisTemplate.opsForValue().set(k, code, CODE_TTL);
 
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(email);
-        msg.setSubject("校园轻享集市验证码");
-        msg.setText("您的验证码为：" + code + "（10分钟内有效）。若非本人操作请忽略。");
-        if (mailFrom != null && !mailFrom.isBlank()) msg.setFrom(mailFrom);
-        mailSender.send(msg);
-        log.info("已发送邮箱验证码 purpose={} email=***{}", purpose, email.substring(Math.max(0, email.length()-4)));
+        // 🎨 使用美化的HTML邮件模板
+        emailTemplateService.sendVerificationCode(email, code, purpose);
+        log.info("✅ 已发送HTML邮箱验证码 purpose={} email=***{}", purpose, email.substring(Math.max(0, email.length()-4)));
     }
 
     @Override

@@ -6,6 +6,9 @@
 
 // 🌐 API 客户端（基于 OpenAPI）
 export * from './apiClient';
+export * from './tokenRefresh';
+export * from './errorHandler';
+export * from './tabSync';
 
 // 🎨 格式化工具
 export * from './format';
@@ -24,6 +27,15 @@ export * from './websocket';
 
 // 🔐 加密工具
 export * from './crypto';
+
+// 🎫 Token 工具
+export * from './tokenUtils';
+
+// 🛡️ ECharts 错误抑制器
+export * from './suppressEChartsError';
+
+// 📦 订单状态映射（UI阶段 ↔ 后端状态）
+export * from './orderStatus';
 
 // 🚧 TODO: 后续添加工具函数
 // export * from './upload';

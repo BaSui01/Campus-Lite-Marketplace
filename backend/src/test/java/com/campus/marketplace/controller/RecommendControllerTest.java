@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
 import com.campus.marketplace.service.RecommendService;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +51,7 @@ class RecommendControllerTest {
                 .build();
         when(recommendService.getHotList(1L, 5)).thenReturn(List.of(goods));
 
-        mockMvc.perform(get("/api/recommend/hot")
+        mockMvc.perform(get("/recommend/hot")
                         .param("campusId", "1")
                         .param("size", "5")
                         .accept(MediaType.APPLICATION_JSON))
@@ -71,7 +70,7 @@ class RecommendControllerTest {
         when(recommendService.getPersonalRecommendations(3))
                 .thenReturn(List.of());
 
-        mockMvc.perform(get("/api/recommend/personal").param("size", "3"))
+        mockMvc.perform(get("/recommend/personal").param("size", "3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").isArray());
@@ -83,7 +82,7 @@ class RecommendControllerTest {
     @DisplayName("管理员刷新热门榜单成功")
     @WithMockUser(roles = "ADMIN")
     void refreshHot_success() throws Exception {
-        mockMvc.perform(post("/api/recommend/admin/hot/refresh")
+        mockMvc.perform(post("/recommend/admin/hot/refresh")
                         .param("campusId", "2")
                         .param("topN", "30"))
                 .andExpect(status().isOk())

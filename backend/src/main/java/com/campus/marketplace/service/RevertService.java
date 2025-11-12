@@ -1,6 +1,9 @@
 package com.campus.marketplace.service;
 
 import com.campus.marketplace.common.dto.request.CreateRevertRequestDto;
+import com.campus.marketplace.common.dto.response.RevertStatistics;
+import com.campus.marketplace.common.entity.RevertRequest;
+import com.campus.marketplace.common.enums.RevertRequestStatus;
 import com.campus.marketplace.revert.dto.RevertExecutionResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,4 +43,40 @@ public interface RevertService {
      * @return 撤销请求分页结果
      */
     Page<?> getUserRevertRequests(Long userId, Pageable pageable);
+
+    // ==================== 管理员接口 ====================
+
+    /**
+     * 查询所有撤销请求（管理员）
+     * 
+     * @param status 状态筛选（可选）
+     * @param pageable 分页参数
+     * @return 撤销请求分页结果
+     */
+    Page<RevertRequest> listRevertRequests(RevertRequestStatus status, Pageable pageable);
+
+    /**
+     * 获取撤销统计数据（管理员）
+     * 
+     * @return 统计数据
+     */
+    RevertStatistics getRevertStatistics();
+
+    /**
+     * 批准撤销请求（管理员）
+     * 
+     * @param id 请求ID
+     * @param comment 审批意见
+     * @param approverId 审批人ID
+     */
+    void approveRevert(Long id, String comment, Long approverId);
+
+    /**
+     * 拒绝撤销请求（管理员）
+     * 
+     * @param id 请求ID
+     * @param reason 拒绝理由
+     * @param approverId 审批人ID
+     */
+    void rejectRevert(Long id, String reason, Long approverId);
 }

@@ -156,4 +156,105 @@ public class RevertServiceImpl implements RevertService {
     public Page<?> getUserRevertRequests(Long userId, Pageable pageable) {
         return revertRequestRepository.findByRequesterIdOrderByCreatedAtDesc(userId, pageable);
     }
+
+    // ==================== 管理员接口实现 ====================
+
+    @Override
+    public Page<RevertRequest> listRevertRequests(com.campus.marketplace.common.enums.RevertRequestStatus status, Pageable pageable) {
+        if (status != null) {
+            return revertRequestRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
+        }
+        return revertRequestRepository.findAllByOrderByCreatedAtDesc(pageable);
+    }
+
+    @Override
+    public com.campus.marketplace.common.dto.response.RevertStatistics getRevertStatistics() {
+        // 待审批数量
+        Long pendingCount = revertRequestRepository.countByStatus(
+            com.campus.marketplace.common.enums.RevertRequestStatus.PENDING
+        );
+
+        // 今日撤销数量（已执行的）
+        java.time.LocalDateTime startOfDay = java.time.LocalDateTime.now()
+            .with(java.time.LocalTime.MIN);
+        Long todayRevertCount = revertRequestRepository.countByStatusAndCreatedAtAfter(
+            com.campus.marketplace.common.enums.RevertRequestStatus.EXECUTED,
+            startOfDay
+        );
+
+        // 成功率：已执行 / (已执行 + 失败)
+        Long executedCount = revertRequestRepository.countByStatus(
+            com.campus.marketplace.common.enums.RevertRequestStatus.EXECUTED
+        );
+        Long failedCount = revertRequestRepository.countByStatus(
+            com.campus.marketplace.common.enums.RevertRequestStatus.FAILED
+        );
+        
+        double successRate = 0.0;
+        if (executedCount + failedCount > 0) {
+            successRate = (double) executedCount / (executedCount + failedCount) * 100;
+        }
+
+        return com.campus.marketplace.common.dto.response.RevertStatistics.builder()
+            .pendingCount(pendingCount)
+            .todayRevertCount(todayRevertCount)
+            .successRate(Math.round(successRate * 10) / 10.0) // 保留1位小数
+            .build();
+    }
+
+    @Override
+    @Transactional
+    public void approveRevert(Long id, String comment, Long approverId) {
+        RevertRequest revertRequest = revertRequestRepository.findById(id)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "撤销请求不存在"));
+
+        if (revertRequest.getStatus() != com.campus.marketplace.common.enums.RevertRequestStatus.PENDING) {
+            throw new BusinessException(ErrorCode.INVALID_OPERATION, "只能批准待处理的撤销请求");
+        }
+
+        // 获取审批人信息
+        String approverName = userRepository.findById(approverId)
+            .map(com.campus.marketplace.common.entity.User::getUsername)
+            .orElse("ADMIN");
+
+        revertRequest.approve(approverId, approverName, comment);
+        revertRequestRepository.save(revertRequest);
+
+        log.info("撤销请求已批准: id={}, approverId={}", id, approverId);
+
+        // 发送批准通知
+        try {
+            notificationService.sendRevertApprovalNotification(revertRequest);
+        } catch (Exception e) {
+            log.error("发送批准通知失败: revertRequestId={}", id, e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void rejectRevert(Long id, String reason, Long approverId) {
+        RevertRequest revertRequest = revertRequestRepository.findById(id)
+            .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "撤销请求不存在"));
+
+        if (revertRequest.getStatus() != com.campus.marketplace.common.enums.RevertRequestStatus.PENDING) {
+            throw new BusinessException(ErrorCode.INVALID_OPERATION, "只能拒绝待处理的撤销请求");
+        }
+
+        // 获取审批人信息
+        String approverName = userRepository.findById(approverId)
+            .map(com.campus.marketplace.common.entity.User::getUsername)
+            .orElse("ADMIN");
+
+        revertRequest.reject(approverId, approverName, reason);
+        revertRequestRepository.save(revertRequest);
+
+        log.info("撤销请求已拒绝: id={}, approverId={}", id, approverId);
+
+        // 发送拒绝通知
+        try {
+            notificationService.sendRevertRejectionNotification(revertRequest);
+        } catch (Exception e) {
+            log.error("发送拒绝通知失败: revertRequestId={}", id, e);
+        }
+    }
 }

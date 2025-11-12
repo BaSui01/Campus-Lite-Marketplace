@@ -22,26 +22,21 @@
   gap: 16px;
 }
 
+/* 卖家头像容器 - 使用 UserAvatar 组件 */
 .seller-card__avatar-wrapper {
   flex-shrink: 0;
-  cursor: pointer;
-}
-
-.seller-card__avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.seller-card__avatar--placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #667eea;
-  color: white;
-  font-size: 24px;
-  font-weight: 600;
+}
+
+.seller-card__avatar-wrapper .campus-user-avatar {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.seller-card__avatar-wrapper .campus-user-avatar:hover {
+  transform: scale(1.05);
 }
 
 .seller-card__info {

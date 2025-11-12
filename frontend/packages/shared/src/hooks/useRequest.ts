@@ -9,7 +9,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 /**
  * useRequest 配置接口
  */
-export interface UseRequestOptions<T, P extends any[]> {
+export interface UseRequestOptions<T, _P extends any[]> {
   /**
    * 是否立即执行
    * @default true

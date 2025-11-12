@@ -1,63 +1,43 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * 合规管理服务
+ * ✅ 合规管理 API 服务 - 完全重构版
+ * @author BaSui 😎
+ * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
-import type { ApiResponse, PageResponse } from '@campus/shared/types';
-
-export interface ComplianceWhitelistItem {
-  id: number;
-  type: string;
-  targetId: number;
-  createdAt?: string;
-}
-
-export interface ComplianceAuditLog {
-  id: number;
-  targetType: string;
-  targetId: number;
-  action: string;
-  operatorId: number;
-  operatorName?: string;
-  remark?: string;
-  createdAt: string;
-}
+import { getApi } from '@campus/shared/utils/apiClient';
+import type {
+  ComplianceWhitelist,
+  ComplianceAuditLog,
+  PageComplianceAuditLog,
+} from '@campus/shared/api';
 
 export class ComplianceService {
-  async addWhitelist(type: string, targetId: number): Promise<ComplianceWhitelistItem> {
-    const res = await http.post<ApiResponse<ComplianceWhitelistItem>>('/api/admin/compliance/whitelist', null, {
-      params: { type, targetId },
-    });
-    return res.data;
+  async listWhitelist(): Promise<ComplianceWhitelist[]> {
+    const api = getApi();
+    const response = await api.listWhitelist();
+    return response.data.data as ComplianceWhitelist[];
+  }
+
+  async addWhitelist(type: string, targetId: number): Promise<ComplianceWhitelist> {
+    const api = getApi();
+    const response = await api.addWhitelist({ type, targetId });
+    return response.data.data as ComplianceWhitelist;
   }
 
   async removeWhitelist(id: number): Promise<void> {
-    await http.delete<ApiResponse<void>>(`/api/admin/compliance/whitelist/${id}`);
+    const api = getApi();
+    await api.removeWhitelist({ id });
   }
 
   async listAudit(
     targetType: string,
     targetId: number,
-    params?: { page?: number; size?: number }
-  ): Promise<PageResponse<ComplianceAuditLog>> {
-    const res = await http.get<ApiResponse<PageResponse<ComplianceAuditLog>>>('/api/admin/compliance/audit', {
-      params: {
-        targetType,
-        targetId,
-        page: params?.page ?? 0,
-        size: params?.size ?? 20,
-      },
-    });
-    return res.data;
+    page: number = 0,
+    size: number = 20
+  ): Promise<PageComplianceAuditLog> {
+    const api = getApi();
+    const response = await api.listAudit({ targetType, targetId, page, size });
+    return response.data.data as PageComplianceAuditLog;
   }
 }
 

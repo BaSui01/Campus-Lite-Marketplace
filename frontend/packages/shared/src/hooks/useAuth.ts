@@ -7,21 +7,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { tokenStorage } from '../utils/storage';
 import { createApi } from '../utils/apiClient';
+import type { User as ApiUser } from '../api/models/user';
 
 // 创建 API 客户端实例
 const api = createApi();
 
 /**
- * 用户信息接口
+ * 扩展 API 的 User 类型，添加权限信息
+ * @description 基于 OpenAPI 生成的 User 类型，扩展权限相关字段
  */
-export interface User {
-  id: number;
-  username: string;
-  nickname?: string;
-  email?: string;
-  phone?: string;
-  avatar?: string;
+export interface User extends Omit<ApiUser, 'roles'> {
+  /**
+   * 角色列表（字符串数组，用于权限检查）
+   */
   roles?: string[];
+
+  /**
+   * 权限列表（字符串数组，用于权限检查）
+   */
   permissions?: string[];
 }
 
@@ -202,11 +205,8 @@ export const useAuth = (): UseAuthResult => {
     try {
       setLoading(true);
 
-      // 调用后端登出 API（需要传递当前access token）
-      const accessToken = tokenStorage.getAccessToken();
-      if (accessToken) {
-        await api.logout(accessToken);
-      }
+      // 调用后端登出 API（Token 通过 Header 自动传递）
+      await api.logout({} as any);
     } catch (error) {
       console.error('登出失败:', error);
     } finally {
@@ -227,8 +227,8 @@ export const useAuth = (): UseAuthResult => {
         throw new Error('Refresh token 不存在');
       }
 
-      // 调用后端刷新 Token API（使用Authorization Bearer方式传递refresh token）
-      const response = await api.refresh(refreshTokenValue);
+      // 调用后端刷新 Token API（Token 通过 Header 自动传递）
+      const response = await api.refresh({} as any);
 
       // 保存新的 Token
       const data = response.data.data as any;

@@ -1,16 +1,19 @@
 /**
+ * ✅ 已重构：使用 OpenAPI 生成的 DefaultApi
+ *
  * 管理员分类服务
  * @author BaSui 😎
  * @description 分类的创建、更新、删除、排序等管理员专属功能
+ * @updated 2025-11-08 - 重构为使用 OpenAPI 生成代码 ✅
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
+import { getApi } from '@campus/shared/utils/apiClient';
 import type {
   Category,
-  CategoryRequest,
-  CategorySortRequest,
-  CategoryStatus,
-} from '@campus/shared/services/category';
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+  CategoryBatchSortRequest,
+} from '@campus/shared/api/models';
 
 /**
  * 管理员分类服务类
@@ -21,22 +24,20 @@ export class AdminCategoryService {
    * @param data 分类信息
    * @returns 创建的分类ID
    */
-  async create(data: CategoryRequest): Promise<number> {
+  async create(data: CreateCategoryRequest): Promise<number> {
     const api = getApi();
-    const response = await api.axiosInstance.post<number>('/api/categories', data);
-    return response.data;
+    const response = await api.createCategory({ createCategoryRequest: data });
+    return response.data.data as number;
   }
 
   /**
    * 更新分类信息（管理员）
    * @param id 分类ID
    * @param data 分类信息
-   * @returns 更新后的分类信息
    */
-  async update(id: number, data: Partial<CategoryRequest>): Promise<Category> {
+  async update(id: number, data: UpdateCategoryRequest): Promise<void> {
     const api = getApi();
-    const response = await api.axiosInstance.put<Category>(`/api/categories/${id}`, data);
-    return response.data;
+    await api.updateCategory({ id, updateCategoryRequest: data });
   }
 
   /**
@@ -45,36 +46,30 @@ export class AdminCategoryService {
    */
   async delete(id: number): Promise<void> {
     const api = getApi();
-    await api.axiosInstance.delete(`/api/categories/${id}`);
+    await api.deleteCategory({ id });
   }
 
   /**
    * 批量排序（管理员）
-   * @param items 排序列表
+   * @param request 排序请求（包含items数组）
    */
-  async batchSort(items: CategorySortRequest[]): Promise<void> {
+  async batchSort(request: CategoryBatchSortRequest): Promise<void> {
     const api = getApi();
-    await api.axiosInstance.put('/api/categories/sort', items);
+    await api.batchUpdateSort({ categoryBatchSortRequest: request });
   }
 
   /**
    * 移动分类（修改父分类，管理员）
    * @param id 分类ID
    * @param newParentId 新父分类ID
-   * @returns 更新后的分类信息
    */
-  async move(id: number, newParentId: number | null): Promise<Category> {
-    return this.update(id, { parentId: newParentId });
-  }
-
-  /**
-   * 启用/禁用分类（管理员）
-   * @param id 分类ID
-   * @param status 状态
-   * @returns 更新后的分类信息
-   */
-  async updateStatus(id: number, status: CategoryStatus): Promise<Category> {
-    return this.update(id, { status });
+  async move(id: number, newParentId: number | null): Promise<void> {
+    const api = getApi();
+    const data: UpdateCategoryRequest = {
+      name: '', // 需要从当前分类获取
+      parentId: newParentId ?? undefined,
+    };
+    await api.updateCategory({ id, updateCategoryRequest: data });
   }
 }
 

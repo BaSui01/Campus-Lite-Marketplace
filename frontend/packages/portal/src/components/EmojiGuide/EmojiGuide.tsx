@@ -81,8 +81,7 @@ export const EmojiGuide: React.FC<EmojiGuideProps> = ({
   const [isVisible, setIsVisible] = useState(propVisible);
   const [showHighlight, setShowHighlight] = useState(false);
 
-  const { setValue, getValue } = useLocalStorage('emoji-guide-completed', false);
-  const guideCompleted = getValue();
+  const [guideCompleted, setGuideCompleted] = useLocalStorage('emoji-guide-completed', false);
 
   // 检查是否应该显示引导
   useEffect(() => {
@@ -96,7 +95,7 @@ export const EmojiGuide: React.FC<EmojiGuideProps> = ({
       // 3秒后隐藏高亮
       setTimeout(() => setShowHighlight(false), 3000);
     }
-  }, [visible, guideCompleted, forceShow, getValue]);
+  }, [visible, guideCompleted, forceShow]);
 
   const nextStep = () => {
     if (currentStep < GUIDE_STEPS.length - 1) {
@@ -121,7 +120,7 @@ export const EmojiGuide: React.FC<EmojiGuideProps> = ({
   };
 
   const completeGuide = () => {
-    setValue(true);
+    setGuideCompleted(true);
     setIsVisible(false);
     setShowHighlight(false);
     onComplete?.();

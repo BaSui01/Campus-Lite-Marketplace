@@ -18,13 +18,13 @@ import {
   Button,
   Space,
   Tag,
-  message,
-  Modal,
   Input,
   Row,
   Col,
   Statistic,
   Tooltip,
+  Modal,
+  App,
 } from 'antd';
 import {
   PlayCircleOutlined,
@@ -51,6 +51,7 @@ const TASK_STATUS_MAP = {
 
 export const TaskList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
 
   // 触发任务参数弹窗
   const [triggerModalVisible, setTriggerModalVisible] = useState(false);
@@ -355,3 +356,5 @@ export const TaskList: React.FC = () => {
     </div>
   );
 };
+
+export default TaskList;

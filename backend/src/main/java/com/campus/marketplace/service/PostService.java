@@ -90,9 +90,86 @@ public interface PostService {
 
     /**
      * 删除帖子（作者或管理员）
-     * 
+     *
      * @param id 帖子 ID
      * @throws com.campus.marketplace.common.exception.BusinessException 帖子不存在、无权限
      */
     void deletePost(Long id);
+
+    // ==================== 新增接口（2025-11-09 - BaSui 😎）====================
+
+    /**
+     * 查询待审核帖子列表（管理员）
+     *
+     * @param page 页码（从 0 开始）
+     * @param size 每页大小
+     * @return 待审核帖子分页结果
+     * @since 2025-11-09
+     */
+    Page<PostResponse> listPendingPosts(int page, int size);
+
+    /**
+     * 查询热门帖子列表
+     *
+     * 热度计算：点赞数 * 2 + 浏览量 + 回复数 * 3
+     *
+     * @param page 页码（从 0 开始）
+     * @param size 每页大小
+     * @return 热门帖子分页结果
+     * @since 2025-11-09
+     */
+    Page<PostResponse> listHotPosts(int page, int size);
+
+    /**
+     * 查询我的点赞列表
+     *
+     * @param userId 用户 ID
+     * @param page 页码
+     * @param size 每页大小
+     * @return 点赞的帖子分页结果
+     * @since 2025-11-09
+     */
+    Page<PostResponse> listUserLikes(Long userId, int page, int size);
+
+    /**
+     * 查询我的收藏列表
+     *
+     * @param userId 用户 ID
+     * @param page 页码
+     * @param size 每页大小
+     * @return 收藏的帖子分页结果
+     * @since 2025-11-09
+     */
+    Page<PostResponse> listUserCollects(Long userId, int page, int size);
+
+    /**
+     * 置顶/取消置顶帖子（管理员）
+     *
+     * @param id 帖子 ID
+     * @param isTop 是否置顶
+     * @throws com.campus.marketplace.common.exception.BusinessException 帖子不存在
+     * @since 2025-11-09
+     */
+    void toggleTopPost(Long id, boolean isTop);
+
+    /**
+     * 批量审核帖子（管理员）
+     *
+     * @param ids 帖子 ID 列表
+     * @param approved 是否通过
+     * @param reason 拒绝原因（可选）
+     * @return 成功审核的数量
+     * @since 2025-11-09
+     */
+    int batchApprovePosts(java.util.List<Long> ids, boolean approved, String reason);
+
+    /**
+     * 获取帖子统计信息
+     *
+     * @param id 帖子 ID
+     * @return 统计信息（点赞用户列表、收藏用户列表等）
+     * @throws com.campus.marketplace.common.exception.BusinessException 帖子不存在
+     * @since 2025-11-09
+     */
+    com.campus.marketplace.common.dto.response.PostStatsResponse getPostStats(Long id);
 }

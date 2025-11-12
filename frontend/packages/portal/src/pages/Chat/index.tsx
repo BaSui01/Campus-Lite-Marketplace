@@ -10,6 +10,7 @@ import { Input, Button, Skeleton } from '@campus/shared/components';
 import { useWebSocketService } from '@campus/shared/hooks';
 import { getApi } from '@campus/shared/utils';
 import type { ConversationResponse, MessageResponse, SendMessageRequest } from '@campus/shared/api/models';
+import { messageService } from '@campus/shared/services';
 import { useAuthStore, useNotificationStore } from '../../store';
 import './Chat.css';
 
@@ -90,6 +91,15 @@ const Chat: React.FC = () => {
           const conversation = apiConversations.find((c) => c.conversationId === conversationId);
           if (conversation) {
             handleSelectConversation(conversation);
+          }
+        }
+
+        // 如果 URL 中有 userId，自动打开与该用户的对话
+        const userIdParam = searchParams.get('userId');
+        if (userIdParam) {
+          const convByUser = apiConversations.find((c) => c.userId === userIdParam);
+          if (convByUser) {
+            handleSelectConversation(convByUser);
           }
         }
       }
@@ -202,6 +212,7 @@ const Chat: React.FC = () => {
         // 🚀 备用：通过 HTTP API 发送消息
         await messageService.sendMessage({
           receiverId: Number(currentConversation.userId),
+          messageType: 'TEXT',
           content: messageInput,
         });
         console.log('[Chat] ✅ 消息已发送（HTTP）');

@@ -20,14 +20,14 @@ import {
   Select,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Card,
   Row,
   Col,
   Statistic,
   Avatar,
+  App,
+  Modal,
 } from 'antd';
 import {
   SearchOutlined,
@@ -35,6 +35,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { bannedUserService } from '@/services';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -49,6 +50,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 
 export const BannedUserList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
   const [form] = Form.useForm();
 
   const [keyword, setKeyword] = useState<string>('');
@@ -59,37 +61,22 @@ export const BannedUserList: React.FC = () => {
   const [unbanModalVisible, setUnbanModalVisible] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
-  // 查询封禁记录（使用模拟数据）
+  // 查询封禁记录（调用真实API）
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['bannedUsers', { keyword, status, page, size }],
-    queryFn: async () => {
-      // 模拟数据
-      return {
-        content: Array.from({ length: 15 }, (_, i) => ({
-          id: page * 20 + i + 1,
-          userId: 1000 + i,
-          userName: `用户${i + 1}`,
-          userAvatar: null,
-          banReason: `违规行为${i + 1}：发布违规内容`,
-          banDuration: [7, 15, 30, 60, 365][i % 5],
-          bannedAt: new Date(Date.now() - i * 86400000).toISOString(),
-          unbannedAt: i % 3 === 0 ? new Date(Date.now() - i * 43200000).toISOString() : null,
-          operatorName: `管理员${(i % 3) + 1}`,
-          status: i % 3 === 0 ? 'UNBANNED' : 'ACTIVE',
-        })),
-        totalElements: 50,
-      };
-    },
+    queryFn: () => bannedUserService.list({
+      userId: keyword ? parseInt(keyword) : undefined,
+      isUnbanned: status === 'UNBANNED' ? true : status === 'ACTIVE' ? false : undefined,
+      page,
+      size,
+    }),
     staleTime: 2 * 60 * 1000,
   });
 
-  // 解封用户
+  // ✅ BaSui 修复：解封用户 - 调用真实API
   const unbanMutation = useMutation({
-    mutationFn: async ({ userId, reason }: { userId: number; reason: string }) => {
-      // TODO: 调用实际API
-      // await userService.unbanUser(userId, reason);
-      await new Promise(resolve => setTimeout(resolve, 500));
-    },
+    mutationFn: ({ userId }: { userId: number; reason: string }) =>
+      bannedUserService.unbanUser(userId),
     onSuccess: () => {
       message.success('解封成功');
       setUnbanModalVisible(false);
@@ -98,8 +85,8 @@ export const BannedUserList: React.FC = () => {
       refetch();
       queryClient.invalidateQueries({ queryKey: ['bannedUsers'] });
     },
-    onError: () => {
-      message.error('解封失败');
+    onError: (error: any) => {
+      message.error(error?.message || '解封失败');
     },
   });
 

@@ -369,7 +369,7 @@ export const useForm = <T extends FormValues = FormValues>(
    */
   const validateField = useCallback(
     async (name: keyof T): Promise<string | undefined> => {
-      const rule = validationRules[name];
+      const rule = validationRules[name as keyof typeof validationRules];
       if (!rule) {
         return undefined;
       }
@@ -390,7 +390,7 @@ export const useForm = <T extends FormValues = FormValues>(
     const newErrors: FormErrors = {};
 
     for (const name in validationRules) {
-      const rule = validationRules[name];
+      const rule = validationRules[name as keyof typeof validationRules];
       if (rule) {
         const value = values[name as keyof T];
         const error = runValidation(value, rule, values);

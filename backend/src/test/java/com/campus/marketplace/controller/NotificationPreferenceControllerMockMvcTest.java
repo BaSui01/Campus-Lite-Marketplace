@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.enums.NotificationChannel;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.service.NotificationPreferenceService;
@@ -50,7 +49,7 @@ class NotificationPreferenceControllerMockMvcTest {
         try (MockedStatic<SecurityUtil> securityUtil = org.mockito.Mockito.mockStatic(SecurityUtil.class)) {
             securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(42L);
 
-            mockMvc.perform(post("/api/notifications/preferences/channel/{channel}/enabled/{enabled}", "EMAIL", true))
+            mockMvc.perform(post("/notifications/preferences/channel/{channel}/enabled/{enabled}", "EMAIL", true))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.code").value(200));
 
@@ -65,7 +64,7 @@ class NotificationPreferenceControllerMockMvcTest {
         try (MockedStatic<SecurityUtil> securityUtil = org.mockito.Mockito.mockStatic(SecurityUtil.class)) {
             securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(55L);
 
-            mockMvc.perform(post("/api/notifications/preferences/channel/{channel}/quiet-hours", "WEB_PUSH")
+            mockMvc.perform(post("/notifications/preferences/channel/{channel}/quiet-hours", "WEB_PUSH")
                             .param("start", "22:00")
                             .param("end", "07:30"))
                     .andExpect(status().isOk())
@@ -83,11 +82,11 @@ class NotificationPreferenceControllerMockMvcTest {
         try (MockedStatic<SecurityUtil> securityUtil = org.mockito.Mockito.mockStatic(SecurityUtil.class)) {
             securityUtil.when(SecurityUtil::getCurrentUserId).thenReturn(77L);
 
-            mockMvc.perform(post("/api/notifications/preferences/unsubscribe/{channel}/{template}", "EMAIL", "ORDER_PAID"))
+            mockMvc.perform(post("/notifications/preferences/unsubscribe/{channel}/{template}", "EMAIL", "ORDER_PAID"))
                     .andExpect(status().isOk());
             verify(preferenceService).unsubscribe(77L, "ORDER_PAID", NotificationChannel.EMAIL);
 
-            mockMvc.perform(delete("/api/notifications/preferences/unsubscribe/{channel}/{template}", "EMAIL", "ORDER_PAID"))
+            mockMvc.perform(delete("/notifications/preferences/unsubscribe/{channel}/{template}", "EMAIL", "ORDER_PAID"))
                     .andExpect(status().isOk());
             verify(preferenceService).resubscribe(77L, "ORDER_PAID", NotificationChannel.EMAIL);
         }
@@ -105,7 +104,7 @@ class NotificationPreferenceControllerMockMvcTest {
             when(preferenceService.isInQuietHours(eq(99L), eq(NotificationChannel.EMAIL), any(LocalTime.class))).thenReturn(true);
             when(preferenceService.isInQuietHours(eq(99L), eq(NotificationChannel.WEB_PUSH), any(LocalTime.class))).thenReturn(false);
 
-            mockMvc.perform(get("/api/notifications/preferences/status"))
+            mockMvc.perform(get("/notifications/preferences/status"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.code").value(200))
                     .andExpect(jsonPath("$.data.emailEnabled").value(true))

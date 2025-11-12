@@ -1,27 +1,26 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * 用户 API 服务
+ * ✅ 用户 API 服务 - 完全重构版
  * @author BaSui 😎
- * @description 用户资料、密码修改、用户列表等接口
+ * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
+ *
+ * 功能：
+ * - 获取当前用户资料
+ * - 获取指定用户资料
+ * - 更新用户资料
+ * - 修改密码
+ * - 积分记录查询
+ * - 签到功能
  */
 
-import { apiClient } from '../utils/apiClient';
+import { getApi } from '../utils/apiClient';
 import type {
-  ApiResponse,
-  PageInfo,
   User,
   UpdateProfileRequest,
-  ChangePasswordRequest,
-  UserListQuery,
-} from '../types';
+  UpdatePasswordRequest,
+  UserProfileResponse,
+} from '../api/models';
+
+// 注意：PageInfo 已废弃，改用 API 生成的分页类型
 
 /**
  * 用户 API 服务类
@@ -31,9 +30,19 @@ export class UserService {
    * 获取当前用户资料
    * @returns 当前用户信息
    */
-  async getProfile(): Promise<ApiResponse<User>> {
-    const response = await apiClient.get('/users/profile');
-    return response.data;
+  async getProfile(): Promise<UserProfileResponse> {
+    const api = getApi();
+    // ✅ 使用 OpenAPI 生成的正确方法名：getCurrentUserProfile
+    const response = await api.getCurrentUserProfile();
+    return response.data.data as UserProfileResponse;
+  }
+
+  /**
+   * 获取当前登录用户信息（别名方法）
+   */
+  async getCurrentUser(): Promise<User> {
+    const profile = await this.getProfile();
+    return profile as User;
   }
 
   /**
@@ -41,9 +50,10 @@ export class UserService {
    * @param userId 用户ID
    * @returns 用户信息
    */
-  async getUserById(userId: number): Promise<ApiResponse<User>> {
-    const response = await apiClient.get(`/users/${userId}`);
-    return response.data;
+  async getUserById(userId: number): Promise<User> {
+    const api = getApi();
+    const response = await api.getUserProfile({ userId });
+    return response.data.data as User;
   }
 
   /**
@@ -51,39 +61,167 @@ export class UserService {
    * @param data 更新资料请求参数
    * @returns 更新后的用户信息
    */
-  async updateProfile(data: UpdateProfileRequest): Promise<ApiResponse<User>> {
-    const response = await apiClient.put('/users/profile', data);
-    return response.data;
+  async updateProfile(data: UpdateProfileRequest): Promise<User> {
+    const api = getApi();
+    const response = await api.updateProfile({ updateProfileRequest: data });
+    return response.data.data as User;
   }
 
   /**
    * 修改密码
    * @param data 修改密码请求参数
-   * @returns 修改结果
    */
-  async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<void>> {
-    const response = await apiClient.put('/users/password', data);
-    return response.data;
+  async changePassword(data: UpdatePasswordRequest): Promise<void> {
+    const api = getApi();
+    await api.updatePassword({ updatePasswordRequest: data });
   }
 
+  // ==================== ❌ 以下方法后端暂未实现，已注释 ====================
+  //
+  // /**
+  //  * 获取用户积分记录（待后端实现）
+  //  * @param params 查询参数
+  //  * @returns 积分记录列表（分页）
+  //  */
+  // async getPointsLogs(params?: { page?: number; pageSize?: number }): Promise<any> {
+  //   const api = getApi();
+  //   // ❌ 后端 UserController 中暂无此接口
+  //   const response = await api.getPointsHistory({
+  //     page: params?.page,
+  //     size: params?.pageSize,
+  //   });
+  //   return response.data.data;
+  // }
+
+  // /**
+  //  * 签到（待后端实现）
+  //  * @returns 签到结果（包含获得的积分）
+  //  */
+  // async signIn(): Promise<{ points: number }> {
+  //   const api = getApi();
+  //   // ❌ 后端 UserController 中暂无此接口
+  //   const response = await api.userSignIn();
+  //   return response.data.data as { points: number };
+  // }
+
   /**
-   * 获取用户积分记录
+   * 获取用户列表（管理端）
    * @param params 查询参数
-   * @returns 积分记录列表
+   * @returns 用户列表（分页）
    */
-  async getPointsLogs(params?: { page?: number; pageSize?: number }): Promise<ApiResponse<PageInfo<any>>> {
-    const response = await apiClient.get('/users/points/logs', { params });
+  async getUserList(params?: UserListQuery): Promise<any> {
+    const api = getApi();
+    const response = await api.listUsers({
+      keyword: params?.keyword,
+      status: params?.status,
+      page: params?.page,
+      size: params?.pageSize,
+    });
     return response.data;
   }
 
   /**
-   * 签到
-   * @returns 签到结果（包含获得的积分）
+   * 获取用户登录设备列表
+   * @param userId 用户ID
+   * @returns 登录设备列表
    */
-  async signIn(): Promise<ApiResponse<{ points: number }>> {
-    const response = await apiClient.post('/users/sign-in');
-    return response.data;
+  async getLoginDevices(userId: number): Promise<any[]> {
+    const api = getApi();
+    const response = await api.getLoginDevices({ userId });
+    return response.data.data as any[];
   }
+
+  /**
+   * 踢出登录设备
+   * @param userId 用户ID
+   * @param deviceId 设备ID
+   */
+  async kickDevice(userId: number, deviceId: number): Promise<void> {
+    const api = getApi();
+    await api.kickDevice({ userId, deviceId });
+  }
+
+  /**
+   * 发送邮箱验证码
+   * @param email 邮箱地址
+   */
+  async sendEmailCode(email: string): Promise<void> {
+    const api = getApi();
+    await api.sendEmailCode({ email });
+  }
+
+  /**
+   * 发送手机验证码
+   * @param phone 手机号
+   */
+  async sendPhoneCode(phone: string): Promise<void> {
+    const api = getApi();
+    await api.sendPhoneCode({ phone });
+  }
+
+  /**
+   * 绑定邮箱
+   * @param userId 用户ID
+   * @param data 绑定邮箱请求参数
+   */
+  async bindEmail(userId: number, data: { email: string; code: string }): Promise<void> {
+    const api = getApi();
+    await api.bindEmail({ userId, bindEmailRequest: data });
+  }
+
+  /**
+   * 绑定手机号
+   * @param userId 用户ID
+   * @param data 绑定手机号请求参数
+   */
+  async bindPhone(userId: number, data: { phone: string; code: string }): Promise<void> {
+    const api = getApi();
+    await api.bindPhone({ userId, bindPhoneRequest: data });
+  }
+
+  // ==================== ⚠️ 两步验证功能已迁移到 authService ====================
+  //
+  // 两步验证相关方法应使用 authService.enable2FA()、verify2FA()、disable2FA()
+  // 这些方法在 Profile 页面中已正确使用 authService
+  //
+  // ==================== 旧方法已注释（保留供参考）====================
+  //
+  // /**
+  //  * 启用两步验证（已废弃 - 使用 authService.enable2FA()）
+  //  * @param userId 用户ID
+  //  * @returns 两步验证响应（包含密钥和二维码URL）
+  //  */
+  // async enableTwoFactor(userId: number): Promise<any> {
+  //   const api = getApi();
+  //   const response = await api.enableTwoFactor({ userId });
+  //   return response.data.data;
+  // }
+
+  // /**
+  //  * 验证并确认两步验证（已废弃 - 使用 authService.verify2FA()）
+  //  * @param userId 用户ID
+  //  * @param code 验证码
+  //  */
+  // async verifyTwoFactor(userId: number, code: string): Promise<void> {
+  //   const api = getApi();
+  //   await api.verifyTwoFactor({ userId, twoFactorRequest: { code } });
+  // }
+
+  // /**
+  //  * 关闭两步验证（已废弃 - 使用 authService.disable2FA()）
+  //  * @param userId 用户ID
+  //  */
+  // async disableTwoFactor(userId: number): Promise<void> {
+  //   const api = getApi();
+  //   await api.disableTwoFactor({ userId });
+  // }
+}
+
+export interface UserListQuery {
+  keyword?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
 }
 
 // 导出单例

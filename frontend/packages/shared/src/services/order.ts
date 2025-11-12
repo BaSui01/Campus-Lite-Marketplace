@@ -7,13 +7,17 @@
  */
 
 import { getApi } from '../utils/apiClient';
-import type {
-  CreateOrderRequest,
-  PayOrderRequest,
-  Order,
-  OrderResponse,
-  PageOrderResponse,
-} from '../api/models';
+import type { CreateOrderRequest, PayOrderRequest, Order, PageOrderResponse, UpdateOrderDeliveryRequest, ShipOrderRequest } from '../api/models';
+
+/**
+ * 支付响应数据类型
+ */
+export interface PaymentResponseData {
+  orderNo: string;           // 订单号
+  paymentUrl: string;        // 支付链接或二维码
+  qrCode?: string;           // 二维码（可选）
+  expireSeconds?: number;    // 过期秒数（可选）
+}
 
 /**
  * 订单查询参数
@@ -43,13 +47,32 @@ export class OrderService {
   }
 
   /**
+   * 更新订单配送/收货信息
+   * @param orderNo 订单号
+   * @param data 配送方式与收货信息
+   */
+  async updateOrderDelivery(orderNo: string, data: {
+    deliveryMethod: 'FACE_TO_FACE' | 'EXPRESS',
+    receiverName?: string,
+    receiverPhone?: string,
+    receiverAddress?: string,
+    note?: string,
+  }): Promise<void> {
+    const api = getApi();
+    await api.updateOrderDelivery({
+      orderNo,
+      updateOrderDeliveryRequest: data as UpdateOrderDeliveryRequest,
+    });
+  }
+
+  /**
    * 获取订单详情
    * @param orderNo 订单号
    * @returns 订单详情
    */
   async getOrderDetail(orderNo: string): Promise<Order> {
     const api = getApi();
-    const response = await api.getOrderDetail(orderNo);
+    const response = await api.getOrderDetail({ orderNo });
     return response.data.data as Order;
   }
 
@@ -60,11 +83,11 @@ export class OrderService {
    */
   async listBuyerOrders(params?: OrderListParams): Promise<PageOrderResponse> {
     const api = getApi();
-    const response = await api.listBuyerOrders(
-      params?.status,
-      params?.page,
-      params?.size
-    );
+    const response = await api.listBuyerOrders({
+      status: params?.status,
+      page: params?.page,
+      size: params?.size
+    });
     return response.data.data as PageOrderResponse;
   }
 
@@ -75,11 +98,11 @@ export class OrderService {
    */
   async listSellerOrders(params?: OrderListParams): Promise<PageOrderResponse> {
     const api = getApi();
-    const response = await api.listSellerOrders(
-      params?.status,
-      params?.page,
-      params?.size
-    );
+    const response = await api.listSellerOrders({
+      status: params?.status,
+      page: params?.page,
+      size: params?.size
+    });
     return response.data.data as PageOrderResponse;
   }
 
@@ -90,31 +113,24 @@ export class OrderService {
    */
   async cancelOrder(orderNo: string): Promise<void> {
     const api = getApi();
-    await api.cancelOrder(orderNo);
-  }
-
-  /**
-   * 获取订单统计数据
-   * @returns 订单统计信息
-   */
-  async getOrderStatistics(): Promise<Record<string, any>> {
-    const api = getApi();
-    const response = await api.getOrderStatistics();
-    return response.data.data as Record<string, any>;
+    await api.cancelOrder({ orderNo });
   }
 
   // ==================== 支付相关接口 ====================
 
   /**
-   * 创建支付订单
+   * 支付订单（新接口）💳
+   * @param orderNo 订单号
    * @param data 支付请求参数
-   * @returns 支付订单号或二维码链接
+   * @returns 支付响应（包含支付链接或二维码）
    */
-  async createPayment(data: PayOrderRequest): Promise<string> {
+  async payOrder(orderNo: string, data: PayOrderRequest): Promise<PaymentResponseData> {
     const api = getApi();
-    const response = await api.createPayment({ payOrderRequest: data });
-    return response.data.data as string;
+    const response = await api.payOrder({ orderNo, payOrderRequest: data });
+    return response.data.data as PaymentResponseData;
   }
+
+  // （已移除）createPayment：请使用 payOrder()
 
   /**
    * 查询订单支付状态
@@ -123,8 +139,30 @@ export class OrderService {
    */
   async queryPaymentStatus(orderNo: string): Promise<string> {
     const api = getApi();
-    const response = await api.queryPaymentStatus(orderNo);
+    const response = await api.queryPaymentStatus({ orderNo });
     return response.data.data as string;
+  }
+
+  // ==================== 发货 / 确认收货 ====================
+
+  /**
+   * 卖家发货（快递）
+   * @param orderNo 订单号
+   * @param opts 物流信息
+   */
+  async shipOrder(orderNo: string, opts: { trackingNumber: string; company: string }): Promise<void> {
+    const api = getApi();
+    const payload: ShipOrderRequest = { trackingNumber: opts.trackingNumber, company: opts.company as any } as any;
+    await api.shipOrder({ orderNo, shipOrderRequest: payload });
+  }
+
+  /**
+   * 买家确认收货
+   * @param params 包含 orderNo
+   */
+  async confirmReceipt(params: { orderNo: string }): Promise<void> {
+    const api = getApi();
+    await api.confirmReceipt({ orderNo: params.orderNo });
   }
 
   // ==================== 物流相关接口 ====================
@@ -142,7 +180,7 @@ export class OrderService {
     company: 'SF' | 'YTO' | 'STO' | 'ZTO' | 'YD' | 'JTEXPRESS' | 'EMS' | 'OTHER'
   ): Promise<any> {
     const api = getApi();
-    const response = await api.createLogistics(orderId, trackingNumber, company);
+    const response = await api.createLogistics({ orderId, trackingNumber, company: company as any });
     return response.data.data;
   }
 
@@ -153,7 +191,7 @@ export class OrderService {
    */
   async getLogisticsByOrderId(orderId: number): Promise<any> {
     const api = getApi();
-    const response = await api.getLogisticsByOrderId(orderId);
+    const response = await api.getLogisticsByOrderId({ orderId });
     return response.data.data;
   }
 
@@ -164,7 +202,7 @@ export class OrderService {
    */
   async syncLogistics(orderId: number): Promise<any> {
     const api = getApi();
-    const response = await api.syncLogistics(orderId);
+    const response = await api.syncLogistics({ orderId });
     return response.data.data;
   }
 
@@ -174,7 +212,7 @@ export class OrderService {
   //   - getOrderByNo()     → 改用 getOrderDetail()
   //   - getBuyerOrders()   → 改用 listBuyerOrders()
   //   - getSellerOrders()  → 改用 listSellerOrders()
-  //   - payOrder()         → 改用 createPayment()
+  //   - payOrder()         →（已标准化）请继续使用 payOrder()
   //   - getPaymentStatus() → 改用 queryPaymentStatus()
   //
   // ✅ 已移除的功能（分散到专属服务）：
@@ -188,7 +226,7 @@ export class OrderService {
   //   新代码：orderService.getOrderDetail(orderNo)
   //
   //   旧代码：orderService.payOrder(data)
-  //   新代码：orderService.createPayment(data)
+  //   新代码：orderService.payOrder(orderNo, data)
   //
   // ==================== 🚀 重构完成 ====================
 }

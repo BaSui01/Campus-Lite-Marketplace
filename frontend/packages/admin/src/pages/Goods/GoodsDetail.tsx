@@ -22,11 +22,9 @@ import {
   Button,
   Space,
   Timeline,
-  Modal,
   Form,
   Input,
   Radio,
-  message,
   Spin,
   Divider,
   Avatar,
@@ -34,6 +32,8 @@ import {
   Row,
   Col,
   Popconfirm,
+  App,
+  Modal, // ✅ 补充导入 Modal 组件
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -59,6 +59,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 };
 
 export const GoodsDetail: React.FC = () => {
+  const { message, modal } = App.useApp(); // ✅ 使用 App 提供的 message 和 modal 实例
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -141,7 +142,7 @@ export const GoodsDetail: React.FC = () => {
   // 上架/下架
   const handleToggleStatus = () => {
     const targetStatus = goods?.status === 'APPROVED' ? 'REJECTED' : 'APPROVED';
-    Modal.confirm({
+    modal.confirm({
       title: `确认${targetStatus === 'APPROVED' ? '上架' : '下架'}`,
       content: `确定要${targetStatus === 'APPROVED' ? '上架' : '下架'}这个商品吗？`,
       onOk: () => {

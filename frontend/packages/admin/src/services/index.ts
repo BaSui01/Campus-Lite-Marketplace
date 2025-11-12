@@ -18,3 +18,14 @@ export * from './blacklist';
 export * from './report';
 export * from './featureFlag';
 export * from './role';
+export * from './bannedUser';
+export * from './operationLog';
+export * from './auditLog';
+export * from './recommend';
+export * from './behavior';
+export * from './searchStatistics';
+export * from './recycleBin';
+export * from './revertManagement';
+
+// ========== 从共享层导出常用服务（避免重复导入）==========
+export { paymentService } from '@campus/shared';

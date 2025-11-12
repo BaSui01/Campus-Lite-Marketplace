@@ -38,5 +38,11 @@ export interface CreatePostRequest {
      * @memberof CreatePostRequest
      */
     'images'?: Array<string>;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof CreatePostRequest
+     */
+    'tagIds'?: Array<number>;
 }
 

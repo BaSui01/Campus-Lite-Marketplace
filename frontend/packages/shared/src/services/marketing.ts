@@ -2,9 +2,18 @@
  * 营销活动服务 - 促销引流，提升销量！🎁
  * @author BaSui 😎
  * @description 限时折扣、满减优惠、秒杀活动管理
+ * ✅ 已重构：使用 OpenAPI 生成的 DefaultApi
  */
 
-import { apiClient } from '../utils/apiClient';
+import { getApi } from '../utils/apiClient';
+import type { 
+  MarketingCampaign as ApiMarketingCampaign, 
+  ApiResponseListMarketingCampaign, 
+  ApiResponseMarketingCampaign, 
+  ApiResponseBoolean, 
+  ApiResponseVoid,
+  ApiResponseObject
+} from '../api';
 
 // ==================== 类型定义 ====================
 
@@ -157,108 +166,199 @@ export const CAMPAIGN_STATUS_CONFIG = {
 
 /**
  * 营销活动服务类
+ * ✅ 基于 OpenAPI 生成的 DefaultApi
  */
 class MarketingService {
   /**
    * 创建营销活动
    */
   async createCampaign(request: CreateCampaignRequest): Promise<MarketingCampaign> {
-    const response = await apiClient.post('/marketing/campaigns', request);
-    return response.data;
+    const api = getApi();
+    const response: ApiResponseMarketingCampaign = (await api.createCampaign({ marketingCampaign: request as any })).data;
+    
+    if (!response.data) {
+      throw new Error(response.message || '创建活动失败');
+    }
+    
+    return response.data as MarketingCampaign;
   }
 
   /**
-   * 获取活动列表
+   * 获取活动列表（暂未实现分页查询API，使用 getMyCompaigns）
    */
   async getCampaigns(params: CampaignListParams = {}): Promise<{
     content: MarketingCampaign[];
     totalElements: number;
     totalPages: number;
   }> {
-    const response = await apiClient.get('/marketing/campaigns', { params });
-    return response.data;
+    // TODO: 后端需要实现分页查询接口
+    const campaigns = await this.getMyCompaigns();
+    return {
+      content: campaigns,
+      totalElements: campaigns.length,
+      totalPages: 1,
+    };
+  }
+
+  /**
+   * 获取我的活动列表（商家）
+   */
+  async getMyCompaigns(): Promise<MarketingCampaign[]> {
+    const api = getApi();
+    const response: ApiResponseListMarketingCampaign = (await api.getMyCompaigns()).data;
+    
+    if (!response.data) {
+      throw new Error(response.message || '获取活动列表失败');
+    }
+    
+    return response.data as MarketingCampaign[];
   }
 
   /**
    * 获取商家的活动列表
    */
   async getMerchantCampaigns(merchantId?: number): Promise<MarketingCampaign[]> {
-    const url = merchantId
-      ? `/marketing/campaigns/merchant/${merchantId}`
-      : '/marketing/campaigns/my';
+    if (!merchantId) {
+      return this.getMyCompaigns();
+    }
     
-    const response = await apiClient.get(url);
-    return response.data;
+    const api = getApi();
+    const response: ApiResponseListMarketingCampaign = (await api.getMerchantCampaigns({ merchantId })).data;
+    
+    if (!response.data) {
+      throw new Error(response.message || '获取商家活动列表失败');
+    }
+    
+    return response.data as MarketingCampaign[];
   }
 
   /**
    * 获取进行中的活动
    */
   async getRunningCampaigns(): Promise<MarketingCampaign[]> {
-    const response = await apiClient.get('/marketing/campaigns/running');
-    return response.data;
+    const api = getApi();
+    const response: ApiResponseListMarketingCampaign = (await api.getRunningCampaigns()).data;
+    
+    if (!response.data) {
+      throw new Error(response.message || '获取进行中的活动失败');
+    }
+    
+    return response.data as MarketingCampaign[];
   }
 
   /**
    * 获取活动详情
    */
   async getCampaignDetail(campaignId: number): Promise<MarketingCampaign> {
-    const response = await apiClient.get(`/marketing/campaigns/${campaignId}`);
-    return response.data;
+    const api = getApi();
+    const response: ApiResponseMarketingCampaign = (await api.getCampaignDetail({ campaignId })).data;
+    
+    if (!response.data) {
+      throw new Error(response.message || '获取活动详情失败');
+    }
+    
+    return response.data as MarketingCampaign;
   }
 
   /**
    * 更新活动
    */
   async updateCampaign(campaignId: number, data: Partial<CreateCampaignRequest>): Promise<MarketingCampaign> {
-    const response = await apiClient.put(`/marketing/campaigns/${campaignId}`, data);
-    return response.data;
+    const api = getApi();
+    const response: ApiResponseMarketingCampaign = (await api.updateCampaign({ 
+      campaignId, 
+      marketingCampaign: data as any 
+    })).data;
+    
+    if (!response.data) {
+      throw new Error(response.message || '更新活动失败');
+    }
+    
+    return response.data as MarketingCampaign;
   }
 
   /**
    * 暂停活动
    */
   async pauseCampaign(campaignId: number): Promise<void> {
-    await apiClient.post(`/marketing/campaigns/${campaignId}/pause`);
+    const api = getApi();
+    const response: ApiResponseVoid = (await api.pauseCampaign({ campaignId })).data;
+    
+    if (response.code !== 200) {
+      throw new Error(response.message || '暂停活动失败');
+    }
   }
 
   /**
    * 恢复活动
    */
   async resumeCampaign(campaignId: number): Promise<void> {
-    await apiClient.post(`/marketing/campaigns/${campaignId}/resume`);
+    const api = getApi();
+    const response: ApiResponseVoid = (await api.resumeCampaign({ campaignId })).data;
+    
+    if (response.code !== 200) {
+      throw new Error(response.message || '恢复活动失败');
+    }
   }
 
   /**
    * 结束活动
    */
   async endCampaign(campaignId: number): Promise<void> {
-    await apiClient.post(`/marketing/campaigns/${campaignId}/end`);
+    const api = getApi();
+    const response: ApiResponseVoid = (await api.endCampaign({ campaignId })).data;
+    
+    if (response.code !== 200) {
+      throw new Error(response.message || '结束活动失败');
+    }
   }
 
   /**
    * 删除活动
    */
   async deleteCampaign(campaignId: number): Promise<void> {
-    await apiClient.delete(`/marketing/campaigns/${campaignId}`);
+    const api = getApi();
+    const response: ApiResponseVoid = (await api.deleteCampaign({ campaignId })).data;
+    
+    if (response.code !== 200) {
+      throw new Error(response.message || '删除活动失败');
+    }
   }
 
   /**
    * 获取活动统计
    */
-  async getCampaignStatistics(): Promise<CampaignStatistics> {
-    const response = await apiClient.get('/marketing/campaigns/statistics');
-    return response.data;
+  async getCampaignStatistics(merchantId?: number): Promise<CampaignStatistics> {
+    const api = getApi();
+    const response: ApiResponseObject = (await api.getCampaignStatistics({ merchantId })).data;
+    
+    if (!response.data) {
+      throw new Error(response.message || '获取活动统计失败');
+    }
+    
+    // 转换统计数据格式
+    const stats = response.data as any;
+    return {
+      totalCampaigns: stats.totalCampaigns || 0,
+      runningCampaigns: stats.statusStats?.RUNNING || 0,
+      totalSalesAmount: stats.totalSalesAmount || 0,
+      totalParticipation: stats.totalParticipation || 0,
+      avgConversionRate: stats.avgConversionRate || 0,
+    };
   }
 
   /**
    * 扣减活动库存（秒杀）
    */
-  async deductStock(campaignId: number, quantity: number): Promise<boolean> {
-    const response = await apiClient.post(`/marketing/campaigns/${campaignId}/deduct-stock`, {
-      quantity,
-    });
-    return response.data;
+  async deductStock(campaignId: number, quantity: number = 1): Promise<boolean> {
+    const api = getApi();
+    const response: ApiResponseBoolean = (await api.deductStock({ campaignId, quantity })).data;
+    
+    if (response.code !== 200) {
+      throw new Error(response.message || '扣减库存失败');
+    }
+    
+    return response.data === true;
   }
 
   /**
@@ -266,9 +366,12 @@ class MarketingService {
    */
   async checkGoodsInCampaign(goodsId: number): Promise<MarketingCampaign | null> {
     try {
-      const response = await apiClient.get(`/marketing/campaigns/goods/${goodsId}`);
-      return response.data;
-    } catch (err) {
+      const api = getApi();
+      const response: ApiResponseMarketingCampaign = (await api.checkGoodsInCampaign({ goodsId })).data;
+      
+      return response.data ? (response.data as MarketingCampaign) : null;
+    } catch (error) {
+      // 如果商品未参与任何活动，后端可能返回 null，这不算错误
       return null;
     }
   }

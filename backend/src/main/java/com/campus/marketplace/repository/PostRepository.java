@@ -98,4 +98,54 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<PostSearchProjection> searchPostsFts(@Param("q") String q,
                                               @Param("campusId") Long campusId,
                                               Pageable pageable);
+
+    // ==================== 新增查询方法（2025-11-09 - BaSui 😎）====================
+
+    /**
+     * 查询热门帖子（按新的热度算法排序）
+     *
+     * 热度 = 点赞数 * 2 + 浏览量 + 回复数 * 3
+     *
+     * @param status 帖子状态
+     * @param pageable 分页参数
+     * @return 热门帖子分页结果
+     * @since 2025-11-09
+     */
+    @EntityGraph(attributePaths = {"author", "campus"})
+    @Query("SELECT p FROM Post p WHERE p.status = :status " +
+           "ORDER BY (p.likeCount * 2 + p.viewCount + p.replyCount * 3) DESC, p.createdAt DESC")
+    Page<Post> findHotPostsWithAuthor(@Param("status") GoodsStatus status, Pageable pageable);
+
+    /**
+     * 查询用户点赞的帖子ID列表
+     *
+     * @param userId 用户ID
+     * @param pageable 分页参数
+     * @return 帖子ID列表
+     * @since 2025-11-09
+     */
+    @Query("SELECT pl.postId FROM PostLike pl WHERE pl.userId = :userId AND pl.deleted = false ORDER BY pl.createdAt DESC")
+    Page<Long> findLikedPostIdsByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    /**
+     * 查询用户收藏的帖子ID列表
+     *
+     * @param userId 用户ID
+     * @param pageable 分页参数
+     * @return 帖子ID列表
+     * @since 2025-11-09
+     */
+    @Query("SELECT pc.postId FROM PostCollect pc WHERE pc.userId = :userId AND pc.deleted = false ORDER BY pc.createdAt DESC")
+    Page<Long> findCollectedPostIdsByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    /**
+     * 根据ID列表查询帖子（含作者信息）
+     *
+     * @param ids 帖子ID列表
+     * @return 帖子列表
+     * @since 2025-11-09
+     */
+    @EntityGraph(attributePaths = {"author", "campus"})
+    @Query("SELECT p FROM Post p WHERE p.id IN :ids")
+    List<Post> findByIdInWithAuthor(@Param("ids") List<Long> ids);
 }

@@ -44,7 +44,7 @@ export class NotificationTemplateService {
    */
   async list(): Promise<NotificationTemplate[]> {
     const api = getApi();
-    const response = await api.list3(); // list3 是 OpenAPI 生成的方法名
+    const response = await api.list2(); // list2 是 OpenAPI 生成的方法名（notification-templates）
 
     if (response.data.code !== 200) {
       throw new Error(response.data.message || '获取通知模板列表失败');
@@ -95,7 +95,7 @@ export class NotificationTemplateService {
    */
   async delete(id: number): Promise<void> {
     const api = getApi();
-    const response = await api.delete3({ id });
+    const response = await api._delete({ id }); // _delete 是 OpenAPI 生成的方法名
 
     if (response.data.code !== 200) {
       throw new Error(response.data.message || '删除通知模板失败');
@@ -119,9 +119,9 @@ export class NotificationTemplateService {
    * console.log('渲染后的标题:', rendered.title);
    * console.log('渲染后的内容:', rendered.content);
    */
-  async render(code: string, params?: Record<string, unknown>): Promise<RenderedTemplate> {
+  async render(code: string, _params?: Record<string, unknown>): Promise<RenderedTemplate> {
     const api = getApi();
-    const response = await api.render({ code, body: params ?? {} });
+    const response = await api.render({ code }); // render 方法只接受 code 参数
 
     if (response.data.code !== 200) {
       throw new Error(response.data.message || '渲染模板失败');

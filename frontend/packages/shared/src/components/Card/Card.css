@@ -1,7 +1,8 @@
 /**
- * Card 组件样式
+ * 💎 Card 组件样式 - 升级版
  * @author BaSui 😎
- * @description 卡片组件样式，支持封面、标题、操作按钮
+ * @description 卡片组件样式，支持主题切换、高级感、质感、动画效果
+ * @date 2025-11-09
  */
 
 /* ==================== Card 容器 ==================== */
@@ -9,21 +10,32 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: var(--color-bg-primary, #ffffff);
+  border-radius: var(--radius-lg, 12px);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal, 0.3s ease);
+  box-shadow: var(--shadow-card, 0 2px 8px rgba(0, 0, 0, 0.08));
 }
 
 /* 边框样式 */
 .campus-card--bordered {
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--color-border, #d9d9d9);
 }
 
-/* 悬浮效果 */
+/* 🌟 悬浮效果（升级版 - 更有质感） */
+.campus-card--hoverable {
+  cursor: pointer;
+  transition: all var(--transition-normal, 0.3s ease);
+}
+
 .campus-card--hoverable:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-card-hover, 0 8px 24px rgba(0, 0, 0, 0.15));
+  transform: translateY(-4px);
+}
+
+.campus-card--hoverable:active {
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md, 0 4px 8px rgba(0, 0, 0, 0.12));
 }
 
 /* 可点击 */
@@ -35,24 +47,45 @@
 .campus-card--loading {
   pointer-events: none;
   user-select: none;
+  opacity: 0.6;
 }
 
 /* ==================== 封面 ==================== */
 .campus-card__cover {
+  position: relative;
   width: 100%;
   overflow: hidden;
-  background-color: #f5f5f5;
+  background: linear-gradient(135deg, var(--color-bg-tertiary, #f5f5f5) 0%, var(--color-bg-secondary, #fafafa) 100%);
 }
 
 .campus-card__cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform var(--transition-slow, 0.5s ease);
 }
 
+/* 🎨 封面悬浮效果（图片放大 + 轻微旋转） */
 .campus-card--hoverable:hover .campus-card__cover img {
-  transform: scale(1.05);
+  transform: scale(1.08) rotate(1deg);
+}
+
+/* 🌫️ 封面遮罩效果（悬浮时显示） */
+.campus-card__cover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-light, rgba(0, 0, 0, 0.3));
+  opacity: 0;
+  transition: opacity var(--transition-normal, 0.3s ease);
+  pointer-events: none;
+}
+
+.campus-card--hoverable:hover .campus-card__cover::after {
+  opacity: 1;
 }
 
 /* ==================== 头部 ==================== */
@@ -62,7 +95,8 @@
   justify-content: space-between;
   gap: 16px;
   padding: 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border-light, #f0f0f0);
+  background: var(--color-bg-primary, #ffffff);
 }
 
 .campus-card__header-content {
@@ -71,34 +105,44 @@
 }
 
 .campus-card__title {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: var(--font-size-md, 16px);
+  font-weight: 600;
   line-height: 1.5;
-  color: #000000d9;
+  color: var(--color-text-primary, #1a1a1a);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color var(--transition-fast, 0.15s ease);
+}
+
+/* 🎯 标题悬浮效果（渐变色） */
+.campus-card--hoverable:hover .campus-card__title {
+  background: var(--gradient-primary, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .campus-card__subtitle {
   margin-top: 4px;
-  font-size: 14px;
+  font-size: var(--font-size-sm, 14px);
   line-height: 1.5;
-  color: #00000073;
+  color: var(--color-text-secondary, #666666);
 }
 
 .campus-card__extra {
   flex-shrink: 0;
-  font-size: 14px;
-  color: #00000073;
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text-secondary, #666666);
 }
 
 /* ==================== 主体内容 ==================== */
 .campus-card__body {
   flex: 1;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #000000d9;
+  font-size: var(--font-size-sm, 14px);
+  line-height: 1.6;
+  color: var(--color-text-primary, #1a1a1a);
+  background: var(--color-bg-primary, #ffffff);
 }
 
 /* 内边距变体 */
@@ -131,8 +175,8 @@
 .campus-card__loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #f0f0f0;
-  border-top-color: #1890ff;
+  border: 3px solid var(--color-border-light, #f0f0f0);
+  border-top-color: var(--color-primary, #667eea);
   border-radius: 50%;
   animation: campus-card-spin 0.8s linear infinite;
 }
@@ -147,14 +191,15 @@
 }
 
 .campus-card__loading-text {
-  font-size: 14px;
-  color: #00000073;
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text-secondary, #666666);
 }
 
 /* ==================== 操作按钮区域 ==================== */
 .campus-card__actions {
   display: flex;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--color-border-light, #f0f0f0);
+  background: var(--color-bg-secondary, #fafafa);
 }
 
 .campus-card__action {
@@ -163,30 +208,100 @@
   align-items: center;
   justify-content: center;
   padding: 12px 16px;
-  font-size: 14px;
-  color: #00000073;
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text-secondary, #666666);
   cursor: pointer;
-  transition: all 0.2s ease;
-  border-right: 1px solid #f0f0f0;
+  transition: all var(--transition-fast, 0.15s ease);
+  border-right: 1px solid var(--color-border-light, #f0f0f0);
+  position: relative;
+  overflow: hidden;
 }
 
 .campus-card__action:last-child {
   border-right: none;
 }
 
+/* 🌊 按钮悬浮效果（波纹 + 渐变背景） */
+.campus-card__action::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: var(--gradient-primary, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  opacity: 0.1;
+  transform: translate(-50%, -50%);
+  transition: width var(--transition-normal, 0.3s ease), height var(--transition-normal, 0.3s ease);
+  pointer-events: none; /* 避免遮挡子元素按钮点击 */
+}
+
+.campus-card__action:hover::before {
+  width: 200%;
+  height: 200%;
+}
+
 .campus-card__action:hover {
-  color: #1890ff;
-  background-color: #fafafa;
+  color: var(--color-primary, #667eea);
+  background-color: var(--color-bg-hover, #f0f0f0);
 }
 
 .campus-card__action:active {
-  background-color: #f0f0f0;
+  background-color: var(--color-bg-active, #e6e6e6);
+  transform: scale(0.98);
+}
+
+/* ==================== 🎨 高级效果（可选） ==================== */
+
+/* 💎 毛玻璃效果卡片 */
+.campus-card--glass {
+  background: var(--backdrop-bg, rgba(255, 255, 255, 0.8));
+  backdrop-filter: var(--backdrop-blur, blur(10px));
+  -webkit-backdrop-filter: var(--backdrop-blur, blur(10px));
+  border: 1px solid var(--backdrop-border, rgba(255, 255, 255, 0.3));
+}
+
+/* ✨ 发光效果卡片 */
+.campus-card--glow {
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.campus-card--glow:hover {
+  box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+}
+
+/* 🌈 渐变边框卡片 */
+.campus-card--gradient-border {
+  position: relative;
+  background: var(--color-bg-primary, #ffffff);
+  border: none;
+}
+
+.campus-card--gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--radius-lg, 12px);
+  padding: 2px;
+  background: var(--gradient-primary, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* ==================== 响应式设计 ==================== */
 
 /* 平板适配 */
 @media (max-width: 1024px) {
+  .campus-card {
+    border-radius: var(--radius-md, 10px);
+  }
+
   .campus-card__header {
     padding: 14px 18px;
   }
@@ -203,7 +318,7 @@
 /* 移动端适配 */
 @media (max-width: 768px) {
   .campus-card {
-    border-radius: 6px;
+    border-radius: var(--radius-md, 8px);
   }
 
   .campus-card__header {
@@ -211,11 +326,11 @@
   }
 
   .campus-card__title {
-    font-size: 15px;
+    font-size: var(--font-size-sm, 15px);
   }
 
   .campus-card__subtitle {
-    font-size: 13px;
+    font-size: var(--font-size-xs, 13px);
   }
 
   .campus-card__body--padding-default {
@@ -232,11 +347,16 @@
 
   .campus-card__action {
     border-right: none;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--color-border-light, #f0f0f0);
   }
 
   .campus-card__action:last-child {
     border-bottom: none;
+  }
+
+  /* 移动端悬浮效果减弱 */
+  .campus-card--hoverable:hover {
+    transform: translateY(-2px);
   }
 }
 
@@ -248,12 +368,12 @@
   }
 
   .campus-card__title {
-    font-size: 14px;
+    font-size: var(--font-size-sm, 14px);
   }
 
   .campus-card__subtitle,
   .campus-card__extra {
-    font-size: 12px;
+    font-size: var(--font-size-xs, 12px);
   }
 
   .campus-card__body--padding-small {
@@ -270,6 +390,61 @@
 
   .campus-card__action {
     padding: 10px 14px;
-    font-size: 13px;
+    font-size: var(--font-size-xs, 13px);
+  }
+}
+
+/* ==================== 🌙 暗色主题适配 ==================== */
+[data-theme='dark'] .campus-card,
+.dark-theme .campus-card {
+  background-color: var(--color-bg-primary, #1a1a1a);
+  box-shadow: var(--shadow-card, 0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+[data-theme='dark'] .campus-card--hoverable:hover,
+.dark-theme .campus-card--hoverable:hover {
+  box-shadow: var(--shadow-card-hover, 0 8px 24px rgba(0, 0, 0, 0.6));
+}
+
+[data-theme='dark'] .campus-card__header,
+.dark-theme .campus-card__header {
+  background: var(--color-bg-primary, #1a1a1a);
+  border-bottom-color: var(--color-border-light, #2a2a2a);
+}
+
+[data-theme='dark'] .campus-card__body,
+.dark-theme .campus-card__body {
+  background: var(--color-bg-primary, #1a1a1a);
+}
+
+[data-theme='dark'] .campus-card__actions,
+.dark-theme .campus-card__actions {
+  background: var(--color-bg-secondary, #242424);
+  border-top-color: var(--color-border-light, #2a2a2a);
+}
+
+/* ==================== 🎭 无障碍优化 ==================== */
+
+/* 键盘焦点样式 */
+.campus-card:focus-visible {
+  outline: 2px solid var(--color-primary, #667eea);
+  outline-offset: 2px;
+}
+
+/* 减少动画（用户偏好） */
+@media (prefers-reduced-motion: reduce) {
+  .campus-card,
+  .campus-card__cover img,
+  .campus-card__title,
+  .campus-card__action {
+    transition: none;
+  }
+
+  .campus-card__action::before {
+    transition: none;
+  }
+
+  .campus-card--hoverable:hover {
+    transform: none;
   }
 }

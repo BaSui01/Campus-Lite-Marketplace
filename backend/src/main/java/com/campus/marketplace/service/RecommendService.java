@@ -1,5 +1,7 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.dto.RecommendConfigDTO;
+import com.campus.marketplace.common.dto.RecommendStatisticsDTO;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
 
 import java.util.List;
@@ -78,4 +80,25 @@ public interface RecommendService {
      * 预计算推荐结果（缓存预热，定时任务调用）
      */
     void precomputeRecommendations();
+
+    /**
+     * 🎯 BaSui 新增：获取推荐配置
+     *
+     * @return 推荐配置DTO
+     */
+    RecommendConfigDTO getRecommendConfig();
+
+    /**
+     * 🎯 BaSui 新增：更新推荐配置
+     *
+     * @param configDTO 推荐配置DTO
+     */
+    void updateRecommendConfig(RecommendConfigDTO configDTO);
+
+    /**
+     * 🎯 BaSui 新增：获取推荐统计
+     *
+     * @return 推荐统计DTO
+     */
+    RecommendStatisticsDTO getRecommendStatistics();
 }

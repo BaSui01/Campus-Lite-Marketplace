@@ -4,7 +4,7 @@
  * @description 下拉选择器组件，支持搜索、多选、分组等功能
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Select.css';
 
 /**
@@ -36,7 +36,7 @@ export interface SelectOptionProps {
 /**
  * Select 组件的 Props 接口
  */
-export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange' | 'value'> {
+export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange' | 'value' | 'size' | 'defaultValue'> {
   /**
    * 当前选中值
    */
@@ -163,8 +163,6 @@ export const Select: React.FC<SelectProps> = ({
     value || defaultValue || (multiple ? [] : '')
   );
 
-  const [isClearVisible, setIsClearVisible] = useState(false);
-
   // 受控模式处理
   const currentValue = value !== undefined ? value : internalValue;
   const hasValue = Array.isArray(currentValue) 
@@ -223,15 +221,15 @@ export const Select: React.FC<SelectProps> = ({
     onChange?.(clearedValue);
   };
 
-  // 处理鼠标悬停显示清除按钮
+  // 处理鼠标悬停显示清除按钮（暂时移除 - 未实现状态管理）
   const handleMouseEnter = () => {
-    if (allowClear && hasValue && !disabled) {
-      setIsClearVisible(true);
-    }
+    // if (allowClear && hasValue && !disabled) {
+    //   setIsClearVisible(true);
+    // }
   };
 
   const handleMouseLeave = () => {
-    setIsClearVisible(false);
+    // setIsClearVisible(false);
   };
 
   return (
@@ -242,7 +240,7 @@ export const Select: React.FC<SelectProps> = ({
       onMouseLeave={handleMouseLeave}
     >
       <select
-        value={currentValue}
+        value={currentValue as string | number | readonly string[]}
         onChange={handleChange}
         disabled={disabled}
         multiple={multiple}
@@ -271,6 +269,6 @@ export const Select: React.FC<SelectProps> = ({
 };
 
 // 为 Select 组件添加 Option 属性
-Select.Option = SelectOption;
+(Select as typeof Select & { Option: typeof SelectOption }).Option = SelectOption;
 
 export default Select;

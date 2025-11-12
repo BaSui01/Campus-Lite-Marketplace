@@ -12,13 +12,13 @@ import {
   Input,
   Select,
   Space,
-  Modal,
   Form,
-  message,
   Typography,
   Tag,
   Popconfirm,
   Tooltip,
+  App,
+  Modal,
 } from 'antd';
 import {
   PlusOutlined,
@@ -40,6 +40,7 @@ const { Search } = Input;
 
 const Compliance: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [whitelistModalVisible, setWhitelistModalVisible] = useState(false);
   const [auditModalVisible, setAuditModalVisible] = useState(false);
   const [selectedTargetType, setSelectedTargetType] = useState<string>();
@@ -49,10 +50,7 @@ const Compliance: React.FC = () => {
   // ===== 白名单查询 =====
   const { data: whitelist, isLoading: whitelistLoading } = useQuery({
     queryKey: ['compliance-whitelist'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/compliance/whitelist');
-      return await res.json();
-    },
+    queryFn: () => complianceService.listWhitelist(),
   });
 
   // ===== 审计日志查询 =====

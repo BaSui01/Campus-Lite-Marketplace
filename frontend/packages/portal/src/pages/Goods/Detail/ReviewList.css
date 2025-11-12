@@ -63,6 +63,11 @@
   color: #fff;
 }
 
+/* “只看有图”按钮与普通排序保持一致 */
+.review-list__sort-btn[title="只看包含图片的评价"]::before {
+  content: '🖼️ ';
+}
+
 /* Tabs 筛选 */
 .review-list__tabs {
   margin-bottom: 24px;
@@ -80,6 +85,36 @@
   margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid #f0f0f0;
+}
+
+/* Chips: 好评/中评/差评 */
+.review-list__chips {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 16px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 6px 12px;
+  font-size: 13px;
+  border: 1px solid #d9d9d9;
+  border-radius: 999px;
+  background: #fff;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chip:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.chip.active {
+  background: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
 }
 
 /* ==================== 响应式设计 ==================== */

@@ -1,0 +1,126 @@
+/**
+ * 回到顶部按钮样式 🎨
+ * @author BaSui 😎
+ * @date 2025-11-08
+ */
+
+.back-to-top {
+  position: fixed;
+  right: 32px;
+  bottom: 80px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4),
+              0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 998;
+  animation: slideInUp 0.3s ease-out;
+  overflow: hidden;
+}
+
+/* 滑入动画 */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 按钮背景渐变光晕 */
+.back-to-top::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.back-to-top:hover::before {
+  opacity: 0.8;
+}
+
+/* Hover效果 */
+.back-to-top:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+}
+
+/* 点击效果 */
+.back-to-top:active {
+  transform: translateY(-2px) scale(1);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 图标 */
+.back-to-top__icon {
+  font-size: 20px;
+  line-height: 1;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* 文本 */
+.back-to-top__text {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 768px) {
+  .back-to-top {
+    right: 20px;
+    bottom: 90px; /* 避开移动端底部导航栏 */
+    width: 44px;
+    height: 44px;
+  }
+
+  .back-to-top__icon {
+    font-size: 18px;
+  }
+
+  .back-to-top__text {
+    font-size: 8px;
+  }
+}
+
+/* ==================== 暗黑模式支持 ==================== */
+@media (prefers-color-scheme: dark) {
+  .back-to-top {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  }
+
+  .back-to-top:hover {
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.7),
+                0 0 0 1px rgba(255, 255, 255, 0.25) inset;
+  }
+}

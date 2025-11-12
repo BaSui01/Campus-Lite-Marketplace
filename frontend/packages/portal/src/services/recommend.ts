@@ -1,16 +1,10 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
  * Recommend Service - 推荐服务
+ * ✅ 已重构：使用 OpenAPI 生成的 DefaultApi
+ *
  * @author BaSui 😎
  * @description 商品推荐算法服务（基于协同过滤、热度排序）
+ * @date 2025-11-10
  */
 
 import { getApi } from '@campus/shared/utils/apiClient';
@@ -121,43 +115,42 @@ class RecommendServiceImpl implements RecommendService {
    * 获取个性化推荐
    */
   async getPersonalizedRecommend(params: RecommendParams): Promise<GoodsResponse[]> {
-    const response = await http.get<{ data: GoodsResponse[] }>('/api/recommend/personalized', {
-      params,
-    });
-    return response.data.data;
+    const api = getApi();
+    // ✅ 使用 OpenAPI 生成的 personal 方法
+    const response = await api.personal({ size: params.size });
+    return response.data.data as GoodsResponse[];
   }
 
   /**
    * 获取相似商品推荐
    */
   async getSimilarGoods(goodsId: number, size: number = 10): Promise<GoodsResponse[]> {
-    const response = await http.get<{ data: GoodsResponse[] }>(`/api/recommend/similar/${goodsId}`, {
-      params: { size },
-    });
-    return response.data.data;
+    const api = getApi();
+    // ✅ 使用 OpenAPI 生成的 getSimilarGoods 方法
+    const response = await api.getSimilarGoods({ goodsId, limit: size });
+    return response.data.data as GoodsResponse[];
   }
 
   /**
    * 获取热门商品推荐
    */
   async getHotGoods(categoryId?: number, size: number = 10): Promise<GoodsResponse[]> {
-    const response = await http.get<{ data: GoodsResponse[] }>('/api/recommend/hot', {
-      params: {
-        categoryId,
-        size,
-      },
-    });
-    return response.data.data;
+    const api = getApi();
+    // ✅ 使用 OpenAPI 生成的 hot 方法
+    // 注意：后端的 hot 接口接受 campusId 而不是 categoryId
+    const response = await api.hot({ size });
+    return response.data.data as GoodsResponse[];
   }
 
   /**
    * 获取猜你喜欢
    */
   async getGuessYouLike(userId: number, size: number = 10): Promise<GoodsResponse[]> {
-    const response = await http.get<{ data: GoodsResponse[] }>(`/api/recommend/guess/${userId}`, {
-      params: { size },
-    });
-    return response.data.data;
+    const api = getApi();
+    // ✅ 使用 OpenAPI 生成的 personal 方法（个性化推荐）
+    // 注意：personal 接口会自动获取当前登录用户，不需要传 userId
+    const response = await api.personal({ size });
+    return response.data.data as GoodsResponse[];
   }
 }
 

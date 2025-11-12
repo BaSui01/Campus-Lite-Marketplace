@@ -6,9 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import jakarta.persistence.LockModeType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -49,13 +51,14 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
 
     /**
      * 分页查询物品（支持多条件筛选）
+     * 🔧 使用 COALESCE 保证 LIKE 参数为字符串，避免 PostgreSQL 将 NULL 判成 bytea 导致 "~~ bytea" 报错
      */
     @Query("SELECT g FROM Goods g WHERE " +
            "(:status IS NULL OR g.status = :status) AND " +
            "(:categoryId IS NULL OR g.categoryId = :categoryId) AND " +
            "(:minPrice IS NULL OR g.price >= :minPrice) AND " +
            "(:maxPrice IS NULL OR g.price <= :maxPrice) AND " +
-           "(:keyword IS NULL OR g.title LIKE %:keyword% OR g.description LIKE %:keyword%)")
+           "(COALESCE(:keyword, '') = '' OR g.title LIKE CONCAT('%', COALESCE(:keyword, ''), '%') OR g.description LIKE CONCAT('%', COALESCE(:keyword, ''), '%'))")
     Page<Goods> findByConditions(
             @Param("status") GoodsStatus status,
             @Param("categoryId") Long categoryId,
@@ -67,13 +70,16 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
 
     /**
      * 分页查询物品（包含校区过滤）
+     * 🔧 使用 COALESCE 保证 LIKE 参数为字符串，避免 PostgreSQL 将 NULL 判成 bytea 导致 "~~ bytea" 报错
+     * 🔧 使用 EntityGraph 预加载 seller 和 category 避免 N+1 查询和懒加载异常
      */
+    @EntityGraph(attributePaths = {"seller", "category"})
     @Query("SELECT g FROM Goods g WHERE " +
            "(:status IS NULL OR g.status = :status) AND " +
            "(:categoryId IS NULL OR g.categoryId = :categoryId) AND " +
            "(:minPrice IS NULL OR g.price >= :minPrice) AND " +
            "(:maxPrice IS NULL OR g.price <= :maxPrice) AND " +
-           "(:keyword IS NULL OR g.title LIKE %:keyword% OR g.description LIKE %:keyword%) AND " +
+           "(COALESCE(:keyword, '') = '' OR g.title LIKE CONCAT('%', COALESCE(:keyword, ''), '%') OR g.description LIKE CONCAT('%', COALESCE(:keyword, ''), '%')) AND " +
            "(:campusId IS NULL OR g.campusId = :campusId)")
     Page<Goods> findByConditionsWithCampus(
             @Param("status") GoodsStatus status,
@@ -85,12 +91,18 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
             Pageable pageable
     );
 
+    /**
+     * 分页查询物品（包含校区过滤和 ID 过滤）
+     * 🔧 使用 COALESCE 保证 LIKE 参数为字符串，避免 PostgreSQL 将 NULL 判成 bytea 导致 "~~ bytea" 报错
+     * 🔧 使用 EntityGraph 预加载 seller 和 category 避免 N+1 查询和懒加载异常
+     */
+    @EntityGraph(attributePaths = {"seller", "category"})
     @Query("SELECT g FROM Goods g WHERE " +
            "(:status IS NULL OR g.status = :status) AND " +
            "(:categoryId IS NULL OR g.categoryId = :categoryId) AND " +
            "(:minPrice IS NULL OR g.price >= :minPrice) AND " +
            "(:maxPrice IS NULL OR g.price <= :maxPrice) AND " +
-           "(:keyword IS NULL OR g.title LIKE %:keyword% OR g.description LIKE %:keyword%) AND " +
+           "(COALESCE(:keyword, '') = '' OR g.title LIKE CONCAT('%', COALESCE(:keyword, ''), '%') OR g.description LIKE CONCAT('%', COALESCE(:keyword, ''), '%')) AND " +
            "(:campusId IS NULL OR g.campusId = :campusId) AND g.id IN (:goodsIds)")
     Page<Goods> findByConditionsWithCampusAndIds(
             @Param("status") GoodsStatus status,
@@ -211,4 +223,19 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
      * 🎯 BaSui 新增：按分类和状态统计商品数量
      */
     long countByCategoryIdAndStatus(Long categoryId, com.campus.marketplace.common.enums.GoodsStatus status);
+
+    /**
+     * 统计卖家的在售商品数量（前端需要）
+     * @param sellerId 卖家ID
+     * @param status 商品状态
+     * @return 商品数量
+     */
+    long countBySellerIdAndStatus(Long sellerId, GoodsStatus status);
+
+    /**
+     * 加行级写锁查询（用于下单场景防并发超卖/重复下单）
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT g FROM Goods g WHERE g.id = :id")
+    Optional<Goods> findByIdForUpdate(@Param("id") Long id);
 }

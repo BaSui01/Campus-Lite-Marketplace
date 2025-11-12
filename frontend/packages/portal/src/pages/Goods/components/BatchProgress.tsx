@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getApi } from '@campus/shared/api';
+import { getApi } from '@campus/shared/utils/apiClient';
 
 interface BatchProgressProps {
   taskId: number;

@@ -79,5 +79,3 @@ export interface RevertRequestResponse {
   number: number;
 }
 
-// 导出所有类型
-export type { CreateRevertRequest, RevertExecutionResult, RevertRequest, RevertRequestResponse };

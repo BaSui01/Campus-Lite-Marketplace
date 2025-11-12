@@ -72,6 +72,60 @@ export interface TodayStatistics {
 }
 
 /**
+ * 📦 订单统计数据
+ */
+export interface OrderStatistics {
+  totalOrders: number;
+  pendingPaymentOrders: number;
+  paidOrders: number;
+  completedOrders: number;
+  cancelledOrders: number;
+  refundingOrders: number;
+  refundedOrders: number;
+  totalAmount: number;
+  completedAmount: number;
+  refundedAmount: number;
+  averageAmount: number;
+  completionRate: number;
+  cancellationRate: number;
+  refundRate: number;
+  ordersByStatus: Record<string, number>;
+  amountByPaymentMethod: Record<string, number>;
+  countByPaymentMethod: Record<string, number>;
+  todayNewOrders: number;
+  todayAmount: number;
+  todayCompletedOrders: number;
+}
+
+/**
+ * 💰 退款统计数据
+ */
+export interface RefundStatistics {
+  totalRefunds: number;
+  appliedRefunds: number;
+  approvedRefunds: number;
+  rejectedRefunds: number;
+  processingRefunds: number;
+  completedRefunds: number;
+  failedRefunds: number;
+  totalAmount: number;
+  completedAmount: number;
+  processingAmount: number;
+  averageAmount: number;
+  approvalRate: number;
+  successRate: number;
+  failureRate: number;
+  refundsByStatus: Record<string, number>;
+  amountByChannel: Record<string, number>;
+  countByChannel: Record<string, number>;
+  todayNewRefunds: number;
+  todayAmount: number;
+  todayCompletedRefunds: number;
+  avgReviewTime: number;
+  avgCompletionTime: number;
+}
+
+/**
  * 管理端统计服务（基于真实后端 API）
  */
 export class StatisticsService {
@@ -257,6 +311,86 @@ export class StatisticsService {
     } catch (error: any) {
       console.error('❌ 获取今日统计失败:', error.response?.data?.message || error.message);
       return { newUsers: 0, newGoods: 0, newOrders: 0, revenue: 0 };
+    }
+  }
+
+  /**
+   * 📦 获取订单统计
+   * GET /api/admin/statistics/orders
+   */
+  async getOrderStatistics(startDate?: string, endDate?: string): Promise<OrderStatistics> {
+    try {
+      const api = getApi();
+      const response = await api.getOrderStatistics({ startDate, endDate });
+
+      const data = response.data.data as any;
+
+      return {
+        totalOrders: data.totalOrders || 0,
+        pendingPaymentOrders: data.pendingPaymentOrders || 0,
+        paidOrders: data.paidOrders || 0,
+        completedOrders: data.completedOrders || 0,
+        cancelledOrders: data.cancelledOrders || 0,
+        refundingOrders: data.refundingOrders || 0,
+        refundedOrders: data.refundedOrders || 0,
+        totalAmount: data.totalAmount || 0,
+        completedAmount: data.completedAmount || 0,
+        refundedAmount: data.refundedAmount || 0,
+        averageAmount: data.averageAmount || 0,
+        completionRate: data.completionRate || 0,
+        cancellationRate: data.cancellationRate || 0,
+        refundRate: data.refundRate || 0,
+        ordersByStatus: data.ordersByStatus || {},
+        amountByPaymentMethod: data.amountByPaymentMethod || {},
+        countByPaymentMethod: data.countByPaymentMethod || {},
+        todayNewOrders: data.todayNewOrders || 0,
+        todayAmount: data.todayAmount || 0,
+        todayCompletedOrders: data.todayCompletedOrders || 0,
+      };
+    } catch (error: any) {
+      console.error('❌ 获取订单统计失败:', error.response?.data?.message || error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * 💰 获取退款统计
+   * GET /api/admin/statistics/refunds
+   */
+  async getRefundStatistics(startDate?: string, endDate?: string): Promise<RefundStatistics> {
+    try {
+      const api = getApi();
+      const response = await api.getRefundStatistics({ startDate, endDate });
+
+      const data = response.data.data as any;
+
+      return {
+        totalRefunds: data.totalRefunds || 0,
+        appliedRefunds: data.appliedRefunds || 0,
+        approvedRefunds: data.approvedRefunds || 0,
+        rejectedRefunds: data.rejectedRefunds || 0,
+        processingRefunds: data.processingRefunds || 0,
+        completedRefunds: data.completedRefunds || 0,
+        failedRefunds: data.failedRefunds || 0,
+        totalAmount: data.totalAmount || 0,
+        completedAmount: data.completedAmount || 0,
+        processingAmount: data.processingAmount || 0,
+        averageAmount: data.averageAmount || 0,
+        approvalRate: data.approvalRate || 0,
+        successRate: data.successRate || 0,
+        failureRate: data.failureRate || 0,
+        refundsByStatus: data.refundsByStatus || {},
+        amountByChannel: data.amountByChannel || {},
+        countByChannel: data.countByChannel || {},
+        todayNewRefunds: data.todayNewRefunds || 0,
+        todayAmount: data.todayAmount || 0,
+        todayCompletedRefunds: data.todayCompletedRefunds || 0,
+        avgReviewTime: data.avgReviewTime || 0,
+        avgCompletionTime: data.avgCompletionTime || 0,
+      };
+    } catch (error: any) {
+      console.error('❌ 获取退款统计失败:', error.response?.data?.message || error.message);
+      throw error;
     }
   }
 

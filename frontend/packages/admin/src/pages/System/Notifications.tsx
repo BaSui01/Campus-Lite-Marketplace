@@ -19,6 +19,7 @@ import {
   Tag,
   Tabs,
   Divider,
+  App,
 } from 'antd';
 import {
   PlusOutlined,
@@ -53,6 +54,7 @@ const channelColors: Record<string, string> = {
 
 const Notifications: React.FC = () => {
   const queryClient = useQueryClient();
+  const { modal } = App.useApp();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
@@ -151,19 +153,30 @@ const Notifications: React.FC = () => {
       title: '发送渠道',
       dataIndex: 'channels',
       key: 'channels',
-      render: (channels: string[] | undefined) => (
-        <Space>
-          {channels?.map(channel => (
-            <Tag 
-              key={channel} 
-              color={channelColors[channel] || 'default'}
-              icon={channelIcons[channel]}
-            >
-              {channel}
-            </Tag>
-          )) || <span style={{ color: '#999' }}>未设置</span>}
-        </Space>
-      ),
+      render: (channels: unknown) => {
+        const list: string[] = Array.isArray(channels)
+          ? (channels as string[])
+          : (typeof channels === 'string' && (channels as string))
+          ? [(channels as string)]
+          : [];
+        return (
+          <Space>
+            {list.length > 0 ? (
+              list.map((channel) => (
+                <Tag
+                  key={channel}
+                  color={channelColors[channel] || 'default'}
+                  icon={channelIcons[channel]}
+                >
+                  {channel}
+                </Tag>
+              ))
+            ) : (
+              <span style={{ color: '#999' }}>未设置</span>
+            )}
+          </Space>
+        );
+      },
     },
     {
       title: '标题模板',
@@ -226,7 +239,7 @@ const Notifications: React.FC = () => {
 
   // ===== 删除模板 =====
   const handleDelete = (template: NotificationTemplate) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除模板？',
       content: `确定要删除模板 "${template.name}" 吗？此操作不可撤销。`,
       onOk: () => deleteTemplateMutation.mutate(template.id),
@@ -438,7 +451,12 @@ const Notifications: React.FC = () => {
               <div>
                 <strong>渠道：</strong>
                 <Space style={{ marginLeft: 8 }}>
-                  {selectedTemplate.channels?.map(channel => (
+                  {(Array.isArray(selectedTemplate.channels)
+                    ? selectedTemplate.channels
+                    : (typeof selectedTemplate.channels === 'string'
+                        ? [selectedTemplate.channels]
+                        : [])
+                  ).map((channel) => (
                     <Tag key={channel} color={channelColors[channel] || 'default'}>
                       {channel}
                     </Tag>

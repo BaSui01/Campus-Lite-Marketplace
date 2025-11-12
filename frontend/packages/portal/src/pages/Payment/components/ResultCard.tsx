@@ -1,7 +1,7 @@
 /**
- * /�ӜaG��
- * @author BaSui =
- * @description >:/�Ӝ����o
+ * 支付结果卡片组件
+ * @author BaSui 😎
+ * @description 显示支付结果详细信息
  */
 
 import React from 'react';
@@ -25,32 +25,32 @@ export const ResultCard: React.FC<ResultCardProps> = ({
   const getStatusConfig = (status: string) => {
     const configs = {
       'SUCCESS': {
-        icon: '<�',
-        title: '/��',
-        message: '���U��/��I�F��'',
+        icon: '🎉',
+        title: '支付成功!',
+        message: '您的订单已成功支付,请等待商家发货。',
         color: 'success',
-        primaryText: '��U��',
-        secondaryText: '��-i',
+        primaryText: '查看订单详情',
+        secondaryText: '继续购物',
         primaryColor: 'bg-green-600 hover:bg-green-700',
         secondaryColor: 'bg-gray-600 hover:bg-gray-700',
       },
       'FAILED': {
-        icon: '=',
-        title: '/�1%',
-        message: '/��-������	�v�/ع',
+        icon: '😔',
+        title: '支付失败',
+        message: '支付过程中出现问题,请重试或选择其他支付方式。',
         color: 'danger',
-        primaryText: 'Ͱ/�',
-        secondaryText: 'T��',
+        primaryText: '重新支付',
+        secondaryText: '联系客服',
         primaryColor: 'bg-blue-600 hover:bg-blue-700',
         secondaryColor: 'bg-gray-600 hover:bg-gray-700',
       },
       'TIMEOUT': {
-        icon: '�',
-        title: '/؅�',
-        message: '/������U��ֈ',
+        icon: '⏰',
+        title: '支付超时',
+        message: '支付时间已过,订单已自动取消。',
         color: 'warning',
-        primaryText: 'ͰU',
-        secondaryText: 'T��',
+        primaryText: '重新下单',
+        secondaryText: '联系客服',
         primaryColor: 'bg-yellow-600 hover:bg-yellow-700',
         secondaryColor: 'bg-gray-600 hover:bg-gray-700',
       },
@@ -67,7 +67,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({
       status === 'FAILED' ? 'border-red-200' :
       'border-yellow-200'
     } border-2`}>
-      {/* Ӝ��� */}
+      {/* 结果图标和标题 */}
       <div className="text-center mb-6">
         <div className="text-6xl mb-4">{config.icon}</div>
         <h2 className={`text-2xl font-bold mb-2 ${
@@ -80,40 +80,40 @@ export const ResultCard: React.FC<ResultCardProps> = ({
         <p className="text-gray-600">{config.message}</p>
       </div>
 
-      {/* �U�o */}
+      {/* 订单信息 */}
       <div className="bg-gray-50 rounded-lg p-6 mb-6">
-        <h3 className="font-semibold mb-4 text-gray-900">�U�o</h3>
+        <h3 className="font-semibold mb-4 text-gray-900">订单信息</h3>
         <div className="space-y-3">
           <div className="flex justify-between">
-            <span className="text-gray-600">�U�</span>
+            <span className="text-gray-600">订单号:</span>
             <span className="font-mono text-sm">{orderInfo?.orderNo}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">�Uѝ</span>
+            <span className="text-gray-600">订单金额:</span>
             <span className="font-bold text-lg text-blue-600">
               {formatCurrency(orderInfo?.actualAmount || '0.00')}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">F��</span>
+            <span className="text-gray-600">商品名称:</span>
             <span className="text-right max-w-xs truncate">
               {orderInfo?.goodsTitle}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">U��</span>
+            <span className="text-gray-600">下单时间:</span>
             <span>{orderInfo?.createTime ? formatDateTime(orderInfo.createTime) : '-'}</span>
           </div>
           {orderInfo?.paymentTime && (
             <div className="flex justify-between">
-              <span className="text-gray-600">/���</span>
+              <span className="text-gray-600">支付时间:</span>
               <span>{formatDateTime(orderInfo.paymentTime)}</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* �\	� */}
+      {/* 操作按钮组 */}
       <div className="flex flex-col sm:flex-row gap-4">
         <button
           onClick={onPrimaryAction}
@@ -130,11 +130,11 @@ export const ResultCard: React.FC<ResultCardProps> = ({
         </button>
       </div>
 
-      {/* /ض�� */}
+      {/* 支付状态标识 */}
       <div className="mt-6 pt-6 border-t border-gray-200">
         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
           <StatusIcon status={status} size="small" />
-          <span>/ض{getPaymentStatusText(status)}</span>
+          <span>支付状态: {getPaymentStatusText(status)}</span>
         </div>
       </div>
     </div>

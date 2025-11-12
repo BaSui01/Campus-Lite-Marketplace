@@ -23,11 +23,20 @@ const transformGoodsData = (goods: GoodsResponse) => ({
   description: goods.description,
   price: goods.price || 0,
   imageUrl: goods.coverImage || '/placeholder.jpg',
-  status: (goods.status?.toLowerCase() === 'on_sale' ? 'on_sale' : 
-           goods.status?.toLowerCase() === 'sold_out' ? 'sold_out' :
-           goods.status?.toLowerCase() === 'off_shelf' ? 'off_shelf' : 'pending') as any,
-  stock: 1,
-  soldCount: 0,
+  images: goods.images || (goods.coverImage ? [goods.coverImage] : ['/placeholder.jpg']),  // ✅ 新增：所有图片（支持轮播）
+  // 后端状态 -> 卡片状态映射
+  // 后端：PENDING/APPROVED/REJECTED/SOLD/OFF_SHELF/LOCKED
+  // 前端卡片：pending/on_sale/sold_out/off_shelf
+  status: (() => {
+    const s = (goods.status || '').toUpperCase();
+    if (s === 'APPROVED') return 'on_sale';
+    if (s === 'SOLD') return 'sold_out';
+    if (s === 'OFF_SHELF' || s === 'OFFLINE' || s === 'REJECTED') return 'off_shelf';
+    return 'pending';
+  })() as any,
+  stock: goods.stock || 1,
+  soldCount: goods.soldCount || 0,
+  originalPrice: goods.originalPrice ? Number(goods.originalPrice) : undefined,  // ✅ 新增：原价
   tags: goods.tags?.map(t => t.name || '').filter(Boolean),
   seller: goods.sellerId ? {
     id: String(goods.sellerId),
@@ -64,13 +73,21 @@ export const GoodsList: React.FC = () => {
         categoryId: filters.categoryId,
         minPrice: filters.minPrice,
         maxPrice: filters.maxPrice,
+        // 仅拉取已审核通过的商品，避免服务端返回待审核数据
+        status: 'APPROVED',
         tags: filters.tags.length > 0 ? filters.tags : undefined,
         sortBy: filters.sortBy,
         sortDirection: filters.sortDirection,
         page,
         size: pageSize,
       });
-      return response;
+      // 兜底：再在前端过滤一次，双保险
+      return {
+        ...response,
+        content: (response.content || []).filter(
+          (g) => (g.status || '').toUpperCase() === 'APPROVED'
+        ),
+      };
     },
     staleTime: 2 * 60 * 1000, // 2分钟缓存
   });
@@ -139,7 +156,7 @@ export const GoodsList: React.FC = () => {
           <GoodsSortBar
             sortBy={filters.sortBy}
             sortDirection={filters.sortDirection}
-            totalCount={totalElements}
+            totalCount={goodsList.length}
             onSortChange={handleSortChange}
           />
 
@@ -231,7 +248,7 @@ export const GoodsList: React.FC = () => {
                   </button>
 
                   <span className="pagination-info">
-                    共 {totalElements} 件商品
+                    本页 {goodsList.length} 件 · 第 {page + 1}/{Math.max(totalPages, 1)} 页
                   </span>
                 </div>
               )}

@@ -1,10 +1,8 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.CreateOrderRequest;
 import com.campus.marketplace.common.dto.response.OrderResponse;
-import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.common.enums.OrderStatus;
 import com.campus.marketplace.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +54,7 @@ class OrderControllerMockMvcTest {
         CreateOrderRequest request = new CreateOrderRequest(12345L, 888L);
         when(orderService.createOrder(request)).thenReturn("O202510270001");
 
-        mockMvc.perform(post("/api/orders")
+        mockMvc.perform(post("/orders")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -83,7 +81,7 @@ class OrderControllerMockMvcTest {
         when(orderService.listBuyerOrders(eq("PAID"), eq(0), eq(5)))
                 .thenReturn(new PageImpl<>(List.of(order)));
 
-        mockMvc.perform(get("/api/orders/buyer")
+        mockMvc.perform(get("/orders/buyer")
                         .param("status", "PAID")
                         .param("page", "0")
                         .param("size", "5"))
@@ -100,7 +98,7 @@ class OrderControllerMockMvcTest {
         when(orderService.listSellerOrders(eq(null), eq(1), eq(10)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/orders/seller")
+        mockMvc.perform(get("/orders/seller")
                         .param("page", "1")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -113,7 +111,7 @@ class OrderControllerMockMvcTest {
     @DisplayName("GET /api/orders/{orderNo} -> 查询订单详情")
     @WithMockUser(roles = "STUDENT")
     void getOrderDetail_returnsEntity() throws Exception {
-        Order order = Order.builder()
+        OrderResponse orderResponse = OrderResponse.builder()
                 .orderNo("O202510270001")
                 .goodsId(12345L)
                 .buyerId(2001L)
@@ -122,9 +120,9 @@ class OrderControllerMockMvcTest {
                 .actualAmount(new BigDecimal("5599"))
                 .status(OrderStatus.PAID)
                 .build();
-        when(orderService.getOrderDetail("O202510270001")).thenReturn(order);
+        when(orderService.getOrderDetail("O202510270001")).thenReturn(orderResponse);
 
-        mockMvc.perform(get("/api/orders/{orderNo}", "O202510270001"))
+        mockMvc.perform(get("/orders/{orderNo}", "O202510270001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.orderNo").value("O202510270001"))
@@ -138,7 +136,7 @@ class OrderControllerMockMvcTest {
     @WithMockUser(roles = "TEACHER")
     void cancelOrder_returnsSuccess() throws Exception {
 
-        mockMvc.perform(post("/api/orders/{orderNo}/cancel", "O202510270002"))
+        mockMvc.perform(post("/orders/{orderNo}/cancel", "O202510270002"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").doesNotExist());

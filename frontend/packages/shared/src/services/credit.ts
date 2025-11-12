@@ -144,7 +144,8 @@ class CreditService {
    */
   async getMyCredit(): Promise<UserCreditInfo> {
     const response = await apiClient.get('/credit/my');
-    return this.enrichCreditInfo(response.data);
+    const payload = response.data?.data ?? response.data;
+    return this.enrichCreditInfo(payload);
   }
 
   /**
@@ -152,7 +153,8 @@ class CreditService {
    */
   async getUserCredit(userId: number): Promise<UserCreditInfo> {
     const response = await apiClient.get(`/credit/user/${userId}`);
-    return this.enrichCreditInfo(response.data);
+    const payload = response.data?.data ?? response.data;
+    return this.enrichCreditInfo(payload);
   }
 
   /**
@@ -166,7 +168,7 @@ class CreditService {
     const response = await apiClient.get('/credit/history', {
       params: { page, size },
     });
-    return response.data;
+    return (response.data?.data ?? response.data) as any;
   }
 
   /**
@@ -174,7 +176,7 @@ class CreditService {
    */
   async getCreditStatistics(): Promise<CreditStatistics> {
     const response = await apiClient.get('/credit/statistics');
-    return response.data;
+    return (response.data?.data ?? response.data) as any;
   }
 
   /**
@@ -197,7 +199,7 @@ class CreditService {
       const levels = Object.keys(CreditLevel) as CreditLevel[];
       const currentIndex = levels.indexOf(baseLevel);
       if (currentIndex > 0) {
-        return levels[currentIndex - 1];
+        return levels[currentIndex - 1]!;
       }
     }
 
@@ -208,7 +210,7 @@ class CreditService {
         const levels = Object.keys(CreditLevel) as CreditLevel[];
         const currentIndex = levels.indexOf(baseLevel);
         if (currentIndex < levels.length - 1) {
-          return levels[currentIndex + 1];
+          return levels[currentIndex + 1]!;
         }
       }
     }
@@ -231,13 +233,19 @@ class CreditService {
     const levels = Object.keys(CreditLevel) as CreditLevel[];
     const currentIndex = levels.indexOf(currentLevel);
 
+    if (!currentConfig || currentIndex === -1) {
+      return 0;
+    }
+
     // 已经是最高等级
     if (currentIndex >= levels.length - 1) {
       return 1;
     }
 
-    const nextLevel = levels[currentIndex + 1];
+    const nextLevel = levels[currentIndex + 1] as CreditLevel;
     const nextConfig = CREDIT_LEVEL_CONFIG[nextLevel];
+
+    if (!nextConfig) return 0;
 
     // 计算进度 = (当前订单数 - 当前等级最小值) / (下一等级最小值 - 当前等级最小值)
     const progress = (orderCount - currentConfig.minOrders) / (nextConfig.minOrders - currentConfig.minOrders);
@@ -255,19 +263,28 @@ class CreditService {
       return undefined;
     }
 
-    return CREDIT_LEVEL_CONFIG[levels[currentIndex + 1]];
+    return CREDIT_LEVEL_CONFIG[levels[currentIndex + 1] as CreditLevel];
   }
 
   /**
    * 增强信用信息（添加前端计算的字段）
    */
   private enrichCreditInfo(data: any): UserCreditInfo {
-    const currentLevelInfo = this.getLevelConfig(data.creditLevel);
-    const nextLevelInfo = this.getNextLevelInfo(data.creditLevel);
-    const progressToNextLevel = this.calculateProgressToNextLevel(data.orderCount, data.creditLevel);
+    const safeOrderCount = Number.isFinite(data?.orderCount) ? Number(data.orderCount) : 0;
+    const rawLevel = data?.creditLevel as CreditLevel | undefined;
+    const levelValues = Object.values(CreditLevel) as string[];
+    const safeLevel: CreditLevel = (rawLevel && levelValues.includes(rawLevel))
+      ? rawLevel
+      : this.calculateCreditLevel(safeOrderCount, data?.positiveRate ?? 1);
+
+    const currentLevelInfo = this.getLevelConfig(safeLevel);
+    const nextLevelInfo = this.getNextLevelInfo(safeLevel);
+    const progressToNextLevel = this.calculateProgressToNextLevel(safeOrderCount, safeLevel);
 
     return {
       ...data,
+      creditLevel: safeLevel,
+      orderCount: safeOrderCount,
       currentLevelInfo,
       nextLevelInfo,
       progressToNextLevel,

@@ -532,9 +532,13 @@ export const Table = <T extends Record<string, any> = any>({
       </div>
 
       {/* 分页器 */}
-      {pagination !== false && (
+      {pagination !== false && pagination && (
         <div className="campus-table__pagination">
-          <Pagination {...pagination} />
+          <Pagination
+            {...pagination}
+            current={pagination.current ?? 1}
+            total={pagination.total ?? 0}
+          />
         </div>
       )}
     </div>

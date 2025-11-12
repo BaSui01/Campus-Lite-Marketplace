@@ -43,9 +43,14 @@ public class TagAdminController {
 
     @GetMapping
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_TAG_VIEW)")
-    @Operation(summary = "查询标签列表", description = "获取所有标签列表")
-    public ApiResponse<List<TagResponse>> listTags() {
-        List<TagResponse> tags = tagService.listAllTags();
+    @Operation(summary = "查询标签列表", description = "支持分页和筛选的标签列表")
+    public ApiResponse<org.springframework.data.domain.Page<TagResponse>> listTags(
+            @Parameter(description = "关键词") @RequestParam(required = false) String keyword,
+            @Parameter(description = "启用状态") @RequestParam(required = false) Boolean enabled,
+            @Parameter(description = "页码") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "每页大小") @RequestParam(defaultValue = "20") int size
+    ) {
+        org.springframework.data.domain.Page<TagResponse> tags = tagService.listTags(keyword, enabled, page, size);
         return ApiResponse.success(tags);
     }
 
@@ -124,5 +129,15 @@ public class TagAdminController {
     ) {
         TagStatisticsResponse statistics = tagService.getStatistics(id);
         return ApiResponse.success(statistics);
+    }
+
+    @GetMapping("/hot")
+    @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_TAG_VIEW)")
+    @Operation(summary = "热门标签", description = "获取热门标签列表（按使用次数排序）")
+    public ApiResponse<List<TagStatisticsResponse>> getHotTags(
+            @Parameter(description = "返回数量") @RequestParam(defaultValue = "20") int limit
+    ) {
+        List<TagStatisticsResponse> hotTags = tagService.getHotTags(limit);
+        return ApiResponse.success(hotTags);
     }
 }

@@ -26,9 +26,14 @@ const transformGoodsData = (goods: GoodsResponse) => ({
   description: goods.description,
   price: goods.price || 0,
   imageUrl: goods.coverImage || '/placeholder.jpg',
-  status: (goods.status?.toLowerCase() === 'on_sale' ? 'on_sale' : 
-           goods.status?.toLowerCase() === 'sold_out' ? 'sold_out' :
-           goods.status?.toLowerCase() === 'off_shelf' ? 'off_shelf' : 'pending') as any,
+  // 后端状态（APPROVED/SOLD/OFFLINE/PENDING/REJECTED/LOCKED）→ 卡片状态
+  status: (() => {
+    const s = (goods.status || '').toUpperCase();
+    if (s === 'APPROVED') return 'on_sale';
+    if (s === 'SOLD') return 'sold_out';
+    if (s === 'OFFLINE' || s === 'REJECTED') return 'off_shelf';
+    return 'pending';
+  })() as any,
   stock: 1,
   soldCount: 0,
   tags: goods.tags?.map(t => t.name || '').filter(Boolean),
@@ -47,22 +52,33 @@ export const RecommendGoods: React.FC<RecommendGoodsProps> = ({
   const navigate = useNavigate();
 
   // 获取相似商品（同分类）
-  const { data: recommendGoods, isLoading } = useQuery({
+  const { data: recommendGoods, isLoading, isError } = useQuery({
     queryKey: ['goods', 'recommend', categoryId, currentGoodsId],
     queryFn: async () => {
-      const response = await goodsService.listGoods({
-        categoryId,
-        page: 0,
-        size: 4,
-        sortBy: 'createdAt',
-        sortDirection: 'desc',
-      });
-      
-      // 过滤掉当前商品
-      return response.content?.filter(g => g.id !== currentGoodsId) || [];
+      try {
+        const response = await goodsService.listGoods({
+          categoryId,
+          page: 0,
+          size: 4,
+          sortBy: 'createdAt',
+          sortDirection: 'DESC',
+        });
+        
+        // 过滤掉当前商品 + 仅保留已审核通过（后端 listGoods 不支持 status，前端过滤）
+        return response.content
+          ?.filter(g => g.id !== currentGoodsId)
+          ?.filter(g => (g.status || '').toUpperCase() === 'APPROVED') || [];
+      } catch (e) {
+        // 降级兜底：使用热门推荐（不基于分类）
+        const hot = await goodsService.getRecommendGoods(4);
+        return hot
+          ?.filter(g => g.id !== currentGoodsId)
+          ?.filter(g => (g.status || '').toUpperCase() === 'APPROVED') || [];
+      }
     },
     enabled: !!categoryId,
     staleTime: 10 * 60 * 1000, // 10分钟缓存
+    retry: 1, // 失败只重试1次
   });
 
   const handleGoodsClick = (goodsId: string) => {
@@ -102,11 +118,20 @@ export const RecommendGoods: React.FC<RecommendGoodsProps> = ({
       )}
 
       {/* 空状态 */}
-      {!isLoading && (!recommendGoods || recommendGoods.length === 0) && (
+      {!isLoading && !isError && (!recommendGoods || recommendGoods.length === 0) && (
         <Empty
           icon="📭"
           title="暂无相似商品"
           description="该分类下暂时没有其他商品"
+        />
+      )}
+
+      {/* 错误状态 */}
+      {isError && (
+        <Empty
+          icon="⚠️"
+          title="加载失败"
+          description="推荐商品加载失败，请稍后再试"
         />
       )}
     </div>

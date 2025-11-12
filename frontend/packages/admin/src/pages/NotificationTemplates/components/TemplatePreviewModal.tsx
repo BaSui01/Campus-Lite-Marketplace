@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Button, Card, Tag, Spin, message } from 'antd';
+import { Modal, Form, Input, Button, Card, Tag, Spin, App } from 'antd';
 import { EyeOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { NotificationTemplate } from '@campus/shared/api';
 import { notificationTemplateService } from '@campus/shared/services/notificationTemplate';
@@ -31,6 +31,7 @@ const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
   template,
   onClose,
 }) => {
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [renderedContent, setRenderedContent] = useState<RenderedTemplate | null>(null);

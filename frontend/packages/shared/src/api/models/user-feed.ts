@@ -73,6 +73,12 @@ export interface UserFeed {
     'targetId'?: number;
     /**
      * 
+     * @type {string}
+     * @memberof UserFeed
+     */
+    'targetType'?: UserFeedTargetTypeEnum;
+    /**
+     * 
      * @type {number}
      * @memberof UserFeed
      */
@@ -99,5 +105,11 @@ export const UserFeedFeedTypeEnum = {
 } as const;
 
 export type UserFeedFeedTypeEnum = typeof UserFeedFeedTypeEnum[keyof typeof UserFeedFeedTypeEnum];
+export const UserFeedTargetTypeEnum = {
+    Post: 'POST',
+    Goods: 'GOODS'
+} as const;
+
+export type UserFeedTargetTypeEnum = typeof UserFeedTargetTypeEnum[keyof typeof UserFeedTargetTypeEnum];
 
 

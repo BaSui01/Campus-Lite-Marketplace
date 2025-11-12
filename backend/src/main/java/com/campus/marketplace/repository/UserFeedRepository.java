@@ -3,6 +3,8 @@ package com.campus.marketplace.repository;
 import com.campus.marketplace.common.entity.UserFeed;
 import com.campus.marketplace.common.enums.FeedType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,6 +22,14 @@ public interface UserFeedRepository extends JpaRepository<UserFeed, Long> {
      * 根据用户ID查询动态流（按时间倒序）
      */
     List<UserFeed> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    /**
+     * 根据用户ID查询动态流并联表抓取 actor（按时间倒序）
+     * 说明：使用 join fetch 解决 LAZY 加载导致的序列化空对象/代理问题，
+     *      以便前端可从 {@code actor.avatar}/{@code actor.nickname} 获取头像与昵称。
+     */
+    @Query("select f from UserFeed f join fetch f.actor where f.userId = :userId order by f.createdAt desc")
+    List<UserFeed> findByUserIdOrderByCreatedAtDescWithActor(@Param("userId") Long userId);
 
     /**
      * 根据用户ID和动态类型查询动态流

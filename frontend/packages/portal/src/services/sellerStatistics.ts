@@ -4,7 +4,7 @@
  * @description 商家销售数据、访客分析、商品排行统计
  */
 
-import { getApi } from '@campus/shared/utils/apiClient';
+import { apiClient } from '@campus/shared/utils/apiClient';
 
 // ==================== 类型定义 ====================
 
@@ -239,14 +239,20 @@ class SellerStatisticsService {
   /**
    * 格式化金额（保留2位小数，添加千分位）
    */
-  formatAmount(amount: number): string {
+  formatAmount(amount: number | undefined): string {
+    if (amount === undefined || amount === null) {
+      return '¥0.00';
+    }
     return `¥${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
   }
 
   /**
    * 格式化增长率
    */
-  formatGrowthRate(rate: number): string {
+  formatGrowthRate(rate: number | undefined): string {
+    if (rate === undefined || rate === null) {
+      return '0.0%';
+    }
     const sign = rate >= 0 ? '+' : '';
     return `${sign}${(rate * 100).toFixed(1)}%`;
   }

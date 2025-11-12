@@ -99,4 +99,37 @@ public interface FileSecurityService {
      * @return 扫描结果：CLEAN（清洁）、INFECTED（感染）、ERROR（扫描失败）
      */
     String scanForVirus(MultipartFile file);
+
+    /**
+     * 验证文件魔数（文件头）是否与声明的MIME类型匹配
+     *
+     * 通过读取文件的前几个字节（魔数/Magic Number）来验证文件的真实类型，
+     * 防止恶意用户通过修改文件扩展名或Content-Type来绕过安全检查。
+     *
+     * 支持的文件类型魔数：
+     * - JPEG: FF D8 FF
+     * - PNG: 89 50 4E 47
+     * - GIF: 47 49 46 38
+     * - PDF: 25 50 44 46
+     * - WEBP: 52 49 46 46 (RIFF)
+     *
+     * @param file 待验证的文件
+     * @throws IllegalArgumentException 如果文件魔数与声明的类型不匹配
+     */
+    void validateFileMagicNumber(MultipartFile file);
+
+    /**
+     * 验证图片尺寸是否在限制范围内
+     *
+     * 检查图片的宽度和高度是否超过最大限制，防止：
+     * - 超大图片占用过多存储空间
+     * - 超大图片影响页面加载速度
+     * - 恶意用户上传超大图片攻击服务器
+     *
+     * @param file 待验证的图片文件
+     * @param maxWidth 最大宽度（像素）
+     * @param maxHeight 最大高度（像素）
+     * @throws IllegalArgumentException 如果图片尺寸超过限制或无法读取图片
+     */
+    void validateImageDimensions(MultipartFile file, int maxWidth, int maxHeight);
 }

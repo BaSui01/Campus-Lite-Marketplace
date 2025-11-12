@@ -35,7 +35,6 @@ public class PrivacyController {
     private final PrivacyService privacyService;
 
     @PostMapping("/privacy")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "创建隐私请求", description = "提交数据导出或删除请求，系统会异步处理")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
@@ -58,7 +57,6 @@ public class PrivacyController {
     }
 
     @GetMapping("/privacy")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "查看我的隐私请求", description = "查看历史隐私请求及处理进度")
     public ApiResponse<List<PrivacyRequestResponse>> listMyRequests() {
         return ApiResponse.success(privacyService.listMyRequests());

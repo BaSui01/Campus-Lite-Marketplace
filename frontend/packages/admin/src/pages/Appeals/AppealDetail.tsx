@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Card, Descriptions, Button, Space, Tag, Modal, Form, Radio, Input, message, Spin, Image, Avatar, Timeline,
+  Card, Descriptions, Button, Space, Tag, Modal, Form, Radio, Input, App, Spin, Image, Avatar, Timeline,
 } from 'antd';
 import { ArrowLeftOutlined, CheckOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -21,6 +21,7 @@ const STATUS_MAP: Record<string, { text: string; color: string }> = {
 };
 
 export const AppealDetail: React.FC = () => {
+  const { message } = App.useApp();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();

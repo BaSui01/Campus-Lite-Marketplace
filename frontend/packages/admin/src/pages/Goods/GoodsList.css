@@ -1,0 +1,187 @@
+/**
+ * 商品列表页样式优化
+ *
+ * @author BaSui 😎
+ * @date 2025-11-09
+ * @description 优化列表页视觉效果，添加动画和交互
+ */
+
+/* ===== 页面容器 ===== */
+.goods-list-container {
+  padding: 24px;
+  animation: fade-in 0.6s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 统计卡片区域 ===== */
+.goods-stats-row .ant-col {
+  animation: fade-in-up 0.6s ease-out backwards;
+}
+
+.goods-stats-row .ant-col:nth-child(1) { animation-delay: 0.1s; }
+.goods-stats-row .ant-col:nth-child(2) { animation-delay: 0.2s; }
+.goods-stats-row .ant-col:nth-child(3) { animation-delay: 0.3s; }
+.goods-stats-row .ant-col:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 筛选卡片 ===== */
+.goods-filter-card {
+  animation: fade-in-up 0.6s ease-out 0.5s backwards;
+}
+
+.goods-filter-card .ant-space {
+  width: 100%;
+}
+
+/* ===== 批量操作区域 ===== */
+.goods-batch-actions {
+  animation: slide-in-left 0.6s ease-out 0.6s backwards;
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== 商品图片优化 ===== */
+.goods-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.goods-image:hover {
+  transform: scale(1.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  cursor: zoom-in;
+}
+
+/* ===== 表格动画 ===== */
+.goods-table-wrapper {
+  animation: fade-in-up 0.6s ease-out 0.7s backwards;
+}
+
+.goods-table-wrapper .ant-table-row {
+  transition: all 0.3s ease;
+}
+
+.goods-table-wrapper .ant-table-row:hover {
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, transparent 100%);
+  transform: translateX(2px);
+}
+
+/* ===== 价格标签美化 ===== */
+.goods-price {
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== 状态标签动画 ===== */
+.goods-table-wrapper .ant-tag {
+  animation: pop-in 0.4s ease-out backwards;
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== 操作按钮组优化 ===== */
+.goods-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.goods-actions .ant-btn {
+  transition: all 0.3s ease;
+}
+
+.goods-actions .ant-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ===== 响应式适配 ===== */
+@media (max-width: 768px) {
+  .goods-list-container {
+    padding: 16px;
+  }
+
+  .goods-filter-card .ant-space {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .goods-filter-card .ant-input,
+  .goods-filter-card .ant-select,
+  .goods-filter-card .ant-input-number,
+  .goods-filter-card .ant-btn {
+    width: 100% !important;
+  }
+
+  .goods-batch-actions .ant-space {
+    flex-wrap: wrap;
+  }
+
+  .goods-batch-actions .ant-btn {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .goods-stats-row .ant-col {
+    margin-bottom: 12px;
+  }
+
+  .goods-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .goods-price {
+    font-size: 14px;
+  }
+}

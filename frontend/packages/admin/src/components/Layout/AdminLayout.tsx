@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer, Modal } from 'antd';
+import { Layout, Menu, Button, Dropdown, Space, Avatar, Typography, Drawer, Modal, App, type MenuProps } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -25,9 +25,19 @@ import {
   StarOutlined,
   ThunderboltOutlined,
   TeamOutlined,
+  BarChartOutlined,
+  MessageOutlined,
+  PayCircleOutlined,
+  CarOutlined,
+  ExportOutlined,
+  FundOutlined,
+  RocketOutlined,
+  SearchOutlined,
+  BellOutlined,
+  BulbOutlined,
+  BulbFilled,
 } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
-import { useAuth, usePermission, useBreakpoint } from '@/hooks';
+import { useAuth, usePermission, useBreakpoint, useTheme } from '@/hooks';
 import { UserAvatar, Badge } from '@campus/shared';
 import { MENU_ITEMS } from '@/config/menu';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
@@ -50,6 +60,15 @@ const getIcon = (iconName: string) => {
     StarOutlined: <StarOutlined />,
     ThunderboltOutlined: <ThunderboltOutlined />,
     TeamOutlined: <TeamOutlined />,
+    BarChartOutlined: <BarChartOutlined />,
+    MessageOutlined: <MessageOutlined />,
+    PayCircleOutlined: <PayCircleOutlined />,
+    CarOutlined: <CarOutlined />,
+    ExportOutlined: <ExportOutlined />,
+    FundOutlined: <FundOutlined />,
+    RocketOutlined: <RocketOutlined />,
+    SearchOutlined: <SearchOutlined />,
+    BellOutlined: <BellOutlined />,
   };
   return icons[iconName];
 };
@@ -57,7 +76,9 @@ const getIcon = (iconName: string) => {
 export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const { hasPermission } = usePermission();
+  const { modal } = App.useApp();
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
+  const { actualTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -82,7 +103,7 @@ export const AdminLayout: React.FC = () => {
   }, [isMobile, isTablet, isDesktop]);
 
   const handleLogout = async () => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认退出登录',
       icon: <ExclamationCircleOutlined />,
       content: (
@@ -209,20 +230,93 @@ export const AdminLayout: React.FC = () => {
 
   // 菜单内容组件（Sider和Drawer共用）
   const MenuContent = () => (
-    <>
-      <div style={{ padding: '16px', textAlign: 'center' }}>
-        <Title level={4} style={{ color: 'white', margin: 0 }}>
-          {collapsed && !isMobile ? '管理' : '校园集市管理系统'}
-        </Title>
+    <div
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      {/* 🎨 优化后的Logo区域 - 现代化设计 */}
+      <div
+        style={{
+          padding: collapsed && !isMobile ? '20px 12px' : '20px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        {/* Logo Icon */}
+        <span
+          style={{
+            fontSize: collapsed && !isMobile ? '28px' : '36px',
+            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          🎓
+        </span>
+
+        {/* Logo Text */}
+        {(!collapsed || isMobile) && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '2px',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <span
+              style={{
+                fontSize: '18px',
+                fontWeight: 700,
+                color: '#ffffff',
+                letterSpacing: '0.5px',
+                lineHeight: '1.2',
+              }}
+            >
+              校园轻享集市
+            </span>
+            <span
+              style={{
+                fontSize: '12px',
+                fontWeight: 500,
+                color: 'rgba(255, 255, 255, 0.65)',
+                letterSpacing: '1px',
+              }}
+            >
+              管理后台
+            </span>
+          </div>
+        )}
       </div>
-      <Menu
-        theme="dark"
-        mode="inline"
-        selectedKeys={getSelectedKeys()}
-        items={filterMenuByPermission(MENU_ITEMS)}
-        onClick={handleMenuClick}
-      />
-    </>
+
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          paddingBottom: 16, // 预留底部空间，避免最后一项被挡
+        }}
+      >
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={getSelectedKeys()}
+          items={filterMenuByPermission(MENU_ITEMS)}
+          onClick={handleMenuClick}
+          style={{
+            borderInlineEnd: 0,
+          }}
+        />
+      </div>
+    </div>
   );
 
   return (
@@ -234,7 +328,15 @@ export const AdminLayout: React.FC = () => {
           closable={false}
           onClose={() => setDrawerVisible(false)}
           open={drawerVisible}
-          styles={{ body: { padding: 0, background: '#001529' } }}
+          styles={{
+            body: {
+              padding: 0,
+              background: '#001529',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+            },
+          }}
           width={250}
         >
           <MenuContent />
@@ -252,13 +354,15 @@ export const AdminLayout: React.FC = () => {
             top: 0,
             bottom: 0,
             zIndex: 999,
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <MenuContent />
         </Sider>
       )}
       
-      <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 80 : 200) }}>
+      <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 80 : 200), height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <Header
           style={{
             padding: '0 16px',
@@ -266,6 +370,10 @@ export const AdminLayout: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            position: 'sticky',
+            top: 0,
+            zIndex: 998,
+            borderBottom: '1px solid #f0f0f0',
           }}
         >
           <Button
@@ -279,16 +387,30 @@ export const AdminLayout: React.FC = () => {
             }}
           />
           
-          <Space>
+          <Space size="middle">
+            {/* 🌙 主题切换按钮 */}
+            <Button
+              type="text"
+              icon={actualTheme === 'dark' ? <BulbFilled style={{ color: '#faad14' }} /> : <BulbOutlined />}
+              onClick={toggleTheme}
+              title={actualTheme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'}
+              style={{
+                fontSize: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            />
+            
             <Badge dot>
               <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenuClick }} placement="bottomRight">
                 <Space style={{ cursor: 'pointer' }}>
                   <UserAvatar
                     src={user?.avatar}
-                    alt={user?.nickname || user?.username}
+                    alt={user?.username}
                     size="small"
                   />
-                  {!isMobile && <span>{user?.nickname || user?.username}</span>}
+                  {!isMobile && <span>{user?.username}</span>}
                 </Space>
               </Dropdown>
             </Badge>
@@ -299,8 +421,9 @@ export const AdminLayout: React.FC = () => {
           style={{
             margin: '16px',
             padding: '16px',
-            minHeight: 280,
             background: '#fff',
+            overflow: 'auto',
+            flex: 1,
           }}
         >
           <Outlet />

@@ -1,0 +1,107 @@
+/**
+ * 2FA 验证组件样式
+ * @author BaSui 😎
+ * @date 2025-11-09
+ */
+
+.two-factor-verify {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.two-factor-verify__header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.two-factor-verify__title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.two-factor-verify__desc {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 错误提示 */
+.two-factor-verify__error {
+  padding: 12px 16px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+  color: #cf1322;
+  font-size: 14px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* 验证码输入框 */
+.two-factor-verify__inputs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.two-factor-verify__input {
+  width: 48px;
+  height: 56px;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid #d9d9d9;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s;
+  font-family: 'Courier New', monospace;
+}
+
+.two-factor-verify__input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.two-factor-verify__input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* 提示信息 */
+.two-factor-verify__hint {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.two-factor-verify__hint p {
+  font-size: 13px;
+  color: #8c8c8c;
+}
+
+/* 操作按钮 */
+.two-factor-verify__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .two-factor-verify {
+    padding: 16px;
+  }
+
+  .two-factor-verify__inputs {
+    gap: 8px;
+  }
+
+  .two-factor-verify__input {
+    width: 40px;
+    height: 48px;
+    font-size: 20px;
+  }
+}

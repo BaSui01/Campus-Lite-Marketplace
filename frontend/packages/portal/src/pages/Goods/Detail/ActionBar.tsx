@@ -10,9 +10,11 @@ import './ActionBar.css';
 interface ActionBarProps {
   isFavorited: boolean;
   isOwner: boolean;
+  isFavoriteLoading?: boolean;
   onFavorite: () => void;
   onBuy: () => void;
   onContact: () => void;
+  onReview: () => void;
   onShare: () => void;
   onReport: () => void;
 }
@@ -20,9 +22,11 @@ interface ActionBarProps {
 export const ActionBar: React.FC<ActionBarProps> = ({
   isFavorited,
   isOwner,
+  isFavoriteLoading = false,
   onFavorite,
   onBuy,
   onContact,
+  onReview,
   onShare,
   onReport,
 }) => {
@@ -33,12 +37,13 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         <button
           className={`action-bar__btn action-bar__btn--favorite ${isFavorited ? 'active' : ''}`}
           onClick={onFavorite}
+          disabled={isFavoriteLoading}
         >
           <span className="action-bar__btn-icon">
-            {isFavorited ? '❤️' : '🤍'}
+            {isFavoriteLoading ? '⏳' : (isFavorited ? '❤️' : '🤍')}
           </span>
           <span className="action-bar__btn-text">
-            {isFavorited ? '已收藏' : '收藏'}
+            {isFavoriteLoading ? '处理中...' : (isFavorited ? '已收藏' : '收藏')}
           </span>
         </button>
 
@@ -51,6 +56,15 @@ export const ActionBar: React.FC<ActionBarProps> = ({
             >
               <span className="action-bar__btn-icon">💬</span>
               <span className="action-bar__btn-text">联系卖家</span>
+            </button>
+
+            <button
+              className="action-bar__btn action-bar__btn--review"
+              onClick={onReview}
+              title="对该商品发表你的评价"
+            >
+              <span className="action-bar__btn-icon">✍️</span>
+              <span className="action-bar__btn-text">评价</span>
             </button>
 
             <button

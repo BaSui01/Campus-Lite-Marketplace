@@ -100,7 +100,8 @@ const getColorByText = (text: string): string => {
   for (let i = 0; i < text.length; i++) {
     hash = text.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return DEFAULT_COLORS[Math.abs(hash) % DEFAULT_COLORS.length];
+  const color = DEFAULT_COLORS[Math.abs(hash) % DEFAULT_COLORS.length];
+  return color || DEFAULT_COLORS[0] || '#1890ff'; // fallback 到第一个颜色或默认蓝色
 };
 
 /**

@@ -9,8 +9,14 @@ import { useNavigate } from 'react-router-dom';
 import ReactECharts from 'echarts-for-react';
 import type { EChartsOption } from 'echarts';
 import { Button, Skeleton } from '@campus/shared/components';
-import { sellerStatisticsService, ReportType } from '../../services';
-import { TodayOverview, SalesTrend, GoodsRanking, VisitorAnalysis } from '@campus/shared/services';;
+import {
+  sellerStatisticsService,
+  ReportType,
+  TodayOverview,
+  SalesTrend,
+  GoodsRanking,
+  VisitorAnalysis
+} from '../../../services';
 import { useNotificationStore } from '../../../store';
 import './Dashboard.css';
 
@@ -167,7 +173,25 @@ const SellerDashboard: React.FC = () => {
    * 访客来源饼图配置
    */
   const getVisitorSourceOption = (): EChartsOption => {
-    if (!visitorAnalysis) return {};
+    if (!visitorAnalysis || !visitorAnalysis.sources || visitorAnalysis.sources.length === 0) {
+      return {
+        title: {
+          text: '访客来源分布',
+          left: 'center',
+          textStyle: { fontSize: 16, fontWeight: 'bold' },
+        },
+        graphic: {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          style: {
+            text: '暂无数据',
+            fontSize: 16,
+            fill: '#999',
+          },
+        },
+      };
+    }
 
     return {
       title: {
@@ -213,9 +237,23 @@ const SellerDashboard: React.FC = () => {
    * 商品销量排行柱状图配置
    */
   const getGoodsRankingOption = (): EChartsOption => {
-    if (!goodsRanking) return {};
+    if (!goodsRanking || !Array.isArray((goodsRanking as any).topBySales) || (goodsRanking as any).topBySales.length === 0) {
+      return {
+        title: {
+          text: '商品销量排行 Top 10',
+          left: 'center',
+          textStyle: { fontSize: 16, fontWeight: 'bold' },
+        },
+        graphic: {
+          type: 'text',
+          left: 'center',
+          top: 'middle',
+          style: { text: '暂无数据', fontSize: 16, fill: '#999' },
+        },
+      } as EChartsOption;
+    }
 
-    const topGoods = goodsRanking.topBySales.slice(0, 10);
+    const topGoods = (goodsRanking.topBySales || []).slice(0, 10);
 
     return {
       title: {
@@ -238,14 +276,17 @@ const SellerDashboard: React.FC = () => {
       },
       yAxis: {
         type: 'category',
-        data: topGoods.map(g => g.goodsTitle.length > 20 ? g.goodsTitle.substring(0, 20) + '...' : g.goodsTitle),
+        data: topGoods.map(g => {
+          const title = g?.goodsTitle || '';
+          return title.length > 20 ? title.substring(0, 20) + '...' : title;
+        }),
         inverse: true,
       },
       series: [
         {
           name: '销量',
           type: 'bar',
-          data: topGoods.map(g => g.salesCount),
+          data: topGoods.map(g => g?.salesCount ?? 0),
           itemStyle: {
             color: {
               type: 'linear',
@@ -370,7 +411,7 @@ const SellerDashboard: React.FC = () => {
               <div className="card-icon">📈</div>
               <div className="card-content">
                 <div className="card-label">转化率</div>
-                <div className="card-value">{(todayData.conversionRate * 100).toFixed(2)}%</div>
+                <div className="card-value">{(Number(todayData.conversionRate ?? 0) * 100).toFixed(2)}%</div>
                 <div className="card-tip">浏览转购买比例</div>
               </div>
             </div>
@@ -441,12 +482,12 @@ const SellerDashboard: React.FC = () => {
               </div>
               <div className="stat-item">
                 <div className="stat-label">平均浏览页数</div>
-                <div className="stat-value">{visitorAnalysis.avgPageViews.toFixed(1)}</div>
+                <div className="stat-value">{(visitorAnalysis.avgPageViews ?? 0).toFixed(1)}</div>
               </div>
               <div className="stat-item">
                 <div className="stat-label">平均停留时间</div>
                 <div className="stat-value">
-                  {sellerStatisticsService.formatStayTime(visitorAnalysis.avgStayTime)}
+                  {sellerStatisticsService.formatStayTime(visitorAnalysis.avgStayTime ?? 0)}
                 </div>
               </div>
             </div>

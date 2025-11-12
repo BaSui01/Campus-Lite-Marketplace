@@ -6,11 +6,15 @@
  */
 
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore, useNotificationStore } from '../../store';
 import { Badge, Dropdown, UserAvatar } from '@campus/shared';
 import { useNotification } from '@campus/shared';
 import { MAIN_NAV_ITEMS, USER_MENU_ITEMS, MOBILE_TAB_BAR, type NavItem } from '../../config/navigation';
+import { SearchSuggestion } from '../../components/SearchSuggestion';
+import { TopLoadingBar } from '../../components/TopLoadingBar';
+import { BackToTop } from '../../components/BackToTop';
+import { ThemeToggle } from '../../components/ThemeToggle';
 import './MainLayout.css';
 
 /**
@@ -23,6 +27,8 @@ const MainLayout = () => {
   const toast = useNotificationStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showSearchSuggestion, setShowSearchSuggestion] = useState(false); // 🔍 搜索建议显示状态
 
   // 订阅 WebSocket 通知
   const { unreadCount } = useNotification({
@@ -30,6 +36,19 @@ const MainLayout = () => {
       toast.info(notification.content, notification.title);
     },
   });
+
+  /**
+   * 监听页面滚动，动态更新导航栏样式
+   */
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      setIsScrolled(scrollTop > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   /**
    * 处理登出
@@ -45,14 +64,38 @@ const MainLayout = () => {
   };
 
   /**
-   * 处理搜索
+   * 处理搜索（优化版 - 支持搜索建议）🔍
    */
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
+      setShowSearchSuggestion(false); // 关闭搜索建议
     }
+  };
+
+  /**
+   * 处理搜索框聚焦 - 显示搜索建议
+   */
+  const handleSearchFocus = () => {
+    setShowSearchSuggestion(true);
+  };
+
+  /**
+   * 处理搜索建议选择
+   */
+  const handleSearchSuggestionSelect = (keyword: string) => {
+    setSearchQuery(keyword);
+    navigate(`/search?q=${encodeURIComponent(keyword)}`);
+    setShowSearchSuggestion(false);
+  };
+
+  /**
+   * 关闭搜索建议
+   */
+  const handleSearchSuggestionClose = () => {
+    setShowSearchSuggestion(false);
   };
 
   /**
@@ -159,8 +202,11 @@ const MainLayout = () => {
 
   return (
     <div className="main-layout">
+      {/* ==================== 顶部加载进度条 ==================== */}
+      <TopLoadingBar />
+
       {/* ==================== 顶部导航栏 ==================== */}
-      <header className="main-layout__header">
+      <header className={`main-layout__header ${isScrolled ? 'scrolled' : ''}`}>
         <div className="main-layout__header-content">
           {/* 移动端菜单按钮 */}
           <button
@@ -190,13 +236,14 @@ const MainLayout = () => {
             )}
           </nav>
 
-          {/* 搜索框 */}
+          {/* 搜索框（增强版 - 支持搜索建议）🔍 */}
           <form className="main-layout__search" onSubmit={handleSearch}>
             <input
               type="text"
               placeholder="搜索商品、用户、社区..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={handleSearchFocus}
               className="main-layout__search-input"
             />
             <button type="submit" className="main-layout__search-btn" aria-label="搜索">
@@ -206,6 +253,9 @@ const MainLayout = () => {
 
           {/* 右侧操作区 */}
           <div className="main-layout__actions">
+            {/* 🌓 主题切换 */}
+            <ThemeToggle />
+
             {/* 通知 */}
             {isAuthenticated && (
               <Badge count={unreadCount} dot={unreadCount > 0}>
@@ -290,20 +340,31 @@ const MainLayout = () => {
             © 2025 校园轻享集市 | Made with ❤️ by BaSui 😎
           </p>
           <div className="main-layout__footer-links">
-            <a href="/about" className="main-layout__footer-link">
+            <Link to="/about" className="main-layout__footer-link">
               关于我们
-            </a>
+            </Link>
             <span className="main-layout__footer-divider">|</span>
-            <a href="/privacy" className="main-layout__footer-link">
+            <Link to="/privacy" className="main-layout__footer-link">
               隐私政策
-            </a>
+            </Link>
             <span className="main-layout__footer-divider">|</span>
-            <a href="/terms" className="main-layout__footer-link">
+            <Link to="/terms" className="main-layout__footer-link">
               服务条款
-            </a>
+            </Link>
           </div>
         </div>
       </footer>
+
+      {/* ==================== 搜索建议组件 ==================== */}
+      <SearchSuggestion
+        visible={showSearchSuggestion}
+        keyword={searchQuery}
+        onSelect={handleSearchSuggestionSelect}
+        onClose={handleSearchSuggestionClose}
+      />
+
+      {/* ==================== 回到顶部按钮 ==================== */}
+      <BackToTop threshold={300} />
     </div>
   );
 };

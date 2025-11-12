@@ -46,6 +46,10 @@ public class AuthServiceImpl implements AuthService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final com.campus.marketplace.service.VerificationCodeService verificationCodeService;
     private final com.campus.marketplace.common.utils.CryptoUtil cryptoUtil;
+    private final com.campus.marketplace.service.CaptchaService captchaService; // 新增 - BaSui 2025-11-09
+    private final com.campus.marketplace.service.TwoFactorAuthService twoFactorAuthService; // 新增 - BaSui 2025-11-09
+    private final com.campus.marketplace.service.LoginNotificationService loginNotificationService; // 新增 - BaSui 2025-11-09
+    private final com.campus.marketplace.service.UserService userService; // 新增 - BaSui 2025-11-10
 
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
@@ -195,10 +199,29 @@ public class AuthServiceImpl implements AuthService {
      * - 用户名登录：其他格式 → findByUsernameWithRoles
      */
     @Override
-    @Transactional(readOnly = true)
-    public LoginResponse login(LoginRequest request) {
+    @Transactional(rollbackFor = Exception.class)
+    public LoginResponse login(LoginRequest request, jakarta.servlet.http.HttpServletRequest httpRequest) {
         String credential = request.username();
         log.info("用户登录: credential={}", credential);
+
+        // 0. 🔐 验证验证码通行证（BaSui 2025-11-11）
+        // ⚠️ 如果是2FA验证阶段，跳过验证码检查
+        if (request.twoFactorCode() == null || request.twoFactorCode().isEmpty()) {
+            // 验证码通行证验证（必须）
+            if (request.captchaToken() == null || request.captchaToken().isEmpty()) {
+                log.warn("❌ 验证码通行证为空");
+                throw new BusinessException(ErrorCode.CAPTCHA_ERROR, "请先完成验证码验证");
+            }
+
+            boolean isValid = captchaService.verifyCaptchaToken(request.captchaToken());
+            if (!isValid) {
+                log.warn("❌ 验证码通行证验证失败: captchaToken={}", request.captchaToken());
+                throw new BusinessException(ErrorCode.CAPTCHA_ERROR, "验证码已过期或无效，请重新验证");
+            }
+            log.info("✅ 验证码通行证验证通过");
+        } else {
+            log.info("🔐 2FA验证阶段，跳过验证码检查");
+        }
 
         // 1. 🔐 解密密码（如果是加密密码）
         String plainPassword;
@@ -230,7 +253,43 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ErrorCode.USER_BANNED);
         }
 
-        // 4. 获取角色和权限
+        // 4. 🔐 检查是否启用了 2FA（新增 - BaSui 2025-11-09）
+        if (Boolean.TRUE.equals(user.getTwoFactorEnabled())) {
+            // 如果请求中没有提供 2FA 代码，返回 requires2FA=true
+            if (request.twoFactorCode() == null || request.twoFactorCode().isEmpty()) {
+                log.info("🔐 用户启用了 2FA，需要验证: userId={}", user.getId());
+
+                // 生成临时 Token（有效期 5 分钟）
+                String tempToken = jwtUtil.generateTempToken(user.getId());
+                redisTemplate.opsForValue().set("temp_token:" + tempToken, user.getId(), 5, TimeUnit.MINUTES);
+
+                return LoginResponse.builder()
+                        .requires2FA(true)
+                        .tempToken(tempToken)
+                        .build();
+            }
+
+            // 如果提供了 2FA 代码，验证它
+            log.info("🔐 验证 2FA 代码: userId={}", user.getId());
+            boolean isValid = twoFactorAuthService.verify2FACode(user.getId(), request.twoFactorCode());
+
+            if (!isValid) {
+                // 尝试使用恢复码验证
+                log.info("🔐 2FA 代码验证失败，尝试恢复码: userId={}", user.getId());
+                isValid = twoFactorAuthService.verifyRecoveryCode(user.getId(), request.twoFactorCode());
+
+                if (!isValid) {
+                    log.warn("❌ 2FA 验证失败: userId={}", user.getId());
+                    throw new BusinessException(ErrorCode.PARAM_ERROR, "2FA 验证码错误");
+                } else {
+                    log.info("✅ 恢复码验证成功: userId={}", user.getId());
+                }
+            } else {
+                log.info("✅ 2FA 代码验证成功: userId={}", user.getId());
+            }
+        }
+
+        // 5. 获取角色和权限
         List<String> roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.toList());
@@ -241,21 +300,46 @@ public class AuthServiceImpl implements AuthService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        // 5. 生成 JWT Token
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), roles, permissions);
+        // 5. 生成双 Token（Access Token + Refresh Token）
+        String accessToken = jwtUtil.generateToken(user.getId(), user.getUsername(), roles, permissions);
+        String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername());
 
-        // 6. 将 Token 存入 Redis（用于登出验证）
-        String redisKey = "token:" + token;
-        redisTemplate.opsForValue().set(redisKey, user.getId(), jwtExpiration, TimeUnit.MILLISECONDS);
+        // 6. 将 Access Token 存入 Redis（用于登出验证）
+        String accessTokenKey = "token:" + accessToken;
+        redisTemplate.opsForValue().set(accessTokenKey, user.getId(), jwtExpiration, TimeUnit.MILLISECONDS);
 
-        // 7. 记录登录日志
+        // 7. 将 Refresh Token 存入 Redis（用于刷新验证和撤销）
+        String refreshTokenKey = "refresh_token:" + refreshToken;
+        redisTemplate.opsForValue().set(refreshTokenKey, user.getId(), 604800000L, TimeUnit.MILLISECONDS); // 7天
+
+        // 8. 记录登录日志
         log.info("用户登录成功: userId={}, username={}", user.getId(), user.getUsername());
 
-        // 8. 构建响应
+        // 9. 📧 发送登录通知 - 先检测新设备再保存（异步，新增 - BaSui 2025-11-09）
+        // ⚠️ 重要：必须先调用 detectAndNotifyNewDevice（检查），再调用 recordLoginDevice（保存）
+        // 否则每次登录都会被判定为新设备！
+        try {
+            loginNotificationService.detectAndNotifyNewDevice(user.getId(), httpRequest);
+        } catch (Exception e) {
+            log.error("❌ 发送登录通知失败: userId={}, error={}", user.getId(), e.getMessage());
+            // 不影响登录流程
+        }
+
+        // 10. 💾 记录登录设备 - 在通知之后保存（新增 - BaSui 2025-11-10）
+        try {
+            userService.recordLoginDevice(user.getId(), httpRequest);
+        } catch (Exception e) {
+            log.error("❌ 记录登录设备失败: userId={}, error={}", user.getId(), e.getMessage());
+            // 不影响登录流程
+        }
+
+        // 10. 构建响应
         return LoginResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(jwtExpiration)
+                .refreshExpiresIn(604800000L) // 7天
                 .userInfo(LoginResponse.UserInfo.builder()
                         .id(user.getId())
                         .username(user.getUsername())
@@ -316,29 +400,38 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * 刷新 Token
+     * 刷新 Token（使用 Refresh Token）
      */
     @Override
     @Transactional(readOnly = true)
-    public LoginResponse refreshToken(String oldToken) {
+    public LoginResponse refreshToken(String oldRefreshToken) {
         log.info("刷新 Token");
 
-        // 1. 验证旧 Token
-        String username = jwtUtil.getUsernameFromToken(oldToken);
-        if (!jwtUtil.validateToken(oldToken, username)) {
-            throw new BusinessException(ErrorCode.TOKEN_INVALID);
+        // 1. 验证 Refresh Token
+        if (!jwtUtil.validateRefreshToken(oldRefreshToken)) {
+            throw new BusinessException(ErrorCode.TOKEN_INVALID, "Refresh Token 无效或已过期");
         }
 
-        // 2. 查询用户
+        // 2. 检查 Refresh Token 是否在 Redis 中（是否已被撤销）
+        String refreshTokenKey = "refresh_token:" + oldRefreshToken;
+        Long userId = (Long) redisTemplate.opsForValue().get(refreshTokenKey);
+        if (userId == null) {
+            throw new BusinessException(ErrorCode.TOKEN_INVALID, "Refresh Token 已被撤销");
+        }
+
+        // 3. 从 Refresh Token 中获取用户名
+        String username = jwtUtil.getUsernameFromToken(oldRefreshToken);
+
+        // 4. 查询用户
         User user = userRepository.findByUsernameWithRoles(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        // 3. 检查用户状态
+        // 5. 检查用户状态
         if (user.isBanned()) {
             throw new BusinessException(ErrorCode.USER_BANNED);
         }
 
-        // 4. 获取角色和权限
+        // 6. 获取角色和权限
         List<String> roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.toList());
@@ -349,22 +442,28 @@ public class AuthServiceImpl implements AuthService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        // 5. 生成新 Token
-        String newToken = jwtUtil.generateToken(user.getId(), user.getUsername(), roles, permissions);
+        // 7. 生成新的双 Token
+        String newAccessToken = jwtUtil.generateToken(user.getId(), user.getUsername(), roles, permissions);
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername());
 
-        // 6. 删除旧 Token，存入新 Token
-        String oldRedisKey = "token:" + oldToken;
-        String newRedisKey = "token:" + newToken;
-        redisTemplate.delete(oldRedisKey);
-        redisTemplate.opsForValue().set(newRedisKey, user.getId(), jwtExpiration, TimeUnit.MILLISECONDS);
+        // 8. 存储新的 Access Token 到 Redis
+        String accessTokenKey = "token:" + newAccessToken;
+        redisTemplate.opsForValue().set(accessTokenKey, user.getId(), jwtExpiration, TimeUnit.MILLISECONDS);
+
+        // 9. 删除旧的 Refresh Token，存储新的 Refresh Token
+        redisTemplate.delete(refreshTokenKey);
+        String newRefreshTokenKey = "refresh_token:" + newRefreshToken;
+        redisTemplate.opsForValue().set(newRefreshTokenKey, user.getId(), 604800000L, TimeUnit.MILLISECONDS); // 7天
 
         log.info("Token 刷新成功: userId={}", user.getId());
 
-        // 7. 构建响应
+        // 10. 构建响应
         return LoginResponse.builder()
-                .token(newToken)
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
                 .tokenType("Bearer")
                 .expiresIn(jwtExpiration)
+                .refreshExpiresIn(604800000L) // 7天
                 .userInfo(LoginResponse.UserInfo.builder()
                         .id(user.getId())
                         .username(user.getUsername())

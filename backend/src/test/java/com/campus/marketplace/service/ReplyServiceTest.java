@@ -139,6 +139,53 @@ class ReplyServiceTest {
     }
 
     @Test
+    @DisplayName("帖子未审核但作者回复应成功")
+    void createReply_PostNotApproved_ByAuthor_Success() {
+        // 当前用户即作者
+        testUser.setId(2L);
+        testPost.setAuthorId(2L);
+        testPost.setStatus(GoodsStatus.PENDING);
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(postRepository.findById(100L)).thenReturn(Optional.of(testPost));
+        when(sensitiveWordFilter.filter(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(valueOperations.increment(anyString(), eq(0L))).thenReturn(0L);
+        when(replyRepository.save(any(Reply.class))).thenAnswer(invocation -> {
+            Reply reply = invocation.getArgument(0);
+            reply.setId(201L);
+            return reply;
+        });
+
+        Long replyId = replyService.createReply(validRequest);
+        assertThat(replyId).isEqualTo(201L);
+        verify(replyRepository, times(1)).save(any(Reply.class));
+    }
+
+    @Test
+    @DisplayName("帖子未审核但管理员回复应成功")
+    void createReply_PostNotApproved_ByAdmin_Success() {
+        // 构造管理员
+        com.campus.marketplace.common.entity.Role adminRole =
+                com.campus.marketplace.common.entity.Role.builder().name("ROLE_ADMIN").build();
+        testUser.getRoles().add(adminRole);
+
+        testPost.setStatus(GoodsStatus.PENDING);
+
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(postRepository.findById(100L)).thenReturn(Optional.of(testPost));
+        when(sensitiveWordFilter.filter(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(valueOperations.increment(anyString(), eq(0L))).thenReturn(0L);
+        when(replyRepository.save(any(Reply.class))).thenAnswer(invocation -> {
+            Reply reply = invocation.getArgument(0);
+            reply.setId(202L);
+            return reply;
+        });
+
+        Long replyId = replyService.createReply(validRequest);
+        assertThat(replyId).isEqualTo(202L);
+        verify(replyRepository, times(1)).save(any(Reply.class));
+    }
+    @Test
     @DisplayName("敏感词过滤")
     void createReply_SensitiveWordFiltered() {
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));

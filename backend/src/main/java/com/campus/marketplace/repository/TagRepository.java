@@ -21,4 +21,8 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     Optional<Tag> findByNameIgnoreCase(String name);
 
     List<Tag> findByEnabledTrue();
+
+    org.springframework.data.domain.Page<Tag> findByNameContainingIgnoreCase(String keyword, org.springframework.data.domain.Pageable pageable);
+
+    org.springframework.data.domain.Page<Tag> findByEnabled(Boolean enabled, org.springframework.data.domain.Pageable pageable);
 }

@@ -32,11 +32,14 @@ export class RevertService {
    * @returns 执行结果
    */
   async requestRevert(
-    auditLogId: number, 
+    auditLogId: number,
     request: CreateRevertRequest
   ): Promise<RevertExecutionResult> {
     const api = getApi();
-    const response = await api.requestRevert(auditLogId, request);
+    const response = await api.requestRevert({
+      auditLogId,
+      createRevertRequestDto: request as any
+    });
     return response.data.data as RevertExecutionResult;
   }
 
@@ -49,12 +52,13 @@ export class RevertService {
     params?: RevertRequestParams
   ): Promise<RevertRequestResponse> {
     const api = getApi();
-    const response = await api.getUserRevertRequests(
-      params?.page,
-      params?.size,
-      undefined, // sort
-      undefined  // additional params
-    );
+    const response = await api.getUserRevertRequests({
+      pageable: {
+        page: params?.page ?? 0,
+        size: params?.size ?? 20,
+        sort: params?.sortBy ? [`${params.sortBy},${params.sortDirection ?? 'asc'}`] : []
+      }
+    });
     return response.data.data as RevertRequestResponse;
   }
 
@@ -65,7 +69,7 @@ export class RevertService {
    */
   async executeRevert(revertRequestId: number): Promise<RevertExecutionResult> {
     const api = getApi();
-    const response = await api.executeRevert(revertRequestId);
+    const response = await api.executeRevert({ revertRequestId });
     return response.data.data as RevertExecutionResult;
   }
 }
@@ -73,5 +77,5 @@ export class RevertService {
 // 导出单例
 export const revertService = new RevertService();
 
-// 导出类型
-export type { CreateRevertRequest, RevertExecutionResult, RevertRequestParams };
+// 导出类型（CreateRevertRequest 和 RevertExecutionResult 已在顶部导入时导出）
+export type { CreateRevertRequest, RevertExecutionResult };

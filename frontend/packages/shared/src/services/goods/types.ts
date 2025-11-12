@@ -77,17 +77,26 @@ export interface ReviewListQuery {
 
   /**
    * 排序方式
-   * - 'time': 按时间
+   * - 'time': 按时间（默认，最新评论置顶）
    * - 'like': 按点赞数
+   * - 'image_first': 有图优先（页内重排）
    * @default 'time'
    */
-  sortBy?: 'time' | 'like';
+  sortBy?: 'time' | 'like' | 'image_first';
 
   /**
    * 是否只看有图评价
    * @default false
    */
   hasImages?: boolean;
+
+  /**
+   * 评分分组
+   * - 'positive'：好评（4-5星）
+   * - 'neutral'：中评（3星）
+   * - 'negative'：差评（1-2星）
+   */
+  group?: 'positive' | 'neutral' | 'negative';
 }
 
 /**

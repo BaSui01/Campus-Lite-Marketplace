@@ -22,13 +22,13 @@ import {
   Select,
   Space,
   Tag,
-  message,
-  Modal,
   Form,
   Card,
   Popconfirm,
   InputNumber,
   Tooltip,
+  App,
+  Modal,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -44,16 +44,19 @@ import {
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { categoryService, CategoryStatus } from '@campus/shared/services';
-import type { Category, CategoryRequest } from '@campus/shared/services';
+import type { CategoryTreeNode, CategoryRequest } from '@campus/shared/services';
 
 const { Option } = Select;
 const { TextArea } = Input;
+
+type Category = CategoryTreeNode;
 
 /**
  * 分类列表页组件
  */
 export const CategoryList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [form] = Form.useForm<CategoryRequest>();
 
   // 查询参数

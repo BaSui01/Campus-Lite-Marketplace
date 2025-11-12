@@ -57,6 +57,21 @@ class AuthServiceLoginTest {
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
+    @Mock
+    private com.campus.marketplace.common.utils.CryptoUtil cryptoUtil;
+
+    @Mock
+    private VerificationCodeService verificationCodeService;
+
+    @Mock
+    private jakarta.servlet.http.HttpServletRequest httpRequest;
+
+    @Mock
+    private com.campus.marketplace.service.LoginNotificationService loginNotificationService;
+
+    @Mock
+    private CaptchaService captchaService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -70,8 +85,14 @@ class AuthServiceLoginTest {
         // 设置 JWT 过期时间
         ReflectionTestUtils.setField(authService, "jwtExpiration", 7200000L);
 
-        // 准备测试数据
-        validLoginRequest = new LoginRequest("testuser", "Password123");
+        // 🎯 Mock CryptoUtil 行为：默认返回明文密码（兼容模式）
+        when(cryptoUtil.isEncrypted(anyString())).thenReturn(false);
+
+        // 🔐 Mock CaptchaService 行为：验证码通行证验证通过
+        when(captchaService.verifyCaptchaToken(anyString())).thenReturn(true);
+
+        // 准备测试数据（新增验证码字段和2FA字段，测试中传 "mock-captcha-token"）
+        validLoginRequest = new LoginRequest("testuser", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
         // 创建权限
         viewPermission = Permission.builder()
@@ -115,11 +136,11 @@ class AuthServiceLoginTest {
                 .thenReturn("mock-jwt-token");
 
         // Act
-        LoginResponse response = authService.login(validLoginRequest);
+        LoginResponse response = authService.login(validLoginRequest, httpRequest);
 
         // Assert
         assertNotNull(response);
-        assertEquals("mock-jwt-token", response.getToken());
+        assertEquals("mock-jwt-token", response.getAccessToken());
         assertEquals("Bearer", response.getTokenType());
         assertEquals(7200000L, response.getExpiresIn());
         
@@ -148,11 +169,11 @@ class AuthServiceLoginTest {
         when(userRepository.findByUsernameWithRoles("nonexistent"))
                 .thenReturn(Optional.empty());
 
-        LoginRequest request = new LoginRequest("nonexistent", "Password123");
+        LoginRequest request = new LoginRequest("nonexistent", "Password123", "mock-captcha-token", null, null, null, null, null, null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            authService.login(request);
+            authService.login(request, httpRequest);
         });
 
         assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
@@ -169,11 +190,11 @@ class AuthServiceLoginTest {
         when(passwordEncoder.matches("WrongPassword", "$2a$10$encodedPassword"))
                 .thenReturn(false);
 
-        LoginRequest request = new LoginRequest("testuser", "WrongPassword");
+        LoginRequest request = new LoginRequest("testuser", "WrongPassword", "mock-captcha-token", null, null, null, null, null, null);
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            authService.login(request);
+            authService.login(request, httpRequest);
         });
 
         assertEquals(ErrorCode.PASSWORD_ERROR.getCode(), exception.getCode());
@@ -195,7 +216,7 @@ class AuthServiceLoginTest {
 
         // Act & Assert
         BusinessException exception = assertThrows(BusinessException.class, () -> {
-            authService.login(validLoginRequest);
+            authService.login(validLoginRequest, httpRequest);
         });
 
         assertEquals(ErrorCode.USER_BANNED.getCode(), exception.getCode());
@@ -216,7 +237,7 @@ class AuthServiceLoginTest {
                 .thenReturn("mock-jwt-token");
 
         // Act
-        authService.login(validLoginRequest);
+        authService.login(validLoginRequest, httpRequest);
 
         // Assert - 验证 JWT Token 生成时传入的参数
         verify(jwtUtil).generateToken(
@@ -239,7 +260,7 @@ class AuthServiceLoginTest {
                 .thenReturn("generated-token-12345");
 
         // Act
-        authService.login(validLoginRequest);
+        authService.login(validLoginRequest, httpRequest);
 
         // Assert - 验证 Token 存入 Redis
         verify(valueOperations).set(

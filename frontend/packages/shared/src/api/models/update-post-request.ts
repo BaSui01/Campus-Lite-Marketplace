@@ -38,5 +38,11 @@ export interface UpdatePostRequest {
      * @memberof UpdatePostRequest
      */
     'images'?: Array<string>;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof UpdatePostRequest
+     */
+    'tagIds'?: Array<number>;
 }
 

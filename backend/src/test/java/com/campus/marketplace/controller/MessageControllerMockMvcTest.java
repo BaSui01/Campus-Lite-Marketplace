@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.dto.response.ConversationResponse;
 import com.campus.marketplace.common.dto.response.MessageResponse;
@@ -61,7 +60,7 @@ class MessageControllerMockMvcTest {
         SendMessageRequest request = new SendMessageRequest(10086L, MessageType.TEXT, "你好");
         when(messageService.sendMessage(any(SendMessageRequest.class))).thenReturn(42L);
 
-        mockMvc.perform(post("/api/messages/send")
+        mockMvc.perform(post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -77,7 +76,7 @@ class MessageControllerMockMvcTest {
     void sendMessage_forbidden() throws Exception {
         SendMessageRequest request = new SendMessageRequest(10086L, MessageType.TEXT, "你好");
 
-        mockMvc.perform(post("/api/messages/send")
+        mockMvc.perform(post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
@@ -97,7 +96,7 @@ class MessageControllerMockMvcTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/messages/send")
+        mockMvc.perform(post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andExpect(status().isBadRequest())
@@ -121,7 +120,7 @@ class MessageControllerMockMvcTest {
         when(messageService.listConversations(0, 20))
                 .thenReturn(new PageImpl<>(List.of(conversation)));
 
-        mockMvc.perform(get("/api/messages/conversations"))
+        mockMvc.perform(get("/messages/conversations"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.content[0].conversationId").value(20001))
@@ -135,7 +134,7 @@ class MessageControllerMockMvcTest {
         when(messageService.listMessages(20001L, 0, 50))
                 .thenThrow(new BusinessException(ErrorCode.NOT_FOUND, "会话不存在"));
 
-        mockMvc.perform(get("/api/messages/conversations/{conversationId}/messages", 20001))
+        mockMvc.perform(get("/messages/conversations/{conversationId}/messages", 20001))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ErrorCode.NOT_FOUND.getCode()))
                 .andExpect(jsonPath("$.message").value("会话不存在"));
@@ -147,7 +146,7 @@ class MessageControllerMockMvcTest {
     void markConversationAsRead_success() throws Exception {
         when(messageService.markConversationAsRead(20001L)).thenReturn(5);
 
-        mockMvc.perform(post("/api/messages/conversations/{conversationId}/mark-read", 20001))
+        mockMvc.perform(post("/messages/conversations/{conversationId}/mark-read", 20001))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(5));
@@ -159,7 +158,7 @@ class MessageControllerMockMvcTest {
     @DisplayName("撤回消息成功返回统一响应")
     @WithMockUser(roles = "USER")
     void recallMessage_success() throws Exception {
-        mockMvc.perform(post("/api/messages/messages/{messageId}/recall", 30001))
+        mockMvc.perform(post("/messages/messages/{messageId}/recall", 30001))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").doesNotExist());
@@ -173,7 +172,7 @@ class MessageControllerMockMvcTest {
     void getUnreadCount_success() throws Exception {
         when(messageService.getUnreadCount()).thenReturn(7);
 
-        mockMvc.perform(get("/api/messages/unread-count"))
+        mockMvc.perform(get("/messages/unread-count"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(7));
@@ -194,7 +193,7 @@ class MessageControllerMockMvcTest {
         when(messageService.listMessages(20001L, 0, 50))
                 .thenReturn(new PageImpl<>(List.of(message)));
 
-        mockMvc.perform(get("/api/messages/conversations/{conversationId}/messages", 20001))
+        mockMvc.perform(get("/messages/conversations/{conversationId}/messages", 20001))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.content[0].messageId").value(50001))

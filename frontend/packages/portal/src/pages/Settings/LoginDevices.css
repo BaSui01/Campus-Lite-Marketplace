@@ -1,0 +1,262 @@
+/**
+ * 登录设备管理样式
+ * @author BaSui 😎
+ */
+
+.login-devices {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ==================== 头部 ==================== */
+
+.login-devices__header {
+  margin-bottom: 8px;
+}
+
+.login-devices__title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 8px 0;
+}
+
+.login-devices__desc {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* ==================== 空状态 ==================== */
+
+.login-devices__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: #fafafa;
+  border-radius: 12px;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.empty-text {
+  font-size: 16px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+/* ==================== 设备列表 ==================== */
+
+.login-devices__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.device-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.device-item:hover {
+  background: #f0f0f0;
+  transform: translateX(4px);
+}
+
+.device-item--current {
+  background: #e6f7ff;
+  border-color: #1890ff;
+}
+
+.device-item__icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.device-item__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.device-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.device-item__name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #262626;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.device-item__badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #1890ff;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: normal;
+  border-radius: 12px;
+}
+
+.device-item__type {
+  font-size: 14px;
+  color: #8c8c8c;
+  padding: 4px 12px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+.device-item__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.device-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #595959;
+}
+
+.device-detail__icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.device-detail__text {
+  line-height: 1.5;
+}
+
+.device-item__time {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.device-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.device-time__label {
+  color: #8c8c8c;
+}
+
+.device-time__value {
+  color: #595959;
+}
+
+.device-item__actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-remove {
+  padding: 8px 16px;
+  background: #ff4d4f;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-remove:hover {
+  background: #ff7875;
+}
+
+/* ==================== 安全提示 ==================== */
+
+.login-devices__tips {
+  padding: 20px;
+  background: #fff7e6;
+  border-radius: 12px;
+  border-left: 4px solid #faad14;
+}
+
+.tips-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #262626;
+  margin: 0 0 12px 0;
+}
+
+.tips-list {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.tips-list li {
+  font-size: 14px;
+  color: #595959;
+  line-height: 1.8;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .device-item {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .device-item__icon {
+    font-size: 40px;
+  }
+
+  .device-item__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .device-item__details {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .device-item__actions {
+    width: 100%;
+  }
+
+  .btn-remove {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .device-item__name {
+    font-size: 16px;
+  }
+
+  .device-item__icon {
+    font-size: 32px;
+  }
+}

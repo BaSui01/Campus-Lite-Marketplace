@@ -1,56 +1,38 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
  * 标签管理 API 服务
  * @author BaSui 😎
  * @description 标签列表、添加、编辑、删除、合并、热门标签等接口
+ * @updated 2025-11-08 - 重构为使用 OpenAPI 生成的 DefaultApi ✅
  */
 
-import { getApi } from '../utils/apiClient';
-import type { BaseResponse } from '@campus/shared/api';
+import { getApi, apiClient } from '../utils/apiClient';
+import type { TagResponse, CreateTagRequest, UpdateTagRequest, MergeTagRequest, TagStatisticsResponse } from '../api/models';
 
-/**
- * 标签类型枚举
- */
+// ==================== 类型重导出（使用 OpenAPI 生成的类型）====================
+export type { TagResponse as Tag, CreateTagRequest, UpdateTagRequest, MergeTagRequest, TagStatisticsResponse } from '../api/models';
+
+export type TagRequest = CreateTagRequest;
+
+// ==================== 标签类型枚举（保持兼容）====================
 export enum TagType {
-  GOODS = 'GOODS',      // 商品标签
-  POST = 'POST',        // 帖子标签
-  COMMON = 'COMMON'     // 通用标签
+  GOODS = 'GOODS',
+  POST = 'POST',
+  COMMON = 'COMMON'
 }
 
-/**
- * 标签状态枚举
- */
 export enum TagStatus {
   ENABLED = 'ENABLED',
   DISABLED = 'DISABLED'
 }
 
-/**
- * 标签信息
- */
-export interface Tag {
+// ==================== 热门标签类型 ====================
+export interface HotTag {
   id: number;
   name: string;
-  type: TagType;
-  color?: string;
-  description?: string;
-  hotCount: number;      // 热度（使用次数）
-  status: TagStatus;
-  createdAt: string;
-  updatedAt?: string;
+  usageCount: number;
 }
 
-/**
- * 标签列表查询参数
- */
+// ==================== 标签列表查询参数 ====================
 export interface TagListParams {
   keyword?: string;
   type?: TagType;
@@ -60,66 +42,52 @@ export interface TagListParams {
 }
 
 /**
- * 分页响应
- */
-export interface PageResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
-
-/**
- * 添加/编辑标签请求
- */
-export interface TagRequest {
-  name: string;
-  type: TagType;
-  color?: string;
-  description?: string;
-  status: TagStatus;
-}
-
-/**
- * 标签合并请求
- */
-export interface TagMergeRequest {
-  sourceIds: number[];   // 源标签ID列表
-  targetId: number;      // 目标标签ID
-}
-
-/**
- * 热门标签
- */
-export interface HotTag {
-  id: number;
-  name: string;
-  type: TagType;
-  hotCount: number;
-  rank: number;  // 排名
-}
-
-/**
  * 标签 API 服务类
+ * ✅ 完全基于 OpenAPI 生成的 DefaultApi
  */
 export class TagService {
   /**
    * 获取标签列表（分页）
    * @param params 查询参数
-   * @returns 标签列表（分页）
+   * @returns 标签分页数据
    */
-  async list(params?: TagListParams): Promise<PageResponse<Tag>> {
-    const response = await http.get<PageResponse<Tag>>('/api/tags', {
-      params: {
-        keyword: params?.keyword,
-        type: params?.type,
-        status: params?.status,
-        page: params?.page ?? 0,
-        size: params?.size ?? 20
-      }
-    });
-    return response.data;
+  async list(params?: TagListParams): Promise<TagResponse[]> {
+    const api = getApi();
+    const response = await api.listTags();
+
+    // 获取数据并进行前端过滤
+    let tags = response.data.data as TagResponse[];
+
+    // 前端筛选（如果后端不支持）
+    if (params?.keyword) {
+      tags = tags.filter(t =>
+        t.name?.toLowerCase().includes(params.keyword!.toLowerCase())
+      );
+    }
+
+    if (params?.status !== undefined) {
+      const enabled = params.status === TagStatus.ENABLED;
+      tags = tags.filter(t => t.enabled === enabled);
+    }
+
+    return tags;
+  }
+
+  /**
+   * 获取热门标签
+   * @param limit 返回数量
+   * @returns 热门标签列表
+   */
+  async getHotTags(limit: number = 20): Promise<HotTag[]> {
+    // 🔧 修复：使用公开接口 /tags/hot 而不是需要权限的 /admin/tags/hot
+    const response = await apiClient.get('/tags/hot', { params: { limit } });
+    const hotTags = response.data.data as any[];
+
+    return hotTags.map(tag => ({
+      id: tag.tagId,
+      name: tag.tagName,
+      usageCount: tag.goodsCount || 0
+    }));
   }
 
   /**
@@ -127,30 +95,31 @@ export class TagService {
    * @param id 标签ID
    * @returns 标签详情
    */
-  async getDetail(id: number): Promise<Tag> {
-    const response = await http.get<Tag>(`/api/tags/${id}`);
-    return response.data;
+  async getDetail(id: number): Promise<TagResponse> {
+    const api = getApi();
+    const response = await api.getTagById({ id });
+    return response.data.data as TagResponse;
   }
 
   /**
-   * 添加标签
+   * 创建标签
    * @param data 标签信息
    * @returns 创建的标签ID
    */
-  async create(data: TagRequest): Promise<number> {
-    const response = await http.post<number>('/api/tags', data);
-    return response.data;
+  async create(data: CreateTagRequest): Promise<number> {
+    const api = getApi();
+    const response = await api.createTag({ createTagRequest: data });
+    return response.data.data as number;
   }
 
   /**
-   * 更新标签信息
+   * 更新标签
    * @param id 标签ID
    * @param data 标签信息
-   * @returns 更新后的标签信息
    */
-  async update(id: number, data: Partial<TagRequest>): Promise<Tag> {
-    const response = await http.put<Tag>(`/api/tags/${id}`, data);
-    return response.data;
+  async update(id: number, data: UpdateTagRequest): Promise<void> {
+    const api = getApi();
+    await api.updateTag({ id, updateTagRequest: data });
   }
 
   /**
@@ -158,49 +127,27 @@ export class TagService {
    * @param id 标签ID
    */
   async delete(id: number): Promise<void> {
-    await http.delete(`/api/tags/${id}`);
-  }
-
-  /**
-   * 启用/禁用标签
-   * @param id 标签ID
-   * @param status 状态
-   * @returns 更新后的标签信息
-   */
-  async updateStatus(id: number, status: TagStatus): Promise<Tag> {
-    return this.update(id, { status });
+    const api = getApi();
+    await api.deleteTag({ id });
   }
 
   /**
    * 合并标签
    * @param request 合并请求
    */
-  async merge(request: TagMergeRequest): Promise<void> {
-    await http.post('/api/tags/merge', request);
-  }
-
-  /**
-   * 获取热门标签（TOP N）
-   * @param limit 数量限制，默认20
-   * @param type 标签类型筛选
-   * @returns 热门标签列表
-   */
-  async getHotTags(limit: number = 20, type?: TagType): Promise<HotTag[]> {
-    const response = await http.get<HotTag[]>('/api/tags/hot', {
-      params: {
-        limit,
-        type
-      }
-    });
-    return response.data;
+  async merge(request: MergeTagRequest): Promise<void> {
+    const api = getApi();
+    await api.mergeTags({ mergeTagRequest: request });
   }
 
   /**
    * 批量删除标签
    * @param ids 标签ID列表
    */
-  async batchDelete(ids: number[]): Promise<void> {
-    await http.post('/api/tags/batch/delete', { ids });
+  async batchDelete(ids: number[]): Promise<number> {
+    const api = getApi();
+    const response = await api.batchDeleteTags({ requestBody: ids });
+    return response.data.data as number;
   }
 
   /**
@@ -208,15 +155,20 @@ export class TagService {
    * @param id 标签ID
    * @returns 使用统计数据
    */
-  async getUsageStatistics(id: number): Promise<{
-    tagId: number;
-    tagName: string;
-    usageCount: number;
-    relatedGoodsCount: number;
-    relatedPostsCount: number;
-  }> {
-    const response = await http.get(`/api/tags/${id}/statistics`);
-    return response.data;
+  async getStatistics(id: number): Promise<TagStatisticsResponse> {
+    const api = getApi();
+    const response = await api.getTagStatistics({ id });
+    return response.data.data as TagStatisticsResponse;
+  }
+
+  /**
+   * 更新标签状态（切换启用/禁用）
+   * @param id 标签ID
+   * @param _status 标签状态（保留参数以保持接口一致性，实际使用 toggleEnabled）
+   */
+  async updateStatus(id: number, _status: TagStatus): Promise<void> {
+    const api = getApi();
+    await api.toggleEnabled({ id });
   }
 }
 
@@ -224,14 +176,4 @@ export class TagService {
  * 标签服务实例
  */
 export const tagService = new TagService();
-
-/**
- * 导出类型
- */
-export type {
-  Tag as TagType,
-  TagListParams as TagListParamsType,
-  TagRequest as TagRequestType,
-  TagMergeRequest as TagMergeRequestType,
-  HotTag as HotTagType
-};
+export default tagService;

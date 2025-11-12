@@ -1,30 +1,25 @@
 /**
  * 社区页面 - 发现校园精彩生活！🌐
  * @author BaSui 😎
- * @description 社区动态、帖子发布、点赞评论
+ * @description 社区动态、帖子发布、点赞评论、标签筛选
+ * @updated 2025-11-08 - 集成标签功能、美化UI
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Input, Button, Skeleton, Modal, Tabs } from '@campus/shared/components';
-import { postService } from '@campus/shared/services';;
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Skeleton, Modal, Tabs, Input } from '@campus/shared/components';
+import { postService, tagService, topicService, communityService } from '@campus/shared/services';
+import type { Tag } from '@campus/shared/services/tag';
+import type { Topic } from '@campus/shared/services/topic';
 import { useAuthStore, useNotificationStore } from '../../store';
+import LeftSidebar from './components/LeftSidebar';
+import PostCard from './components/PostCard';
+import type { Post } from './components/PostCard';
+import RightSidebar from './components/RightSidebar';
+import MarkdownEditor from '../../components/MarkdownEditor';
 import './Community.css';
 
 // ==================== 类型定义 ====================
-
-interface Post {
-  postId: string;
-  authorId: string;
-  authorName: string;
-  authorAvatar?: string;
-  content: string;
-  images?: string[];
-  likeCount: number;
-  commentCount: number;
-  isLiked: boolean;
-  createdAt: string;
-}
 
 interface Comment {
   commentId: string;
@@ -41,6 +36,7 @@ interface Comment {
  */
 const Community: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const toast = useNotificationStore();
   const currentUser = useAuthStore((state) => state.user);
 
@@ -56,7 +52,58 @@ const Community: React.FC = () => {
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [publishContent, setPublishContent] = useState('');
   const [publishImages, setPublishImages] = useState<string[]>([]);
+  const [publishTagIds, setPublishTagIds] = useState<number[]>([]);
+  const [publishTopicIds, setPublishTopicIds] = useState<number[]>([]); // 新增：话题ID列表
   const [publishing, setPublishing] = useState(false);
+
+  // 草稿保存
+  const DRAFT_KEY = 'community_post_draft';
+
+  /**
+   * 从 localStorage 加载草稿
+   */
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_KEY);
+      if (savedDraft) {
+        const draft = JSON.parse(savedDraft);
+        // 仅在内容不为空时提示
+        if (draft.content && !publishContent) {
+          const shouldRestore = window.confirm('检测到未发布的草稿，是否恢复？');
+          if (shouldRestore) {
+            setPublishContent(draft.content);
+            setPublishTagIds(draft.tagIds || []);
+          } else {
+            localStorage.removeItem(DRAFT_KEY);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('加载草稿失败：', error);
+    }
+  }, []);
+
+  /**
+   * 自动保存草稿（每 5 秒）
+   */
+  useEffect(() => {
+    if (!publishContent) return;
+
+    const timer = setTimeout(() => {
+      try {
+        const draft = {
+          content: publishContent,
+          tagIds: publishTagIds,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch (error) {
+        console.error('保存草稿失败：', error);
+      }
+    }, 5000); // 5秒后保存
+
+    return () => clearTimeout(timer);
+  }, [publishContent, publishTagIds]);
 
   // 评论弹窗
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -67,8 +114,88 @@ const Community: React.FC = () => {
 
   // 标签筛选
   const [activeTab, setActiveTab] = useState('all');
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loadingTags, setLoadingTags] = useState(false);
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
+
+  // 话题列表
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [hotTags, setHotTags] = useState<Array<{ id: number; name: string; usageCount?: number }>>([]);
+  const [hotTopics, setHotTopics] = useState<Array<{ id: number; name: string; description?: string; postCount?: number; followerCount?: number }>>([]);
+  // 关注流缓存与游标
+  const [followedPostIds, setFollowedPostIds] = useState<number[]>([]);
+  const [followedCursor, setFollowedCursor] = useState(0);
 
   // ==================== 数据加载 ====================
+
+  /**
+   * 加载标签列表
+   */
+  const loadTags = async () => {
+    try {
+      setLoadingTags(true);
+      // 🚀 调用真实后端 API 获取标签列表
+      const response = await tagService.list({
+        status: 'ENABLED' as any,
+        size: 50,
+      });
+
+      if (Array.isArray(response)) {
+        setTags(response);
+      }
+    } catch (err: any) {
+      console.error('加载标签失败：', err);
+      // 静默失败，不影响主要功能
+    } finally {
+      setLoadingTags(false);
+    }
+  };
+
+  /**
+   * 加载热门标签
+   */
+  const loadHotTags = async () => {
+    try {
+      const hotTagsData = await tagService.getHotTags(10);
+      setHotTags(hotTagsData.map(tag => ({
+        id: tag.id,
+        name: tag.name,
+        usageCount: tag.usageCount,
+      })));
+    } catch (err: any) {
+      console.error('加载热门标签失败：', err);
+    }
+  };
+
+  /**
+   * 加载话题列表
+   */
+  const loadTopics = async () => {
+    try {
+      const allTopics = await topicService.getAll();
+      setTopics(allTopics);
+    } catch (err: any) {
+      console.error('加载话题失败：', err);
+    }
+  };
+
+  /**
+   * 加载热门话题
+   */
+  const loadHotTopics = async () => {
+    try {
+      const hotTopicsData = await topicService.getHotTopics();
+      setHotTopics(hotTopicsData.map(topic => ({
+        id: topic.id,
+        name: topic.name,
+        description: topic.description,
+        postCount: topic.postCount,
+        followerCount: topic.followerCount,
+      })));
+    } catch (err: any) {
+      console.error('加载热门话题失败：', err);
+    }
+  };
 
   /**
    * 加载帖子列表
@@ -83,13 +210,102 @@ const Community: React.FC = () => {
     try {
       // 🚀 调用真实后端 API 获取帖子列表
       const currentPage = isLoadMore ? page : 0;
-      const response = await postService.getPosts({
+
+      // 根据 tab 选择排序规则
+      const tab = (activeTab || 'all').toLowerCase();
+      // 关注流（使用后端 /community/feed）
+      if (tab === 'followed') {
+        const PAGE_SIZE = 10;
+
+        let idsSource = followedPostIds;
+        if (!isLoadMore && followedPostIds.length === 0) {
+          try {
+            const feed = await communityService.getUserFeed();
+            const ids = Array.from(new Set((feed || [])
+              .filter((f: any) => (f.feedType === 'POST' || f.feedType === 'Post') && f.targetId)
+              .map((f: any) => Number(f.targetId))
+              .filter((id: any) => Number.isFinite(id))));
+            setFollowedPostIds(ids);
+            setFollowedCursor(0);
+            idsSource = ids;
+          } catch (e) {
+            console.error('加载关注流失败：', e);
+          }
+        }
+
+        const start = isLoadMore ? followedCursor : 0;
+        const end = Math.min(start + PAGE_SIZE, idsSource.length);
+        const batchIds = idsSource.slice(start, end);
+
+        if (batchIds.length > 0) {
+          const details = await Promise.all(batchIds.map(async (id) => {
+            try {
+              return await postService.getPostById(id);
+            } catch (e) {
+              console.warn('获取帖子失败，跳过：', id, e);
+              return null;
+            }
+          }));
+
+          const apiPosts: Post[] = details.filter(Boolean).map((p: any) => ({
+            postId: String(p.id),
+            authorId: String(p.userId),
+            authorName: p.userName || '未知用户',
+            authorAvatar: p.userAvatar,
+            content: p.content,
+            images: p.images || [],
+            likeCount: p.likeCount || 0,
+            commentCount: p.commentCount || 0,
+            isLiked: p.isLiked || false,
+            createdAt: p.createTime,
+          }));
+
+          if (isLoadMore) {
+            setPosts((prev) => [...prev, ...apiPosts]);
+          } else {
+            setPosts(apiPosts);
+          }
+
+          setHasMore(end < idsSource.length);
+          setFollowedCursor(end);
+        } else {
+          if (!isLoadMore) setPosts([]);
+          setHasMore(false);
+        }
+
+        return; // 关注流已处理
+      }
+
+      let sortBy: string | undefined;
+      let sortDirection: string | undefined;
+      switch (tab) {
+        case 'hot':
+          sortBy = 'replyCount';
+          sortDirection = 'DESC';
+          break;
+        case 'new':
+          sortBy = 'createdAt';
+          sortDirection = 'DESC';
+          break;
+        case 'featured':
+          sortBy = 'viewCount';
+          sortDirection = 'DESC';
+          break;
+        default:
+          sortBy = 'createdAt';
+          sortDirection = 'DESC';
+      }
+
+      const pageData = await postService.getPosts({
         page: currentPage,
-        pageSize: 10,
+        size: 10,
+        sortBy,
+        sortDirection,
       });
 
-      if (response.success && response.data) {
-        const apiPosts: Post[] = response.data.content.map((p: any) => ({
+      if (pageData) {
+        const list = Array.isArray(pageData.content) ? pageData.content : [];
+        const apiPosts: Post[] = list.map((p: any) => ({
           postId: String(p.id),
           authorId: String(p.userId),
           authorName: p.userName || '未知用户',
@@ -108,8 +324,12 @@ const Community: React.FC = () => {
           setPosts(apiPosts);
         }
 
-        // 判断是否还有更多
-        setHasMore(response.data.content.length >= 10);
+        // 判断是否还有更多（优先用 last 字段，没有则用条数回退判断）
+        if (typeof pageData.last === 'boolean') {
+          setHasMore(!pageData.last);
+        } else {
+          setHasMore(list.length >= 10);
+        }
       }
     } catch (err: any) {
       console.error('加载帖子失败：', err);
@@ -123,6 +343,28 @@ const Community: React.FC = () => {
   useEffect(() => {
     loadPosts();
   }, [activeTab]);
+
+  // 监听 URL 中的 tab 参数变化，联动筛选
+  useEffect(() => {
+    const tabFromUrl = (searchParams.get('tab') || 'all').toLowerCase();
+    if (tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+      setPage(1);
+      setHasMore(true);
+      setPosts([]);
+      if (tabFromUrl === 'followed') {
+        setFollowedCursor(0);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  useEffect(() => {
+    loadTags(); // 初始化加载标签
+    loadHotTags(); // 加载热门标签
+    loadTopics(); // 加载话题列表
+    loadHotTopics(); // 加载热门话题
+  }, []);
 
   // ==================== 事件处理 ====================
 
@@ -138,6 +380,7 @@ const Community: React.FC = () => {
     setShowPublishModal(true);
     setPublishContent('');
     setPublishImages([]);
+    setPublishTagIds([]);
   };
 
   /**
@@ -147,6 +390,10 @@ const Community: React.FC = () => {
     setShowPublishModal(false);
     setPublishContent('');
     setPublishImages([]);
+    setPublishTagIds([]);
+    setPublishTopicIds([]);
+    // 清除草稿
+    localStorage.removeItem(DRAFT_KEY);
   };
 
   /**
@@ -161,13 +408,17 @@ const Community: React.FC = () => {
     setPublishing(true);
 
     try {
-      // 🚀 调用真实后端 API 发布动态
+      // 🚀 调用真实后端 API 发布动态（带标签）
       await postService.createPost({
+        title: publishContent.substring(0, 50), // 标题取前50字符
         content: publishContent,
         images: publishImages,
+        tagIds: publishTagIds, // 🎯 新增：传递标签ID列表
       });
 
       toast.success('发布成功！🎉');
+      // 清除草稿
+      localStorage.removeItem(DRAFT_KEY);
       handleClosePublishModal();
       loadPosts(); // 重新加载帖子列表
     } catch (err: any) {
@@ -225,16 +476,29 @@ const Community: React.FC = () => {
    * 打开评论弹窗
    */
   const handleOpenCommentModal = async (post: Post) => {
+    // 先校验帖子状态，未审核不允许评论（与后端一致）
+    try {
+      const detail = await postService.getPostById(Number(post.postId));
+      const isAuthor = !!detail && currentUser?.id === detail.authorId;
+      if (detail?.status && detail.status !== 'APPROVED' && !isAuthor) {
+        toast.info(`该帖子当前为「${detail.status === 'PENDING' ? '待审核' : detail.status === 'REJECTED' ? '未通过' : '非可评论状态'}」，仅作者或管理员可评论。`);
+        return;
+      }
+    } catch (e) {
+      // 若详情拉取失败，不阻断弹窗，但后续发布会因后端校验失败而提示
+    }
+
     setCurrentPost(post);
     setShowCommentModal(true);
     setCommentContent('');
 
     try {
       // 🚀 调用真实后端 API 获取评论列表
-      const response = await postService.getReplies(Number(post.postId), { page: 0, pageSize: 50 });
+      const pageReply = await postService.getReplies(Number(post.postId), { page: 0, size: 50 });
 
-      if (response.success && response.data) {
-        const apiComments: Comment[] = response.data.content.map((c: any) => ({
+      if (pageReply) {
+        const list = Array.isArray(pageReply.content) ? pageReply.content : [];
+        const apiComments: Comment[] = list.map((c: any) => ({
           commentId: String(c.id),
           postId: post.postId,
           authorId: String(c.userId),
@@ -276,6 +540,16 @@ const Community: React.FC = () => {
     setCommenting(true);
 
     try {
+      // 再次兜底校验（避免打开后状态有变化）
+      try {
+        const detail = await postService.getPostById(Number(currentPost.postId));
+        const isAuthor = !!detail && currentUser?.id === detail.authorId;
+        if (detail?.status && detail.status !== 'APPROVED' && !isAuthor) {
+          toast.warning('该帖子未处于可评论状态，仅作者或管理员可评论。');
+          return;
+        }
+      } catch {}
+
       // 🚀 调用真实后端 API 发布评论
       await postService.createReply({
         postId: Number(currentPost.postId),
@@ -303,6 +577,13 @@ const Community: React.FC = () => {
   };
 
   /**
+   * 查看帖子详情
+   */
+  const handleViewPost = (postId: string) => {
+    navigate(`/posts/${postId}`);
+  };
+
+  /**
    * 加载更多
    */
   const handleLoadMore = () => {
@@ -317,6 +598,41 @@ const Community: React.FC = () => {
     setActiveTab(value);
     setPage(1);
     setHasMore(true);
+    setPosts([]);
+    if (value === 'followed') {
+      setFollowedCursor(0);
+    }
+    setSearchParams(value && value !== 'all' ? { tab: value } : {});
+  };
+
+  /**
+   * 选择标签筛选
+   */
+  const handleSelectTag = (tagId: number | null) => {
+    setSelectedTagId(tagId);
+    setPage(1);
+    setHasMore(true);
+    setPosts([]);
+    loadPosts(); // 立即加载该标签的帖子
+  };
+
+  /**
+   * 切换发布帖子的标签
+   */
+  const handleTogglePublishTag = (tagId: number) => {
+    setPublishTagIds((prev) => {
+      if (prev.includes(tagId)) {
+        // 已选中，取消选择
+        return prev.filter((id) => id !== tagId);
+      } else {
+        // 未选中，添加选择（最多10个）
+        if (prev.length >= 10) {
+          toast.warning('最多只能选择 10 个标签！😰');
+          return prev;
+        }
+        return [...prev, tagId];
+      }
+    });
   };
 
   /**
@@ -355,18 +671,66 @@ const Community: React.FC = () => {
     return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
   };
 
+  // 选择话题
+  const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null);
+
   // ==================== 渲染 ====================
 
   return (
     <div className="community-page">
       <div className="community-container">
-        {/* ==================== 顶部操作栏 ==================== */}
-        <div className="community-header">
-          <h1 className="community-header__title">🌐 校园社区</h1>
-          <Button type="primary" size="large" onClick={handleOpenPublishModal}>
-            ✍️ 发布动态
-          </Button>
+        {/* ==================== 左侧边栏 ==================== */}
+        <div className="community-sidebar-left">
+          <LeftSidebar
+            topics={topics}
+            selectedTopicId={selectedTopicId}
+            onSelectTopic={setSelectedTopicId}
+            isAuthenticated={!!currentUser}
+          />
         </div>
+
+        {/* ==================== 主内容区 ==================== */}
+        <div className="community-main">
+          {/* 顶部操作栏 */}
+          <div className="community-header">
+            <h1 className="community-header__title">🌐 校园社区</h1>
+            <Button type="primary" size="large" onClick={handleOpenPublishModal}>
+              ✍️ 发布动态
+            </Button>
+          </div>
+
+        {/* ==================== 热门标签 ==================== */}
+        {tags.length > 0 && (
+          <div className="community-tags-section">
+            <div className="tags-header">
+              <span className="tags-title">🏷️ 热门标签</span>
+              <span className="tags-subtitle">点击筛选相关内容</span>
+            </div>
+            <div className="tags-list">
+              {/* "全部"标签 */}
+              <button
+                className={`tag-item ${selectedTagId === null ? 'tag-item--active' : ''}`}
+                onClick={() => handleSelectTag(null)}
+              >
+                <span className="tag-name">全部</span>
+              </button>
+
+              {/* 热门标签列表 */}
+              {tags.slice(0, 10).map((tag) => (
+                <button
+                  key={tag.id}
+                  className={`tag-item ${selectedTagId === tag.id ? 'tag-item--active' : ''}`}
+                  onClick={() => handleSelectTag(tag.id)}
+                >
+                  <span className="tag-name">{tag.name}</span>
+                  {tag.hotCount > 0 && (
+                    <span className="tag-count">{tag.hotCount}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ==================== 标签筛选 ==================== */}
         <div className="community-tabs">
@@ -382,66 +746,27 @@ const Community: React.FC = () => {
           />
         </div>
 
-        {/* ==================== 帖子列表 ==================== */}
-        <div className="community-posts">
-          {loading ? (
-            <Skeleton type="card" count={3} animation="wave" />
-          ) : posts.length === 0 ? (
-            <div className="community-empty">
-              <div className="empty-icon">📭</div>
-              <p className="empty-text">还没有动态</p>
-              <p className="empty-tip">快来发布第一条动态吧！</p>
-            </div>
-          ) : (
-            <>
-              {posts.map((post) => (
-                <div key={post.postId} className="post-card">
-                  {/* 用户信息 */}
-                  <div className="post-card__header">
-                    <div className="post-card__avatar">
-                      {post.authorAvatar ? (
-                        <img src={post.authorAvatar} alt={post.authorName} />
-                      ) : (
-                        <span>👤</span>
-                      )}
-                    </div>
-                    <div className="post-card__info">
-                      <div className="post-card__name">{post.authorName}</div>
-                      <div className="post-card__time">{formatTime(post.createdAt)}</div>
-                    </div>
-                  </div>
-
-                  {/* 帖子内容 */}
-                  <div className="post-card__content">
-                    <p>{post.content}</p>
-                  </div>
-
-                  {/* 图片 */}
-                  {post.images && post.images.length > 0 && (
-                    <div className="post-card__images">
-                      {post.images.map((image, index) => (
-                        <img key={index} src={image} alt={`图片${index + 1}`} />
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 操作栏 */}
-                  <div className="post-card__actions">
-                    <button
-                      className={`post-card__action ${post.isLiked ? 'active' : ''}`}
-                      onClick={() => handleToggleLike(post)}
-                    >
-                      {post.isLiked ? '❤️' : '🤍'} {post.likeCount}
-                    </button>
-                    <button
-                      className="post-card__action"
-                      onClick={() => handleOpenCommentModal(post)}
-                    >
-                      💬 {post.commentCount}
-                    </button>
-                  </div>
-                </div>
-              ))}
+          {/* ==================== 帖子列表 ==================== */}
+          <div className="community-posts">
+            {loading ? (
+              <Skeleton type="card" count={3} animation="wave" />
+            ) : posts.length === 0 ? (
+              <div className="community-empty">
+                <div className="empty-icon">📭</div>
+                <p className="empty-text">还没有动态</p>
+                <p className="empty-tip">快来发布第一条动态吧！</p>
+              </div>
+            ) : (
+              <>
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.postId}
+                    post={post}
+                    onLike={handleToggleLike}
+                    onComment={handleOpenCommentModal}
+                    onView={handleViewPost}
+                  />
+                ))}
 
               {/* 加载更多 */}
               {hasMore && (
@@ -452,28 +777,64 @@ const Community: React.FC = () => {
                 </div>
               )}
 
-              {!hasMore && (
-                <div className="community-no-more">
-                  <p>已经到底啦！😊</p>
-                </div>
-              )}
-            </>
-          )}
+                {!hasMore && (
+                  <div className="community-no-more">
+                    <p>已经到底啦！😊</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ==================== 右侧边栏 ==================== */}
+        <div className="community-sidebar-right">
+          <RightSidebar
+            hotTopics={topics.filter(t => t.isHot).slice(0, 8)}
+            hotTags={tags.slice(0, 12)}
+            onSelectTopic={setSelectedTopicId}
+            onSelectTag={(tagId) => handleSelectTag(tagId)}
+          />
         </div>
       </div>
 
       {/* ==================== 发布动态弹窗 ==================== */}
       {showPublishModal && (
-        <Modal onClose={handleClosePublishModal} title="✍️ 发布动态">
+        <Modal visible={showPublishModal} onClose={handleClosePublishModal} title="✍️ 发布动态" footer={null}>
           <div className="publish-modal">
-            <textarea
-              className="publish-modal__textarea"
-              placeholder="分享你的生活...（最多500字）"
+            {/* Markdown 编辑器 */}
+            <MarkdownEditor
               value={publishContent}
-              onChange={(e) => setPublishContent(e.target.value)}
-              maxLength={500}
-              rows={6}
+              onChange={setPublishContent}
+              placeholder="分享你的生活... 支持 Markdown 语法哦！✨"
+              maxLength={5000}
+              minHeight={200}
+              showToolbar={true}
+              showEmojiPicker={true}
             />
+
+            {/* 标签选择区域 */}
+            {tags.length > 0 && (
+              <div className="publish-modal__tags">
+                <div className="publish-modal__tags-header">
+                  <span className="publish-modal__tags-title">🏷️ 选择标签</span>
+                  <span className="publish-modal__tags-hint">（最多选择10个，已选{publishTagIds.length}个）</span>
+                </div>
+                <div className="publish-modal__tags-list">
+                  {tags.slice(0, 20).map((tag) => (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      className={`publish-tag-item ${publishTagIds.includes(tag.id) ? 'publish-tag-item--active' : ''}`}
+                      onClick={() => handleTogglePublishTag(tag.id)}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="publish-modal__footer">
               <Button onClick={handleClosePublishModal}>取消</Button>
               <Button

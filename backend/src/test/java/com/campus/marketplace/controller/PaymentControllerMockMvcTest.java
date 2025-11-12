@@ -1,9 +1,8 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
-import com.campus.marketplace.common.entity.Order;
+import com.campus.marketplace.common.dto.response.OrderResponse;
 import com.campus.marketplace.service.OrderService;
 import com.campus.marketplace.service.RefundService;
 import com.campus.marketplace.service.impl.AlipayPaymentService;
@@ -85,11 +84,11 @@ class PaymentControllerMockMvcTest {
             when(wechatPaymentServiceV2.buildSuccessResponse()).thenReturn("<xml>SUCCESS</xml>");
             when(wechatPaymentServiceV2.buildFailResponse("订单信息为空")).thenReturn("<xml>FAIL</xml>");
             when(orderService.getOrderDetail("ORDER123")).thenReturn(
-                    Order.builder().orderNo("ORDER123").amount(new BigDecimal("99.90")).build()
+                    OrderResponse.builder().orderNo("ORDER123").amount(new BigDecimal("99.90")).build()
             );
             when(orderService.handlePaymentCallback(any(PaymentCallbackRequest.class), eq(true))).thenReturn(true);
 
-            MockHttpServletRequestBuilder request = post("/api/payment/wechat/notify")
+            MockHttpServletRequestBuilder request = post("/payment/wechat/notify")
                     .contentType(MediaType.APPLICATION_XML)
                     .content(xmlBody);
 
@@ -115,7 +114,7 @@ class PaymentControllerMockMvcTest {
             when(wechatPaymentService.buildSuccessResponse()).thenReturn("{\"code\":\"SUCCESS\"}");
             when(wechatPaymentService.buildFailResponse("订单信息为空")).thenReturn("{\"code\":\"FAIL\"}");
 
-            MockHttpServletRequestBuilder request = post("/api/payment/wechat/notify")
+            MockHttpServletRequestBuilder request = post("/payment/wechat/notify")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody)
                     .header("Wechatpay-Signature", "sig")
@@ -138,7 +137,7 @@ class PaymentControllerMockMvcTest {
     void queryPaymentStatus_v3() throws Exception {
         when(wechatPaymentService.queryOrderStatus("ORDER999")).thenReturn("SUCCESS");
 
-        mockMvc.perform(get("/api/payment/status/ORDER999"))
+        mockMvc.perform(get("/payment/status/ORDER999"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"code\":200,\"message\":\"操作成功\",\"data\":\"SUCCESS\"}"));
@@ -153,7 +152,7 @@ class PaymentControllerMockMvcTest {
         when(refundService.handleRefundCallback(eq("ORDER789"), eq("ALIPAY"), eq(true), anyMap()))
                 .thenReturn(true);
 
-        mockMvc.perform(post("/api/payment/alipay/refund/notify")
+        mockMvc.perform(post("/payment/alipay/refund/notify")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("out_trade_no", "ORDER789")
                         .param("refund_status", "REFUND_SUCCESS"))
@@ -168,7 +167,7 @@ class PaymentControllerMockMvcTest {
     void alipayRefundNotify_verifyFailed() throws Exception {
         when(alipayPaymentService.verifySignature(anyMap())).thenReturn(false);
 
-        mockMvc.perform(post("/api/payment/alipay/refund/notify")
+        mockMvc.perform(post("/payment/alipay/refund/notify")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("out_trade_no", "ORDER789"))
                 .andExpect(status().isBadRequest())

@@ -13,7 +13,7 @@
  * @date 2025-11-07
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Form,
@@ -37,6 +37,7 @@ import {
   Badge,
   Tooltip,
   Alert,
+  type UploadFile,
 } from 'antd';
 import {
   UserOutlined,
@@ -56,19 +57,19 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userService, uploadService } from '@campus/shared';
+import { userService, uploadService, ImageUploadWithCrop, authService } from '@campus/shared';
 import { useAuth } from '@/hooks';
-import type { UploadFile } from 'antd';
 import type { RcFile } from 'antd/es/upload';
 import type { ColumnsType } from 'antd/es/table';
+import './Profile.css';
 
 const { TextArea } = Input;
 const { Text, Title, Paragraph } = Typography;
 const { Step } = Steps;
 
-// 模拟登录设备数据
+// 登录设备数据类型
 interface LoginDevice {
-  id: string;
+  id: number;
   deviceName: string;
   deviceType: 'mobile' | 'desktop' | 'tablet';
   os: string;
@@ -80,7 +81,7 @@ interface LoginDevice {
 }
 
 export const ProfilePage: React.FC = () => {
-  const { message } = App.useApp(); // ✅ 使用 App 提供的 message 实例
+  const { message, modal } = App.useApp(); // ✅ 使用 App 提供的 message 和 modal 实例
   const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
 
@@ -89,6 +90,7 @@ export const ProfilePage: React.FC = () => {
   const [passwordForm] = Form.useForm();
   const [emailForm] = Form.useForm();
   const [phoneForm] = Form.useForm();
+  const [twoFactorForm] = Form.useForm();
 
   // 状态管理
   const [avatarFileList, setAvatarFileList] = useState<UploadFile[]>([]);
@@ -109,50 +111,24 @@ export const ProfilePage: React.FC = () => {
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      const response = await userService.getProfile();
+      const userData = await userService.getProfile(); // ✅ 已经是 User 对象
       // 设置已验证状态
-      setEmailVerified(!!response.data.emailVerified);
-      setPhoneVerified(!!response.data.phoneVerified);
-      setTwoFactorEnabled(!!response.data.twoFactorEnabled);
-      return response.data;
+      setEmailVerified(!!userData.emailVerified);
+      setPhoneVerified(!!userData.phoneVerified);
+      setTwoFactorEnabled(!!userData.twoFactorEnabled);
+      return userData;
     },
     staleTime: 5 * 60 * 1000,
   });
 
-  // 查询登录设备（模拟数据）
+  // 查询登录设备列表
   const { data: loginDevices = [] } = useQuery<LoginDevice[]>({
-    queryKey: ['loginDevices'],
+    queryKey: ['loginDevices', currentUser?.id],
     queryFn: async () => {
-      // TODO: 调用真实API
-      // const response = await userService.getLoginDevices();
-      // return response.data;
-
-      // 模拟数据
-      return [
-        {
-          id: '1',
-          deviceName: 'Windows 11 - Chrome',
-          deviceType: 'desktop',
-          os: 'Windows 11',
-          browser: 'Chrome 120',
-          ip: '192.168.1.100',
-          location: '中国 北京',
-          lastActiveAt: new Date().toISOString(),
-          isCurrent: true,
-        },
-        {
-          id: '2',
-          deviceName: 'iPhone 15 Pro - Safari',
-          deviceType: 'mobile',
-          os: 'iOS 17.2',
-          browser: 'Safari',
-          ip: '192.168.1.101',
-          location: '中国 上海',
-          lastActiveAt: new Date(Date.now() - 86400000).toISOString(),
-          isCurrent: false,
-        },
-      ];
+      if (!currentUser?.id) return [];
+      return await userService.getLoginDevices(currentUser.id);
     },
+    enabled: !!currentUser?.id,
     staleTime: 2 * 60 * 1000,
   });
 
@@ -191,37 +167,76 @@ export const ProfilePage: React.FC = () => {
     },
   });
 
-  // 上传头像 Mutation
-  const uploadAvatarMutation = useMutation({
-    mutationFn: async (file: RcFile) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await uploadService.uploadImage(formData);
-      return response.data.url;
-    },
-    onSuccess: (url: string) => {
-      setAvatarUrl(url);
+  // 处理头像变化（支持 Base64 上传）
+  const handleAvatarChange = async (urls: string[]) => {
+    if (urls.length > 0) {
+      setAvatarUrl(urls[0]);
       message.success('头像上传成功！记得保存修改 ✅');
+    }
+  };
+
+  // ✅ 同步用户资料到表单（数据加载完成后）
+  useEffect(() => {
+    if (userProfile) {
+      profileForm.setFieldsValue({
+        nickname: userProfile.nickname,
+        bio: userProfile.bio,
+      });
+      // 同步头像
+      if (userProfile.avatar) {
+        setAvatarUrl(userProfile.avatar);
+      }
+    }
+  }, [userProfile, profileForm]);
+
+  // 发送邮箱验证码 Mutation
+  const sendEmailCodeMutation = useMutation({
+    mutationFn: async (email: string) => {
+      await userService.sendEmailCode(email);
+    },
+    onSuccess: () => {
+      message.success('验证码已发送！请查收邮件 📧');
+      setEmailCodeSent(true);
+      startCountdown();
     },
     onError: (error: any) => {
-      message.error(`上传失败：${error.message} 😰`);
+      message.error(`发送失败：${error.message} 😰`);
     },
   });
 
   // 发送邮箱验证码
   const sendEmailCode = () => {
-    // TODO: 调用真实API
-    message.success('验证码已发送到您的邮箱！');
-    setEmailCodeSent(true);
-    startCountdown();
+    const email = emailForm.getFieldValue('email');
+    if (!email) {
+      message.error('请先输入邮箱地址！');
+      return;
+    }
+    sendEmailCodeMutation.mutate(email);
   };
+
+  // 发送手机验证码 Mutation
+  const sendPhoneCodeMutation = useMutation({
+    mutationFn: async (phone: string) => {
+      await userService.sendPhoneCode(phone);
+    },
+    onSuccess: () => {
+      message.success('验证码已发送！请查收短信 📱');
+      setPhoneCodeSent(true);
+      startCountdown();
+    },
+    onError: (error: any) => {
+      message.error(`发送失败：${error.message} 😰`);
+    },
+  });
 
   // 发送手机验证码
   const sendPhoneCode = () => {
-    // TODO: 调用真实API
-    message.success('验证码已发送到您的手机！');
-    setPhoneCodeSent(true);
-    startCountdown();
+    const phone = phoneForm.getFieldValue('phone');
+    if (!phone) {
+      message.error('请先输入手机号！');
+      return;
+    }
+    sendPhoneCodeMutation.mutate(phone);
   };
 
   // 倒计时
@@ -238,84 +253,214 @@ export const ProfilePage: React.FC = () => {
     }, 1000);
   };
 
-  // 绑定邮箱
-  const handleBindEmail = () => {
-    emailForm.validateFields().then((values) => {
-      // TODO: 调用真实API
+  // 绑定邮箱 Mutation
+  const bindEmailMutation = useMutation({
+    mutationFn: async (data: { email: string; code: string }) => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      await userService.bindEmail(currentUser.id, data);
+    },
+    onSuccess: () => {
       message.success('邮箱绑定成功！🎉');
       setEmailVerified(true);
       setEmailBindModalVisible(false);
       emailForm.resetFields();
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+    onError: (error: any) => {
+      message.error(`绑定失败：${error.message} 😰`);
+    },
+  });
+
+  // 绑定邮箱
+  const handleBindEmail = () => {
+    emailForm.validateFields().then((values) => {
+      bindEmailMutation.mutate(values);
     });
   };
 
-  // 绑定手机号
-  const handleBindPhone = () => {
-    phoneForm.validateFields().then((values) => {
-      // TODO: 调用真实API
+  // 绑定手机号 Mutation
+  const bindPhoneMutation = useMutation({
+    mutationFn: async (data: { phone: string; code: string }) => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      await userService.bindPhone(currentUser.id, data);
+    },
+    onSuccess: () => {
       message.success('手机号绑定成功！🎉');
       setPhoneVerified(true);
       setPhoneBindModalVisible(false);
       phoneForm.resetFields();
       queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+    onError: (error: any) => {
+      message.error(`绑定失败：${error.message} 😰`);
+    },
+  });
+
+  // 绑定手机号
+  const handleBindPhone = () => {
+    phoneForm.validateFields().then((values) => {
+      bindPhoneMutation.mutate(values);
     });
   };
 
+  // 启用两步验证 Mutation（修复 - BaSui 2025-11-10）
+  const enableTwoFactorMutation = useMutation({
+    mutationFn: async () => {
+      // ✅ 修复：使用 authService.enable2FA() 而不是 userService
+      const response = await authService.enable2FA();
+      if (response.code !== 200 || !response.data) {
+        throw new Error(response.message || '启用失败');
+      }
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setTwoFactorSecret(data.secret);
+      setTwoFactorModalVisible(true);
+      setTwoFactorStep(0);
+      message.success('2FA 密钥生成成功！请扫描二维码 🎉');
+    },
+    onError: (error: any) => {
+      message.error(`启用失败：${error.message} 😰`);
+    },
+  });
+
   // 启用两步验证
   const handleEnableTwoFactor = () => {
-    // 生成模拟密钥
-    setTwoFactorSecret('JBSWY3DPEHPK3PXP');
-    setTwoFactorModalVisible(true);
-    setTwoFactorStep(0);
+    enableTwoFactorMutation.mutate();
   };
 
+  // 验证两步验证 Mutation（修复 - BaSui 2025-11-10）
+  const verifyTwoFactorMutation = useMutation({
+    mutationFn: async (code: string) => {
+      // ✅ 修复：使用 authService.verify2FA() 而不是 userService
+      const response = await authService.verify2FA({ code });
+      if (response.code !== 200) {
+        throw new Error(response.message || '验证失败');
+      }
+      return response;
+    },
+    onSuccess: () => {
+      message.success('两步验证已启用！🎉');
+      setTwoFactorEnabled(true);
+      setTwoFactorModalVisible(false);
+      setTwoFactorStep(0);
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+    onError: (error: any) => {
+      message.error(`验证失败：${error.message} 😰`);
+    },
+  });
+
   // 确认两步验证
-  const handleConfirmTwoFactor = () => {
-    // TODO: 验证 TOTP 码
-    message.success('两步验证启用成功！🎉');
-    setTwoFactorEnabled(true);
-    setTwoFactorModalVisible(false);
-    setTwoFactorStep(0);
+  const handleConfirmTwoFactor = (code: string) => {
+    if (!code || code.length !== 6) {
+      message.error('请输入6位验证码！');
+      return;
+    }
+    verifyTwoFactorMutation.mutate(code);
   };
+
+  // 关闭两步验证 Mutation（修复 - BaSui 2025-11-10）
+  const disableTwoFactorMutation = useMutation({
+    mutationFn: async (password: string) => {
+      // ✅ 修复：使用 authService.disable2FA() 而不是 userService
+      const response = await authService.disable2FA({ password });
+      if (response.code !== 200) {
+        throw new Error(response.message || '关闭失败');
+      }
+      return response;
+    },
+    onSuccess: () => {
+      message.success('两步验证已关闭！');
+      setTwoFactorEnabled(false);
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    },
+    onError: (error: any) => {
+      message.error(`关闭失败：${error.message} 😰`);
+    },
+  });
 
   // 关闭两步验证
   const handleDisableTwoFactor = () => {
-    Modal.confirm({
+    modal.confirm({
       title: '关闭两步验证',
-      content: '关闭后您的账号安全性会降低，确定要关闭吗？',
+      content: (
+        <Form layout="vertical">
+          <Alert
+            message="关闭后您的账号安全性会降低"
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+          <Form.Item
+            label="请输入密码以确认"
+            required
+          >
+            <Input.Password
+              id="disable-2fa-password"
+              placeholder="请输入登录密码"
+            />
+          </Form.Item>
+        </Form>
+      ),
       okText: '确认关闭',
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        // TODO: 调用真实API
-        message.success('两步验证已关闭');
-        setTwoFactorEnabled(false);
+        const passwordInput = document.getElementById('disable-2fa-password') as HTMLInputElement;
+        const password = passwordInput?.value;
+        if (!password) {
+          message.error('请输入密码！');
+          return Promise.reject();
+        }
+        return disableTwoFactorMutation.mutateAsync(password);
       },
     });
   };
 
+  // 踢出设备 Mutation
+  const kickDeviceMutation = useMutation({
+    mutationFn: async (deviceId: number) => {
+      if (!currentUser?.id) throw new Error('用户ID不存在');
+      await userService.kickDevice(currentUser.id, deviceId);
+    },
+    onSuccess: () => {
+      message.success('设备已踢出！🎉');
+      queryClient.invalidateQueries({ queryKey: ['loginDevices'] });
+    },
+    onError: (error: any) => {
+      message.error(`踢出失败：${error.message} 😰`);
+    },
+  });
+
   // 踢出设备
   const handleKickDevice = (deviceId: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: '踢出设备',
       content: '确定要踢出这个设备吗？该设备需要重新登录。',
       okText: '确认踢出',
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
-        // TODO: 调用真实API
-        message.success('设备已踢出');
-        queryClient.invalidateQueries({ queryKey: ['loginDevices'] });
+        kickDeviceMutation.mutate(Number(deviceId));
       },
     });
   };
 
   // 提交个人资料
   const handleProfileSubmit = () => {
-    profileForm.validateFields().then((values) => {
-      updateProfileMutation.mutate(values);
-    });
+    profileForm
+      .validateFields()
+      .then((values) => {
+        updateProfileMutation.mutate(values);
+      })
+      .catch((error) => {
+        console.error('表单验证失败:', error);
+        // 显示第一个错误字段的错误信息
+        if (error.errorFields && error.errorFields.length > 0) {
+          message.error(error.errorFields[0].errors[0]);
+        }
+      });
   };
 
   // 提交密码修改
@@ -325,21 +470,6 @@ export const ProfilePage: React.FC = () => {
     });
   };
 
-  // 头像上传前校验
-  const beforeUpload = (file: RcFile) => {
-    const isImage = file.type.startsWith('image/');
-    if (!isImage) {
-      message.error('只能上传图片文件！');
-      return false;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('图片大小不能超过 2MB！');
-      return false;
-    }
-    uploadAvatarMutation.mutate(file);
-    return false;
-  };
 
   // 登录设备表格列定义
   const deviceColumns: ColumnsType<LoginDevice> = [
@@ -348,11 +478,17 @@ export const ProfilePage: React.FC = () => {
       key: 'device',
       render: (_, record) => (
         <Space>
-          {record.deviceType === 'mobile' ? <MobileOutlined style={{ fontSize: 18 }} /> : <DesktopOutlined style={{ fontSize: 18 }} />}
+          <div className="profile-device-icon">
+            {record.deviceType === 'mobile' ? <MobileOutlined /> : <DesktopOutlined />}
+          </div>
           <div>
             <div>
               <Text strong>{record.deviceName}</Text>
-              {record.isCurrent && <Tag color="green" style={{ marginLeft: 8 }}>当前设备</Tag>}
+              {record.isCurrent && (
+                <span className="profile-device-current-badge" style={{ marginLeft: 8 }}>
+                  <CheckCircleOutlined /> 当前设备
+                </span>
+              )}
             </div>
             <Text type="secondary" style={{ fontSize: 12 }}>
               {record.os} · {record.browser}
@@ -406,40 +542,44 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Form
             form={profileForm}
             layout="vertical"
+            className="profile-form"
             initialValues={{
               nickname: userProfile?.nickname,
               bio: userProfile?.bio,
             }}
           >
-            {/* 头像上传 */}
+            {/* 头像上传（带裁剪功能）✂️ */}
             <Form.Item label="头像">
-              <Space direction="vertical" align="center" style={{ width: '100%' }}>
-                <Avatar
-                  size={120}
-                  src={avatarUrl || userProfile?.avatar}
-                  icon={<UserOutlined />}
+              <div className="profile-avatar-section">
+                <div className="profile-avatar-wrapper">
+                  <Avatar
+                    size={120}
+                    src={avatarUrl || userProfile?.avatar}
+                    icon={<UserOutlined />}
+                  />
+                  <div className="profile-avatar-badge">
+                    <CameraOutlined />
+                  </div>
+                </div>
+                <ImageUploadWithCrop
+                  value={avatarUrl ? [avatarUrl] : []}
+                  onChange={handleAvatarChange}
+                  maxCount={1}
+                  enableCrop={true}
+                  cropAspect={1}  // 1:1 正方形裁剪
+                  category="avatar"
+                  uploadText="更换头像"
+                  maxSize={2}  // 2MB
+                  tip="支持 JPG、PNG 格式，大小不超过 2MB。支持裁剪和粘贴板上传（Ctrl+V）"
                 />
-                <Upload
-                  accept="image/*"
-                  showUploadList={false}
-                  beforeUpload={beforeUpload}
-                  fileList={avatarFileList}
-                >
-                  <Button icon={<CameraOutlined />} loading={uploadAvatarMutation.isPending}>
-                    更换头像
-                  </Button>
-                </Upload>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  支持 JPG、PNG 格式，大小不超过 2MB
-                </Text>
-              </Space>
+              </div>
             </Form.Item>
 
-            <Divider />
+            <Divider className="profile-divider" />
 
             {/* 昵称 */}
             <Form.Item
@@ -447,7 +587,7 @@ export const ProfilePage: React.FC = () => {
               name="nickname"
               rules={[
                 { required: true, message: '请输入昵称！' },
-                { min: 2, max: 20, message: '昵称长度为 2-20 个字符！' },
+                { min: 1, max: 20, message: '昵称长度为 1-20 个字符！' },
               ]}
             >
               <Input placeholder="请输入昵称" maxLength={20} />
@@ -471,6 +611,7 @@ export const ProfilePage: React.FC = () => {
             <Form.Item>
               <Button
                 type="primary"
+                className="profile-btn-primary"
                 icon={<SaveOutlined />}
                 onClick={handleProfileSubmit}
                 loading={updateProfileMutation.isPending}
@@ -490,15 +631,16 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Alert
+            className="profile-alert"
             message="密码安全提示"
             description="为了您的账号安全，建议定期更换密码，并使用包含大小写字母、数字和特殊字符的强密码。"
             type="info"
             showIcon
             style={{ marginBottom: 24 }}
           />
-          <Form form={passwordForm} layout="vertical">
+          <Form form={passwordForm} layout="vertical" className="profile-form">
             <Form.Item
               label="当前密码"
               name="oldPassword"
@@ -544,6 +686,7 @@ export const ProfilePage: React.FC = () => {
             <Form.Item>
               <Button
                 type="primary"
+                className="profile-btn-primary"
                 icon={<SaveOutlined />}
                 onClick={handlePasswordSubmit}
                 loading={changePasswordMutation.isPending}
@@ -563,30 +706,35 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {/* 邮箱绑定 */}
-            <div>
+            <div className="profile-contact-item">
               <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
                 <Col>
                   <Space>
-                    <MailOutlined style={{ fontSize: 18 }} />
-                    <div>
-                      <div>
-                        <Text strong>邮箱</Text>
+                    <div className="profile-contact-icon">
+                      <MailOutlined />
+                    </div>
+                    <div className="profile-contact-info">
+                      <div className="profile-contact-title">
+                        邮箱
                         {emailVerified && (
-                          <Badge status="success" text="已验证" style={{ marginLeft: 8 }} />
+                          <span className="profile-contact-badge" style={{ marginLeft: 8 }}>
+                            <CheckCircleOutlined /> 已验证
+                          </span>
                         )}
                       </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <div className="profile-contact-value">
                         {userProfile?.email || '未绑定邮箱'}
-                      </Text>
+                      </div>
                     </div>
                   </Space>
                 </Col>
                 <Col>
                   <Button
                     type={emailVerified ? 'default' : 'primary'}
+                    className={emailVerified ? 'profile-btn-default' : 'profile-btn-primary'}
                     onClick={() => setEmailBindModalVisible(true)}
                   >
                     {emailVerified ? '更换邮箱' : '绑定邮箱'}
@@ -598,30 +746,35 @@ export const ProfilePage: React.FC = () => {
               </Paragraph>
             </div>
 
-            <Divider />
+            <Divider className="profile-divider" />
 
             {/* 手机号绑定 */}
-            <div>
+            <div className="profile-contact-item">
               <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
                 <Col>
                   <Space>
-                    <PhoneOutlined style={{ fontSize: 18 }} />
-                    <div>
-                      <div>
-                        <Text strong>手机号</Text>
+                    <div className="profile-contact-icon">
+                      <PhoneOutlined />
+                    </div>
+                    <div className="profile-contact-info">
+                      <div className="profile-contact-title">
+                        手机号
                         {phoneVerified && (
-                          <Badge status="success" text="已验证" style={{ marginLeft: 8 }} />
+                          <span className="profile-contact-badge" style={{ marginLeft: 8 }}>
+                            <CheckCircleOutlined /> 已验证
+                          </span>
                         )}
                       </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <div className="profile-contact-value">
                         {userProfile?.phone || '未绑定手机号'}
-                      </Text>
+                      </div>
                     </div>
                   </Space>
                 </Col>
                 <Col>
                   <Button
                     type={phoneVerified ? 'default' : 'primary'}
+                    className={phoneVerified ? 'profile-btn-default' : 'profile-btn-primary'}
                     onClick={() => setPhoneBindModalVisible(true)}
                   >
                     {phoneVerified ? '更换手机号' : '绑定手机号'}
@@ -644,34 +797,46 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             {/* 两步验证 */}
-            <div>
+            <div className="profile-security-item">
               <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
                 <Col>
                   <Space>
-                    <QrcodeOutlined style={{ fontSize: 18 }} />
-                    <div>
-                      <div>
-                        <Text strong>两步验证（2FA）</Text>
+                    <div className="profile-security-icon">
+                      <QrcodeOutlined />
+                    </div>
+                    <div className="profile-contact-info">
+                      <div className="profile-contact-title">
+                        两步验证（2FA）
                         {twoFactorEnabled && (
-                          <Badge status="success" text="已启用" style={{ marginLeft: 8 }} />
+                          <span className="profile-contact-badge" style={{ marginLeft: 8 }}>
+                            <CheckCircleOutlined /> 已启用
+                          </span>
                         )}
                       </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <div className="profile-contact-value">
                         {twoFactorEnabled ? '使用 Google Authenticator 保护您的账号' : '未启用两步验证'}
-                      </Text>
+                      </div>
                     </div>
                   </Space>
                 </Col>
                 <Col>
                   {twoFactorEnabled ? (
-                    <Button danger onClick={handleDisableTwoFactor}>
+                    <Button
+                      danger
+                      className="profile-btn-danger"
+                      onClick={handleDisableTwoFactor}
+                    >
                       关闭
                     </Button>
                   ) : (
-                    <Button type="primary" onClick={handleEnableTwoFactor}>
+                    <Button
+                      type="primary"
+                      className="profile-btn-primary"
+                      onClick={handleEnableTwoFactor}
+                    >
                       启用
                     </Button>
                   )}
@@ -682,21 +847,21 @@ export const ProfilePage: React.FC = () => {
               </Paragraph>
             </div>
 
-            <Divider />
+            <Divider className="profile-divider" />
 
             {/* 登录通知 */}
-            <div>
+            <div className="profile-security-item">
               <Row justify="space-between" align="middle">
                 <Col>
                   <Space>
-                    <SafetyOutlined style={{ fontSize: 18 }} />
-                    <div>
-                      <div>
-                        <Text strong>登录通知</Text>
-                      </div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                    <div className="profile-security-icon">
+                      <SafetyOutlined />
+                    </div>
+                    <div className="profile-contact-info">
+                      <div className="profile-contact-title">登录通知</div>
+                      <div className="profile-contact-value">
                         有新设备登录时发送通知
-                      </Text>
+                      </div>
                     </div>
                   </Space>
                 </Col>
@@ -717,20 +882,24 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Alert
+            className="profile-alert"
             message="安全提示"
             description="如果发现陌生设备，请立即踢出并修改密码。"
             type="warning"
             showIcon
             style={{ marginBottom: 16 }}
           />
-          <Table
-            columns={deviceColumns}
-            dataSource={loginDevices}
-            rowKey="id"
-            pagination={false}
-          />
+          <div className="profile-device-table">
+            <Table
+              columns={deviceColumns}
+              dataSource={loginDevices}
+              rowKey="id"
+              pagination={false}
+              loading={kickDeviceMutation.isPending}
+            />
+          </div>
         </Card>
       ),
     },
@@ -742,53 +911,73 @@ export const ProfilePage: React.FC = () => {
         </span>
       ),
       children: (
-        <Card>
+        <Card className="profile-content-card">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <Title level={5}>基本信息</Title>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">用户名：</Text>
-                <Text strong>{userProfile?.username}</Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">用户ID：</Text>
-                <Text strong>{userProfile?.id}</Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">注册时间：</Text>
-                <Text>{userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleString() : '-'}</Text>
-              </Col>
-              <Col span={12}>
-                <Text type="secondary">最后登录：</Text>
-                <Text>{userProfile?.lastLoginAt ? new Date(userProfile.lastLoginAt).toLocaleString() : '-'}</Text>
-              </Col>
-            </Row>
+            {/* 基本信息 */}
+            <div className="profile-info-section">
+              <div className="profile-info-title">基本信息</div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">用户名：</span>
+                <span className="profile-info-value">{userProfile?.username}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">用户ID：</span>
+                <span className="profile-info-value">{userProfile?.id}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">学号：</span>
+                <span className="profile-info-value">{userProfile?.studentId || '-'}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">所属校区：</span>
+                <span className="profile-info-value">{userProfile?.campus?.name || '-'}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">账号状态：</span>
+                <span className={`profile-info-tag ${
+                  userProfile?.status === 'ACTIVE' ? 'status-active' :
+                  userProfile?.status === 'BANNED' ? 'status-banned' :
+                  'status-deleted'
+                }`}>
+                  {userProfile?.status === 'ACTIVE' ? '正常' : userProfile?.status === 'BANNED' ? '封禁' : '已注销'}
+                </span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">信誉分：</span>
+                <span className="profile-info-value" style={{ color: (userProfile?.creditScore || 0) >= 100 ? '#52c41a' : '#ff4d4f' }}>
+                  {userProfile?.creditScore || 100} / 200
+                </span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">注册时间：</span>
+                <span className="profile-info-value">{userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleString() : '-'}</span>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">最后登录：</span>
+                <span className="profile-info-value">{userProfile?.lastLoginAt ? new Date(userProfile.lastLoginAt).toLocaleString() : '-'}</span>
+              </div>
+            </div>
 
-            <Divider />
-
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <Title level={5}>角色权限</Title>
-              </Col>
-              <Col span={24}>
-                <Text type="secondary">角色：</Text>
-                <Space wrap style={{ marginLeft: 8 }}>
+            {/* 角色权限 */}
+            <div className="profile-info-section">
+              <div className="profile-info-title">角色权限</div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">角色：</span>
+                <Space wrap>
                   {currentUser?.roles?.map((role) => (
                     <Tag color="blue" key={role}>
                       {role}
                     </Tag>
                   ))}
                 </Space>
-              </Col>
-              <Col span={24}>
-                <Text type="secondary">权限数量：</Text>
-                <Text strong style={{ marginLeft: 8 }}>
+              </div>
+              <div className="profile-info-item">
+                <span className="profile-info-label">权限数量：</span>
+                <span className="profile-info-value">
                   {currentUser?.permissions?.length || 0} 个
-                </Text>
-              </Col>
-            </Row>
+                </span>
+              </div>
+            </div>
           </Space>
         </Card>
       ),
@@ -796,8 +985,9 @@ export const ProfilePage: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="profile-page-container">
       <Card
+        className="profile-main-card"
         title={
           <Space>
             <UserOutlined />
@@ -811,6 +1001,7 @@ export const ProfilePage: React.FC = () => {
 
       {/* 邮箱绑定弹窗 */}
       <Modal
+        className="profile-modal"
         title="绑定邮箱"
         open={emailBindModalVisible}
         onCancel={() => {
@@ -853,10 +1044,17 @@ export const ProfilePage: React.FC = () => {
 
           <Form.Item>
             <Space>
-              <Button type="primary" onClick={handleBindEmail}>
+              <Button
+                type="primary"
+                className="profile-btn-primary"
+                onClick={handleBindEmail}
+              >
                 确认绑定
               </Button>
-              <Button onClick={() => setEmailBindModalVisible(false)}>
+              <Button
+                className="profile-btn-default"
+                onClick={() => setEmailBindModalVisible(false)}
+              >
                 取消
               </Button>
             </Space>
@@ -866,6 +1064,7 @@ export const ProfilePage: React.FC = () => {
 
       {/* 手机号绑定弹窗 */}
       <Modal
+        className="profile-modal"
         title="绑定手机号"
         open={phoneBindModalVisible}
         onCancel={() => {
@@ -908,10 +1107,17 @@ export const ProfilePage: React.FC = () => {
 
           <Form.Item>
             <Space>
-              <Button type="primary" onClick={handleBindPhone}>
+              <Button
+                type="primary"
+                className="profile-btn-primary"
+                onClick={handleBindPhone}
+              >
                 确认绑定
               </Button>
-              <Button onClick={() => setPhoneBindModalVisible(false)}>
+              <Button
+                className="profile-btn-default"
+                onClick={() => setPhoneBindModalVisible(false)}
+              >
                 取消
               </Button>
             </Space>
@@ -921,6 +1127,7 @@ export const ProfilePage: React.FC = () => {
 
       {/* 两步验证设置弹窗 */}
       <Modal
+        className="profile-modal"
         title="启用两步验证"
         open={twoFactorModalVisible}
         onCancel={() => {
@@ -930,7 +1137,7 @@ export const ProfilePage: React.FC = () => {
         footer={null}
         width={600}
       >
-        <Steps current={twoFactorStep} style={{ marginBottom: 24 }}>
+        <Steps className="profile-steps" current={twoFactorStep} style={{ marginBottom: 24 }}>
           <Step title="扫描二维码" />
           <Step title="输入验证码" />
           <Step title="完成设置" />
@@ -941,14 +1148,20 @@ export const ProfilePage: React.FC = () => {
             <Paragraph>
               请使用 Google Authenticator 或其他 TOTP 应用扫描下方二维码：
             </Paragraph>
-            <QRCode
-              value={`otpauth://totp/CampusMarketplace:${userProfile?.username}?secret=${twoFactorSecret}&issuer=CampusMarketplace`}
-              size={200}
-            />
+            <div className="profile-qrcode-wrapper">
+              <QRCode
+                value={`otpauth://totp/CampusMarketplace:${userProfile?.username}?secret=${twoFactorSecret}&issuer=CampusMarketplace`}
+                size={200}
+              />
+            </div>
             <Paragraph type="secondary">
               密钥（手动输入）：<Text code copyable>{twoFactorSecret}</Text>
             </Paragraph>
-            <Button type="primary" onClick={() => setTwoFactorStep(1)}>
+            <Button
+              type="primary"
+              className="profile-btn-primary"
+              onClick={() => setTwoFactorStep(1)}
+            >
               下一步
             </Button>
           </Space>
@@ -959,16 +1172,36 @@ export const ProfilePage: React.FC = () => {
             <Paragraph>
               请输入 Google Authenticator 中显示的 6 位数字验证码：
             </Paragraph>
-            <Form layout="vertical">
-              <Form.Item label="验证码" required>
+            <Form form={twoFactorForm} layout="vertical">
+              <Form.Item
+                label="验证码"
+                name="code"
+                rules={[
+                  { required: true, message: '请输入验证码！' },
+                  { len: 6, message: '验证码必须是6位数字！' },
+                  { pattern: /^\d{6}$/, message: '验证码必须是6位数字！' }
+                ]}
+              >
                 <Input placeholder="请输入6位验证码" maxLength={6} />
               </Form.Item>
               <Form.Item>
                 <Space>
-                  <Button type="primary" onClick={handleConfirmTwoFactor}>
+                  <Button
+                    type="primary"
+                    className="profile-btn-primary"
+                    loading={verifyTwoFactorMutation.isPending}
+                    onClick={() => {
+                      twoFactorForm.validateFields().then((values) => {
+                        handleConfirmTwoFactor(values.code);
+                      });
+                    }}
+                  >
                     验证并启用
                   </Button>
-                  <Button onClick={() => setTwoFactorStep(0)}>
+                  <Button
+                    className="profile-btn-default"
+                    onClick={() => setTwoFactorStep(0)}
+                  >
                     上一步
                   </Button>
                 </Space>

@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Input, Select, Skeleton } from '@campus/shared/components';
-import { goodsService } from '@campus/shared/services';;
+import { categoryService, tagService } from '@campus/shared/services';;
 import type { GoodsFormData } from './index';
 import './BasicInfoStep.css';
 
@@ -38,16 +38,41 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   onCancel,
 }) => {
   const [tagInput, setTagInput] = useState('');
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
 
   // 获取分类树
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ['categories', 'tree'],
     queryFn: async () => {
-      const response = await goodsService.getCategoryTree();
+      const response = await categoryService.tree();
       return response;
     },
     staleTime: 30 * 60 * 1000,
   });
+
+  // 获取标签列表
+  const { data: tags, isLoading: tagsLoading } = useQuery({
+    queryKey: ['tags', 'list'],
+    queryFn: async () => {
+      const response = await tagService.list();
+      return response;
+    },
+    staleTime: 30 * 60 * 1000,
+  });
+
+  // 过滤标签建议（根据用户输入）
+  const tagSuggestions = React.useMemo(() => {
+    if (!tags || !tagInput.trim()) return [];
+    
+    const input = tagInput.toLowerCase().trim();
+    return tags
+      .filter(tag => 
+        tag.name?.toLowerCase().includes(input) && 
+        !formData.tags.includes(tag.name || '')
+      )
+      .slice(0, 5) // 最多显示5个建议
+      .map(tag => tag.name || '');
+  }, [tags, tagInput, formData.tags]);
 
   // 构建分类选项（展平二级分类）
   const categoryOptions = React.useMemo(() => {
@@ -90,12 +115,18 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   };
 
   // 添加标签
-  const handleAddTag = () => {
-    const tag = tagInput.trim();
+  const handleAddTag = (tagName?: string) => {
+    const tag = (tagName || tagInput).trim();
     if (tag && !formData.tags.includes(tag)) {
       onUpdate({ tags: [...formData.tags, tag] });
       setTagInput('');
+      setShowTagSuggestions(false);
     }
+  };
+
+  // 选择标签建议
+  const handleSelectTagSuggestion = (tag: string) => {
+    handleAddTag(tag);
   };
 
   // 删除标签
@@ -270,21 +301,67 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
           <label className="form-field__label">
             商品标签 <span className="form-field__optional">选填</span>
           </label>
-          <div className="form-field__tag-input">
+          <div className="form-field__tag-input" style={{ position: 'relative' }}>
             <Input
-              placeholder="输入标签，按回车添加"
+              placeholder="输入标签，按回车添加（支持从已有标签选择）"
               value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onPressEnter={handleAddTag}
+              onChange={(e) => {
+                setTagInput(e.target.value);
+                setShowTagSuggestions(e.target.value.trim().length > 0);
+              }}
+              onPressEnter={() => handleAddTag()}
+              onFocus={() => setShowTagSuggestions(tagInput.trim().length > 0)}
+              onBlur={() => setTimeout(() => setShowTagSuggestions(false), 200)}
+              disabled={tagsLoading}
             />
             <button
               type="button"
               className="form-field__tag-add-btn"
-              onClick={handleAddTag}
+              onClick={() => handleAddTag()}
+              disabled={tagsLoading}
             >
               添加
             </button>
+            
+            {/* 标签建议下拉框 */}
+            {showTagSuggestions && tagSuggestions.length > 0 && (
+              <div 
+                className="form-field__tag-suggestions"
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  zIndex: 1000,
+                  backgroundColor: '#fff',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '4px',
+                  marginTop: '4px',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+              >
+                {tagSuggestions.map((tag) => (
+                  <div
+                    key={tag}
+                    className="form-field__tag-suggestion-item"
+                    style={{
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onClick={() => handleSelectTagSuggestion(tag)}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}
+                  >
+                    #{tag}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+          
           {formData.tags.length > 0 && (
             <div className="form-field__tags">
               {formData.tags.map((tag) => (
@@ -301,6 +378,9 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               ))}
             </div>
           )}
+          <div className="form-field__hint">
+            {tagsLoading ? '正在加载标签...' : `已选 ${formData.tags.length} 个标签`}
+          </div>
         </div>
       </div>
 

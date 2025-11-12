@@ -14,11 +14,11 @@ import {
   Space,
   Modal,
   Form,
-  message,
   Typography,
   Tag,
   Divider,
   Alert,
+  App,
 } from 'antd';
 import {
   PlusOutlined,
@@ -28,15 +28,15 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { rateLimitService } from '@campus/shared';
+import { rateLimitService , PERMISSION_CODES } from '@campus/shared';
 import { PermissionGuard } from '@/components';
-import { PERMISSION_CODES } from '@campus/shared';
 import type { RateLimitRules } from '@campus/shared';
 
 const { Title } = Typography;
 
 const RateLimit: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [userWhitelistModalVisible, setUserWhitelistModalVisible] = useState(false);
   const [ipWhitelistModalVisible, setIpWhitelistModalVisible] = useState(false);
   const [ipBlacklistModalVisible, setIpBlacklistModalVisible] = useState(false);
@@ -295,11 +295,11 @@ const RateLimit: React.FC = () => {
             >
               <Table
                 columns={userWhitelistColumns}
-                dataSource={rules?.userWhitelist?.map((userId, index) => ({
-                  key: index,
+                dataSource={rules?.userWhitelist?.map((userId) => ({
                   userId,
                   userIdFormatted: userId.toString(),
                 })) || []}
+                rowKey="userId"
                 pagination={false}
                 size="small"
                 locale={{ emptyText: '暂无白名单用户' }}
@@ -327,10 +327,10 @@ const RateLimit: React.FC = () => {
             >
               <Table
                 columns={ipWhitelistColumns}
-                dataSource={rules?.ipWhitelist?.map((ip, index) => ({
-                  key: index,
+                dataSource={rules?.ipWhitelist?.map((ip) => ({
                   ip,
                 })) || []}
+                rowKey="ip"
                 pagination={false}
                 size="small"
                 locale={{ emptyText: '暂无白名单IP' }}
@@ -356,10 +356,10 @@ const RateLimit: React.FC = () => {
             >
               <Table
                 columns={ipBlacklistColumns}
-                dataSource={rules?.ipBlacklist?.map((ip, index) => ({
-                  key: index,
+                dataSource={rules?.ipBlacklist?.map((ip) => ({
                   ip,
                 })) || []}
+                rowKey="ip"
                 pagination={false}
                 size="small"
                 locale={{ emptyText: '暂无黑名单IP' }}

@@ -28,7 +28,13 @@ export interface LoginResponse {
      * @type {string}
      * @memberof LoginResponse
      */
-    'token'?: string;
+    'accessToken'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginResponse
+     */
+    'refreshToken'?: string;
     /**
      * 
      * @type {string}
@@ -43,9 +49,27 @@ export interface LoginResponse {
     'expiresIn'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof LoginResponse
+     */
+    'refreshExpiresIn'?: number;
+    /**
+     * 
      * @type {UserInfo}
      * @memberof LoginResponse
      */
     'userInfo'?: UserInfo;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof LoginResponse
+     */
+    'requires2FA'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginResponse
+     */
+    'tempToken'?: string;
 }
 

@@ -23,17 +23,25 @@ public enum RoleDefinition {
             PermissionCodes.SYSTEM_ROLE_ASSIGN
     )),
     CONTENT_MANAGER("ROLE_CONTENT_MANAGER", "内容审核员", Set.of(
+            PermissionCodes.SYSTEM_GOODS_VIEW,
             PermissionCodes.SYSTEM_GOODS_APPROVE,
             PermissionCodes.SYSTEM_GOODS_DELETE,
             PermissionCodes.SYSTEM_POST_APPROVE,
             PermissionCodes.SYSTEM_POST_DELETE,
-            PermissionCodes.SYSTEM_REPORT_HANDLE
+            PermissionCodes.SYSTEM_REPORT_HANDLE,
+            PermissionCodes.SYSTEM_TOPIC_MANAGE,
+            PermissionCodes.SYSTEM_COMMUNITY_MANAGE
     )),
     OPERATION_MANAGER("ROLE_OPERATION_MANAGER", "运营经理", Set.of(
             PermissionCodes.MARKET_GOODS_APPROVE,
             PermissionCodes.MARKET_ORDER_REFUND,
             PermissionCodes.SYSTEM_STATISTICS_VIEW,
-            PermissionCodes.SYSTEM_CONFIG_VIEW
+            PermissionCodes.SYSTEM_CONFIG_VIEW,
+            PermissionCodes.SYSTEM_GOODS_VIEW,
+            PermissionCodes.SYSTEM_ORDER_VIEW,
+            PermissionCodes.SYSTEM_ORDER_MANAGE,
+            PermissionCodes.SYSTEM_MONITOR_VIEW,
+            PermissionCodes.SYSTEM_TASK_MANAGE
     )),
     COMPLIANCE_OFFICER("ROLE_COMPLIANCE_OFFICER", "合规官", Set.of(
             PermissionCodes.SYSTEM_COMPLIANCE_REVIEW,
@@ -60,11 +68,16 @@ public enum RoleDefinition {
             PermissionCodes.SYSTEM_REPORT_HANDLE
     )),
     APPEAL_MANAGER("ROLE_APPEAL_MANAGER", "申诉专员", Set.of(
+            PermissionCodes.SYSTEM_APPEAL_VIEW,
+            PermissionCodes.SYSTEM_APPEAL_HANDLE,
             PermissionCodes.SYSTEM_USER_APPEAL_HANDLE,
+            PermissionCodes.SYSTEM_DISPUTE_VIEW,
             PermissionCodes.SYSTEM_DISPUTE_HANDLE,
-            PermissionCodes.SYSTEM_DISPUTE_VIEW
+            PermissionCodes.SYSTEM_DISPUTE_MANAGE,
+            PermissionCodes.SYSTEM_DISPUTE_STATISTICS
     )),
     BATCH_MANAGER("ROLE_BATCH_MANAGER", "批量操作管理员", Set.of(
+            PermissionCodes.SYSTEM_BATCH_MANAGE,
             PermissionCodes.SYSTEM_BATCH_GOODS_OFFLINE,
             PermissionCodes.SYSTEM_BATCH_GOODS_UPDATE,
             PermissionCodes.SYSTEM_BATCH_GOODS_DELETE,
@@ -87,7 +100,9 @@ public enum RoleDefinition {
             PermissionCodes.SYSTEM_SCHEDULE_VIEW,
             PermissionCodes.SYSTEM_SCHEDULE_MANAGE,
             PermissionCodes.SYSTEM_SCHEDULE_EXECUTE,
-            PermissionCodes.SYSTEM_BROADCAST
+            PermissionCodes.SYSTEM_BROADCAST,
+            PermissionCodes.SYSTEM_TASK_MANAGE,
+            PermissionCodes.SYSTEM_MONITOR_VIEW
     )),
     CACHE_MANAGER("ROLE_CACHE_MANAGER", "缓存管理员", Set.of(
             PermissionCodes.SYSTEM_CACHE_VIEW,

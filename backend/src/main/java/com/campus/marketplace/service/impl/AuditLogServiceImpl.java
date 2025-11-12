@@ -1,5 +1,6 @@
 package com.campus.marketplace.service.impl;
 
+import com.campus.marketplace.common.dto.request.AuditLogFilterRequest;
 import com.campus.marketplace.common.dto.response.AuditLogResponse;
 import com.campus.marketplace.common.entity.AuditLog;
 import com.campus.marketplace.common.enums.AuditActionType;
@@ -41,10 +42,20 @@ public class AuditLogServiceImpl implements AuditLogService {
                           String targetType, Long targetId, String details, String result,
                           String ipAddress, String userAgent) {
         try {
+            String entityName = (targetType != null && !targetType.isBlank()) ? targetType : actionType.name();
+            AuditEntityType entityType;
+            try {
+                entityType = AuditEntityType.valueOf(entityName.toUpperCase());
+            } catch (Exception ignore) {
+                // 默认归类到系统设置，避免因未覆盖的实体类型导致持久化失败
+                entityType = AuditEntityType.SYSTEM_SETTING;
+            }
             AuditLog log = AuditLog.builder()
                     .operatorId(operatorId)
                     .operatorName(operatorName)
                     .actionType(actionType)
+                    .entityName(entityName)
+                    .entityType(entityType)
                     .targetType(targetType)
                     .targetId(targetId)
                     .details(details)
@@ -70,6 +81,24 @@ public class AuditLogServiceImpl implements AuditLogService {
                                 String ipAddress, String userAgent) {
         logAction(operatorId, operatorName, actionType, targetType, targetId, 
                  details, result, ipAddress, userAgent);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AuditLogResponse> listAuditLogs(AuditLogFilterRequest filterRequest) {
+        log.info("查询审计日志（统一筛选）: operatorId={}, actionType={}, page={}, size={}", 
+                filterRequest.getOperatorId(), filterRequest.getActionType(), 
+                filterRequest.getPage(), filterRequest.getSize());
+
+        // 调用传统方法（复用现有逻辑）
+        return listAuditLogs(
+                filterRequest.getOperatorId(),
+                filterRequest.getActionType(),
+                filterRequest.getStartTime(),
+                filterRequest.getEndTime(),
+                filterRequest.getPageOrDefault(),
+                filterRequest.getSizeOrDefault()
+        );
     }
 
     @Override
@@ -136,10 +165,19 @@ public class AuditLogServiceImpl implements AuditLogService {
                                   String targetType, String targetIds, String details, 
                                   boolean isReversible) {
         try {
+            String entityName = (targetType != null && !targetType.isBlank()) ? targetType : "BATCH_OPERATION";
+            AuditEntityType entityType;
+            try {
+                entityType = AuditEntityType.valueOf(entityName.toUpperCase());
+            } catch (Exception ignore) {
+                entityType = AuditEntityType.BATCH_OPERATION;
+            }
             AuditLog auditLog = AuditLog.builder()
                     .operatorId(operatorId)
                     .operatorName(operatorName)
                     .actionType(actionType)
+                    .entityName(entityName)
+                    .entityType(entityType)
                     .targetType(targetType)
                     .targetIds(targetIds)
                     .details(details)
@@ -184,8 +222,79 @@ public class AuditLogServiceImpl implements AuditLogService {
             log.info("可撤销操作审计记录成功: operator={}, entity={}, id={}", 
                     operatorName, entityName, String.valueOf(entityId));
         } catch (Exception e) {
-            log.error("可撤销操作审计记录失败: operator={}, entity={}, error={}", 
+            log.error("可撤销操作审计记录失败: operator={}, entity={}, error={}",
                     operatorName, entityName, e.getMessage());
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.Map<String, Object> getStatistics(Long operatorId, AuditActionType actionType,
+                                                       java.time.LocalDateTime startTime, java.time.LocalDateTime endTime) {
+        log.info("获取操作日志统计: operatorId={}, actionType={}, startTime={}, endTime={}",
+                operatorId, actionType, startTime, endTime);
+
+        java.util.Map<String, Object> statistics = new java.util.HashMap<>();
+
+        try {
+            // 查询所有符合条件的日志
+            java.util.List<AuditLog> logs = new java.util.ArrayList<>();
+
+            if (operatorId != null && actionType != null && startTime != null && endTime != null) {
+                // 所有条件都有
+                logs = auditLogRepository.findAll().stream()
+                        .filter(log -> log.getOperatorId().equals(operatorId))
+                        .filter(log -> log.getActionType().equals(actionType))
+                        .filter(log -> log.getCreatedAt().isAfter(startTime) && log.getCreatedAt().isBefore(endTime))
+                        .toList();
+            } else if (operatorId != null) {
+                logs = auditLogRepository.findAll().stream()
+                        .filter(log -> log.getOperatorId().equals(operatorId))
+                        .toList();
+            } else if (actionType != null) {
+                logs = auditLogRepository.findAll().stream()
+                        .filter(log -> log.getActionType().equals(actionType))
+                        .toList();
+            } else if (startTime != null && endTime != null) {
+                logs = auditLogRepository.findAll().stream()
+                        .filter(log -> log.getCreatedAt().isAfter(startTime) && log.getCreatedAt().isBefore(endTime))
+                        .toList();
+            } else {
+                logs = auditLogRepository.findAll();
+            }
+
+            // 统计总操作数
+            long totalOperations = logs.size();
+
+            // 统计成功数
+            long successCount = logs.stream()
+                    .filter(log -> "SUCCESS".equals(log.getResult()))
+                    .count();
+
+            // 统计失败数
+            long failureCount = totalOperations - successCount;
+
+            // 统计今日操作数
+            java.time.LocalDateTime todayStart = java.time.LocalDate.now().atStartOfDay();
+            long todayCount = logs.stream()
+                    .filter(log -> log.getCreatedAt().isAfter(todayStart))
+                    .count();
+
+            statistics.put("totalOperations", totalOperations);
+            statistics.put("successCount", successCount);
+            statistics.put("failureCount", failureCount);
+            statistics.put("todayCount", todayCount);
+
+            log.info("操作日志统计成功: total={}, success={}, failure={}, today={}",
+                    totalOperations, successCount, failureCount, todayCount);
+        } catch (Exception e) {
+            log.error("操作日志统计失败: {}", e.getMessage());
+            statistics.put("totalOperations", 0);
+            statistics.put("successCount", 0);
+            statistics.put("failureCount", 0);
+            statistics.put("todayCount", 0);
+        }
+
+        return statistics;
     }
 }

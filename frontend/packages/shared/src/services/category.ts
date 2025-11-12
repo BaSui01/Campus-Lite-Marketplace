@@ -1,223 +1,266 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
  * 分类管理 API 服务
  * @author BaSui 😎
  * @description 分类树、添加、编辑、删除、排序等接口
+ * @updated 2025-11-08 - 重构为使用 OpenAPI 生成的 DefaultApi ✅
  */
 
 import { getApi } from '../utils/apiClient';
-import type { BaseResponse } from '@campus/shared/api';
+import type {
+  Category as ApiCategory,
+  CategoryNodeResponse,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+  CategoryBatchSortRequest,
+  CategoryStatisticsResponse,
+} from '../api/models';
+
+// ==================== 类型重导出 ====================
+
+export type {
+  Category,
+  CategoryNodeResponse,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+  CategoryBatchSortRequest,
+  CategoryStatisticsResponse,
+} from '../api/models';
+
+export type CategoryRequest = CreateCategoryRequest;
+export type CategorySortRequest = CategoryBatchSortRequest;
+export type CategoryStatistics = CategoryStatisticsResponse;
+
+export interface CategoryListParams {
+  keyword?: string;
+  status?: CategoryStatus;
+  parentId?: number | null;
+  includeDisabled?: boolean;
+}
+/**
+ * 分类树节点（附带层级与路径信息）
+ */
+export interface CategoryTreeNode extends CategoryNodeResponse {
+  /**
+   * 当前节点所在层级（根节点为 0）
+   */
+  level: number;
+  /**
+   * 从根节点到当前节点的 ID 路径
+   */
+  path: number[];
+  /**
+   * 父节点 ID 列表（不包含当前节点）
+   */
+  parentChain: number[];
+  /**
+   * 是否叶子节点
+   */
+  isLeaf: boolean;
+  /**
+   * 子节点
+   */
+  children?: CategoryTreeNode[];
+}
 
 /**
- * 分类状态枚举
+ * 扁平化配置
  */
+export interface CategoryFlattenOptions {
+  /**
+   * 限制输出的最大层级（默认不限）
+   */
+  maxDepth?: number;
+  /**
+   * 需要排除的分类 ID 列表
+   */
+  excludeIds?: number[];
+}
+
+type CategoryTreeInput = CategoryNodeResponse & {
+  children?: CategoryTreeInput[];
+  [key: string]: any;
+};
+
 export enum CategoryStatus {
   ENABLED = 'ENABLED',
   DISABLED = 'DISABLED'
 }
 
-/**
- * 分类信息
- */
-export interface Category {
-  id: number;
-  name: string;
-  parentId?: number | null;
-  level: number;
-  icon?: string;
-  description?: string;
-  sortOrder: number;
-  status: CategoryStatus;
-  children?: Category[];
-  createdAt: string;
-  updatedAt?: string;
-}
+// ==================== 服务类 ====================
 
-/**
- * 分类树节点（包含子节点）
- */
-export interface CategoryTreeNode extends Category {
-  children: CategoryTreeNode[];
-  key: string;  // 用于树形组件
-  title: string;  // 用于树形组件
-}
-
-/**
- * 分类列表查询参数
- */
-export interface CategoryListParams {
-  keyword?: string;
-  status?: CategoryStatus;
-  parentId?: number | null;  // null表示查询一级分类
-}
-
-/**
- * 添加/编辑分类请求
- */
-export interface CategoryRequest {
-  name: string;
-  parentId?: number | null;
-  icon?: string;
-  description?: string;
-  sortOrder?: number;
-  status: CategoryStatus;
-}
-
-/**
- * 批量排序请求
- */
-export interface CategorySortRequest {
-  id: number;
-  sortOrder: number;
-}
-
-/**
- * 分类统计数据
- */
-export interface CategoryStatistics {
-  categoryId: number;
-  categoryName: string;
-  goodsCount: number;  // 该分类下的商品数
-  childrenCount: number;  // 子分类数
-}
-
-/**
- * 分类 API 服务类
- */
 export class CategoryService {
   /**
-   * 获取分类树（完整层级结构）
-   * @returns 分类树
+   * 获取分类树（树形结构）
    */
-  async tree(): Promise<Category[]> {
-    const response = await http.get<Category[]>('/api/categories/tree');
-    return response.data;
+  async tree(): Promise<CategoryTreeNode[]> {
+    const api = getApi();
+    const response = await api.getCategoryTree();
+    const rawTree = (response.data.data as CategoryTreeInput[]) ?? [];
+    return this.normalizeTree(rawTree);
+  }
+
+  /**
+   * 扁平化分类树，方便下拉选择等场景使用
+   */
+  flatten(
+    tree: CategoryNodeResponse[] | CategoryTreeNode[] = [],
+    options: CategoryFlattenOptions = {},
+  ): CategoryTreeNode[] {
+    const normalized = this.ensureTreeNodes(tree);
+    if (normalized.length === 0) {
+      return [];
+    }
+
+    const flat = this.flattenTree(normalized);
+    const { maxDepth, excludeIds } = options;
+    const excludeSet = excludeIds && excludeIds.length > 0 ? new Set(excludeIds) : null;
+
+    return flat.filter(node => {
+      const withinDepth = typeof maxDepth === 'number' ? node.level <= maxDepth : true;
+      const notExcluded = excludeSet ? !excludeSet.has(node.id ?? -1) : true;
+      return withinDepth && notExcluded;
+    });
   }
 
   /**
    * 获取分类列表（扁平结构）
-   * @param params 查询参数
-   * @returns 分类列表
    */
-  async list(params?: CategoryListParams): Promise<Category[]> {
-    const response = await http.get<Category[]>('/api/categories', {
-      params: {
-        keyword: params?.keyword,
-        status: params?.status,
-        parentId: params?.parentId
-      }
-    });
-    return response.data;
+  async list(): Promise<ApiCategory[]> {
+    const api = getApi();
+    const response = await api.listCategories();
+    return response.data.data as ApiCategory[];
   }
 
   /**
    * 获取分类详情
-   * @param id 分类ID
-   * @returns 分类详情
    */
-  async getDetail(id: number): Promise<Category> {
-    const response = await http.get<Category>(`/api/categories/${id}`);
-    return response.data;
+  async getDetail(id: number): Promise<ApiCategory> {
+    const api = getApi();
+    const response = await api.getCategoryById({ id });
+    return response.data.data as ApiCategory;
   }
 
   /**
-   * 获取分类统计数据
-   * @param id 分类ID
-   * @returns 分类统计数据
+   * 创建分类
    */
-  async statistics(id: number): Promise<CategoryStatistics> {
-    const response = await http.get<CategoryStatistics>(
-      `/api/categories/${id}/statistics`
-    );
-    return response.data;
+  async create(data: CreateCategoryRequest): Promise<number> {
+    const api = getApi();
+    const response = await api.createCategory({ createCategoryRequest: data });
+    return response.data.data as number;
   }
 
   /**
-   * 获取子分类列表
-   * @param parentId 父分类ID
-   * @returns 子分类列表
+   * 更新分类
    */
-  async getChildren(parentId: number): Promise<Category[]> {
-    return this.list({ parentId });
+  async update(id: number, data: UpdateCategoryRequest): Promise<void> {
+    const api = getApi();
+    await api.updateCategory({ id, updateCategoryRequest: data });
   }
 
   /**
-   * 转换为树形结构（前端辅助方法）
-   * @param categories 扁平分类列表
-   * @returns 树形结构
+   * 删除分类
    */
-  toTree(categories: Category[]): CategoryTreeNode[] {
-    const map = new Map<number, CategoryTreeNode>();
-    const roots: CategoryTreeNode[] = [];
+  async delete(id: number): Promise<void> {
+    const api = getApi();
+    await api.deleteCategory({ id });
+  }
 
-    // 转换为TreeNode并建立映射
-    categories.forEach(category => {
-      const node: CategoryTreeNode = {
-        ...category,
-        children: [],
-        key: category.id.toString(),
-        title: category.name
+  /**
+   * 批量更新排序
+   */
+  async batchUpdateSort(data: CategoryBatchSortRequest): Promise<void> {
+    const api = getApi();
+    await api.batchUpdateSort({ categoryBatchSortRequest: data });
+  }
+
+  /**
+   * 获取分类统计
+   */
+  async getStatistics(): Promise<Record<string, number>> {
+    const api = getApi();
+    const response = await api.getCategoryStatistics();
+    return response.data.data as Record<string, number>;
+  }
+
+  /**
+   * 更新分类状态
+   * TODO: 后端API不支持单独更新状态，需要先获取完整数据再更新
+   * 暂时抛出错误提示
+   */
+  async updateStatus(_id: number, _status: CategoryStatus): Promise<void> {
+    // 正确的做法是：
+    // 1. 先调用 getDetail(id) 获取完整的分类信息
+    // 2. 然后调用 update(id, { ...category, status })
+    //
+    // 但这需要在调用方处理，因为需要完整的 name 等字段
+    throw new Error('请使用 update() 方法更新分类状态，需要提供完整的分类信息');
+  }
+
+  /**
+   * 标准化树节点，补充层级/路径等元数据
+   */
+  private normalizeTree(
+    nodes: CategoryTreeInput[] = [],
+    level = 0,
+    parentChain: number[] = [],
+  ): CategoryTreeNode[] {
+    return nodes.map((node) => {
+      const nextParentChain =
+        node.id !== undefined && node.id !== null
+          ? [...parentChain, node.id]
+          : [...parentChain];
+      const normalizedChildren =
+        node.children && node.children.length > 0
+          ? this.normalizeTree(node.children as CategoryTreeInput[], level + 1, nextParentChain)
+          : [];
+
+      return {
+        ...node,
+        level,
+        parentChain: [...parentChain],
+        path: nextParentChain,
+        isLeaf: normalizedChildren.length === 0,
+        children: normalizedChildren,
       };
-      map.set(category.id, node);
     });
+  }
 
-    // 构建树形结构
-    categories.forEach(category => {
-      const node = map.get(category.id)!;
-      if (category.parentId && map.has(category.parentId)) {
-        const parent = map.get(category.parentId)!;
-        parent.children.push(node);
-      } else {
-        roots.push(node);
+  /**
+   * 将树结构转换为扁平数组
+   */
+  private flattenTree(nodes: CategoryTreeNode[] = [], acc: CategoryTreeNode[] = []): CategoryTreeNode[] {
+    nodes.forEach((node) => {
+      acc.push(node);
+      if (node.children && node.children.length > 0) {
+        this.flattenTree(node.children, acc);
       }
     });
-
-    return roots;
+    return acc;
   }
 
   /**
-   * 扁平化树形结构（前端辅助方法）
-   * @param tree 树形结构
-   * @returns 扁平列表
+   * 确保节点已经包含层级元数据
    */
-  flatten(tree: Category[]): Category[] {
-    const result: Category[] = [];
-    
-    const traverse = (nodes: Category[]) => {
-      nodes.forEach(node => {
-        result.push(node);
-        if (node.children && node.children.length > 0) {
-          traverse(node.children);
-        }
-      });
-    };
+  private ensureTreeNodes(
+    tree: CategoryNodeResponse[] | CategoryTreeNode[],
+  ): CategoryTreeNode[] {
+    if (!Array.isArray(tree) || tree.length === 0) {
+      return [];
+    }
 
-    traverse(tree);
-    return result;
+    if (this.hasTreeMeta(tree[0])) {
+      return tree as CategoryTreeNode[];
+    }
+
+    return this.normalizeTree(tree as CategoryTreeInput[]);
+  }
+
+  private hasTreeMeta(
+    node?: CategoryNodeResponse | CategoryTreeNode,
+  ): node is CategoryTreeNode {
+    return !!node && typeof (node as CategoryTreeNode).level === 'number';
   }
 }
 
-/**
- * 分类服务实例
- */
 export const categoryService = new CategoryService();
-
-/**
- * 导出类型
- */
-export type {
-  Category as CategoryType,
-  CategoryTreeNode as CategoryTreeNodeType,
-  CategoryListParams as CategoryListParamsType,
-  CategoryRequest as CategoryRequestType,
-  CategorySortRequest as CategorySortRequestType,
-  CategoryStatistics as CategoryStatisticsType
-};
+export default categoryService;

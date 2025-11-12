@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.response.FollowResponse;
 import com.campus.marketplace.service.FollowService;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +46,7 @@ class FollowControllerTest {
     @DisplayName("关注卖家成功")
     @WithMockUser(roles = "STUDENT")
     void follow_success() throws Exception {
-        mockMvc.perform(post("/api/follow/{sellerId}", 5001L))
+        mockMvc.perform(post("/follow/{sellerId}", 5001L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -58,7 +57,7 @@ class FollowControllerTest {
     @DisplayName("非学生角色关注卖家返回403")
     @WithMockUser(roles = "TEACHER")
     void follow_forbidden() throws Exception {
-        mockMvc.perform(post("/api/follow/{sellerId}", 6002L))
+        mockMvc.perform(post("/follow/{sellerId}", 6002L))
                 .andExpect(status().isForbidden());
 
         verify(followService, never()).followSeller(any());
@@ -68,7 +67,7 @@ class FollowControllerTest {
     @DisplayName("取消关注成功")
     @WithMockUser(roles = "STUDENT")
     void unfollow_success() throws Exception {
-        mockMvc.perform(delete("/api/follow/{sellerId}", 7003L))
+        mockMvc.perform(delete("/follow/{sellerId}", 7003L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -87,7 +86,7 @@ class FollowControllerTest {
                 .build();
         when(followService.listFollowings()).thenReturn(List.of(item));
 
-        mockMvc.perform(get("/api/following").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/following").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0].sellerId").value(8004))

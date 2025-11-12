@@ -1,19 +1,66 @@
 /**
- * 社区页面样式 - 精彩生活分享！🌐
+ * 社区页面样式 - Linux.do 风格三栏布局
  * @author BaSui 😎
- * @description 美观的社区界面设计（蓝绿主题）
+ * @description Linux.do 风格的社区界面设计
  */
 
 .community-page {
-  min-height: 100vh;
+  min-height: calc(100vh - 64px); /* 减去顶部导航栏高度，让页面铺满 */
   background: #f5f5f5;
   padding: 20px 0;
 }
 
+/* 三栏布局容器 */
 .community-container {
-  max-width: 800px;
+  max-width: 1600px; /* 加大最大宽度，让内容更充分利用屏幕空间 */
   margin: 0 auto;
   padding: 0 20px;
+  display: grid;
+  grid-template-columns: 250px 1fr 320px; /* 调整列宽比例 */
+  gap: 20px;
+  align-items: start;
+  min-height: calc(100vh - 104px); /* 确保容器高度铺满 */
+}
+
+/* 左侧边栏区域 */
+.community-sidebar-left {
+  position: sticky;
+  top: 80px; /* 顶部导航栏高度 + 间距 */
+  height: fit-content;
+}
+
+/* 主内容区 */
+.community-main {
+  min-width: 0; /* 防止内容溢出 */
+}
+
+/* 右侧边栏区域 */
+.community-sidebar-right {
+  position: sticky;
+  top: 80px;
+  height: fit-content;
+}
+
+/* 响应式布局 */
+@media (max-width: 1200px) {
+  .community-container {
+    grid-template-columns: 250px 1fr;
+  }
+  
+  .community-sidebar-right {
+    display: none; /* 平板隐藏右侧栏 */
+  }
+}
+
+@media (max-width: 768px) {
+  .community-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .community-sidebar-left {
+    position: static;
+    width: 100%;
+  }
 }
 
 /* ==================== 顶部操作栏 ==================== */
@@ -39,7 +86,107 @@
   background-clip: text;
 }
 
-/* ==================== 标签筛选 ==================== */
+/* ==================== 标签筛选 ====================  */
+
+/* 热门标签区域 */
+.community-tags-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tags-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.tags-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tags-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tag-item:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 选中状态 - 高亮显示 */
+.tag-item--active {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+  border-color: #38ef7d !important;
+  box-shadow: 0 4px 12px rgba(56, 239, 125, 0.4) !important;
+  transform: translateY(-3px) !important;
+}
+
+.tag-item--active:hover {
+  transform: translateY(-3px) scale(1.05) !important;
+}
+
+.tag-name {
+  white-space: nowrap;
+}
+
+.tag-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: bold;
+}
 
 .community-tabs {
   margin-bottom: 20px;
@@ -86,14 +233,36 @@
 /* 帖子卡片 */
 .post-card {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.post-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.post-card:hover::before {
+  transform: scaleX(1);
 }
 
 .post-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  border-color: #11998e;
+  transform: translateY(-4px);
 }
 
 .post-card__header {
@@ -254,6 +423,70 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+/* 标签选择区域 */
+.publish-modal__tags {
+  margin-top: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+}
+
+.publish-modal__tags-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.publish-modal__tags-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.publish-modal__tags-hint {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.publish-modal__tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.publish-tag-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  font-size: 13px;
+  color: #595959;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.publish-tag-item:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.publish-tag-item--active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-color: #764ba2 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px) !important;
+}
+
+.publish-tag-item--active:hover {
+  transform: translateY(-2px) scale(1.05) !important;
 }
 
 /* ==================== 评论弹窗 ==================== */

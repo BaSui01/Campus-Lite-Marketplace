@@ -4,7 +4,7 @@
  * @description 发布订单评价，支持星级评分、文字评价、图片上传
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { StarRating, ImageUpload } from '@campus/shared/components';
 import { useReviewStore } from '../../store/useReviewStore';
@@ -27,6 +27,14 @@ const ReviewCreate: React.FC = () => {
   const [content, setContent] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [showEmojiPanel, setShowEmojiPanel] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // 常用表情（系统内置 Unicode，避免额外依赖）
+  const EMOJIS = useMemo(
+    () => ['😀','😁','😂','🤣','😊','😍','😘','😎','😇','🤔','🙌','👍','👎','👏','🔥','✨','🌟','❤️','💔','🥳','😤','😢','😭','😡','🤮','🤯','😴','🤤','🤝','🙏'],
+    []
+  );
 
   // 错误提示状态
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +89,30 @@ const ReviewCreate: React.FC = () => {
       setContent(value);
       setError(null);
     }
+  };
+
+  /**
+   * 在光标处插入表情
+   */
+  const insertEmoji = (emoji: string) => {
+    const el = textareaRef.current;
+    if (!el) {
+      // 兜底：直接拼接
+      if (content.length < 500) setContent((prev) => (prev + emoji).slice(0, 500));
+      return;
+    }
+    const start = el.selectionStart ?? content.length;
+    const end = el.selectionEnd ?? content.length;
+    const before = content.slice(0, start);
+    const after = content.slice(end);
+    const next = (before + emoji + after).slice(0, 500);
+    setContent(next);
+    // 将光标移到插入表情后
+    const cursor = Math.min(start + emoji.length, 500);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(cursor, cursor);
+    });
   };
 
   /**
@@ -181,16 +213,45 @@ const ReviewCreate: React.FC = () => {
 
         {/* 评价内容 */}
         <div className="review-create__section">
-          <label className="review-create__label">
-            评价内容 <span className="review-create__required">*</span>
-          </label>
+          <div className="review-create__label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>
+              评价内容 <span className="review-create__required">*</span>
+            </span>
+            <button
+              type="button"
+              className="emoji-toggle-btn"
+              onClick={() => setShowEmojiPanel((v) => !v)}
+              aria-label="插入表情"
+              title="插入表情"
+            >
+              😊 表情
+            </button>
+          </div>
           <textarea
             className="review-create__textarea"
             placeholder="分享您的购买体验，让更多人了解这个商品吧~（至少10个字）"
             value={content}
             onChange={handleContentChange}
             maxLength={500}
+            ref={textareaRef}
           />
+
+          {showEmojiPanel && (
+            <div className="emoji-panel" role="menu" aria-label="emoji-panel">
+              {EMOJIS.map((e) => (
+                <button
+                  type="button"
+                  key={e}
+                  className="emoji-item"
+                  onClick={() => insertEmoji(e)}
+                  title={`插入 ${e}`}
+                >
+                  {e}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="review-create__char-count">
             {contentLength} / 500
           </div>

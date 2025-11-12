@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录通知</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .alert-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .alert-box.new-device {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .alert-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        .alert-box.new-device .alert-title {
+            color: #721c24;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .info-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .info-table td:first-child {
+            font-weight: bold;
+            color: #666666;
+            width: 120px;
+        }
+        .info-table td:last-child {
+            color: #333333;
+        }
+        .action-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #667eea;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 30px 20px;
+            }
+            .info-table td:first-child {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table class="email-container" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <!-- Header -->
+        <tr>
+            <td class="header">
+                <h1 class="logo">🎓 校园轻享集市</h1>
+            </td>
+        </tr>
+
+        <!-- Content -->
+        <tr>
+            <td class="content">
+                <div class="greeting">
+                    您好，<span th:text="${username}">用户</span>！👋
+                </div>
+
+                <div th:if="${isNewDevice}" class="alert-box new-device">
+                    <div class="alert-title">🚨 检测到新设备登录</div>
+                    <div class="message">
+                        我们检测到您的账号在一个新设备上登录。如果这是您本人的操作，请忽略此邮件。
+                        如果不是，请立即修改密码并联系客服。
+                    </div>
+                </div>
+
+                <div th:unless="${isNewDevice}" class="alert-box">
+                    <div class="alert-title">✅ 账号登录通知</div>
+                    <div class="message">
+                        您的账号刚刚登录成功。
+                    </div>
+                </div>
+
+                <div class="message">
+                    <strong>登录详情：</strong>
+                </div>
+
+                <table class="info-table">
+                    <tr>
+                        <td>🖥️ 设备名称</td>
+                        <td th:text="${deviceName}">Chrome on Windows</td>
+                    </tr>
+                    <tr>
+                        <td>🌐 IP地址</td>
+                        <td th:text="${ip}">192.168.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>📍 登录地点</td>
+                        <td th:text="${location}">中国 北京</td>
+                    </tr>
+                    <tr>
+                        <td>⏰ 登录时间</td>
+                        <td th:text="${loginTime}">2025-11-10 14:30:00</td>
+                    </tr>
+                </table>
+
+                <div th:if="${isNewDevice}" class="message">
+                    <strong>⚠️ 安全建议：</strong><br>
+                    • 如果这不是您本人的操作，请立即修改密码<br>
+                    • 启用两步验证以增强账号安全<br>
+                    • 定期检查账号登录记录
+                </div>
+
+                <div style="text-align: center;">
+                    <a href="#" class="action-button">查看账号安全设置</a>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+            <td class="footer">
+                <p>此邮件由系统自动发送，请勿直接回复</p>
+                <p>
+                    © 2025 校园轻享集市 |
+                    <a href="#">隐私政策</a> |
+                    <a href="#">服务条款</a> |
+                    <a href="#">联系客服</a>
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -48,11 +48,11 @@ export class NotificationService {
    */
   async listNotifications(params?: NotificationListParams): Promise<PageNotificationResponse> {
     const api = getApi();
-    const response = await api.listNotifications(
-      params?.status as any,
-      params?.page ?? 0,
-      params?.size ?? 20
-    );
+    const response = await api.listNotifications({
+      status: params?.status as any,
+      page: params?.page ?? 0,
+      size: params?.size ?? 20
+    });
     
     let content = response.data.data?.content || [];
     
@@ -88,7 +88,7 @@ export class NotificationService {
    */
   async markAsRead(notificationIds: number[]): Promise<void> {
     const api = getApi();
-    await api.markAsRead({ requestBody: notificationIds });
+    await api.markAsRead({ body: JSON.stringify(notificationIds) });
   }
 
   /**
@@ -105,7 +105,7 @@ export class NotificationService {
    */
   async deleteNotifications(notificationIds: number[]): Promise<void> {
     const api = getApi();
-    await api.deleteNotifications({ requestBody: notificationIds });
+    await api.deleteNotifications({ body: JSON.stringify(notificationIds) });
   }
 
   /**
@@ -143,16 +143,16 @@ export class NotificationService {
     };
 
     notifications.content.forEach((item) => {
-      if (item.status === 'UNREAD') stats.unread++;
-      
+      if (item.status === 'UNREAD') stats.unread = (stats.unread || 0) + 1;
+
       const type = item.type?.toLowerCase() || '';
-      if (type.includes('order')) stats.order++;
-      else if (type.includes('message')) stats.message++;
-      else if (type.includes('like')) stats.like++;
-      else if (type.includes('comment')) stats.comment++;
-      else if (type.includes('follow')) stats.follow++;
-      else if (type.includes('price')) stats.priceAlert++;
-      else stats.system++;
+      if (type.includes('order')) stats.order = (stats.order || 0) + 1;
+      else if (type.includes('message')) stats.message = (stats.message || 0) + 1;
+      else if (type.includes('like')) stats.like = (stats.like || 0) + 1;
+      else if (type.includes('comment')) stats.comment = (stats.comment || 0) + 1;
+      else if (type.includes('follow')) stats.follow = (stats.follow || 0) + 1;
+      else if (type.includes('price')) stats.priceAlert = (stats.priceAlert || 0) + 1;
+      else stats.system = (stats.system || 0) + 1;
     });
 
     return stats;

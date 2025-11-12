@@ -53,7 +53,7 @@ class DisputeArbitrationControllerTest {
     void assignArbitrator_ShouldReturnSuccess() throws Exception {
         when(arbitrationService.assignArbitrator(anyLong(), anyLong())).thenReturn(true);
 
-        mockMvc.perform(post("/api/disputes/arbitrations/1/assign")
+        mockMvc.perform(post("/disputes/arbitrations/1/assign")
                         .with(csrf())
                         .param("arbitratorId", "300"))
                 .andExpect(status().isOk())
@@ -66,7 +66,7 @@ class DisputeArbitrationControllerTest {
     void getArbitrationDetail_ShouldReturnOptional() throws Exception {
         when(arbitrationService.getArbitrationDetail(anyLong())).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/disputes/arbitrations/1"))
+        mockMvc.perform(get("/disputes/arbitrations/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
     }
@@ -77,7 +77,7 @@ class DisputeArbitrationControllerTest {
     void getArbitratorCases_ShouldReturnList() throws Exception {
         when(arbitrationService.getArbitratorCases(anyLong())).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/disputes/arbitrations/my-cases"))
+        mockMvc.perform(get("/disputes/arbitrations/my-cases"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
     }

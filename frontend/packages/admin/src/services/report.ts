@@ -1,19 +1,19 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
+ * ✅ 重构完成：已使用 OpenAPI 生成的 API 客户端
+ * 📋 使用方法：listPendingReports, handleReport
  */
 /**
  * 举报管理服务（管理端）
+ * @author BaSui 😎
+ * @description 举报列表、处理举报等接口（基于 OpenAPI 生成代码）
  */
 
-import { apiClient } from '@campus/shared/utils/apiClient';
-import type { ApiResponse, PageResponse } from '@campus/shared/types';
+import { getApi } from '@campus/shared/utils/apiClient';
+import type { PageResponse } from '@campus/shared/types';
 
+/**
+ * 举报摘要信息
+ */
 export interface ReportSummary {
   id: number;
   reporterId: number;
@@ -25,28 +25,49 @@ export interface ReportSummary {
   createdAt: string;
 }
 
+/**
+ * 处理举报请求
+ */
 export interface HandleReportPayload {
   approved: boolean;
   handleResult: string;
 }
 
+/**
+ * 举报管理 API 服务类
+ */
 export class ReportService {
+  /**
+   * 获取待处理举报列表（分页）
+   * @param params 查询参数
+   * @returns 待处理举报列表（分页）
+   */
   async listPendingReports(params?: { page?: number; size?: number }): Promise<PageResponse<ReportSummary>> {
-    const res = await http.get<ApiResponse<PageResponse<ReportSummary>>>('/api/reports/pending', {
-      params,
+    const api = getApi();
+    const response = await api.listPendingReports({
+      page: params?.page,
+      size: params?.size,
     });
-    return res.data;
+    return response.data.data as PageResponse<ReportSummary>;
   }
 
+  /**
+   * 处理举报
+   * @param id 举报ID
+   * @param payload 处理结果
+   */
   async handleReport(id: number, payload: HandleReportPayload): Promise<void> {
-    await http.post<ApiResponse<void>>(`/api/reports/${id}/handle`, null, {
-      params: {
-        approved: payload.approved,
-        handleResult: payload.handleResult,
-      },
+    const api = getApi();
+    await api.handleReport({
+      id,
+      approved: payload.approved,
+      handleResult: payload.handleResult,
     });
   }
 }
 
+/**
+ * 举报服务实例
+ */
 export const reportService = new ReportService();
 export default reportService;

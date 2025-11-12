@@ -208,6 +208,8 @@ export enum GoodsStatus {
   PENDING = 'PENDING',
   /** 已上架 */
   APPROVED = 'APPROVED',
+  /** 已锁定（待支付占用） */
+  LOCKED = 'LOCKED',
   /** 已拒绝 */
   REJECTED = 'REJECTED',
   /** 已售出 */
@@ -405,20 +407,27 @@ export interface Campus extends BaseEntity {
 
 /**
  * 订单状态枚举
+ *
+ * ⚠️ 重要：与后端 OrderStatus.java 保持完全一致！
+ *
+ * @author BaSui 😎
+ * @date 2025-11-10
  */
 export enum OrderStatus {
   /** 待支付 */
   PENDING_PAYMENT = 'PENDING_PAYMENT',
   /** 已支付 */
   PAID = 'PAID',
-  /** 待发货 */
-  PENDING_DELIVERY = 'PENDING_DELIVERY',
-  /** 待收货 */
-  PENDING_RECEIPT = 'PENDING_RECEIPT',
+  /** 已发货 */
+  SHIPPED = 'SHIPPED',
+  /** 已送达（待确认收货） */
+  DELIVERED = 'DELIVERED',
   /** 已完成 */
   COMPLETED = 'COMPLETED',
   /** 已取消 */
   CANCELLED = 'CANCELLED',
+  /** 已评价 */
+  REVIEWED = 'REVIEWED',
   /** 退款中 */
   REFUNDING = 'REFUNDING',
   /** 已退款 */

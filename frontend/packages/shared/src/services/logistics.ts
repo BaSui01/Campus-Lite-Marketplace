@@ -1,19 +1,12 @@
 /**
- * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
- * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
- * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
- * 👉 重构步骤：
- *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
- *    2. 替换为：const api = getApi(); api.methodName(...)
- *    3. 更新返回值类型
- */
-/**
- * Logistics Service - 物流服务
+ * Logistics Service - 物流服务（已完成OpenAPI集成）✅
  * @author BaSui 😎
  * @description 查询订单物流信息、追踪物流轨迹
+ * @date 2025-11-10 - 完成后端API集成
  */
 
 import { getApi } from '../utils/apiClient';
+import type { LogisticsDTO } from '../api';
 
 // ==================== 类型定义 ====================
 
@@ -168,36 +161,180 @@ export interface LogisticsService {
 // ==================== 服务实现 ====================
 
 /**
- * 物流服务实现类
+ * 快递公司枚举映射
+ * 后端: SHUNFENG -> 前端: SF
+ */
+const COMPANY_MAPPING: Record<string, string> = {
+  'SHUNFENG': 'SF',
+  'ZHONGTONG': 'ZTO',
+  'YUANTONG': 'YTO',
+  'YUNDA': 'YD',
+  'EMS': 'EMS',
+  'JINGDONG': 'JD',
+  'DEBANG': 'DBL',
+  'SHENTONG': 'STO',
+};
+
+const COMPANY_NAMES: Record<string, string> = {
+  'SHUNFENG': '顺丰速运',
+  'ZHONGTONG': '中通快递',
+  'YUANTONG': '圆通速递',
+  'YUNDA': '韵达快递',
+  'EMS': '邮政EMS',
+  'JINGDONG': '京东物流',
+  'DEBANG': '德邦物流',
+  'SHENTONG': '申通快递',
+};
+
+/**
+ * 状态映射
+ * 后端: PENDING -> 前端: PENDING
+ */
+const STATUS_MAPPING: Record<string, Logistics['status']> = {
+  'PENDING': 'PENDING',
+  'PICKED_UP': 'IN_TRANSIT',
+  'IN_TRANSIT': 'IN_TRANSIT',
+  'DELIVERING': 'OUT_FOR_DELIVERY',
+  'DELIVERED': 'DELIVERED',
+  'REJECTED': 'EXCEPTION',
+  'LOST': 'EXCEPTION',
+};
+
+/**
+ * 物流服务实现类（已集成OpenAPI）✅
+ * @author BaSui 😎
  */
 class LogisticsServiceImpl implements LogisticsService {
   /**
-   * 查询订单物流信息
+   * 查询订单物流信息 ✅
+   * 后端接口: GET /logistics/order/{orderId}
    */
   async getOrderLogistics(orderId: number): Promise<Logistics> {
-    const response = await http.get<{ data: Logistics }>(`/api/orders/${orderId}/logistics`);
-    return response.data.data;
+    const api = getApi();
+    const response = await api.getLogisticsByOrderId({ orderId });
+    
+    const data = response.data.data as LogisticsDTO;
+    
+    // 映射后端字段到前端格式
+    return {
+      orderId: data.orderId!,
+      expressCode: COMPANY_MAPPING[data.logisticsCompany as string] || data.logisticsCompany as string,
+      expressName: COMPANY_NAMES[data.logisticsCompany as string] || data.logisticsCompany as string,
+      trackingNumber: data.trackingNumber!,
+      shippedAt: data.createdAt,
+      deliveredAt: data.actualDeliveryTime,
+      status: STATUS_MAPPING[data.status as string] || 'PENDING',
+      tracks: (data.trackRecords || []).map(track => ({
+        time: track.time!,
+        description: track.statusDesc!,
+        location: track.location,
+        status: track.statusDesc,
+      })),
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   }
 
   /**
-   * 追踪物流轨迹
+   * 追踪物流轨迹 ✅
+   * 后端接口: GET /logistics/tracking/{trackingNumber}
    */
-  async trackLogistics(expressCode: string, trackingNumber: string): Promise<Logistics> {
-    const response = await http.get<{ data: Logistics }>('/api/logistics/track', {
-      params: {
-        expressCode,
-        trackingNumber,
-      },
-    });
-    return response.data.data;
+  async trackLogistics(_expressCode: string, trackingNumber: string): Promise<Logistics> {
+    const api = getApi();
+    const response = await api.getLogisticsByTrackingNumber({ trackingNumber });
+    
+    const data = response.data.data as LogisticsDTO;
+    
+    // 映射后端字段到前端格式
+    return {
+      orderId: data.orderId!,
+      expressCode: COMPANY_MAPPING[data.logisticsCompany as string] || data.logisticsCompany as string,
+      expressName: COMPANY_NAMES[data.logisticsCompany as string] || data.logisticsCompany as string,
+      trackingNumber: data.trackingNumber!,
+      shippedAt: data.createdAt,
+      deliveredAt: data.actualDeliveryTime,
+      status: STATUS_MAPPING[data.status as string] || 'PENDING',
+      tracks: (data.trackRecords || []).map(track => ({
+        time: track.time!,
+        description: track.statusDesc!,
+        location: track.location,
+        status: track.statusDesc,
+      })),
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
   }
 
   /**
-   * 获取物流统计
+   * 获取物流统计 ✅
+   * 后端接口: GET /logistics/statistics
    */
-  async getLogisticsStatistics(): Promise<LogisticsStatistics> {
-    const response = await http.get<{ data: LogisticsStatistics }>('/api/logistics/statistics');
-    return response.data.data;
+  async getLogisticsStatistics(startDate?: string, endDate?: string): Promise<LogisticsStatistics> {
+    const api = getApi();
+
+    // 默认查询最近30天
+    // ✅ 修复：后端期望 "yyyy-MM-dd HH:mm:ss" 格式，添加时间部分
+    const end = endDate ? `${endDate} 23:59:59` : `${new Date().toISOString().split('T')[0]} 23:59:59`;
+    const start = startDate ? `${startDate} 00:00:00` : `${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]} 00:00:00`;
+
+    const response = await api.getLogisticsStatistics({ startDate: start, endDate: end });
+    const data = response.data.data as any; // LogisticsStatisticsDTO 字段名可能不匹配
+    
+    return {
+      totalOrders: data.totalOrders || 0,
+      pendingShipment: data.pendingShipment || data.pending || 0,
+      inTransit: data.inTransit || data.shipping || 0,
+      delivered: data.delivered || 0,
+      exception: data.exception || data.failed || 0,
+      avgDeliveryTime: data.averageDeliveryTime || data.avgDeliveryTime || 0,
+    };
+  }
+  
+  /**
+   * 管理员物流列表 ✅
+   * 后端接口: GET /admin/logistics
+   */
+  async listLogistics(params?: {
+    keyword?: string;
+    status?: string;
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    sortDirection?: string;
+  }): Promise<{ content: Logistics[]; totalElements: number; totalPages: number }> {
+    const api = getApi();
+    const response = await api.listLogistics({
+      // keyword: params?.keyword, // API 可能不支持此参数
+      status: params?.status as any,
+      page: params?.page || 0,
+      size: params?.size || 20,
+      sortBy: params?.sortBy,
+      sortDirection: params?.sortDirection,
+    } as any);
+    
+    const data = response.data.data;
+    
+    return {
+      content: (data?.content || []).map((item: LogisticsDTO) => ({
+        orderId: item.orderId!,
+        expressCode: COMPANY_MAPPING[item.logisticsCompany as string] || item.logisticsCompany as string,
+        expressName: COMPANY_NAMES[item.logisticsCompany as string] || item.logisticsCompany as string,
+        trackingNumber: item.trackingNumber!,
+        shippedAt: item.createdAt,
+        deliveredAt: item.actualDeliveryTime,
+        status: STATUS_MAPPING[item.status as string] || 'PENDING',
+        tracks: (item.trackRecords || []).map(track => ({
+          time: track.time!,
+          description: track.statusDesc!,
+          location: track.location,
+          status: track.statusDesc,
+        })),
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      })),
+      totalElements: data?.totalElements || 0,
+      totalPages: data?.totalPages || 0,
+    };
   }
 }
 

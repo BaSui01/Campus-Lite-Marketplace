@@ -3,8 +3,6 @@ package com.campus.marketplace.controller;
 import com.campus.marketplace.common.dto.request.PayOrderRequest;
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
-
-import java.math.BigDecimal;
 import com.campus.marketplace.service.OrderService;
 import com.campus.marketplace.service.impl.WechatPaymentService;
 import com.campus.marketplace.service.impl.WechatPaymentServiceV2;
@@ -22,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
@@ -82,7 +79,6 @@ public class PaymentController {
     @Operation(summary = "创建支付订单")
 
     @PostMapping("/create")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Deprecated
     public ApiResponse<String> createPayment(@Valid @RequestBody PayOrderRequest request) {
         log.info("📥 收到支付请求（已弃用）: orderNo={}, paymentMethod={}", 
@@ -172,13 +168,11 @@ public class PaymentController {
                 try {
                     // ✅ 安全实践：从数据库查询订单金额，而不是信任回调数据
                     // 原因：防止回调数据被篡改，确保金额以系统记录为准
-                    com.campus.marketplace.common.entity.Order order = orderService.getOrderDetail(orderNo);
-                    if (order == null) {
+                    java.math.BigDecimal amount = orderService.getOrderActualAmount(orderNo);
+                    if (amount == null) {
                         log.error("💥 订单不存在: orderNo={}", orderNo);
                         throw new IllegalStateException("订单不存在");
                     }
-
-                    BigDecimal amount = order.getAmount();
 
                     PaymentCallbackRequest callbackRequest = new PaymentCallbackRequest(
                             orderNo,
@@ -221,6 +215,81 @@ public class PaymentController {
     }
 
     /**
+     * 支付宝支付异步通知回调 🔔
+     *
+     * POST /api/payment/alipay/notify
+     *
+     * 说明：支付宝服务器会在用户支付完成后主动调用此接口，请务必返回字符串 "success"
+     *       表示接收成功，避免重复通知。
+     */
+    @Operation(summary = "支付宝支付回调")
+    @PostMapping("/alipay/notify")
+    public ResponseEntity<String> alipayPayNotify(HttpServletRequest request) {
+        log.info("📥 收到支付宝支付异步通知");
+        try {
+            // 1. 提取参数（将 Map<String, String[]> 转为 Map<String, String>）
+            java.util.Map<String, String[]> paramMap = request.getParameterMap();
+            java.util.Map<String, String> params = new java.util.HashMap<>();
+            for (var e : paramMap.entrySet()) {
+                if (e.getValue() != null && e.getValue().length > 0) {
+                    params.put(e.getKey(), e.getValue()[0]);
+                }
+            }
+
+            // 2. 验证签名
+            boolean verified = alipayPaymentService != null && alipayPaymentService.verifySignature(params);
+            if (!verified) {
+                // 按支付宝规范，无论内部处理是否成功，一律返回 success，避免重复回调压力
+                log.error("💥 支付宝回调验签失败，仍返回 success 以避免重复通知");
+                return ResponseEntity.ok("success");
+            }
+
+            // 3. 解析回调并获取订单号、交易号
+            String[] result = alipayPaymentService.handleNotify(params);
+            if (result == null || result.length < 2) {
+                // 解析不到成功态，同样按规范返回 success，内部落日志供排查
+                log.error("💥 支付宝回调解析失败，必要参数缺失或状态非成功，仍返回 success");
+                return ResponseEntity.ok("success");
+            }
+            String orderNo = result[0];
+            String tradeNo = result[1];
+
+            // 4. 为了安全，从数据库查询订单金额，而不是信任回调中的金额
+            try {
+                java.math.BigDecimal amount = orderService.getOrderActualAmount(orderNo);
+                if (amount == null) {
+                    log.error("💥 订单不存在: orderNo={}", orderNo);
+                    throw new IllegalStateException("订单不存在");
+                }
+
+                PaymentCallbackRequest callbackRequest = new PaymentCallbackRequest(
+                        orderNo,
+                        tradeNo,
+                        amount,
+                        "SUCCESS",
+                        null // 验签已通过
+                );
+                boolean updateSuccess = orderService.handlePaymentCallback(callbackRequest, true);
+                if (!updateSuccess) {
+                    log.warn("⚠️ 订单状态未更新或已处理: orderNo={}", orderNo);
+                } else {
+                    log.info("🎉 支付宝订单回调处理成功: orderNo={}, tradeNo={}", orderNo, tradeNo);
+                }
+            } catch (Exception e) {
+                // 不要向支付宝返回失败，否则会反复重试；记录错误并返回 success，后续人工/任务修复
+                log.error("💥 处理支付宝回调更新订单异常", e);
+            }
+
+            // 5. 按支付宝规范返回 "success"
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            log.error("💥 支付宝支付回调异常", e);
+            // 出现异常也返回 success，避免支付宝重复通知压垮系统
+            return ResponseEntity.ok("success");
+        }
+    }
+
+    /**
      * 查询支付状态 🔍
      *
      * GET /api/payment/status/{orderNo}
@@ -231,8 +300,6 @@ public class PaymentController {
     @Operation(summary = "查询支付状态")
 
     @GetMapping("/status/{orderNo}")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
-    
     public ApiResponse<String> queryPaymentStatus(@Parameter(description = "订单号", example = "O202510270001") @PathVariable String orderNo) {
         log.info("🔍 查询支付状态: orderNo={}, version={}", orderNo, wechatPayVersion);
         

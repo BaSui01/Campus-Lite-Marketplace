@@ -1,7 +1,9 @@
 package com.campus.marketplace.service.impl;
 
 import com.campus.marketplace.common.entity.*;
+import com.campus.marketplace.common.dto.UserFeedDTO;
 import com.campus.marketplace.common.enums.NotificationType;
+import com.campus.marketplace.common.enums.TargetType;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.repository.*;
@@ -122,6 +124,11 @@ public class CommunityServiceImpl implements CommunityService {
             .build();
         postLikeRepository.save(postLike);
 
+        // 🔥 新增：更新帖子点赞数（2025-11-09 - BaSui 😎）
+        post.incrementLikeCount();
+        postRepository.save(post);
+        log.info("帖子点赞数已更新: postId={}, likeCount={}", postId, post.getLikeCount());
+
         // 发送通知给帖子作者（不是自己的帖子）
         if (!post.getAuthorId().equals(userId)) {
             try {
@@ -151,6 +158,14 @@ public class CommunityServiceImpl implements CommunityService {
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "点赞记录不存在"));
 
         postLikeRepository.delete(postLike);
+
+        // 🔥 新增：更新帖子点赞数（2025-11-09 - BaSui 😎）
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        post.decrementLikeCount();
+        postRepository.save(post);
+        log.info("帖子点赞数已更新: postId={}, likeCount={}", postId, post.getLikeCount());
+
         log.info("取消点赞成功: postId={}, userId={}", postId, userId);
     }
 
@@ -159,9 +174,8 @@ public class CommunityServiceImpl implements CommunityService {
     public void collectPost(Long postId, Long userId) {
         log.info("收藏帖子: postId={}, userId={}", postId, userId);
 
-        if (!postRepository.existsById(postId)) {
-            throw new BusinessException(ErrorCode.POST_NOT_FOUND);
-        }
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
         if (postCollectRepository.existsByPostIdAndUserId(postId, userId)) {
             throw new BusinessException(ErrorCode.OPERATION_FAILED, "已经收藏过了");
@@ -173,6 +187,11 @@ public class CommunityServiceImpl implements CommunityService {
             .userId(userId)
             .build();
         postCollectRepository.save(postCollect);
+
+        // 🔥 新增：更新帖子收藏数（2025-11-09 - BaSui 😎）
+        post.incrementCollectCount();
+        postRepository.save(post);
+        log.info("帖子收藏数已更新: postId={}, collectCount={}", postId, post.getCollectCount());
 
         log.info("帖子收藏成功: postId={}, userId={}", postId, userId);
     }
@@ -186,13 +205,49 @@ public class CommunityServiceImpl implements CommunityService {
             .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "收藏记录不存在"));
 
         postCollectRepository.delete(postCollect);
+
+        // 🔥 新增：更新帖子收藏数（2025-11-09 - BaSui 😎）
+        Post post = postRepository.findById(postId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+        post.decrementCollectCount();
+        postRepository.save(post);
+        log.info("帖子收藏数已更新: postId={}, collectCount={}", postId, post.getCollectCount());
+
         log.info("取消收藏成功: postId={}, userId={}", postId, userId);
     }
 
     @Override
     public List<UserFeed> getUserFeed(Long userId) {
         log.info("获取用户动态流: userId={}", userId);
-        return userFeedRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        // 关键修复：联查加载 actor，确保前端能拿到头像与昵称（nickname 为空时由前端做用户名兜底）
+        return userFeedRepository.findByUserIdOrderByCreatedAtDescWithActor(userId);
+    }
+
+    @Override
+    public List<UserFeedDTO> getUserFeedV2(Long userId) {
+        log.info("获取用户动态流(v2 DTO): userId={}", userId);
+        List<UserFeed> feeds = userFeedRepository.findByUserIdOrderByCreatedAtDescWithActor(userId);
+        return feeds.stream().map(f -> {
+            User actor = f.getActor();
+            String displayName = null;
+            String avatarUrl = null;
+            if (actor != null) {
+                avatarUrl = actor.getAvatar();
+                String nickname = actor.getNickname();
+                displayName = (nickname != null && !nickname.trim().isEmpty()) ? nickname : actor.getUsername();
+            }
+            TargetType targetType = f.getTargetType() != null ? f.getTargetType() : TargetType.POST;
+            return UserFeedDTO.builder()
+                .id(f.getId())
+                .actorId(f.getActorId())
+                .displayName(displayName)
+                .avatarUrl(avatarUrl)
+                .feedType(f.getFeedType())
+                .targetType(targetType)
+                .targetId(f.getTargetId())
+                .createdAt(f.getCreatedAt())
+                .build();
+        }).toList();
     }
 
     @Override

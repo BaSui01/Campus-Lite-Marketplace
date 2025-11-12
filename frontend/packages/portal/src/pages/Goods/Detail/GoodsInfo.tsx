@@ -121,12 +121,13 @@ export const GoodsInfo: React.FC<GoodsInfoProps> = ({ goods }) => {
         </div>
       </div>
 
-      {/* 商品状态标签 */}
-      {goods.status && goods.status !== 'ON_SALE' && (
+      {/* 商品状态标签（仅非可售状态显示） */}
+      {goods.status && goods.status !== 'APPROVED' && (
         <div className={`goods-info__status goods-info__status--${goods.status.toLowerCase()}`}>
-          {goods.status === 'SOLD_OUT' && '已售出'}
-          {goods.status === 'OFF_SHELF' && '已下架'}
+          {goods.status === 'SOLD' && '已售出'}
+          {(goods.status === 'OFF_SHELF' || goods.status === 'OFFLINE') && '已下架'}
           {goods.status === 'PENDING' && '审核中'}
+          {goods.status === 'REJECTED' && '已拒绝'}
         </div>
       )}
     </div>
