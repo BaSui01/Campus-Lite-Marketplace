@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "批量操作", description = "批量任务管理接口")
 @Slf4j
 @RestController
-@RequestMapping("/api/batch")
+@RequestMapping("/batch")
 @RequiredArgsConstructor
 public class BatchOperationController {
 

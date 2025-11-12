@@ -1,0 +1,115 @@
+/**
+ * ReviewStats 样式
+ * @author BaSui 😎
+ */
+
+.review-stats {
+  margin-top: 24px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.review-stats__overview {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.review-stats__score {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-stats__score-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #faad14;
+  line-height: 1;
+}
+
+.review-stats__count {
+  font-size: 12px;
+  color: #999;
+}
+
+.review-stats__rate {
+  min-width: 260px;
+  flex: 1;
+}
+
+.review-stats__rate-title {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.review-stats__rate-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #52c41a;
+}
+
+.review-stats__rate-bar {
+  height: 8px;
+  background: #f5f5f5;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.review-stats__rate-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #73d13d, #52c41a);
+}
+
+.review-stats__rate-meta {
+  font-size: 12px;
+  color: #999;
+}
+
+.review-stats__dimensions {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.review-stats__dim-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+}
+
+.review-stats__dim-label {
+  font-size: 12px;
+  color: #666;
+}
+
+.review-stats__dim-value {
+  font-size: 12px;
+  color: #333;
+  font-weight: 600;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .review-stats {
+    padding: 12px;
+  }
+  .review-stats__overview {
+    gap: 12px;
+  }
+  .review-stats__score-value {
+    font-size: 28px;
+  }
+}
+

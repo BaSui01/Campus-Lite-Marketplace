@@ -19,7 +19,7 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("/api/admin/rate-limit")
+@RequestMapping("/admin/rate-limit")
 @RequiredArgsConstructor
 @Tag(name = "限流规则管理", description = "动态维护限流黑白名单与总开关")
 public class RateLimitAdminController {

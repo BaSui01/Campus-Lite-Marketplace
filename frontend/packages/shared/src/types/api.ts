@@ -2,37 +2,22 @@
  * API 请求/响应类型定义
  * @author BaSui 😎
  * @description 前端 API 接口的 Request 和 Response 类型
+ *
+ * ⚠️ 重要：此文件应该废弃！
+ * - 所有 API 类型应从 '@campus/shared/api' (OpenAPI生成) 导入
+ * - 所有实体类型应从 '@campus/shared/api' 导入
+ * - 所有枚举类型应从 '@campus/shared/api' 导入
+ *
+ * 保留此文件仅为兼容性考虑，新代码请勿使用！
  */
 
-import type {
-  User,
-  Goods,
-  Order,
-  Category,
-  Message,
-  Conversation,
-  Notification,
-  Post,
-  Reply,
-  Review,
-  Favorite,
-  Report,
-  PointsLog,
-  BanLog,
-} from './entity';
-import type {
-  GoodsStatus,
-  OrderStatus,
-  PaymentMethod,
-  GoodsSortField,
-  PostSortField,
-  SortOrder,
-} from './enum';
+import type { PageParams } from './common';
 
 // ==================== 通用 API 类型 ====================
 
 /**
  * API 响应基础结构
+ * @deprecated 请使用 '@campus/shared/api' 中的 ApiResponse
  */
 export interface ApiResponse<T = any> {
   /**
@@ -58,28 +43,9 @@ export interface ApiResponse<T = any> {
 
 /**
  * 分页参数
+ * @deprecated 从 common 导入，避免重复定义
  */
-export interface PageParams {
-  /**
-   * 当前页码（从 1 开始）
-   */
-  page?: number;
-
-  /**
-   * 每页条数
-   */
-  pageSize?: number;
-
-  /**
-   * 排序字段
-   */
-  sortField?: string;
-
-  /**
-   * 排序方向
-   */
-  sortOrder?: SortOrder;
-}
+export type { PageParams };
 
 /**
  * 分页响应数据
@@ -214,27 +180,36 @@ export interface LoginRequest {
 
 /**
  * 登录响应数据
+ * @description 后端实际返回的字段：token, tokenType, expiresIn, userInfo
  */
 export interface LoginResponse {
   /**
+   * JWT Token（访问令牌）
+   */
+  token: string;
+
+  /**
+   * Token 类型（默认 "Bearer"）
+   */
+  tokenType?: string;
+
+  /**
+   * Token 过期时间（毫秒）
+   */
+  expiresIn?: number;
+
+  /**
    * 用户信息
    */
-  user: User;
-
-  /**
-   * 访问令牌
-   */
-  accessToken: string;
-
-  /**
-   * 刷新令牌
-   */
-  refreshToken: string;
-
-  /**
-   * Token 过期时间（秒）
-   */
-  expiresIn: number;
+  userInfo: {
+    id: number;
+    username: string;
+    email?: string;
+    avatar?: string;
+    points?: number;
+    roles?: string[];
+    permissions?: string[];
+  };
 }
 
 /**
@@ -412,8 +387,9 @@ export interface GoodsListQuery extends PageParams {
 
   /**
    * 物品状态
+   * @description 应从 '@campus/shared/api' 导入 GoodsStatus 枚举
    */
-  status?: GoodsStatus;
+  status?: string;
 
   /**
    * 卖家ID
@@ -437,8 +413,9 @@ export interface GoodsListQuery extends PageParams {
 
   /**
    * 排序字段
+   * @description 应从 '@campus/shared/api' 导入相关枚举
    */
-  sortField?: GoodsSortField;
+  sortField?: string;
 }
 
 /**
@@ -509,8 +486,9 @@ export interface CreateOrderResponse {
 export interface OrderListQuery extends PageParams {
   /**
    * 订单状态
+   * @description 应从 '@campus/shared/api' 导入 OrderStatus 枚举
    */
-  status?: OrderStatus;
+  status?: string;
 
   /**
    * 关键词搜索（订单号、物品名称）
@@ -539,8 +517,9 @@ export interface PayOrderRequest {
 
   /**
    * 支付方式
+   * @description 应从 '@campus/shared/api' 导入 PaymentMethod 枚举
    */
-  paymentMethod: PaymentMethod;
+  paymentMethod: string;
 }
 
 /**
@@ -774,8 +753,9 @@ export interface PostListQuery extends PageParams {
 
   /**
    * 排序字段
+   * @description 应从 '@campus/shared/api' 导入相关枚举
    */
-  sortField?: PostSortField;
+  sortField?: string;
 }
 
 /**

@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.entity.ScheduledTask;
 import com.campus.marketplace.service.TaskService;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +46,7 @@ class TaskControllerTest {
                 .build();
         when(taskService.list()).thenReturn(List.of(task));
 
-        mockMvc.perform(get("/api/tasks"))
+        mockMvc.perform(get("/tasks"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0].name").value("recompute-hot"));
@@ -60,7 +59,7 @@ class TaskControllerTest {
     void triggerTask_success() throws Exception {
         when(taskService.trigger("recompute-hot", "campusId=1")).thenReturn(888L);
 
-        mockMvc.perform(post("/api/tasks/{name}/trigger", "recompute-hot")
+        mockMvc.perform(post("/tasks/{name}/trigger", "recompute-hot")
                         .param("params", "campusId=1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
@@ -72,7 +71,7 @@ class TaskControllerTest {
     @Test
     @DisplayName("暂停定时任务成功")
     void pauseTask_success() throws Exception {
-        mockMvc.perform(post("/api/tasks/{name}/pause", "recompute-hot"))
+        mockMvc.perform(post("/tasks/{name}/pause", "recompute-hot"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -82,7 +81,7 @@ class TaskControllerTest {
     @Test
     @DisplayName("恢复定时任务成功")
     void resumeTask_success() throws Exception {
-        mockMvc.perform(post("/api/tasks/{name}/resume", "recompute-hot"))
+        mockMvc.perform(post("/tasks/{name}/resume", "recompute-hot"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

@@ -51,11 +51,17 @@ export const isValidIdCard = (idCard: string): boolean => {
 
   let sum = 0;
   for (let i = 0; i < 17; i++) {
-    sum += parseInt(idCard[i]) * weights[i];
+    const char = idCard[i];
+    const weight = weights[i];
+    if (!char || weight === undefined) return false; // 🛡️ 严格检查数组访问
+    sum += parseInt(char) * weight;
   }
 
   const checkCode = checkCodes[sum % 11];
-  return idCard[17].toUpperCase() === checkCode;
+  const lastChar = idCard[17];
+  // 🛡️ 严格检查数组访问和返回值
+  if (!checkCode || !lastChar) return false;
+  return lastChar.toUpperCase() === checkCode;
 };
 
 /**

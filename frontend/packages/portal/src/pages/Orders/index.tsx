@@ -1,482 +1,264 @@
 /**
- * 订单列表页 - 我的买入/卖出订单管理！📋
+ * 订单列表页 📦
  * @author BaSui 😎
- * @description 分页展示订单列表、状态筛选、Tab切换
+ * @description 买家订单、卖家订单、订单状态筛选
  */
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@campus/shared/components';
-import { orderService } from '@campus/shared/services/order';
-import { websocketService } from '@campus/shared/utils';
-import type { Order, OrderStatus, PageInfo } from '@campus/shared/types';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Skeleton, Empty, OrderCard } from '@campus/shared/components';
+import { orderService } from '@campus/shared/services';
+import { 
+  preferredBackendStatusForStage, 
+  isStatusInStage, 
+  toUiStage, 
+  type UiOrderStage 
+} from '@campus/shared/utils';
+import { OrderStatus as BackendOrderStatus } from '@campus/shared/types/enum';
 import './Orders.css';
 
-/**
- * Tab 类型
- */
-type OrderTab = 'buyer' | 'seller';
+type OrderType = 'buyer' | 'seller';
+// UI 标签的筛选值（聚合态），与后端枚举解耦
+type OrderStatus = 'all' | 'PENDING_PAYMENT' | 'PENDING_SHIPMENT' | 'PENDING_RECEIPT' | 'COMPLETED' | 'CANCELLED' | 'AFTER_SALES';
 
-/**
- * 订单列表页组件
- */
-const Orders: React.FC = () => {
+const ORDER_TABS = [
+  { value: 'buyer' as OrderType, label: '我买到的' },
+  { value: 'seller' as OrderType, label: '我卖出的' },
+];
+
+const STATUS_TABS = [
+  { value: 'all' as OrderStatus, label: '全部' },
+  { value: 'PENDING_PAYMENT' as OrderStatus, label: '待支付' },
+  { value: 'PENDING_SHIPMENT' as OrderStatus, label: '待发货' },
+  { value: 'PENDING_RECEIPT' as OrderStatus, label: '待收货' },
+  { value: 'COMPLETED' as OrderStatus, label: '已完成' },
+  { value: 'CANCELLED' as OrderStatus, label: '已取消' },
+];
+
+export const Orders: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // ==================== 状态管理 ====================
-
-  const [activeTab, setActiveTab] = useState<OrderTab>('buyer'); // 当前 Tab（买入/卖出）
-  const [orderList, setOrderList] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // 分页状态
+  const [orderType, setOrderType] = useState<OrderType>(
+    (searchParams.get('type') as OrderType) || 'buyer'
+  );
+  const [orderStatus, setOrderStatus] = useState<OrderStatus>(
+    (searchParams.get('status') as OrderStatus) || 'all'
+  );
   const [page, setPage] = useState(0);
-  const [pageSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
+  const pageSize = 10;
+  const queryClient = useQueryClient();
 
-  // 筛选状态
-  const [filterStatus, setFilterStatus] = useState<OrderStatus | 'ALL'>('ALL');
-  const [keyword, setKeyword] = useState('');
-
-  // ==================== 数据加载 ====================
-
-  /**
-   * 加载订单列表（使用真实后端 API！）
-   */
-  const loadOrderList = async (isLoadMore = false) => {
-    if (isLoadMore) {
-      setLoadingMore(true);
-    } else {
-      setLoading(true);
-    }
-    setError(null);
-
-    try {
-      const currentPage = isLoadMore ? page + 1 : 0;
-
-      // 构建查询参数
-      const params: any = {
-        page: currentPage,
-        pageSize,
-      };
-
-      if (filterStatus !== 'ALL') {
-        params.status = filterStatus;
+  // 查询订单列表
+  const { data: ordersData, isLoading } = useQuery({
+    queryKey: ['orders', orderType, orderStatus, page],
+    queryFn: async () => {
+      // 将 UI 阶段映射为后端枚举（只能传单值时取首选）
+      let backendStatus: BackendOrderStatus | undefined = undefined;
+      if (orderStatus !== 'all') {
+        const uiStage = orderStatus as UiOrderStage;
+        backendStatus = preferredBackendStatusForStage(uiStage);
       }
 
-      if (keyword.trim()) {
-        params.keyword = keyword.trim();
+      const params = {
+        status: backendStatus,
+        page,
+        size: pageSize,
+      } as any;
+
+      const pageResp = orderType === 'buyer'
+        ? await orderService.listBuyerOrders(params)
+        : await orderService.listSellerOrders(params);
+
+      // 如果选择“待收货/售后”等需要匹配多个后端状态的阶段，这里做一次前端归并过滤，避免后端多状态查询不支持
+      if (orderStatus === 'PENDING_RECEIPT' || orderStatus === 'AFTER_SALES') {
+        const filtered = (pageResp.content || []).filter((o) => isStatusInStage(o.status as BackendOrderStatus, orderStatus as UiOrderStage));
+        return { ...pageResp, content: filtered };
       }
 
-      // 🚀 调用真实后端 API 获取订单列表
-      let response: any;
-      if (activeTab === 'buyer') {
-        response = await orderService.getBuyerOrders(params);
-      } else {
-        response = await orderService.getSellerOrders(params);
-      }
+      return pageResp;
+    },
+    staleTime: 1 * 60 * 1000, // 1分钟缓存
+  });
 
-      const pageData: PageInfo<Order> = response.data;
-      const newOrders = pageData.content || [];
-
-      if (isLoadMore) {
-        setOrderList((prev) => [...prev, ...newOrders]);
-        setPage(currentPage);
-      } else {
-        setOrderList(newOrders);
-        setPage(0);
-      }
-
-      setTotalPages(pageData.totalPages || 0);
-      setTotalElements(pageData.totalElements || 0);
-      setHasMore(!pageData.last);
-    } catch (err: any) {
-      console.error('加载订单列表失败：', err);
-      setError(err.response?.data?.message || '加载订单列表失败，请稍后重试！😭');
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  };
-
-  // 初始加载
-  useEffect(() => {
-    loadOrderList();
-  }, [activeTab, filterStatus]);
-
-  // ==================== 📦 实时订单状态更新（WebSocket）====================
-
-  /**
-   * 📦 监听 WebSocket 订单状态更新
-   */
-  useEffect(() => {
-    console.log('[Orders] 📦 开始监听实时订单状态更新...');
-
-    // 定义订单更新处理器
-    const handleOrderUpdate = (data: any) => {
-      console.log('[Orders] 📦 收到订单状态更新:', data);
-
-      const { orderId, orderNo, status, message } = data;
-
-      // 🚀 乐观更新 UI（更新列表中对应的订单）
-      setOrderList((prev) =>
-        prev.map((order) => {
-          if (order.orderId === orderId || order.orderNo === orderNo) {
-            console.log(`[Orders] ✅ 更新订单 ${orderNo} 状态: ${order.status} → ${status}`);
-            return {
-              ...order,
-              status,
-              updateTime: new Date().toISOString(),
-            };
-          }
-          return order;
-        })
-      );
-
-      // 💬 显示 Toast 提示（可选）
-      if (message) {
-        console.log(`[Orders] 💬 订单 ${orderNo}: ${message}`);
-      }
-    };
-
-    // 📡 订阅订单更新推送
-    websocketService.onOrderUpdate(handleOrderUpdate);
-
-    // 🔌 确保 WebSocket 已连接
-    if (!websocketService.isConnected()) {
-      console.log('[Orders] 🔌 WebSocket 未连接，尝试连接...');
-      websocketService.connect();
-    }
-
-    // 🧹 清理函数（组件卸载时取消订阅）
-    return () => {
-      console.log('[Orders] 🧹 取消订阅实时订单状态更新');
-      websocketService.offOrderUpdate(handleOrderUpdate);
-    };
-  }, []); // 空依赖，只在组件挂载时执行一次
-
-  // ==================== 事件处理 ====================
-
-  /**
-   * 切换 Tab
-   */
-  const handleTabChange = (tab: OrderTab) => {
-    if (tab === activeTab) return;
-    setActiveTab(tab);
-    setOrderList([]);
+  // 切换订单类型
+  const handleTypeChange = (type: OrderType) => {
+    setOrderType(type);
+    setOrderStatus('all');
     setPage(0);
-    setFilterStatus('ALL');
-    setKeyword('');
+    setSearchParams({ type });
   };
 
-  /**
-   * 切换筛选状态
-   */
-  const handleFilterChange = (status: OrderStatus | 'ALL') => {
-    setFilterStatus(status);
-    setOrderList([]);
+  // 切换订单状态
+  const handleStatusChange = (status: OrderStatus) => {
+    setOrderStatus(status);
     setPage(0);
+    const params: Record<string, string> = { type: orderType };
+    if (status !== 'all') {
+      params.status = status;
+    }
+    setSearchParams(params);
   };
 
-  /**
-   * 搜索关键词
-   */
-  const handleSearch = () => {
-    setOrderList([]);
-    setPage(0);
-    loadOrderList();
-  };
-
-  /**
-   * 加载更多
-   */
-  const handleLoadMore = () => {
-    if (loadingMore || !hasMore) return;
-    loadOrderList(true);
-  };
-
-  /**
-   * 查看订单详情
-   */
+  // 查看订单详情
   const handleViewOrder = (orderNo: string) => {
     navigate(`/orders/${orderNo}`);
   };
 
-  // ==================== 工具函数 ====================
-
-  /**
-   * 格式化价格 - ¥X.XX
-   */
-  const formatPrice = (price?: number) => {
-    if (!price) return '¥0.00';
-    // 后端价格单位是分，需要除以100
-    return `¥${(price / 100).toFixed(2)}`;
+  // 立即支付：跳转到支付页选择支付方式
+  const handlePay = (o: { orderNo: string }) => {
+    if (!o?.orderNo) return;
+    navigate(`/payment?orderNo=${encodeURIComponent(o.orderNo)}`);
   };
 
-  /**
-   * 格式化时间
-   */
-  const formatTime = (time?: string) => {
-    if (!time) return '—';
-
-    const date = new Date(time);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-
-    const minutes = Math.floor(diff / 1000 / 60);
-    const hours = Math.floor(diff / 1000 / 60 / 60);
-    const days = Math.floor(diff / 1000 / 60 / 60 / 24);
-
-    if (minutes < 1) return '刚刚';
-    if (minutes < 60) return `${minutes}分钟前`;
-    if (hours < 24) return `${hours}小时前`;
-    if (days < 30) return `${days}天前`;
-
-    return date.toLocaleDateString('zh-CN');
-  };
-
-  /**
-   * 获取订单状态文本
-   */
-  const getStatusText = (status?: OrderStatus) => {
-    switch (status) {
-      case 'PENDING_PAYMENT':
-        return '待支付';
-      case 'PAID':
-        return '已支付';
-      case 'PENDING_DELIVERY':
-        return '待发货';
-      case 'PENDING_RECEIPT':
-        return '待收货';
-      case 'COMPLETED':
-        return '已完成';
-      case 'CANCELLED':
-        return '已取消';
-      case 'REFUNDING':
-        return '退款中';
-      case 'REFUNDED':
-        return '已退款';
-      default:
-        return '未知';
+  // 取消订单（待支付）
+  const handleCancel = async (o: { orderNo: string }) => {
+    if (!o?.orderNo) return;
+    if (!window.confirm('确定要取消该订单吗？')) return;
+    try {
+      await orderService.cancelOrder(o.orderNo);
+      // 刷新列表
+      await queryClient.invalidateQueries({ queryKey: ['orders'] });
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || e?.message || '取消失败，请稍后重试';
+      window.alert(msg);
     }
   };
 
-  /**
-   * 获取订单状态样式类
-   */
-  const getStatusClass = (status?: OrderStatus) => {
-    switch (status) {
-      case 'PENDING_PAYMENT':
-        return 'status-pending';
-      case 'PAID':
-      case 'PENDING_DELIVERY':
-      case 'PENDING_RECEIPT':
-        return 'status-processing';
-      case 'COMPLETED':
-        return 'status-completed';
-      case 'CANCELLED':
-      case 'REFUNDED':
-        return 'status-cancelled';
-      case 'REFUNDING':
-        return 'status-refunding';
-      default:
-        return '';
-    }
-  };
-
-  // ==================== 渲染 ====================
-
-  // 加载中状态
-  if (loading && orderList.length === 0) {
-    return (
-      <div className="orders-page">
-        <div className="orders-container">
-          <h1 className="orders-page-title">我的订单</h1>
-          {/* 使用列表骨架屏 */}
-          <Skeleton type="list" count={5} animation="wave" />
-        </div>
-      </div>
-    );
-  }
+  const orderList = ordersData?.content || [];
+  const totalPages = ordersData?.totalPages || 0;
 
   return (
     <div className="orders-page">
       <div className="orders-container">
-        {/* ==================== 页面标题 ==================== */}
-        <h1 className="orders-page-title">我的订单</h1>
+        <h1 className="orders-title">我的订单</h1>
 
-        {/* ==================== Tab 切换 ==================== */}
-        <div className="orders-tabs">
-          <div
-            className={`tab-item ${activeTab === 'buyer' ? 'active' : ''}`}
-            onClick={() => handleTabChange('buyer')}
-          >
-            🛒 我买到的
-          </div>
-          <div
-            className={`tab-item ${activeTab === 'seller' ? 'active' : ''}`}
-            onClick={() => handleTabChange('seller')}
-          >
-            💰 我卖出的
-          </div>
+        {/* 订单类型切换 */}
+        <div className="orders-type-tabs">
+          {ORDER_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              className={`orders-type-tab ${orderType === tab.value ? 'active' : ''}`}
+              onClick={() => handleTypeChange(tab.value)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* ==================== 筛选栏 ==================== */}
-        <div className="orders-filter">
-          <div className="filter-status">
+        {/* 订单状态筛选 */}
+        <div className="orders-status-tabs">
+          {STATUS_TABS.map((tab) => (
             <button
-              className={`status-btn ${filterStatus === 'ALL' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('ALL')}
+              key={tab.value}
+              className={`orders-status-tab ${orderStatus === tab.value ? 'active' : ''}`}
+              onClick={() => handleStatusChange(tab.value)}
             >
-              全部
+              {tab.label}
             </button>
-            <button
-              className={`status-btn ${filterStatus === 'PENDING_PAYMENT' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('PENDING_PAYMENT')}
-            >
-              待支付
-            </button>
-            <button
-              className={`status-btn ${filterStatus === 'PAID' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('PAID')}
-            >
-              已支付
-            </button>
-            <button
-              className={`status-btn ${filterStatus === 'PENDING_RECEIPT' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('PENDING_RECEIPT')}
-            >
-              待收货
-            </button>
-            <button
-              className={`status-btn ${filterStatus === 'COMPLETED' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('COMPLETED')}
-            >
-              已完成
-            </button>
-            <button
-              className={`status-btn ${filterStatus === 'CANCELLED' ? 'active' : ''}`}
-              onClick={() => handleFilterChange('CANCELLED')}
-            >
-              已取消
-            </button>
-          </div>
-
-          <div className="filter-search">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="搜索订单号或商品名称..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            />
-            <button className="search-btn" onClick={handleSearch}>
-              🔍 搜索
-            </button>
-          </div>
+          ))}
         </div>
 
-        {/* ==================== 订单列表 ==================== */}
-        {error ? (
-          <div className="orders-error">
-            <div className="error-icon">😭</div>
-            <p>{error}</p>
-            <button className="btn-retry" onClick={() => loadOrderList()}>
-              重试
-            </button>
+        {/* Loading状态 */}
+        {isLoading && (
+          <div className="orders-loading">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton key={index} type="card" animation="wave" />
+            ))}
           </div>
-        ) : orderList.length === 0 ? (
-          <div className="orders-empty">
-            <div className="empty-icon">📦</div>
-            <p className="empty-text">暂无订单</p>
-            <p className="empty-tip">快去逛逛，淘点好货吧！</p>
-            <button className="btn-go-home" onClick={() => navigate('/')}>
-              去首页逛逛
-            </button>
-          </div>
-        ) : (
+        )}
+
+        {/* 订单列表 */}
+        {!isLoading && orderList.length > 0 && (
           <>
             <div className="orders-list">
               {orderList.map((order) => (
-                <div
-                  key={order.id}
-                  className="order-card"
-                  onClick={() => handleViewOrder(order.orderNo)}
-                >
-                  {/* 订单头部 */}
-                  <div className="order-header">
-                    <div className="order-no">订单号：{order.orderNo}</div>
-                    <div className={`order-status ${getStatusClass(order.status)}`}>
-                      {getStatusText(order.status)}
-                    </div>
-                  </div>
-
-                  {/* 商品信息 */}
-                  <div className="order-body">
-                    <div className="goods-image">
-                      {order.goods?.images?.[0] ? (
-                        <img src={order.goods.images[0]} alt={order.goods.title} />
-                      ) : (
-                        <div className="image-placeholder">📦</div>
-                      )}
-                    </div>
-                    <div className="goods-info">
-                      <h3 className="goods-title">{order.goods?.title || '未知商品'}</h3>
-                      <p className="goods-desc">{order.goods?.description || '暂无描述'}</p>
-                      <div className="order-meta">
-                        <span className="order-time">{formatTime(order.createdAt)}</span>
-                        {activeTab === 'buyer' && order.seller?.username && (
-                          <span className="order-user">卖家：{order.seller.username}</span>
-                        )}
-                        {activeTab === 'seller' && order.buyer?.username && (
-                          <span className="order-user">买家：{order.buyer.username}</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="order-price">{formatPrice(order.amount)}</div>
-                  </div>
-
-                  {/* 操作按钮 */}
-                  <div className="order-footer">
-                    <button
-                      className="btn-view-detail"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewOrder(order.orderNo);
-                      }}
-                    >
-                      查看详情
-                    </button>
-                  </div>
-                </div>
+                <OrderCard
+                  key={order.orderNo}
+                  order={{
+                    // 将后端返回的订单转为 OrderCard 需要的结构与状态（UI 阶段）
+                    id: String(order.id),
+                    orderNo: order.orderNo!,
+                    status: ((): any => {
+                      const backendStatus = order.status as BackendOrderStatus;
+                      // AFTER_SALES 细分：优先依据后端原始状态判断
+                      if (backendStatus === 'REFUNDING') return 'refunding';
+                      if (backendStatus === 'REFUNDED') return 'refunded';
+                      const stage = toUiStage(backendStatus);
+                      switch (stage) {
+                        case 'PENDING_PAYMENT': return 'pending_payment';
+                        case 'PENDING_SHIPMENT': return 'pending_delivery';
+                        case 'PENDING_RECEIPT': return 'pending_receipt';
+                        case 'COMPLETED': return 'completed';
+                        case 'CANCELLED': return 'cancelled';
+                        default: return 'pending_payment';
+                      }
+                    })(),
+                    items: [{
+                      goodsId: String(order.goodsId),
+                      goodsName: order.goodsTitle || '—',
+                      goodsImage: order.goodsImage || '',
+                      price: Number(order.actualAmount || order.amount || 0),
+                      quantity: 1,
+                    }],
+                    totalAmount: Number(order.actualAmount || order.amount || 0),
+                    buyer: order.buyerUsername ? { id: String(order.buyerId), name: order.buyerUsername } : undefined,
+                    seller: order.sellerUsername ? { id: String(order.sellerId), name: order.sellerUsername } : undefined,
+                    createdAt: order.createdAt as unknown as string,
+                  }}
+                  onDetailClick={() => handleViewOrder(order.orderNo!)}
+                  onPayClick={() => handlePay({ orderNo: order.orderNo! })}
+                  onCancelClick={() => handleCancel({ orderNo: order.orderNo! })}
+                />
               ))}
             </div>
 
-            {/* 加载更多 */}
-            {hasMore && (
-              <div className="orders-load-more">
+            {/* 分页 */}
+            {totalPages > 1 && (
+              <div className="orders-pagination">
                 <button
-                  className="btn-load-more"
-                  onClick={handleLoadMore}
-                  disabled={loadingMore}
+                  className="pagination-btn"
+                  disabled={page === 0}
+                  onClick={() => setPage(page - 1)}
                 >
-                  {loadingMore ? '⏳ 加载中...' : '加载更多'}
+                  上一页
+                </button>
+                <span className="pagination-info">
+                  第 {page + 1} / {totalPages} 页
+                </span>
+                <button
+                  className="pagination-btn"
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage(page + 1)}
+                >
+                  下一页
                 </button>
               </div>
             )}
-
-            {/* 分页信息 */}
-            <div className="orders-pagination-info">
-              已加载 <span className="count">{orderList.length}</span> / 共{' '}
-              <span className="count">{totalElements}</span> 条订单
-              {!hasMore && orderList.length > 0 && <span className="all-loaded"> · 已全部加载</span>}
-            </div>
           </>
+        )}
+
+        {/* 空状态 */}
+        {!isLoading && orderList.length === 0 && (
+          <Empty
+            icon="📦"
+            title="暂无订单"
+            description={
+              orderStatus === 'all'
+                ? orderType === 'buyer'
+                  ? '您还没有购买过商品'
+                  : '您还没有卖出过商品'
+                : `暂无${STATUS_TABS.find(t => t.value === orderStatus)?.label}订单`
+            }
+            action={
+              orderType === 'buyer' && (
+                <button onClick={() => navigate('/goods')}>
+                  去逛逛
+                </button>
+              )
+            }
+          />
         )}
       </div>
     </div>

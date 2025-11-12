@@ -1,0 +1,51 @@
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  ngrok 多隧道配置文件 - 同时暴露前后端三个服务                          ║
+# ║  ngrok Multi-Tunnel Configuration                                     ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
+#
+# 🎯 用途: 将本地前后端服务暴露到公网，方便远程访问和测试
+#
+# 📝 使用方法:
+#   1. 在 .env 中设置 NGROK_AUTHTOKEN
+#   2. 启动服务: docker compose --profile tunnel up -d
+#   3. 访问管理界面: http://localhost:4040
+#
+# 🌐 暴露的服务:
+#   - backend (8200)  : 后端API服务（支付回调必需）
+#   - admin (8210)    : 前端管理端
+#   - portal (8220)   : 前端用户端
+
+# ngrok 配置文件版本（v3 必需）
+version: "2"
+
+# ngrok 认证 token（通过 Docker 环境变量传递，不在配置文件中设置）
+
+# 隧道定义
+tunnels:
+  # 🖥️ 后端API服务 (8200端口)
+  # 💡 支付宝/微信回调只需要暴露后端即可
+  backend:
+    proto: http
+    addr: host.docker.internal:8200
+    # 自定义域名（可选，需要付费版）
+    # hostname: api.your-domain.com
+    inspect: true
+    # 基础认证（可选，保护API）
+    # auth: "username:password"
+
+# Web 界面配置
+web_addr: 0.0.0.0:4040
+
+# 日志配置
+log_level: info
+log_format: json
+log: stdout
+
+# 区域配置（可选，选择最近的区域以降低延迟）
+# region: us   # 美国
+# region: eu   # 欧洲
+# region: ap   # 亚太
+# region: au   # 澳大利亚
+# region: sa   # 南美
+# region: jp   # 日本
+# region: in   # 印度

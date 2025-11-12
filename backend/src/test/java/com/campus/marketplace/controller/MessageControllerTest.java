@@ -76,7 +76,7 @@ class MessageControllerTest {
     void sendMessage_success() throws Exception {
         when(messageService.sendMessage(any())).thenReturn(123L);
 
-        mockMvc.perform(post("/api/messages/send")
+        mockMvc.perform(post("/messages/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -101,7 +101,7 @@ class MessageControllerTest {
     void getUnreadCount_success() throws Exception {
         when(messageService.getUnreadCount()).thenReturn(5);
 
-        mockMvc.perform(get("/api/messages/unread-count"))
+        mockMvc.perform(get("/messages/unread-count"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(5));
@@ -127,7 +127,7 @@ class MessageControllerTest {
         );
         when(messageService.listConversations(1, 5)).thenReturn(page);
 
-        mockMvc.perform(get("/api/messages/conversations")
+        mockMvc.perform(get("/messages/conversations")
                         .param("page", "1")
                         .param("size", "5"))
                 .andExpect(status().isOk())
@@ -158,7 +158,7 @@ class MessageControllerTest {
         );
         when(messageService.listMessages(900L, 2, 10)).thenReturn(page);
 
-        mockMvc.perform(get("/api/messages/conversations/{conversationId}/messages", 900)
+        mockMvc.perform(get("/messages/conversations/{conversationId}/messages", 900)
                         .param("page", "2")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -174,7 +174,7 @@ class MessageControllerTest {
     void markConversationAsRead_success() throws Exception {
         when(messageService.markConversationAsRead(77L)).thenReturn(4);
 
-        mockMvc.perform(post("/api/messages/conversations/{conversationId}/mark-read", 77))
+        mockMvc.perform(post("/messages/conversations/{conversationId}/mark-read", 77))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(4));
@@ -185,7 +185,7 @@ class MessageControllerTest {
     @Test
     @DisplayName("撤回消息成功")
     void recallMessage_success() throws Exception {
-        mockMvc.perform(post("/api/messages/messages/{messageId}/recall", 808))
+        mockMvc.perform(post("/messages/messages/{messageId}/recall", 808))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

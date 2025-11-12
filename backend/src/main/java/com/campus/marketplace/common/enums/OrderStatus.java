@@ -44,7 +44,17 @@ public enum OrderStatus {
     /**
      * 已评价
      */
-    REVIEWED("已评价");
+    REVIEWED("已评价"),
+
+    /**
+     * 退款中
+     */
+    REFUNDING("退款中"),
+
+    /**
+     * 已退款
+     */
+    REFUNDED("已退款");
 
     private final String description;
 

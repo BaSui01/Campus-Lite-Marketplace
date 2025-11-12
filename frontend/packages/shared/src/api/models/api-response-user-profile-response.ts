@@ -40,6 +40,6 @@ export interface ApiResponseUserProfileResponse {
      * @type {UserProfileResponse}
      * @memberof ApiResponseUserProfileResponse
      */
-    'data'?: UserProfileResponse | null;
+    'data'?: UserProfileResponse;
 }
 

@@ -1,11 +1,38 @@
 /**
- * 首页样式 - 让商品列表变得美观！🎨
+ * 首页样式 🏠
  * @author BaSui 😎
+ * @description 整合Hero、HotGoods、Categories三大模块的容器样式
+ * @updated 2025-11-08 - 增强视觉层次感和整体美观度
  */
 
 .home-page {
+  width: 100%;
   min-height: 100vh;
-  background: #f5f5f5;
+  background: linear-gradient(
+    to bottom,
+    #f8f9fc 0%,
+    #ffffff 300px,
+    #fafbfd 100%
+  );
+}
+
+/* ==================== 主内容容器 ==================== */
+.home-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  animation: fadeInContent 0.6s ease-out;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ==================== 搜索栏 ==================== */
@@ -372,32 +399,57 @@
 /* 商品卡片 */
 .home-goods-card {
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.home-goods-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+
+.home-goods-card:hover::before {
+  opacity: 1;
 }
 
 .home-goods-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.15), 0 0 0 1px rgba(102, 126, 234, 0.1);
 }
 
 .home-goods-card__image {
   width: 100%;
   height: 200px;
   overflow: hidden;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #f5f7fa 0%, #fafbfd 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 .home-goods-card__image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.home-goods-card:hover .home-goods-card__image img {
+  transform: scale(1.1) rotate(1deg);
 }
 
 .home-goods-card__placeholder {
@@ -405,17 +457,25 @@
 }
 
 .home-goods-card__info {
-  padding: 16px;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .home-goods-card__title {
-  font-size: 16px;
-  font-weight: bold;
-  color: #262626;
-  margin: 0 0 8px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 10px 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: -0.2px;
+  transition: color 0.3s ease;
+}
+
+.home-goods-card:hover .home-goods-card__title {
+  color: #667eea;
 }
 
 .home-goods-card__desc {
@@ -456,9 +516,13 @@
 }
 
 .home-goods-card__price {
-  font-size: 20px;
-  font-weight: bold;
-  color: #ff4d4f;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
 }
 
 .home-goods-card__meta {

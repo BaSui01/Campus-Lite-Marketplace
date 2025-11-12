@@ -1,0 +1,114 @@
+/* PageContainer 通用页面容器样式 */
+
+.page-container {
+  padding: 24px;
+  min-height: 100%;
+}
+
+/* ===== 面包屑导航 ===== */
+.page-container__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #666;
+}
+
+.page-container__breadcrumb-link {
+  color: #1677ff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.page-container__breadcrumb-link:hover {
+  color: #4096ff;
+}
+
+.page-container__breadcrumb-text {
+  color: #333;
+}
+
+.page-container__breadcrumb-separator {
+  color: #ccc;
+}
+
+/* ===== 页头区域 ===== */
+.page-container__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-container__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.page-container__extra {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ===== 内容区域 ===== */
+.page-container__content {
+  min-height: 400px;
+}
+
+.page-container__content--card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 加载状态 ===== */
+.page-container__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #666;
+}
+
+.page-container__spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f0f0f0;
+  border-top-color: #1677ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 16px;
+  }
+
+  .page-container__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-container__title {
+    font-size: 20px;
+  }
+
+  .page-container__content--card {
+    padding: 16px;
+  }
+}

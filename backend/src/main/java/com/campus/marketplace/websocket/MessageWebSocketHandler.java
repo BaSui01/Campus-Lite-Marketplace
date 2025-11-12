@@ -3,7 +3,6 @@ package com.campus.marketplace.websocket;
 import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.dto.websocket.WebSocketMessage;
 import com.campus.marketplace.common.enums.MessageType;
-import com.campus.marketplace.common.utils.JwtUtil;
 import com.campus.marketplace.service.MessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * WebSocket 消息处理器
@@ -41,8 +39,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class MessageWebSocketHandler extends TextWebSocketHandler {
 
-    private final WebSocketSessionManager sessionManager;
-    private final JwtUtil jwtUtil;
+    private final MessageSessionManager sessionManager;
     private final ObjectMapper objectMapper;
     private final MessageService messageService;
 
@@ -59,36 +56,19 @@ public class MessageWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         try {
-            // 1. 获取 JWT Token（从查询参数 ?token=xxx）
-            String token = getTokenFromSession(session);
-            if (token == null || token.isEmpty()) {
-                log.warn("⚠️ WebSocket 连接失败：缺少 Token，会话 ID={}", session.getId());
-                sendErrorMessage(session, "缺少认证 Token");
+            // 1. 从拦截器设置的 attributes 获取用户 ID（避免重复解析Token）
+            Long userId = (Long) session.getAttributes().get("userId");
+            if (userId == null) {
+                log.warn("⚠️ WebSocket 连接失败：拦截器未提供 userId，会话 ID={}", session.getId());
+                sendErrorMessage(session, "认证失败");
                 session.close(CloseStatus.NOT_ACCEPTABLE);
                 return;
             }
 
-            // 2. 验证 Token 并提取用户 ID
-            Long userId;
-            try {
-                userId = jwtUtil.getUserIdFromToken(token);
-                if (userId == null) {
-                    log.warn("⚠️ WebSocket 连接失败：Token 无效，会话 ID={}", session.getId());
-                    sendErrorMessage(session, "Token 无效");
-                    session.close(CloseStatus.NOT_ACCEPTABLE); // 1003
-                    return;
-                }
-            } catch (Exception e) {
-                log.error("❌ WebSocket 连接失败：Token 解析异常，会话 ID={}", session.getId(), e);
-                sendErrorMessage(session, "Token 解析失败");
-                session.close(CloseStatus.NOT_ACCEPTABLE); // 1003
-                return;
-            }
-
-            // 3. 注册会话
+            // 2. 注册会话
             sessionManager.addSession(userId, session);
 
-            // 4. 发送连接成功消息
+            // 3. 发送连接成功消息
             WebSocketMessage successMessage = WebSocketMessage.builder()
                     .type(WebSocketMessage.TYPE_SYSTEM)
                     .content("WebSocket 连接成功")
@@ -259,35 +239,6 @@ public class MessageWebSocketHandler extends TextWebSocketHandler {
             log.error("❌ 处理私信消息失败：发送者={}, 接收者={}", senderId, wsMessage.getToUserId(), e);
             sendErrorMessage(session, "消息发送失败：" + e.getMessage());
         }
-    }
-
-    /**
-     * 从会话中获取 JWT Token
-     *
-     * Token 传递方式：
-     * 1. 查询参数：ws://localhost:8080/ws/message?token=xxx
-     * 2. SockJS：ws://localhost:8080/ws/message/websocket?token=xxx
-     */
-    private String getTokenFromSession(WebSocketSession session) {
-        URI uri = session.getUri();
-        if (uri == null) {
-            return null;
-        }
-
-        String query = uri.getQuery();
-        if (query == null || query.isEmpty()) {
-            return null;
-        }
-
-        // 解析查询参数 token=xxx
-        for (String param : query.split("&")) {
-            String[] keyValue = param.split("=");
-            if (keyValue.length == 2 && "token".equals(keyValue[0])) {
-                return keyValue[1];
-            }
-        }
-
-        return null;
     }
 
     /**

@@ -1,0 +1,273 @@
+/**
+ * 图片画廊样式
+ * @author BaSui 😎
+ */
+
+/* ==================== 主容器 ==================== */
+.image-gallery {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.image-gallery__main {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.image-gallery__main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
+/* ==================== 箭头按钮 ==================== */
+.image-gallery__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  color: #333;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.image-gallery__arrow:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.image-gallery__arrow--left {
+  left: 12px;
+}
+
+.image-gallery__arrow--right {
+  right: 12px;
+}
+
+/* ==================== 图片计数 ==================== */
+.image-gallery__counter {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 16px;
+  color: white;
+  font-size: 13px;
+  z-index: 10;
+}
+
+/* ==================== 全屏按钮 ==================== */
+.image-gallery__fullscreen-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.image-gallery__fullscreen-btn:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+/* ==================== 缩略图 ==================== */
+.image-gallery__thumbnails {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.image-gallery__thumbnail {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  background: #f5f5f5;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.image-gallery__thumbnail:hover {
+  border-color: #ccc;
+}
+
+.image-gallery__thumbnail.active {
+  border-color: #667eea;
+}
+
+.image-gallery__thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==================== 全屏模式 ==================== */
+.image-gallery-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.image-gallery-fullscreen__close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.image-gallery-fullscreen__close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.image-gallery-fullscreen__img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  cursor: default;
+}
+
+.image-gallery-fullscreen__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-gallery-fullscreen__arrow:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.image-gallery-fullscreen__arrow--left {
+  left: 32px;
+}
+
+.image-gallery-fullscreen__arrow--right {
+  right: 32px;
+}
+
+.image-gallery-fullscreen__counter {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  color: white;
+  font-size: 14px;
+}
+
+/* ==================== 响应式 ==================== */
+
+/* Mobile */
+@media (max-width: 767px) {
+  .image-gallery {
+    padding: 12px;
+    border-radius: 0;
+  }
+
+  .image-gallery__arrow {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .image-gallery__arrow--left {
+    left: 8px;
+  }
+
+  .image-gallery__arrow--right {
+    right: 8px;
+  }
+
+  .image-gallery__thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  .image-gallery-fullscreen__close {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .image-gallery-fullscreen__arrow {
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+  }
+
+  .image-gallery-fullscreen__arrow--left {
+    left: 12px;
+  }
+
+  .image-gallery-fullscreen__arrow--right {
+    right: 12px;
+  }
+
+  .image-gallery-fullscreen__counter {
+    bottom: 20px;
+    font-size: 13px;
+  }
+}

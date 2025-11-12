@@ -1,0 +1,78 @@
+/* 微信支付二维码样式 */
+.wechat-pay-qrcode {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.qrcode-header {
+  margin-bottom: 2rem;
+}
+
+.wechat-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.qrcode-header h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.qrcode-header p {
+  font-size: 0.95rem;
+  color: #718096;
+}
+
+.qrcode-container {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  min-height: 320px;
+}
+
+.qrcode-image {
+  width: 280px;
+  height: 280px;
+  border: 8px solid white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.qrcode-loading {
+  text-align: center;
+}
+
+.qrcode-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #09bb07;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.info-item .value.warning {
+  color: #f56565;
+}
+
+.btn-cancel-payment {
+  padding: 0.75rem 2rem;
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel-payment:hover {
+  background: #cbd5e0;
+}

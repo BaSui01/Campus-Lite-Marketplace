@@ -25,8 +25,8 @@ import java.util.Map;
  */
 @Entity
 @Table(name = "t_user_behavior_log", indexes = {
-        @Index(name = "idx_user_behavior", columnList = "user_id,behavior_type,created_at"),
-        @Index(name = "idx_created_at", columnList = "created_at")
+        @Index(name = "idx_user_behavior_composite", columnList = "user_id,behavior_type,created_at"),
+        @Index(name = "idx_user_behavior_log_created_at", columnList = "created_at")
 })
 @Getter
 @Setter

@@ -15,12 +15,12 @@ import {
   Button,
   Space,
   Image,
-  Modal,
   Form,
   Input,
   DatePicker,
-  message,
   Tooltip,
+  App,
+  Modal,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -28,8 +28,8 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userService, adminUserService } from '@campus/shared';
-import { UserAvatar } from '@campus/shared';
+import { userService, UserAvatar } from '@campus/shared';
+import { adminUserService } from '@/services';
 import dayjs from 'dayjs';
 import type { User } from '@campus/shared';
 
@@ -37,6 +37,7 @@ const UserDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [banModalVisible, setBanModalVisible] = useState(false);
   const [roleModalVisible, setRoleModalVisible] = useState(false);
   const [banForm] = Form.useForm();
@@ -46,8 +47,8 @@ const UserDetail: React.FC = () => {
   const { data: user, isLoading } = useQuery({
     queryKey: ['user-detail', id],
     queryFn: async () => {
-      const response = await userService.getUserById(Number(id));
-      return response.data;
+      // ✅ getUserById 已经返回 User 对象，不需要再 .data
+      return await userService.getUserById(Number(id));
     },
     enabled: !!id,
   });
@@ -122,7 +123,7 @@ const UserDetail: React.FC = () => {
   const handleUnbanUser = () => {
     if (!user) return;
     
-    Modal.confirm({
+    modal.confirm({
       title: '确认解封用户？',
       content: `确定要解封用户 "${user.nickname}" 吗？`,
       onOk: () => unbanMutation.mutate(user.id),

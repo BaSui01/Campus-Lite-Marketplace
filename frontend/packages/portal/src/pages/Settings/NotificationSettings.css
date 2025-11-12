@@ -1,0 +1,254 @@
+/**
+ * 通知设置页面样式
+ * @author BaSui 😎
+ */
+
+.notification-settings {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* 加载状态 */
+.notification-settings.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* 页面头部 */
+.settings-header {
+  margin-bottom: 32px;
+}
+
+.settings-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.settings-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* 设置区块 */
+.settings-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.section-description {
+  font-size: 14px;
+  color: #999;
+  margin: 0 0 20px 0;
+}
+
+/* 通知渠道列表 */
+.channel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.channel-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.channel-item:hover {
+  background: #f0f0f0;
+}
+
+.channel-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.channel-icon {
+  font-size: 24px;
+}
+
+.channel-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.channel-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.channel-hint {
+  font-size: 13px;
+  color: #999;
+}
+
+/* 免打扰时段 */
+.quiet-hours {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quiet-hours-switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.switch-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.quiet-hours-time {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f0f8ff;
+  border-radius: 8px;
+  border: 1px dashed #1890ff;
+}
+
+.time-picker-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-picker-group label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.time-separator {
+  font-size: 16px;
+  color: #999;
+  margin-top: 20px;
+}
+
+.save-quiet-hours-btn {
+  align-self: flex-start;
+}
+
+.quiet-hours-hint {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  padding: 12px;
+  background: #fffbe6;
+  border-radius: 6px;
+  border-left: 3px solid #faad14;
+}
+
+/* 通知类型预览 */
+.types-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preview-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stat-item {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1890ff;
+}
+
+/* 管理按钮 */
+.manage-types-btn {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+}
+
+/* 底部提示 */
+.settings-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.footer-hint {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  margin: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .notification-settings {
+    padding: 16px;
+  }
+
+  .settings-title {
+    font-size: 24px;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+
+  .quiet-hours-time {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .time-separator {
+    margin-top: 0;
+    transform: rotate(90deg);
+  }
+
+  .time-picker-group {
+    width: 100%;
+  }
+}

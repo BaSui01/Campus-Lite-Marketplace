@@ -28,7 +28,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
      * @return 通知列表
      */
     @Query("SELECT n FROM Notification n WHERE n.receiverId = :receiverId " +
-            "AND (:status IS NULL OR n.status = :status) " +
+            "AND ( (:status IS NULL AND n.status <> 'DELETED') OR (:status IS NOT NULL AND n.status = :status) ) " +
             "ORDER BY n.createdAt DESC")
     Page<Notification> findByReceiverIdAndStatus(
             @Param("receiverId") Long receiverId,

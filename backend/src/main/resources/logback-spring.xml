@@ -15,24 +15,6 @@
     <property name="LOG_PATTERN" value="${ENV_LOG_PATTERN}"/>
     <property name="LOG_PATTERN_COLOR" value="${ENV_LOG_PATTERN_COLOR}"/>
 
-    <!-- 控制台输出（带颜色） -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp/>
-                <pattern>
-                    <pattern>
-                        {"level":"%level","logger":"%logger{36}","thread":"%thread","msg":"%message"}
-                    </pattern>
-                </pattern>
-                <mdc/>
-                <context/>
-                <arguments/>
-                <stackTrace/>
-            </providers>
-        </encoder>
-    </appender>
-
     <!-- 文件输出（异步，提高性能） -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${LOG_FILE}.log</file>
@@ -156,8 +138,15 @@
 
     <!-- 测试环境 -->
     <springProfile name="test">
+        <!-- 控制台纯文本输出 -->
+        <appender name="CONSOLE_PLAIN" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}:%line - %msg%n</pattern>
+            </encoder>
+        </appender>
+        
         <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="CONSOLE_PLAIN"/>
         </root>
         <logger name="com.campus.marketplace" level="DEBUG"/>
     </springProfile>

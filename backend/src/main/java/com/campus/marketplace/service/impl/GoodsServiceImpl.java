@@ -64,6 +64,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     private final GoodsRepository goodsRepository;
     private final UserRepository userRepository;
+    private final com.campus.marketplace.repository.OrderRepository orderRepository;
     private final CategoryRepository categoryRepository;
     private final SensitiveWordFilter sensitiveWordFilter;
     private final com.campus.marketplace.service.ComplianceService complianceService;
@@ -73,6 +74,8 @@ public class GoodsServiceImpl implements GoodsService {
     private final FollowService followService;
     private final SubscriptionService subscriptionService;
     private final EncryptUtil encryptUtil;
+    private final com.campus.marketplace.repository.FavoriteRepository favoriteRepository;  // 🆕 收藏Repository
+    private final com.campus.marketplace.repository.ReviewRepository reviewRepository;  // 🆕 评价Repository
 
     /**
      * 发布物品
@@ -142,17 +145,19 @@ public class GoodsServiceImpl implements GoodsService {
 
     /**
      * 查询物品列表
+     * 
+     * 🔧 缓存策略优化：不缓存 Page 对象（避免 Pageable 序列化问题）
+     * 原因：Spring Data 的 Sort.Order 内部字段变更会导致 Redis 反序列化失败
+     * 解决方案：分页查询不适合缓存，因为参数组合过多，缓存命中率低
      */
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "goods:list",
-            key = "T(java.util.Objects).hash(#keyword,#categoryId,#minPrice,#maxPrice,#page,#size,#sortBy,#sortDirection,#tagIds)",
-            unless = "#result == null")
     public Page<GoodsResponse> listGoods(
             String keyword,
             Long categoryId,
             BigDecimal minPrice,
             BigDecimal maxPrice,
+            GoodsStatus status,
             int page,
             int size,
             String sortBy,
@@ -166,8 +171,8 @@ public class GoodsServiceImpl implements GoodsService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        log.info("查询物品列表: keyword={}, categoryId={}, minPrice={}, maxPrice={}, page={}, size={}, tags={}",
-                keyword, categoryId, minPrice, maxPrice, page, size, sanitizedTagIds);
+        log.info("查询物品列表: keyword={}, categoryId={}, minPrice={}, maxPrice={}, status={}, page={}, size={}, tags={}",
+                keyword, categoryId, minPrice, maxPrice, status, page, size, sanitizedTagIds);
 
         if (sanitizedTagIds.size() > 10) {
             throw new BusinessException(ErrorCode.INVALID_PARAMETER, "最多选择 10 个标签");
@@ -208,26 +213,38 @@ public class GoodsServiceImpl implements GoodsService {
             goodsIdsFilter = goodsIds.stream().distinct().toList();
         }
 
+        // ✅ 使用传入的 status 参数，如果为 null 则默认查询 APPROVED 状态
+        GoodsStatus queryStatus = status != null ? status : GoodsStatus.APPROVED;
+
+        // 🔧 处理 keyword 为 null 的情况，避免 PostgreSQL 类型转换错误
+        // 当 keyword 为 null 时，PostgreSQL 可能将其识别为 bytea 类型，导致 LIKE 操作符报错
+        String sanitizedKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+
         Page<Goods> goodsPage = goodsIdsFilter == null
                 ? goodsRepository.findByConditionsWithCampus(
-                GoodsStatus.APPROVED,
+                queryStatus,
                 categoryId,
                 minPrice,
                 maxPrice,
-                keyword,
+                sanitizedKeyword,
                 campusFilter,
                 pageable
         )
                 : goodsRepository.findByConditionsWithCampusAndIds(
-                GoodsStatus.APPROVED,
+                queryStatus,
                 categoryId,
                 minPrice,
                 maxPrice,
-                keyword,
+                sanitizedKeyword,
                 campusFilter,
                 goodsIdsFilter,
                 pageable
         );
+
+        // 🔧 记录查询结果，便于排查问题
+        log.info("📊 查询到 {} 条商品记录（总数：{}）", 
+                goodsPage.getContent().size(), 
+                goodsPage.getTotalElements());
 
         Map<Long, List<TagResponse>> tagsMap = loadTagsForGoods(
                 goodsPage.getContent().stream().map(Goods::getId).toList()
@@ -264,6 +281,33 @@ public class GoodsServiceImpl implements GoodsService {
             }
         }
 
+        // 2.5 若商品处于锁定状态，仅允许买家/卖家查看；其他用户视为不存在
+        if (goods.getStatus() == com.campus.marketplace.common.enums.GoodsStatus.LOCKED) {
+            Long currentUserId = null;
+            try {
+                if (SecurityUtil.isAuthenticated()) {
+                    String username = SecurityUtil.getCurrentUsername();
+                    var user = userRepository.findByUsername(username).orElse(null);
+                    currentUserId = user != null ? user.getId() : null;
+                }
+            } catch (Exception ignored) {}
+
+            boolean isSeller = currentUserId != null && currentUserId.equals(goods.getSellerId());
+            boolean isBuyer = false;
+            try {
+                var pending = orderRepository.findFirstByGoodsIdAndStatus(
+                        goods.getId(), com.campus.marketplace.common.enums.OrderStatus.PENDING_PAYMENT);
+                isBuyer = pending.isPresent() && currentUserId != null && currentUserId.equals(pending.get().getBuyerId());
+            } catch (Exception e) {
+                log.debug("查询商品锁定关联订单失败: goodsId={}, error={}", goods.getId(), e.getMessage());
+            }
+
+            if (!isSeller && !isBuyer) {
+                log.info("锁定中的商品对非参与方不可见: goodsId={}, userId={}", goods.getId(), currentUserId);
+                throw new BusinessException(ErrorCode.GOODS_NOT_FOUND);
+            }
+        }
+
         // 3. 增加浏览量
         goods.incrementViewCount();
         goodsRepository.save(goods);
@@ -274,33 +318,70 @@ public class GoodsServiceImpl implements GoodsService {
 
     /**
      * 转换为列表响应 DTO（不包含标签）
+     * 🔧 优先使用已加载的关联实体（EntityGraph），避免额外查询
      */
     private GoodsResponse convertToResponse(Goods goods) {
-        String categoryName = categoryRepository.findById(goods.getCategoryId())
-                .map(Category::getName)
-                .orElse("未知分类");
-        String sellerUsername = userRepository.findById(goods.getSellerId())
-                .map(User::getUsername)
-                .orElse("未知用户");
-        String coverImage = goods.getImages() != null && goods.getImages().length > 0
-                ? goods.getImages()[0]
-                : null;
+        try {
+            // 🔧 优先使用已加载的 category 关联（EntityGraph 预加载）
+            String categoryName = "未知分类";
+            if (goods.getCategory() != null) {
+                categoryName = goods.getCategory().getName();
+            } else if (goods.getCategoryId() != null) {
+                // 备用方案：如果关联未加载，再查询数据库
+                categoryName = categoryRepository.findById(goods.getCategoryId())
+                        .map(Category::getName)
+                        .orElse("未知分类");
+            } else {
+                log.warn("⚠️ 商品 {} 的 categoryId 为 null", goods.getId());
+            }
 
-        return GoodsResponse.builder()
-                .id(goods.getId())
-                .title(goods.getTitle())
-                .description(truncateDescription(goods.getDescription()))
-                .price(goods.getPrice())
-                .categoryId(goods.getCategoryId())
-                .categoryName(categoryName)
-                .sellerId(goods.getSellerId())
-                .sellerUsername(sellerUsername)
-                .status(goods.getStatus())
-                .viewCount(goods.getViewCount())
-                .favoriteCount(goods.getFavoriteCount())
-                .coverImage(coverImage)
-                .createdAt(goods.getCreatedAt())
-                .build();
+            // 🔧 优先使用已加载的 seller 关联（EntityGraph 预加载）
+            String sellerUsername = "未知用户";
+            String sellerAvatar = null;
+            if (goods.getSeller() != null) {
+                sellerUsername = goods.getSeller().getUsername();
+                sellerAvatar = goods.getSeller().getAvatar();
+            } else if (goods.getSellerId() != null) {
+                // 备用方案：如果关联未加载，再查询数据库
+                User seller = userRepository.findById(goods.getSellerId()).orElse(null);
+                sellerUsername = seller != null ? seller.getUsername() : "未知用户";
+                sellerAvatar = seller != null ? seller.getAvatar() : null;
+                
+                if (seller == null) {
+                    log.warn("⚠️ 商品 {} 的卖家 {} 不存在", goods.getId(), goods.getSellerId());
+                }
+            } else {
+                log.warn("⚠️ 商品 {} 的 sellerId 为 null", goods.getId());
+            }
+
+            String coverImage = goods.getImages() != null && goods.getImages().length > 0
+                    ? goods.getImages()[0]
+                    : null;
+
+            return GoodsResponse.builder()
+                    .id(goods.getId())
+                    .title(goods.getTitle())
+                    .description(truncateDescription(goods.getDescription()))
+                    .price(goods.getPrice())
+                    .categoryId(goods.getCategoryId())
+                    .categoryName(categoryName)
+                    .sellerId(goods.getSellerId())
+                    .sellerUsername(sellerUsername)
+                    .sellerAvatar(sellerAvatar)  // ✅ 新增：卖家头像
+                    .status(goods.getStatus())
+                    .viewCount(goods.getViewCount())
+                    .favoriteCount(goods.getFavoriteCount())
+                    .stock(goods.getStock())  // ✅ 新增：库存
+                    .soldCount(goods.getSoldCount())  // ✅ 新增：已售数量
+                    .originalPrice(goods.getOriginalPrice())  // ✅ 新增：原价
+                    .coverImage(coverImage)
+                    .images(goods.getImages())  // ✅ 新增：所有图片（支持轮播）
+                    .createdAt(goods.getCreatedAt())
+                    .build();
+        } catch (Exception e) {
+            log.error("❌ 转换商品响应失败: goodsId={}, error={}", goods.getId(), e.getMessage(), e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "商品数据转换失败");
+        }
     }
 
     /**
@@ -308,9 +389,23 @@ public class GoodsServiceImpl implements GoodsService {
      */
     private GoodsDetailResponse convertToDetailResponse(Goods goods) {
         // 获取分类名称
-        String categoryName = goods.getCategory() != null 
-                ? goods.getCategory().getName() 
+        String categoryName = goods.getCategory() != null
+                ? goods.getCategory().getName()
                 : "未知分类";
+
+        // 🆕 获取当前用户是否已收藏（前端需要）
+        Boolean isFavorited = false;
+        try {
+            if (SecurityUtil.isAuthenticated()) {
+                String username = SecurityUtil.getCurrentUsername();
+                User currentUser = userRepository.findByUsername(username).orElse(null);
+                if (currentUser != null) {
+                    isFavorited = favoriteRepository.existsByUserIdAndGoodsId(currentUser.getId(), goods.getId());
+                }
+            }
+        } catch (Exception e) {
+            log.debug("获取收藏状态失败（未登录或其他原因）: {}", e.getMessage());
+        }
 
         // 获取卖家信息（敏感信息脱敏）
         User seller = goods.getSeller();
@@ -321,6 +416,23 @@ public class GoodsServiceImpl implements GoodsService {
         if (seller == null) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "卖家信息缺失");
         }
+
+        // 🆕 获取卖家评分（前端需要）
+        Double sellerRating = null;
+        try {
+            sellerRating = reviewRepository.getAverageRatingBySellerId(seller.getId());
+        } catch (Exception e) {
+            log.debug("获取卖家评分失败: {}", e.getMessage());
+        }
+
+        // 🆕 获取卖家在售商品数量（前端需要）
+        Integer sellerGoodsCount = null;
+        try {
+            sellerGoodsCount = (int) goodsRepository.countBySellerIdAndStatus(seller.getId(), GoodsStatus.APPROVED);
+        } catch (Exception e) {
+            log.debug("获取卖家商品数量失败: {}", e.getMessage());
+        }
+
         GoodsDetailResponse.SellerInfo sellerInfo = GoodsDetailResponse.SellerInfo.builder()
                 .id(seller.getId())
                 .username(seller.getUsername())
@@ -328,11 +440,13 @@ public class GoodsServiceImpl implements GoodsService {
                 .points(seller.getPoints())
                 .phone(seller.getPhone() != null ? encryptUtil.maskPhone(seller.getPhone()) : null)
                 .email(seller.getEmail() != null ? encryptUtil.maskEmail(seller.getEmail()) : null)
+                .rating(sellerRating)  // 🆕 卖家评分
+                .goodsCount(sellerGoodsCount)  // 🆕 在售商品数量
                 .build();
 
         // 转换图片数组为列表
-        List<String> images = goods.getImages() != null 
-                ? Arrays.asList(goods.getImages()) 
+        List<String> images = goods.getImages() != null
+                ? Arrays.asList(goods.getImages())
                 : List.of();
 
         List<TagResponse> tags = loadTagsForGoods(List.of(goods.getId()))
@@ -353,6 +467,10 @@ public class GoodsServiceImpl implements GoodsService {
                 .seller(sellerInfo)
                 .createdAt(goods.getCreatedAt())
                 .updatedAt(goods.getUpdatedAt())
+                .isFavorited(isFavorited)  // 🆕 是否已收藏
+                .condition(goods.getCondition())  // 🆕 商品成色
+                .deliveryMethod(goods.getDeliveryMethod())  // 🆕 交易方式
+                .originalPrice(goods.getOriginalPrice())  // 🆕 原价
                 .build();
     }
 
@@ -361,16 +479,16 @@ public class GoodsServiceImpl implements GoodsService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<GoodsResponse> listPendingGoods(int page, int size) {
-        log.info("查询待审核物品列表: page={}, size={}", page, size);
+    public Page<GoodsResponse> listPendingGoods(String keyword, int page, int size) {
+        log.info("查询待审核物品列表: keyword={}, page={}, size={}", keyword, page, size);
 
         // 构建分页参数（按创建时间倒序）
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // 查询待审核物品
+        // 查询待审核物品（支持关键词搜索）
         Page<Goods> goodsPage = goodsRepository.findByConditions(
                 GoodsStatus.PENDING,
-                null, null, null, null,
+                null, null, null, keyword,
                 pageable
         );
 
@@ -537,5 +655,43 @@ public class GoodsServiceImpl implements GoodsService {
         GoodsResponse base = convertToResponse(goods);
         base.setTags(tagsMap.getOrDefault(goods.getId(), List.of()));
         return base;
+    }
+
+    /**
+     * 查询当前用户发布的物品列表
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<GoodsResponse> getMyGoods(int page, int size, String sortBy, String sortDirection) {
+        log.info("查询我的发布: page={}, size={}, sortBy={}, sortDirection={}", page, size, sortBy, sortDirection);
+
+        // 1. 获取当前登录用户
+        String username = SecurityUtil.getCurrentUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        // 2. 构建排序参数
+        Sort.Direction direction = "ASC".equalsIgnoreCase(sortDirection)
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+        
+        String sortField = switch (sortBy == null ? "createdAt" : sortBy.toLowerCase()) {
+            case "price" -> "price";
+            case "viewcount" -> "viewCount";
+            default -> "createdAt";
+        };
+
+        Sort sort = Sort.by(direction, sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // 3. 查询我的商品（所有状态）
+        Page<Goods> goodsPage = goodsRepository.findBySellerId(user.getId(), pageable);
+
+        Map<Long, List<TagResponse>> tagsMap = loadTagsForGoods(
+                goodsPage.getContent().stream().map(Goods::getId).toList()
+        );
+
+        // 4. 转换为响应 DTO
+        return goodsPage.map(goods -> convertToResponse(goods, tagsMap));
     }
 }

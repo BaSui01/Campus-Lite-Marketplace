@@ -1,0 +1,542 @@
+/**
+ * 物流追踪页面样式 - 实时查看物流信息！📦
+ * @author BaSui 😎
+ * @description 美观的物流追踪界面设计
+ */
+
+.logistics-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.logistics-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.logistics-header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 40px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.logistics-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logistics-header__subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+}
+
+/* ==================== 查询表单 ==================== */
+
+.logistics-search {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.logistics-search__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-label {
+  font-size: 15px;
+  font-weight: bold;
+  color: #2d3436;
+}
+
+.form-label .required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+/* 快递公司选择 */
+.express-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.express-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: #f9f9f9;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.express-item:hover {
+  background: #f0f0f0;
+  border-color: #667eea;
+}
+
+.express-item.active {
+  background: #f0f5ff;
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.express-item__icon {
+  font-size: 32px;
+}
+
+.express-item__name {
+  font-size: 13px;
+  color: #2d3436;
+  font-weight: 500;
+  text-align: center;
+}
+
+.express-item.active .express-item__name {
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* 快递单号输入 */
+.tracking-input {
+  position: relative;
+  display: flex;
+  gap: 8px;
+}
+
+.tracking-input input {
+  flex: 1;
+}
+
+.tracking-input__copy {
+  padding: 8px 16px;
+  background: #f9f9f9;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.tracking-input__copy:hover {
+  background: #f0f5ff;
+  border-color: #667eea;
+}
+
+/* 操作按钮 */
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.form-actions button {
+  flex: 1;
+}
+
+/* ==================== 物流结果 ==================== */
+
+.logistics-result {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 空状态 */
+.logistics-empty {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.logistics-empty .empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.logistics-empty .empty-text {
+  font-size: 24px;
+  color: #2d3436;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+}
+
+.logistics-empty .empty-tip {
+  font-size: 16px;
+  color: #636e72;
+  margin: 0;
+}
+
+/* ==================== 物流概览 ==================== */
+
+.logistics-overview {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.logistics-overview__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.logistics-overview__company {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.company-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.company-info {
+  flex: 1;
+}
+
+.company-name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2d3436;
+  margin: 0 0 8px 0;
+}
+
+.company-tracking {
+  font-size: 15px;
+  color: #636e72;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copy-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+  transform: scale(1.2);
+}
+
+.logistics-overview__status {
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.status-icon {
+  font-size: 16px;
+}
+
+.status-text {
+  font-size: 14px;
+}
+
+.logistics-overview__times {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.time-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.time-label {
+  color: #636e72;
+  font-weight: 500;
+}
+
+.time-value {
+  color: #2d3436;
+  font-weight: bold;
+}
+
+/* ==================== 物流轨迹 ==================== */
+
+.logistics-timeline {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.logistics-timeline__title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2d3436;
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.logistics-timeline__content {
+  padding: 0;
+}
+
+/* ==================== 温馨提示 ==================== */
+
+.logistics-tips {
+  background: #fffbe6;
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 4px solid #faad14;
+}
+
+.logistics-tips__title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #874d00;
+  margin: 0 0 12px 0;
+}
+
+.logistics-tips__list {
+  margin: 0;
+  padding-left: 20px;
+  color: #ad6800;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.logistics-tips__list li {
+  margin-bottom: 4px;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 768px) {
+  .logistics-page {
+    padding: 10px 0;
+  }
+
+  .logistics-container {
+    padding: 0 10px;
+  }
+
+  .logistics-header {
+    padding: 32px 24px;
+  }
+
+  .logistics-header__title {
+    font-size: 28px;
+  }
+
+  .logistics-header__subtitle {
+    font-size: 14px;
+  }
+
+  .logistics-search {
+    padding: 24px 20px;
+  }
+
+  .express-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+  }
+
+  .express-item {
+    padding: 12px 8px;
+  }
+
+  .express-item__icon {
+    font-size: 28px;
+  }
+
+  .express-item__name {
+    font-size: 12px;
+  }
+
+  .tracking-input {
+    flex-direction: column;
+  }
+
+  .tracking-input__copy {
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .logistics-overview {
+    padding: 20px;
+  }
+
+  .logistics-overview__header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .logistics-overview__status {
+    align-self: flex-start;
+  }
+
+  .company-icon {
+    font-size: 40px;
+  }
+
+  .company-name {
+    font-size: 18px;
+  }
+
+  .company-tracking {
+    font-size: 14px;
+  }
+
+  .logistics-timeline {
+    padding: 20px;
+  }
+
+  .logistics-timeline__title {
+    font-size: 18px;
+  }
+
+  .logistics-empty {
+    padding: 60px 16px;
+  }
+
+  .logistics-empty .empty-icon {
+    font-size: 64px;
+  }
+
+  .logistics-empty .empty-text {
+    font-size: 20px;
+  }
+
+  .logistics-empty .empty-tip {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logistics-header {
+    padding: 24px 20px;
+  }
+
+  .logistics-header__title {
+    font-size: 24px;
+  }
+
+  .logistics-search {
+    padding: 20px 16px;
+  }
+
+  .express-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .logistics-overview {
+    padding: 16px;
+  }
+
+  .logistics-overview__company {
+    gap: 12px;
+  }
+
+  .company-icon {
+    font-size: 36px;
+  }
+
+  .company-name {
+    font-size: 16px;
+  }
+
+  .company-tracking {
+    font-size: 13px;
+  }
+
+  .logistics-timeline {
+    padding: 16px;
+  }
+
+  .logistics-timeline__title {
+    font-size: 16px;
+  }
+
+  .time-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .logistics-tips {
+    padding: 16px;
+  }
+
+  .logistics-tips__title {
+    font-size: 14px;
+  }
+
+  .logistics-tips__list {
+    font-size: 13px;
+  }
+
+  .logistics-empty {
+    padding: 40px 12px;
+  }
+
+  .logistics-empty .empty-icon {
+    font-size: 56px;
+  }
+
+  .logistics-empty .empty-text {
+    font-size: 18px;
+  }
+}

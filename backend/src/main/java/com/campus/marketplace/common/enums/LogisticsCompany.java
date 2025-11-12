@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 物流公司枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @since 2025-11-03
  */
 @Getter
-@RequiredArgsConstructor
 public enum LogisticsCompany {
 
     /**
@@ -55,6 +53,14 @@ public enum LogisticsCompany {
 
     private final String displayName;
     private final String code;
+
+    /**
+     * 枚举构造器（私有）
+     */
+    LogisticsCompany(String displayName, String code) {
+        this.displayName = displayName;
+        this.code = code;
+    }
 
     /**
      * 根据代码查找物流公司（不区分大小写）

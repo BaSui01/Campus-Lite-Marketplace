@@ -25,7 +25,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/reviews")
 @RequiredArgsConstructor
 @Tag(name = "评价媒体管理", description = "评价图文视频上传、查询、删除接口")
 public class ReviewMediaController {

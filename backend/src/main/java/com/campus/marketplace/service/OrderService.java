@@ -5,6 +5,7 @@ import com.campus.marketplace.common.dto.request.PayOrderRequest;
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
 import com.campus.marketplace.common.dto.response.OrderResponse;
 import com.campus.marketplace.common.dto.response.PaymentResponse;
+import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 
 /**
@@ -90,5 +91,31 @@ public interface OrderService {
      * @param orderNo 订单号
      * @return 订单详情
      */
-    com.campus.marketplace.common.entity.Order getOrderDetail(String orderNo);
+    OrderResponse getOrderDetail(String orderNo);
+
+    /**
+     * 获取订单实付金额（系统内部使用）
+     * 不进行权限校验，供支付回调等系统流程查询金额校验使用
+     */
+    BigDecimal getOrderActualAmount(String orderNo);
+
+    /**
+     * 更新订单的配送与收货信息
+     * @param orderNo 订单号
+     * @param request 配送信息
+     */
+    void updateOrderDelivery(String orderNo, com.campus.marketplace.common.dto.request.UpdateOrderDeliveryRequest request);
+
+    /**
+     * 卖家发货（快递）→ 订单进入 SHIPPED
+     * @param orderNo 订单号
+     * @param request 发货信息（物流公司、运单号）
+     */
+    void shipOrder(String orderNo, com.campus.marketplace.common.dto.request.ShipOrderRequest request);
+
+    /**
+     * 买家确认收货 → 订单从 DELIVERED 流转到 COMPLETED
+     * @param orderNo 订单号
+     */
+    void confirmReceipt(String orderNo);
 }

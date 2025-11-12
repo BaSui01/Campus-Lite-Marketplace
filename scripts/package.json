@@ -1,0 +1,23 @@
+{
+  "name": "campus-marketplace-scripts",
+  "version": "1.0.0",
+  "description": "BaSui 的工具脚本集合 🚀",
+  "private": true,
+  "scripts": {
+    "watch": "node watch-api.js",
+    "ppt:gen": "node generate-ppt.mjs",
+    "ppt:gen:snap": "PPT_CAPTURE=1 node generate-ppt.mjs",
+    "ppt:bg:fetch": "node fetch-bg.mjs",
+    "test": "echo \"暂无测试\" && exit 0"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.1",
+    "pptxgenjs": "^3.12.0",
+    "puppeteer": "^24.29.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "BaSui 😎",
+  "license": "MIT"
+}

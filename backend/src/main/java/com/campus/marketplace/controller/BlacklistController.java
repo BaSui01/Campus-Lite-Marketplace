@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RestController
-@RequestMapping("/api/blacklist")
+@RequestMapping("/blacklist")
 @RequiredArgsConstructor
 @Tag(name = "黑名单管理", description = "拉黑、解除拉黑、查询黑名单等接口")
 public class BlacklistController {

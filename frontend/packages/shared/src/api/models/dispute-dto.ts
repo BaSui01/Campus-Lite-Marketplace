@@ -49,6 +49,12 @@ export interface DisputeDTO {
      * @type {number}
      * @memberof DisputeDTO
      */
+    'amount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DisputeDTO
+     */
     'initiatorId'?: number;
     /**
      * 
@@ -133,13 +139,13 @@ export interface DisputeDTO {
      * @type {boolean}
      * @memberof DisputeDTO
      */
-    'negotiating'?: boolean;
+    'arbitrating'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof DisputeDTO
      */
-    'arbitrating'?: boolean;
+    'negotiating'?: boolean;
 }
 
 export const DisputeDTOInitiatorRoleEnum = {

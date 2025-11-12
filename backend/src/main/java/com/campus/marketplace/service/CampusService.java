@@ -15,9 +15,13 @@ import java.util.List;
 
 public interface CampusService {
     List<Campus> listAll();
+    Campus getById(Long id);
     Campus create(String code, String name);
     Campus update(Long id, String name, CampusStatus status);
     void delete(Long id);
+    int batchDelete(List<Long> ids);
+
+    com.campus.marketplace.common.dto.response.CampusStatisticsResponse getStatistics(Long id);
 
     CampusMigrationValidationResponse validateUserMigration(Long fromCampusId, Long toCampusId);
     int migrateUsers(Long fromCampusId, Long toCampusId);

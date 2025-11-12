@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付成功</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .success-icon {
+            font-size: 64px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #52c41a;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #999999;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .goods-section {
+            background-color: #fafafa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #e8e8e8;
+        }
+        .goods-container {
+            display: table;
+            width: 100%;
+        }
+        .goods-image-cell {
+            display: table-cell;
+            vertical-align: top;
+            width: 120px;
+            padding-right: 20px;
+        }
+        .goods-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #e8e8e8;
+            display: block;
+        }
+        .goods-info-cell {
+            display: table-cell;
+            vertical-align: top;
+        }
+        .goods-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333333;
+            margin: 0 0 10px 0;
+        }
+        .goods-description {
+            font-size: 13px;
+            color: #666666;
+            margin: 0 0 10px 0;
+            line-height: 1.6;
+        }
+        .goods-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff4d4f;
+            margin: 0;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .info-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        .info-table td:first-child {
+            color: #666666;
+            width: 120px;
+        }
+        .info-table td:last-child {
+            color: #333333;
+            font-weight: 500;
+        }
+        .info-table tr:last-child td {
+            border-bottom: none;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%);
+            border-left: 4px solid #ff4d4f;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .highlight-text {
+            font-size: 14px;
+            color: #333333;
+            margin: 0;
+        }
+        .highlight-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff4d4f;
+            margin: 10px 0 0 0;
+        }
+        .tips-box {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .tips-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1890ff;
+            margin: 0 0 10px 0;
+        }
+        .tips-content {
+            font-size: 13px;
+            color: #666666;
+            line-height: 1.8;
+            margin: 0;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+        }
+        .footer a {
+            color: #52c41a;
+            text-decoration: none;
+        }
+        .divider {
+            height: 1px;
+            background-color: #eeeeee;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <table class="email-container" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <!-- Header -->
+        <tr>
+            <td class="header">
+                <h1 class="logo">🎓 校园轻享集市</h1>
+            </td>
+        </tr>
+
+        <!-- Content -->
+        <tr>
+            <td class="content">
+                <!-- Success Icon & Title -->
+                <div class="success-icon">✅</div>
+                <div class="title">支付成功！</div>
+                <div class="subtitle">您的订单已支付完成，卖家会尽快为您发货</div>
+
+                <!-- Goods Section -->
+                <div class="goods-section">
+                    <div class="goods-container">
+                        <div class="goods-image-cell">
+                            <img th:src="${goodsImage}" alt="商品图片" class="goods-image" />
+                        </div>
+                        <div class="goods-info-cell">
+                            <h3 class="goods-title" th:text="${goodsTitle}">商品标题</h3>
+                            <p class="goods-description" th:text="${goodsDescription}">商品描述</p>
+                            <p class="goods-price">¥<span th:text="${goodsPrice}">99.00</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Amount Highlight -->
+                <div class="highlight-box">
+                    <p class="highlight-text">实付金额</p>
+                    <p class="highlight-amount">¥<span th:text="${actualAmount}">99.00</span></p>
+                </div>
+
+                <!-- Order Info Table -->
+                <table class="info-table">
+                    <tr>
+                        <td>📦 订单号</td>
+                        <td th:text="${orderNo}">O202511110001</td>
+                    </tr>
+                    <tr>
+                        <td>💳 支付方式</td>
+                        <td th:text="${paymentMethod}">支付宝</td>
+                    </tr>
+                    <tr>
+                        <td>⏰ 支付时间</td>
+                        <td th:text="${paymentTime}">2025-11-11 14:30:00</td>
+                    </tr>
+                    <tr>
+                        <td>🆔 交易流水号</td>
+                        <td th:text="${transactionId}">202511110001</td>
+                    </tr>
+                    <tr th:if="${sellerName}">
+                        <td>👤 卖家</td>
+                        <td th:text="${sellerName}">卖家昵称</td>
+                    </tr>
+                </table>
+
+                <!-- Tips Box -->
+                <div class="tips-box">
+                    <p class="tips-title">💡 温馨提示</p>
+                    <p class="tips-content">
+                        • 卖家会尽快为您发货，请耐心等待<br>
+                        • 收货后请及时确认，并对商品进行评价<br>
+                        • 如有问题，请及时联系卖家或客服处理<br>
+                        • 交易过程中请注意保护个人信息安全
+                    </p>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Contact Info -->
+                <div style="text-align: center; font-size: 13px; color: #999999;">
+                    <p>如有任何问题，请联系客服团队</p>
+                    <p style="margin: 5px 0;">客服邮箱: support@campus-marketplace.com</p>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+            <td class="footer">
+                <p>此邮件由系统自动发送，请勿直接回复</p>
+                <p>
+                    © 2025 校园轻享集市 |
+                    <a href="#">隐私政策</a> |
+                    <a href="#">服务条款</a> |
+                    <a href="#">联系客服</a>
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

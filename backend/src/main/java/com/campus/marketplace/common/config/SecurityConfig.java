@@ -1,6 +1,5 @@
 package com.campus.marketplace.common.config;
 
-import com.campus.marketplace.common.security.PermissionCodes;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +53,21 @@ public class SecurityConfig {
     private final ServerProperties serverProperties;
 
     /**
+     * 配置 WebSocket Security（WebSocket 请求不走 Spring Security）
+     * 🔧 BaSui: WebSocket 有自己的认证机制（WebSocketAuthInterceptor），不需要 Spring Security 拦截
+     * 
+     * ⚠️ 注意：不使用 web.ignoring()，而是在 filterChain 中使用 permitAll()
+     * 原因：web.ignoring() 会完全跳过 Spring Security，可能导致 WebSocket 握手请求路由失败
+     * 解决方案：让请求通过 Security 过滤链，但设置为 permitAll()，然后由 WebSocketAuthInterceptor 进行认证
+     */
+    // @Bean
+    // public WebSecurityCustomizer webSecurityCustomizer() {
+    //     return (web) -> web.ignoring().requestMatchers(
+    //             matchersWithContext("/ws/**")  // 忽略所有 WebSocket 端点
+    //     );
+    // }
+
+    /**
      * 配置 Security 过滤器链
      */
     @Bean
@@ -75,14 +89,28 @@ public class SecurityConfig {
                         .requestMatchers(matchersWithContext("/auth/**")).permitAll()
                         .requestMatchers(matchersWithContext("/actuator/health")).permitAll()
                         
+                        // 验证码接口（登录前需要访问，必须公开）
+                        // 🎯 统一验证接口（方案B - 推荐）
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/captcha/verify")).permitAll()
+                        // 🎨 验证码生成接口（四种类型）
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/image")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/slide")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/slide/image")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/rotate")).permitAll()
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/captcha/click")).permitAll()
+                        
                         // 公共查询接口
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/search", "/search/**")).permitAll()
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/recommend/hot")).permitAll()
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/replies/**")).permitAll()
-                        .requestMatchers(HttpMethod.GET, matchersWithContext("/users/**")).permitAll()
+                        
+                        // 用户相关接口
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/users/profile")).authenticated()  // 当前用户资料（需要认证）
+                        .requestMatchers(HttpMethod.GET, matchersWithContext("/users/**")).permitAll()  // 其他用户查询（公开）
                         
                         // 支付回调
                         .requestMatchers(HttpMethod.POST, matchersWithContext("/payment/wechat/notify")).permitAll()
+                        .requestMatchers(HttpMethod.POST, matchersWithContext("/payment/alipay/notify")).permitAll()
                         .requestMatchers(HttpMethod.POST, matchersWithContext("/payment/alipay/refund/notify")).permitAll()
                         
                         // Swagger UI 和 API 文档
@@ -90,9 +118,8 @@ public class SecurityConfig {
                         .requestMatchers(matchersWithContext("/swagger-ui/**")).permitAll()
                         .requestMatchers(matchersWithContext("/v3/api-docs/**")).permitAll()
 
-                        // 管理后台必须具备明确权限
-                        .requestMatchers(matchersWithContext("/admin/**"))
-                        .hasAuthority(PermissionCodes.SYSTEM_STATISTICS_VIEW)
+                        // 管理后台需要认证（具体权限由 @PreAuthorize 控制）
+                        .requestMatchers(matchersWithContext("/admin/**")).authenticated()
                         
                         // 物品查询接口（公开）
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/goods/**")).permitAll()
@@ -101,6 +128,9 @@ public class SecurityConfig {
                         
                         // 帖子查询接口（公开）
                         .requestMatchers(HttpMethod.GET, matchersWithContext("/posts/**")).permitAll()
+                        
+                        // 收藏接口（需要认证，但不需要特殊角色，Controller 层有 @PreAuthorize）
+                        .requestMatchers(matchersWithContext("/favorites/**")).authenticated()
                         
                         // WebSocket 连接
                         .requestMatchers(matchersWithContext("/ws/**")).permitAll()

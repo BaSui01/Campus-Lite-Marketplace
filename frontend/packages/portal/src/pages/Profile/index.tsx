@@ -5,18 +5,20 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Skeleton } from '@campus/shared/components';
 import { userService } from '@campus/shared/services/user';
 import { goodsService } from '@campus/shared/services/goods';
-import { useNotificationStore } from '../../store';
-import type { User, PageGoodsResponse } from '@campus/shared/types';
+import { postService } from '@campus/shared/services/post';
+import { useNotificationStore, useAuthStore } from '../../store';
+import type { PageGoodsResponse } from '@campus/shared/types';
+import type { UserProfileResponse, PostResponse, PagePostResponse } from '@campus/shared/api/models';
 import './Profile.css';
 
 /**
  * Tab 类型
  */
-type ProfileTab = 'info' | 'published' | 'favorites';
+type ProfileTab = 'info' | 'published' | 'favorites' | 'posts';
 
 /**
  * 个人中心页组件
@@ -24,11 +26,15 @@ type ProfileTab = 'info' | 'published' | 'favorites';
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   const toast = useNotificationStore();
+  const currentUser = useAuthStore((state) => state.user);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // ==================== 状态管理 ====================
 
-  const [activeTab, setActiveTab] = useState<ProfileTab>('info'); // 当前 Tab
-  const [user, setUser] = useState<User | null>(null);
+  // 从 URL 读取 tab 参数，默认为 'info'
+  const tabFromUrl = (searchParams.get('tab') as ProfileTab) || 'info';
+  const [activeTab, setActiveTab] = useState<ProfileTab>(tabFromUrl);
+  const [user, setUser] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +50,12 @@ const Profile: React.FC = () => {
   const [favoritePage, setFavoritePage] = useState(0);
   const [favoriteHasMore, setFavoriteHasMore] = useState(false);
 
+  // 我的帖子
+  const [posts, setPosts] = useState<PostResponse[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [postsPage, setPostsPage] = useState(0);
+  const [postsHasMore, setPostsHasMore] = useState(false);
+
   // ==================== 数据加载 ====================
 
   /**
@@ -55,8 +67,7 @@ const Profile: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 获取当前用户资料
-      const response = await userService.getProfile();
-      const userData = response.data;
+      const userData = await userService.getProfile();
       setUser(userData);
     } catch (err: any) {
       console.error('加载用户资料失败：', err);
@@ -135,10 +146,59 @@ const Profile: React.FC = () => {
     }
   };
 
+  /**
+   * 加载我的帖子（使用真实后端 API！）
+   */
+  const loadMyPosts = async (isLoadMore = false) => {
+    if (!currentUser?.id) {
+      console.warn('用户未登录，无法加载帖子');
+      return;
+    }
+
+    if (isLoadMore) {
+      setPostsLoading(true);
+    }
+
+    try {
+      const currentPage = isLoadMore ? postsPage + 1 : 0;
+
+      // 🚀 调用真实后端 API 获取我的帖子
+      const pageData: PagePostResponse = await postService.getPostsByAuthor(currentUser.id, {
+        page: currentPage,
+        size: 10,
+      });
+
+      const newPosts = pageData.content || [];
+
+      if (isLoadMore) {
+        setPosts((prev) => [...prev, ...newPosts]);
+        setPostsPage(currentPage);
+      } else {
+        setPosts(newPosts);
+        setPostsPage(0);
+      }
+
+      setPostsHasMore(!pageData.last);
+    } catch (err: any) {
+      console.error('加载我的帖子失败：', err);
+      toast.error(err.response?.data?.message || '加载失败，请稍后重试！😭');
+    } finally {
+      setPostsLoading(false);
+    }
+  };
+
   // 初始加载用户资料
   useEffect(() => {
     loadUserProfile();
   }, []);
+
+  // 监听 URL 参数变化，同步 activeTab
+  useEffect(() => {
+    const newTab = (searchParams.get('tab') as ProfileTab) || 'info';
+    if (newTab !== activeTab) {
+      setActiveTab(newTab);
+    }
+  }, [searchParams]);
 
   // 切换 Tab 时加载对应数据
   useEffect(() => {
@@ -146,17 +206,21 @@ const Profile: React.FC = () => {
       loadPublishedGoods();
     } else if (activeTab === 'favorites' && favoriteGoods.length === 0) {
       loadFavoriteGoods();
+    } else if (activeTab === 'posts' && posts.length === 0) {
+      loadMyPosts();
     }
   }, [activeTab]);
 
   // ==================== 事件处理 ====================
 
   /**
-   * 切换 Tab
+   * 切换 Tab（同步更新 URL）
    */
   const handleTabChange = (tab: ProfileTab) => {
     if (tab === activeTab) return;
     setActiveTab(tab);
+    // 更新 URL 参数
+    setSearchParams({ tab });
   };
 
   /**
@@ -180,6 +244,14 @@ const Profile: React.FC = () => {
   const handleLoadMoreFavorite = () => {
     if (favoriteLoading || !favoriteHasMore) return;
     loadFavoriteGoods(true);
+  };
+
+  /**
+   * 加载更多 - 我的帖子
+   */
+  const handleLoadMorePosts = () => {
+    if (postsLoading || !postsHasMore) return;
+    loadMyPosts(true);
   };
 
   /**
@@ -209,8 +281,8 @@ const Profile: React.FC = () => {
    */
   const formatPrice = (price?: number) => {
     if (!price) return '¥0.00';
-    // 后端价格单位是分，需要除以100
-    return `¥${(price / 100).toFixed(2)}`;
+    // ✅ 后端已使用元（BigDecimal，scale=2），不需要再除以 100
+    return `¥${price.toFixed(2)}`;
   };
 
   /**
@@ -333,6 +405,12 @@ const Profile: React.FC = () => {
             onClick={() => handleTabChange('favorites')}
           >
             ❤️ 我的收藏
+          </div>
+          <div
+            className={`tab-item ${activeTab === 'posts' ? 'active' : ''}`}
+            onClick={() => handleTabChange('posts')}
+          >
+            💬 我的帖子
           </div>
         </div>
 
@@ -502,6 +580,73 @@ const Profile: React.FC = () => {
                       disabled={favoriteLoading}
                     >
                       {favoriteLoading ? '⏳ 加载中...' : '加载更多'}
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'posts' && (
+          <div className="tab-content">
+            {posts.length === 0 && !postsLoading ? (
+              <div className="empty-state">
+                <div className="empty-icon">💬</div>
+                <p className="empty-text">还没有发布任何帖子</p>
+                <button className="btn-action" onClick={() => navigate('/community')}>
+                  去社区逛逛
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="posts-list">
+                  {posts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="post-card"
+                      onClick={() => navigate(`/posts/${post.id}`)}
+                    >
+                      <div className="post-header">
+                        <h4 className="post-title">{post.title}</h4>
+                        <span className={`post-status ${post.status?.toLowerCase()}`}>
+                          {post.status === 'APPROVED' ? '✅ 已通过' :
+                           post.status === 'PENDING' ? '⏳ 审核中' :
+                           post.status === 'REJECTED' ? '❌ 已拒绝' : '❓ 未知'}
+                        </span>
+                      </div>
+                      <p className="post-content">
+                        {post.content && post.content.length > 100
+                          ? `${post.content.substring(0, 100)}...`
+                          : post.content}
+                      </p>
+                      {post.images && post.images.length > 0 && (
+                        <div className="post-images">
+                          {post.images.slice(0, 3).map((img, idx) => (
+                            <img key={idx} src={img} alt={`图片${idx + 1}`} />
+                          ))}
+                        </div>
+                      )}
+                      <div className="post-meta">
+                        <span className="post-views">👁️ {post.viewCount || 0}</span>
+                        <span className="post-replies">💬 {post.replyCount || 0}</span>
+                        <span className="post-date">
+                          📅 {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : '未知'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 加载更多 */}
+                {postsHasMore && (
+                  <div className="load-more-section">
+                    <button
+                      className="btn-load-more"
+                      onClick={handleLoadMorePosts}
+                      disabled={postsLoading}
+                    >
+                      {postsLoading ? '⏳ 加载中...' : '加载更多'}
                     </button>
                   </div>
                 )}

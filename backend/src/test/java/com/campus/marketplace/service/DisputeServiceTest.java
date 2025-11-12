@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -123,6 +122,111 @@ class DisputeServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getDisputeCode()).isEqualTo("DSP-20251103-000001");
+    }
+
+    @Test
+    @DisplayName("查询仲裁员纠纷列表 - 应该返回分页结果")
+    void getArbitratorDisputes_ShouldReturnPagedResults() {
+        // Arrange - 准备测试数据 🎯
+        Dispute dispute1 = new Dispute();
+        dispute1.setId(1L);
+        dispute1.setDisputeCode("DSP-20251107-000001");
+        dispute1.setOrderId(101L);
+        dispute1.setArbitratorId(300L); // 仲裁员ID
+        dispute1.setStatus(DisputeStatus.ARBITRATING);
+        dispute1.setOrder(testOrder);
+
+        Dispute dispute2 = new Dispute();
+        dispute2.setId(2L);
+        dispute2.setDisputeCode("DSP-20251107-000002");
+        dispute2.setOrderId(102L);
+        dispute2.setArbitratorId(300L); // 同一个仲裁员
+        dispute2.setStatus(DisputeStatus.PENDING_ARBITRATION);
+        dispute2.setOrder(testOrder);
+
+        Page<Dispute> disputePage = new PageImpl<>(List.of(dispute1, dispute2));
+        when(disputeRepository.findByArbitratorIdWithStatus(eq(300L), isNull(), any(Pageable.class)))
+                .thenReturn(disputePage);
+
+        // Act - 查询仲裁员的纠纷列表 🚀
+        Page<DisputeDTO> result = disputeService.getArbitratorDisputes(
+                300L,
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        // Assert - 验证结果 ✅
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0).getDisputeCode()).isEqualTo("DSP-20251107-000001");
+        assertThat(result.getContent().get(1).getDisputeCode()).isEqualTo("DSP-20251107-000002");
+
+        // 验证调用了正确的 Repository 方法
+        verify(disputeRepository, times(1)).findByArbitratorIdWithStatus(
+                eq(300L),
+                isNull(),
+                any(Pageable.class)
+        );
+    }
+
+    @Test
+    @DisplayName("查询仲裁员纠纷列表 - 按状态筛选应该返回正确结果")
+    void getArbitratorDisputes_WithStatus_ShouldReturnFilteredResults() {
+        // Arrange - 准备测试数据 🎯
+        Dispute arbitratingDispute = new Dispute();
+        arbitratingDispute.setId(1L);
+        arbitratingDispute.setDisputeCode("DSP-20251107-000003");
+        arbitratingDispute.setOrderId(103L);
+        arbitratingDispute.setArbitratorId(300L);
+        arbitratingDispute.setStatus(DisputeStatus.ARBITRATING);
+        arbitratingDispute.setOrder(testOrder);
+
+        Page<Dispute> disputePage = new PageImpl<>(List.of(arbitratingDispute));
+        when(disputeRepository.findByArbitratorIdWithStatus(
+                eq(300L),
+                eq(DisputeStatus.ARBITRATING),
+                any(Pageable.class))
+        ).thenReturn(disputePage);
+
+        // Act - 按状态查询 🚀
+        Page<DisputeDTO> result = disputeService.getArbitratorDisputes(
+                300L,
+                DisputeStatus.ARBITRATING,
+                PageRequest.of(0, 10)
+        );
+
+        // Assert - 验证结果 ✅
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getStatus()).isEqualTo(DisputeStatus.ARBITRATING);
+
+        // 验证调用了正确的 Repository 方法并传入了正确的状态
+        verify(disputeRepository, times(1)).findByArbitratorIdWithStatus(
+                eq(300L),
+                eq(DisputeStatus.ARBITRATING),
+                any(Pageable.class)
+        );
+    }
+
+    @Test
+    @DisplayName("查询仲裁员纠纷列表 - 没有纠纷时应该返回空列表")
+    void getArbitratorDisputes_WhenNoDisputes_ShouldReturnEmptyPage() {
+        // Arrange - 准备空数据 🎯
+        Page<Dispute> emptyPage = new PageImpl<>(List.of());
+        when(disputeRepository.findByArbitratorIdWithStatus(anyLong(), any(), any(Pageable.class)))
+                .thenReturn(emptyPage);
+
+        // Act - 查询不存在纠纷的仲裁员 🚀
+        Page<DisputeDTO> result = disputeService.getArbitratorDisputes(
+                999L,
+                null,
+                PageRequest.of(0, 10)
+        );
+
+        // Assert - 验证返回空列表 ✅
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isEmpty();
+        assertThat(result.getTotalElements()).isEqualTo(0);
     }
 
     @Test

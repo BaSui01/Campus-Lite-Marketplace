@@ -6,7 +6,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { websocketService, type OrderUpdateData } from '../utils/websocket';
-import type { OrderStatus } from '../types';
+// ✅ 使用 API 生成的类型
+import { OrderResponseStatusEnum as OrderStatus } from '../api/models/order-response';
 
 /**
  * 订单状态更新记录
@@ -235,7 +236,8 @@ export const useOrderUpdate = (
       // 更新订单状态映射
       setOrderStatusMap((prev) => {
         const newMap = new Map(prev);
-        newMap.set(data.orderId, data.status);
+        // ✅ data.status 是字符串，需要类型断言为 OrderStatus
+        newMap.set(data.orderId, data.status as typeof OrderStatus[keyof typeof OrderStatus]);
         return newMap;
       });
 

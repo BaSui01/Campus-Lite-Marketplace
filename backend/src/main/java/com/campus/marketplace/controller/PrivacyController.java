@@ -34,8 +34,7 @@ public class PrivacyController {
 
     private final PrivacyService privacyService;
 
-    @PostMapping("/api/privacy")
-    @PreAuthorize("hasRole('STUDENT')")
+    @PostMapping("/privacy")
     @Operation(summary = "创建隐私请求", description = "提交数据导出或删除请求，系统会异步处理")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             required = true,
@@ -57,21 +56,20 @@ public class PrivacyController {
         return ApiResponse.success(privacyService.createRequest(request));
     }
 
-    @GetMapping("/api/privacy")
-    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/privacy")
     @Operation(summary = "查看我的隐私请求", description = "查看历史隐私请求及处理进度")
     public ApiResponse<List<PrivacyRequestResponse>> listMyRequests() {
         return ApiResponse.success(privacyService.listMyRequests());
     }
 
-    @GetMapping("/api/admin/privacy/requests")
+    @GetMapping("/admin/privacy/requests")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_COMPLIANCE_REVIEW)")
     @Operation(summary = "查看待处理隐私请求", description = "管理员查看等待处理的隐私请求")
     public ApiResponse<List<PrivacyRequestResponse>> listPendingRequests() {
         return ApiResponse.success(privacyService.listPendingRequests());
     }
 
-    @PostMapping("/api/admin/privacy/requests/{id}/complete")
+    @PostMapping("/admin/privacy/requests/{id}/complete")
     @PreAuthorize("hasAuthority(T(com.campus.marketplace.common.security.PermissionCodes).SYSTEM_COMPLIANCE_REVIEW)")
     @Operation(summary = "标记隐私请求完成", description = "管理员处理完成后上传结果路径")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(

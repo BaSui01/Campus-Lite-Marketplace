@@ -1,10 +1,15 @@
 package com.campus.marketplace.controller;
 
-import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.annotation.RateLimit;
+import com.campus.marketplace.common.dto.MessageSearchHistory;
+import com.campus.marketplace.common.dto.MessageSearchSuggestion;
+import com.campus.marketplace.common.dto.MessageSearchStatistics;
+import com.campus.marketplace.common.dto.request.MessageSearchRequest;
+import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
 import com.campus.marketplace.common.dto.response.ConversationResponse;
 import com.campus.marketplace.common.dto.response.MessageResponse;
+import com.campus.marketplace.common.dto.response.MessageSearchResponse;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +26,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 消息控制器
  *
@@ -32,7 +39,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/messages")
 @RequiredArgsConstructor
 @Tag(name = "消息管理", description = "私信发送、查询、未读消息数等接口")
 public class MessageController {
@@ -144,5 +151,91 @@ public class MessageController {
 
         log.info("消息已撤回：messageId={}", messageId);
         return ApiResponse.success(null);
+    }
+
+    // ==================== 消息搜索相关接口 ====================
+
+    @Operation(summary = "搜索协商消息", description = "在纠纷协商中搜索聊天消息，支持多种筛选条件")
+    @PostMapping("/search")
+    @PreAuthorize("hasRole('USER')")
+    @RateLimit(key = "message:search", maxRequests = 30, timeWindow = 60)
+    public ApiResponse<Page<MessageSearchResponse>> searchMessages(@Valid @RequestBody MessageSearchRequest request) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        log.info("搜索消息：userId={}, disputeId={}, keyword={}",
+                currentUserId, request.getDisputeId(), request.getKeyword());
+
+        Page<MessageSearchResponse> result = messageService.searchMessages(request, currentUserId);
+
+        log.info("消息搜索完成：userId={}, total={}", currentUserId, result.getTotalElements());
+        return ApiResponse.success(result);
+    }
+
+    @Operation(summary = "获取消息搜索建议", description = "根据输入提供智能搜索建议")
+    @GetMapping("/search/suggestions")
+    @PreAuthorize("hasRole('USER')")
+    public ApiResponse<List<MessageSearchSuggestion>> getSearchSuggestions(
+            @Parameter(description = "纠纷ID", required = true) @RequestParam Long disputeId,
+            @Parameter(description = "关键词前缀") @RequestParam(required = false) String keyword,
+            @Parameter(description = "建议类型 (keyword/user/date)") @RequestParam(required = false) String suggestionType,
+            @Parameter(description = "返回数量限制") @RequestParam(defaultValue = "10") int limit) {
+
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        log.debug("获取搜索建议：userId={}, disputeId={}, keyword={}, type={}",
+                currentUserId, disputeId, keyword, suggestionType);
+
+        List<MessageSearchSuggestion> suggestions = messageService.getSearchSuggestions(
+                disputeId, keyword, suggestionType, limit, currentUserId);
+
+        return ApiResponse.success(suggestions);
+    }
+
+    @Operation(summary = "获取消息搜索历史", description = "获取用户的消息搜索历史记录")
+    @GetMapping("/search/history")
+    @PreAuthorize("hasRole('USER')")
+    public ApiResponse<List<MessageSearchHistory>> getSearchHistory(
+            @Parameter(description = "纠纷ID", required = true) @RequestParam Long disputeId,
+            @Parameter(description = "返回数量限制") @RequestParam(defaultValue = "20") int limit) {
+
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        log.debug("获取搜索历史：userId={}, disputeId={}, limit={}",
+                currentUserId, disputeId, limit);
+
+        List<MessageSearchHistory> history = messageService.getSearchHistory(disputeId, limit, currentUserId);
+
+        return ApiResponse.success(history);
+    }
+
+    @Operation(summary = "清空消息搜索历史", description = "清空用户在指定纠纷的消息搜索历史记录")
+    @DeleteMapping("/search/history")
+    @PreAuthorize("hasRole('USER')")
+    public ApiResponse<Void> clearSearchHistory(
+            @Parameter(description = "纠纷ID", required = true) @RequestParam Long disputeId) {
+
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        log.info("清空搜索历史：userId={}, disputeId={}", currentUserId, disputeId);
+
+        messageService.clearSearchHistory(disputeId, currentUserId);
+
+        log.info("搜索历史已清空：userId={}, disputeId={}", currentUserId, disputeId);
+        return ApiResponse.success(null);
+    }
+
+    @Operation(summary = "获取消息搜索统计", description = "获取搜索相关的统计信息")
+    @GetMapping("/search/statistics")
+    @PreAuthorize("hasRole('USER')")
+    public ApiResponse<MessageSearchStatistics> getSearchStatistics(
+            @Parameter(description = "纠纷ID", required = true) @RequestParam Long disputeId) {
+
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        log.debug("获取搜索统计：userId={}, disputeId={}", currentUserId, disputeId);
+
+        MessageSearchStatistics statistics = messageService.getSearchStatistics(disputeId, currentUserId);
+
+        return ApiResponse.success(statistics);
     }
 }

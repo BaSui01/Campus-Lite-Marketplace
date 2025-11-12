@@ -15,7 +15,7 @@
 
 
 /**
- * 
+ * 业务数据载荷
  * @export
  * @interface OrderResponse
  */
@@ -116,6 +116,48 @@ export interface OrderResponse {
      * @memberof OrderResponse
      */
     'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'deliveryMethod'?: OrderResponseDeliveryMethodEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'receiverName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'receiverPhone'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'receiverAddress'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'buyerNote'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrderResponse
+     */
+    'paymentExpireAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof OrderResponse
+     */
+    'timeoutMinutes'?: number;
 }
 
 export const OrderResponseStatusEnum = {
@@ -125,9 +167,17 @@ export const OrderResponseStatusEnum = {
     Delivered: 'DELIVERED',
     Completed: 'COMPLETED',
     Cancelled: 'CANCELLED',
-    Reviewed: 'REVIEWED'
+    Reviewed: 'REVIEWED',
+    Refunding: 'REFUNDING',
+    Refunded: 'REFUNDED'
 } as const;
 
 export type OrderResponseStatusEnum = typeof OrderResponseStatusEnum[keyof typeof OrderResponseStatusEnum];
+export const OrderResponseDeliveryMethodEnum = {
+    FaceToFace: 'FACE_TO_FACE',
+    Express: 'EXPRESS'
+} as const;
+
+export type OrderResponseDeliveryMethodEnum = typeof OrderResponseDeliveryMethodEnum[keyof typeof OrderResponseDeliveryMethodEnum];
 
 

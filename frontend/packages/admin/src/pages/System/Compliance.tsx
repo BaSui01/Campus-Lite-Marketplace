@@ -12,24 +12,24 @@ import {
   Input,
   Select,
   Space,
-  Modal,
   Form,
-  message,
   Typography,
   Tag,
   Popconfirm,
   Tooltip,
+  App,
+  Modal,
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
   EyeOutlined,
-  ShieldOutlined,
+  SafetyOutlined,
   FileSearchOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { complianceService } from '@campus/shared';
+import { complianceService } from '@/services';
 import { PermissionGuard } from '@/components';
 import { PERMISSION_CODES } from '@campus/shared';
 import type { ComplianceWhitelistItem, ComplianceAuditLog } from '@campus/shared';
@@ -40,6 +40,7 @@ const { Search } = Input;
 
 const Compliance: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [whitelistModalVisible, setWhitelistModalVisible] = useState(false);
   const [auditModalVisible, setAuditModalVisible] = useState(false);
   const [selectedTargetType, setSelectedTargetType] = useState<string>();
@@ -49,10 +50,7 @@ const Compliance: React.FC = () => {
   // ===== 白名单查询 =====
   const { data: whitelist, isLoading: whitelistLoading } = useQuery({
     queryKey: ['compliance-whitelist'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/compliance/whitelist');
-      return await res.json();
-    },
+    queryFn: () => complianceService.listWhitelist(),
   });
 
   // ===== 审计日志查询 =====
@@ -259,7 +257,7 @@ const Compliance: React.FC = () => {
           <Card 
             title={
               <Space>
-                <ShieldOutlined />
+                <SafetyOutlined />
                 <span>合规白名单</span>
                 <PermissionGuard permission={PERMISSION_CODES.SYSTEM_COMPLIANCE_REVIEW}>
                   <Button

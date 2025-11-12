@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验证码</title>
+    <style>
+        /* 邮件客户端兼容性样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .code-container {
+            background-color: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        .code-hint {
+            font-size: 12px;
+            color: #999999;
+            margin-top: 15px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 13px;
+            color: #856404;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 30px 20px;
+            }
+            .code {
+                font-size: 28px;
+                letter-spacing: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table class="email-container" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <!-- Header -->
+        <tr>
+            <td class="header">
+                <h1 class="logo">🎓 校园轻享集市</h1>
+            </td>
+        </tr>
+
+        <!-- Content -->
+        <tr>
+            <td class="content">
+                <div class="greeting">您好！👋</div>
+
+                <div class="message">
+                    您正在进行<strong th:text="${purposeText}">操作</strong>，请使用以下验证码完成验证：
+                </div>
+
+                <div class="code-container">
+                    <div class="code" th:text="${code}">123456</div>
+                    <div class="code-hint">
+                        验证码有效期：<span th:text="${validMinutes}">10</span> 分钟
+                    </div>
+                </div>
+
+                <div class="warning">
+                    ⚠️ <strong>安全提示：</strong><br>
+                    • 请勿将验证码告知他人<br>
+                    • 如非本人操作，请忽略此邮件<br>
+                    • 验证码仅用于本次操作，请及时使用
+                </div>
+
+                <div class="message">
+                    如有任何问题，请联系我们的客服团队。
+                </div>
+            </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+            <td class="footer">
+                <p>此邮件由系统自动发送，请勿直接回复</p>
+                <p>
+                    © 2025 校园轻享集市 |
+                    <a href="#">隐私政策</a> |
+                    <a href="#">服务条款</a>
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -68,7 +68,7 @@ class DisputeStatisticsControllerTest {
 
         when(statisticsService.getStatistics()).thenReturn(stats);
 
-        mockMvc.perform(get("/api/disputes/statistics"))
+        mockMvc.perform(get("/disputes/statistics"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.totalDisputes").value(100))
@@ -79,7 +79,7 @@ class DisputeStatisticsControllerTest {
     @WithMockUser(username = "testuser", roles = "STUDENT")
     @DisplayName("Get statistics without admin role - should return 403")
     void getStatistics_WithoutAdminRole_ShouldReturn403() throws Exception {
-        mockMvc.perform(get("/api/disputes/statistics"))
+        mockMvc.perform(get("/disputes/statistics"))
                 .andExpect(status().isForbidden());
     }
 }

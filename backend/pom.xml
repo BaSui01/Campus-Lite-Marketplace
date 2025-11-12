@@ -138,6 +138,20 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- 🎨 Thymeleaf (HTML邮件模板引擎) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- 🔥 Spring Boot DevTools (热重载神器) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
         <!-- PostgreSQL Driver -->
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -233,10 +247,6 @@
             <version>3.1.8</version>
         </dependency>
 
-        <!-- Springdoc OpenAPI (Swagger UI) -->
-        <!-- ⚠️ 版本限制：2.6.x 兼容 Spring Boot 3.2.x (Spring Framework 6.1.x) -->
-        <!-- ⚠️ 安全漏洞：2.7.0 修复了 DOMPurify CVE-2024-45801，但需要 Spring Boot 3.3+ -->
-        <!-- 💡 解决方案：等待升级 Spring Boot 3.3+ 后再升级 SpringDoc 2.7.0 -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -326,6 +336,32 @@
             <groupId>com.huaban</groupId>
             <artifactId>jieba-analysis</artifactId>
             <version>1.0.2</version>
+        </dependency>
+
+        <!-- ip2region (IP 地理位置离线库) -->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+
+        <!-- Google Authenticator (TOTP 双因素认证) -->
+        <dependency>
+            <groupId>com.warrenstrange</groupId>
+            <artifactId>googleauth</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <!-- Apache POI (Excel 导出) -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
         </dependency>
 
         <!-- 测试依赖 -->

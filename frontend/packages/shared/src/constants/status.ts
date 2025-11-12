@@ -107,28 +107,40 @@ export const GOODS_CONDITION_LABELS: Record<GoodsCondition, string> = {
 
 /**
  * 订单状态选项列表
+ *
+ * ⚠️ 重要：与后端 OrderStatus.java 保持完全一致！
+ *
+ * @author BaSui 😎
+ * @date 2025-11-10
  */
 export const ORDER_STATUS_OPTIONS = [
   { label: '待支付', value: OrderStatus.PENDING_PAYMENT, color: 'orange' },
   { label: '已支付', value: OrderStatus.PAID, color: 'blue' },
-  { label: '待发货', value: OrderStatus.PENDING_DELIVERY, color: 'cyan' },
-  { label: '待收货', value: OrderStatus.PENDING_RECEIPT, color: 'purple' },
+  { label: '已发货', value: OrderStatus.SHIPPED, color: 'cyan' },
+  { label: '已送达', value: OrderStatus.DELIVERED, color: 'purple' },
   { label: '已完成', value: OrderStatus.COMPLETED, color: 'green' },
   { label: '已取消', value: OrderStatus.CANCELLED, color: 'gray' },
+  { label: '已评价', value: OrderStatus.REVIEWED, color: 'blue' },
   { label: '退款中', value: OrderStatus.REFUNDING, color: 'orange' },
   { label: '已退款', value: OrderStatus.REFUNDED, color: 'red' },
 ] as const;
 
 /**
  * 订单状态标签映射
+ *
+ * ⚠️ 重要：与后端 OrderStatus.java 保持完全一致！
+ *
+ * @author BaSui 😎
+ * @date 2025-11-10
  */
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   [OrderStatus.PENDING_PAYMENT]: '待支付',
   [OrderStatus.PAID]: '已支付',
-  [OrderStatus.PENDING_DELIVERY]: '待发货',
-  [OrderStatus.PENDING_RECEIPT]: '待收货',
+  [OrderStatus.SHIPPED]: '已发货',
+  [OrderStatus.DELIVERED]: '已送达',
   [OrderStatus.COMPLETED]: '已完成',
   [OrderStatus.CANCELLED]: '已取消',
+  [OrderStatus.REVIEWED]: '已评价',
   [OrderStatus.REFUNDING]: '退款中',
   [OrderStatus.REFUNDED]: '已退款',
 };
@@ -139,10 +151,11 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   [OrderStatus.PENDING_PAYMENT]: 'orange',
   [OrderStatus.PAID]: 'blue',
-  [OrderStatus.PENDING_DELIVERY]: 'cyan',
-  [OrderStatus.PENDING_RECEIPT]: 'purple',
+  [OrderStatus.SHIPPED]: 'cyan',
+  [OrderStatus.DELIVERED]: 'purple',
   [OrderStatus.COMPLETED]: 'green',
   [OrderStatus.CANCELLED]: 'gray',
+  [OrderStatus.REVIEWED]: 'blue',
   [OrderStatus.REFUNDING]: 'orange',
   [OrderStatus.REFUNDED]: 'red',
 };
@@ -228,36 +241,42 @@ export const MESSAGE_TYPE_ICONS: Record<MessageType, string> = {
  * 通知类型标签映射
  */
 export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
-  [NotificationType.SYSTEM]: '系统通知',
   [NotificationType.ORDER]: '订单通知',
-  [NotificationType.MESSAGE]: '消息通知',
-  [NotificationType.REVIEW]: '评价通知',
-  [NotificationType.FAVORITE]: '收藏通知',
-  [NotificationType.REPORT]: '举报通知',
+  [NotificationType.PAYMENT]: '支付通知',
+  [NotificationType.MESSAGE]: '站内消息',
+  [NotificationType.LIKE]: '点赞通知',
+  [NotificationType.COMMENT]: '评论通知',
+  [NotificationType.FOLLOW]: '关注通知',
+  [NotificationType.PRICE_ALERT]: '价格提醒',
+  [NotificationType.SYSTEM]: '系统公告',
 };
 
 /**
  * 通知类型图标映射
  */
 export const NOTIFICATION_TYPE_ICONS: Record<NotificationType, string> = {
-  [NotificationType.SYSTEM]: '🔔',
-  [NotificationType.ORDER]: '📦',
+  [NotificationType.ORDER]: '🛒',
+  [NotificationType.PAYMENT]: '💰',
   [NotificationType.MESSAGE]: '💬',
-  [NotificationType.REVIEW]: '⭐',
-  [NotificationType.FAVORITE]: '❤️',
-  [NotificationType.REPORT]: '⚠️',
+  [NotificationType.LIKE]: '👍',
+  [NotificationType.COMMENT]: '💬',
+  [NotificationType.FOLLOW]: '👤',
+  [NotificationType.PRICE_ALERT]: '💲',
+  [NotificationType.SYSTEM]: '📢',
 };
 
 /**
  * 通知类型颜色映射
  */
 export const NOTIFICATION_TYPE_COLORS: Record<NotificationType, string> = {
-  [NotificationType.SYSTEM]: 'blue',
   [NotificationType.ORDER]: 'green',
+  [NotificationType.PAYMENT]: 'blue',
   [NotificationType.MESSAGE]: 'purple',
-  [NotificationType.REVIEW]: 'orange',
-  [NotificationType.FAVORITE]: 'red',
-  [NotificationType.REPORT]: 'yellow',
+  [NotificationType.LIKE]: 'orange',
+  [NotificationType.COMMENT]: 'cyan',
+  [NotificationType.FOLLOW]: 'magenta',
+  [NotificationType.PRICE_ALERT]: 'gold',
+  [NotificationType.SYSTEM]: 'blue',
 };
 
 // ==================== 审核状态 ====================

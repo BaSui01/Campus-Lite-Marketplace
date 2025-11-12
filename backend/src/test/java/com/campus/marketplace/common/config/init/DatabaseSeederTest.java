@@ -7,6 +7,7 @@ import com.campus.marketplace.common.entity.Role;
 import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.CampusStatus;
 import com.campus.marketplace.common.security.RoleDefinition;
+import com.campus.marketplace.repository.*;
 import com.campus.marketplace.repository.CampusRepository;
 import com.campus.marketplace.repository.CategoryRepository;
 import com.campus.marketplace.repository.PermissionRepository;
@@ -52,6 +53,44 @@ class DatabaseSeederTest {
     @Mock
     private TransactionTemplate transactionTemplate;
 
+    // 💡 新增 Repository Mock（用于关联数据）
+    @Mock
+    private GoodsRepository goodsRepository;
+    @Mock
+    private OrderRepository orderRepository;
+    @Mock
+    private FavoriteRepository favoriteRepository;
+    @Mock
+    private ConversationRepository conversationRepository;
+    @Mock
+    private MessageRepository messageRepository;
+    @Mock
+    private PostRepository postRepository;
+    @Mock
+    private ReviewRepository reviewRepository;
+
+    // 🎯 核心业务实体 Repository Mock
+    @Mock
+    private TagRepository tagRepository;
+    @Mock
+    private GoodsTagRepository goodsTagRepository;
+    @Mock
+    private PostTagRepository postTagRepository;
+    @Mock
+    private ReplyRepository replyRepository;
+    @Mock
+    private UserFollowRepository userFollowRepository;
+    @Mock
+    private NotificationRepository notificationRepository;
+    @Mock
+    private ReportRepository reportRepository;
+    @Mock
+    private BanLogRepository banLogRepository;
+    @Mock
+    private PointsLogRepository pointsLogRepository;
+    @Mock
+    private RefundRequestRepository refundRequestRepository;
+
     private DatabaseSeeder seeder;
 
     @BeforeEach
@@ -63,7 +102,26 @@ class DatabaseSeederTest {
                 categoryRepository,
                 userRepository,
                 passwordEncoder,
-                transactionTemplate
+                transactionTemplate,
+                // 💡 新增依赖注入
+                goodsRepository,
+                orderRepository,
+                favoriteRepository,
+                conversationRepository,
+                messageRepository,
+                postRepository,
+                reviewRepository,
+                // 🎯 核心业务实体依赖
+                tagRepository,
+                goodsTagRepository,
+                postTagRepository,
+                replyRepository,
+                userFollowRepository,
+                notificationRepository,
+                reportRepository,
+                banLogRepository,
+                pointsLogRepository,
+                refundRequestRepository
         );
     }
 

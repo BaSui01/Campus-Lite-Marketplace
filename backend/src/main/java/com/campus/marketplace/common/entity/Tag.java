@@ -46,8 +46,10 @@ public class Tag extends BaseEntity {
 
     /**
      * 是否启用
+     *
+     * 默认启用，便于新标签立即生效！😎
      */
-    @Column(name = "enabled", nullable = false)
+    @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
     @Builder.Default
     private Boolean enabled = Boolean.TRUE;
 }

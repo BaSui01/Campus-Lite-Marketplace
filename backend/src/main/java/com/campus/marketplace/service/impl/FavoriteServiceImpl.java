@@ -48,7 +48,8 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "favorite:list", key = "#root.target.getCurrentUserId()")
+    // 🆙 升级缓存空间：favorite:list → favorite:v2:list
+    @CacheEvict(value = {"favorite:list", "favorite:v2:list"}, key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId()")
     public void addFavorite(Long goodsId) {
         log.info("添加收藏: goodsId={}", goodsId);
 
@@ -103,7 +104,8 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "favorite:list", key = "#root.target.getCurrentUserId()")
+    // 同时清理老版本与新版本缓存键，保证兼容
+    @CacheEvict(value = {"favorite:list", "favorite:v2:list"}, key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId()")
     public void removeFavorite(Long goodsId) {
         log.info("取消收藏: goodsId={}", goodsId);
 
@@ -133,7 +135,8 @@ public class FavoriteServiceImpl implements FavoriteService {
      */
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "favorite:list", key = "#root.target.getCurrentUserId()")
+    // 读取新版本缓存空间，避免读取历史不兼容数据
+    @Cacheable(value = "favorite:v2:list", key = "T(com.campus.marketplace.common.utils.SecurityUtil).getCurrentUserId() + ':' + #page + ':' + #size")
     public Page<GoodsResponse> listFavorites(int page, int size) {
         log.info("查询收藏列表: page={}, size={}", page, size);
 
@@ -179,14 +182,14 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .map(Category::getName)
                 .orElse("未知分类");
 
-        // 获取卖家用户名
-        String sellerUsername = userRepository.findById(goods.getSellerId())
-                .map(User::getUsername)
-                .orElse("未知用户");
+        // 获取卖家信息（包括头像）
+        User seller = userRepository.findById(goods.getSellerId()).orElse(null);
+        String sellerUsername = seller != null ? seller.getUsername() : "未知用户";
+        String sellerAvatar = seller != null ? seller.getAvatar() : null;
 
         // 获取封面图片（第一张）
-        String coverImage = goods.getImages() != null && goods.getImages().length > 0 
-                ? goods.getImages()[0] 
+        String coverImage = goods.getImages() != null && goods.getImages().length > 0
+                ? goods.getImages()[0]
                 : null;
 
         return GoodsResponse.builder()
@@ -198,10 +201,15 @@ public class FavoriteServiceImpl implements FavoriteService {
                 .categoryName(categoryName)
                 .sellerId(goods.getSellerId())
                 .sellerUsername(sellerUsername)
+                .sellerAvatar(sellerAvatar)  // ✅ 新增
                 .status(goods.getStatus())
                 .viewCount(goods.getViewCount())
                 .favoriteCount(goods.getFavoriteCount())
+                .stock(goods.getStock())  // ✅ 新增
+                .soldCount(goods.getSoldCount())  // ✅ 新增
+                .originalPrice(goods.getOriginalPrice())  // ✅ 新增
                 .coverImage(coverImage)
+                .images(goods.getImages())  // ✅ 新增：所有图片（支持轮播）
                 .createdAt(goods.getCreatedAt())
                 .build();
     }
@@ -216,19 +224,5 @@ public class FavoriteServiceImpl implements FavoriteService {
         return description.length() > 100 
                 ? description.substring(0, 100) + "..." 
                 : description;
-    }
-
-    /**
-     * 获取当前用户 ID（用于缓存 key）
-     */
-    public Long getCurrentUserId() {
-        try {
-            String username = SecurityUtil.getCurrentUsername();
-            return userRepository.findByUsername(username)
-                    .map(User::getId)
-                    .orElse(0L);
-        } catch (Exception e) {
-            return 0L;
-        }
     }
 }

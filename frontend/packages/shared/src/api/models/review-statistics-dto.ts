@@ -15,7 +15,7 @@
 
 
 /**
- * 
+ * 业务数据载荷
  * @export
  * @interface ReviewStatisticsDTO
  */

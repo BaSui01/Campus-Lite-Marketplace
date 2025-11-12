@@ -23,7 +23,7 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("/api/notifications/preferences")
+@RequestMapping("/notifications/preferences")
 @RequiredArgsConstructor
 @Tag(name = "通知偏好", description = "用户通知偏好与退订管理")
 public class NotificationPreferenceController {

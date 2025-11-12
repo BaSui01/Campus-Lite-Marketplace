@@ -11,11 +11,10 @@ import {
   Button,
   Select,
   Space,
-  Modal,
-  message,
   Typography,
   Tag,
   Tooltip,
+  App,
 } from 'antd';
 import {
   UndoOutlined,
@@ -24,9 +23,9 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { softDeleteService } from '@campus/shared';
+import { softDeleteService , PERMISSION_CODES } from '@campus/shared';
 import { PermissionGuard } from '@/components';
-import { PERMISSION_CODES } from '@campus/shared';
+
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -42,6 +41,7 @@ interface SoftDeleteRecord {
 
 const RecycleBin: React.FC = () => {
   const queryClient = useQueryClient();
+  const { message, modal } = App.useApp();
   const [selectedEntity, setSelectedEntity] = useState<string>();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -57,10 +57,7 @@ const RecycleBin: React.FC = () => {
     queryKey: ['soft-delete-records', selectedEntity, currentPage, pageSize],
     queryFn: async () => {
       if (!selectedEntity) return { content: [], totalElements: 0 };
-      
-      const res = await fetch(`/api/admin/soft-delete/records?entity=${selectedEntity}&page=${currentPage - 1}&size=${pageSize}`);
-      const data = await res.json();
-      return data;
+      return softDeleteService.getRecords(selectedEntity, currentPage - 1, pageSize);
     },
     enabled: !!selectedEntity,
   });
@@ -168,7 +165,7 @@ const RecycleBin: React.FC = () => {
   const handleRestore = (record: SoftDeleteRecord) => {
     if (!selectedEntity) return;
     
-    Modal.confirm({
+    modal.confirm({
       title: '恢复数据？',
       content: `确定要恢复 "${record.entityName}" 吗？数据将恢复到删除前的状态。`,
       onOk: () => restoreMutation.mutate({
@@ -182,7 +179,7 @@ const RecycleBin: React.FC = () => {
   const handlePurge = (record: SoftDeleteRecord) => {
     if (!selectedEntity) return;
     
-    Modal.confirm({
+    modal.confirm({
       title: '彻底删除？',
       content: `确定要彻底删除 "${record.entityName}" 吗？此操作不可撤销！`,
       okText: '确认删除',

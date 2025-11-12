@@ -70,7 +70,7 @@ class DisputeNegotiationControllerTest {
         SendNegotiationRequest request = new SendNegotiationRequest(1L, "Test message");
         when(negotiationService.sendTextMessage(any(), anyLong())).thenReturn(1L);
 
-        mockMvc.perform(post("/api/disputes/negotiations/messages")
+        mockMvc.perform(post("/disputes/negotiations/messages")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -90,7 +90,7 @@ class DisputeNegotiationControllerTest {
 
         when(negotiationService.proposeResolution(any(), anyLong())).thenReturn(1L);
 
-        mockMvc.perform(post("/api/disputes/negotiations/proposals")
+        mockMvc.perform(post("/disputes/negotiations/proposals")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -110,7 +110,7 @@ class DisputeNegotiationControllerTest {
 
         when(negotiationService.respondToProposal(any(), anyLong())).thenReturn(true);
 
-        mockMvc.perform(post("/api/disputes/negotiations/proposals/1/respond")
+        mockMvc.perform(post("/disputes/negotiations/proposals/1/respond")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -124,7 +124,7 @@ class DisputeNegotiationControllerTest {
     void getNegotiationHistory_ShouldReturnList() throws Exception {
         when(negotiationService.getNegotiationHistory(anyLong())).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/disputes/negotiations/1/history"))
+        mockMvc.perform(get("/disputes/negotiations/1/history"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
     }
@@ -135,7 +135,7 @@ class DisputeNegotiationControllerTest {
     void getPendingProposal_ShouldReturnOptional() throws Exception {
         when(negotiationService.getPendingProposal(anyLong())).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/disputes/negotiations/1/pending-proposal"))
+        mockMvc.perform(get("/disputes/negotiations/1/pending-proposal"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
     }

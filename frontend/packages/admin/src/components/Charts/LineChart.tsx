@@ -6,7 +6,7 @@
 
 import React from 'react';
 import * as echarts from 'echarts/core';
-import { LineChart } from 'echarts/charts';
+import { LineChart as EChartsLineChart } from 'echarts/charts';
 import {
   TitleComponent,
   TooltipComponent,
@@ -23,7 +23,7 @@ echarts.use([
   GridComponent,
   LegendComponent,
   DataZoomComponent,
-  LineChart,
+  EChartsLineChart,
   CanvasRenderer,
 ]);
 

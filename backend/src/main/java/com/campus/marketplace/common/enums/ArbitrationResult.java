@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 仲裁结果枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @since 2025-11-03
  */
 @Getter
-@RequiredArgsConstructor
 public enum ArbitrationResult {
 
     FULL_REFUND("全额退款"),
@@ -19,4 +17,8 @@ public enum ArbitrationResult {
     NEED_MORE_EVIDENCE("需补充证据");
 
     private final String description;
+
+    ArbitrationResult(String description) {
+        this.description = description;
+    }
 }

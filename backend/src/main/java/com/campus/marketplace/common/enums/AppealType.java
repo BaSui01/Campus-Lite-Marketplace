@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 申诉类型枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-11-02
  */
 @Getter
-@RequiredArgsConstructor
 public enum AppealType {
     
     UNJUST_BAN("误封申诉"),
@@ -22,4 +20,8 @@ public enum AppealType {
     OTHER("其他原因");
     
     private final String description;
+
+    AppealType(String description) {
+        this.description = description;
+    }
 }

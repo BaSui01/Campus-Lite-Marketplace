@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/topics")
+@RequestMapping("/topics")
 @RequiredArgsConstructor
 @Tag(name = "话题管理", description = "话题相关接口")
 public class TopicController {

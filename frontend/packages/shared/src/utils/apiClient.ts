@@ -1,12 +1,15 @@
 /**
  * 🚀 BaSui 的 API 客户端（基于 OpenAPI 生成代码）
  * @description 统一的 API 客户端配置：Token、拦截器、错误处理
+ * @updated 2025-11-08 - 优化 Token 刷新和错误处理
  */
 
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { DefaultApi, Configuration } from '../api';
 import { BASE_PATH as DEFAULT_BASE_PATH } from '../api/base';
 import { TOKEN_KEY, REFRESH_TOKEN_KEY } from '../constants';
+import { installTokenRefreshInterceptor } from './tokenRefresh';
+// import { installErrorHandler } from './errorHandler'; // ⚠️ 暂未使用，避免编译警告
 
 // ==================== 常量配置 ====================
 
@@ -53,17 +56,87 @@ const API_BASE_URL = normalizeBaseUrl(resolveEnvBaseUrl() || DEFAULT_BASE_PATH);
 // ==================== Token 管理 ====================
 
 /**
- * 获取访问 Token
+ * 获取访问 Token（内部使用）
+ * 🔧 BaSui 修复：统一从 Zustand persist 存储中读取，避免与路由守卫判断不一致
+ *
+ * 读取优先级：
+ * 1. Portal 端：从 'auth-storage' (Zustand persist) 读取
+ * 2. Admin 端：从 'admin-auth-storage' (Zustand persist) 读取
+ * 3. 兜底：从 localStorage 直接读取 'access_token'（向后兼容）
+ *
+ * @internal
  */
-export const getAccessToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
+const getAccessTokenInternal = (): string | null => {
+  try {
+    // 1. 尝试从 Portal 端 Zustand persist 读取
+    const portalAuthStorage = localStorage.getItem('auth-storage');
+    if (portalAuthStorage) {
+      const portalAuthData = JSON.parse(portalAuthStorage);
+      const portalToken = portalAuthData?.state?.accessToken;
+      if (portalToken) {
+        return portalToken;
+      }
+    }
+
+    // 2. 尝试从 Admin 端 Zustand persist 读取
+    const adminAuthStorage = localStorage.getItem('admin-auth-storage');
+    if (adminAuthStorage) {
+      const adminAuthData = JSON.parse(adminAuthStorage);
+      const adminToken = adminAuthData?.state?.accessToken;
+      if (adminToken) {
+        return adminToken;
+      }
+    }
+
+    // 3. 兜底：从 localStorage 直接读取（向后兼容）
+    return localStorage.getItem(TOKEN_KEY);
+  } catch (error) {
+    console.error('[API Client] ❌ 获取 Access Token 失败:', error);
+    // 兜底：从 localStorage 直接读取
+    return localStorage.getItem(TOKEN_KEY);
+  }
 };
 
 /**
- * 获取刷新 Token
+ * 获取刷新 Token（内部使用）
+ * 🔧 BaSui 修复：统一从 Zustand persist 存储中读取
+ *
+ * 读取优先级：
+ * 1. Portal 端：从 'auth-storage' (Zustand persist) 读取
+ * 2. Admin 端：从 'admin-auth-storage' (Zustand persist) 读取
+ * 3. 兜底：从 localStorage 直接读取 'refresh_token'（向后兼容）
+ *
+ * @internal
  */
-export const getRefreshToken = (): string | null => {
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
+const getRefreshTokenInternal = (): string | null => {
+  try {
+    // 1. 尝试从 Portal 端 Zustand persist 读取
+    const portalAuthStorage = localStorage.getItem('auth-storage');
+    if (portalAuthStorage) {
+      const portalAuthData = JSON.parse(portalAuthStorage);
+      const portalRefreshToken = portalAuthData?.state?.refreshToken;
+      if (portalRefreshToken) {
+        return portalRefreshToken;
+      }
+    }
+
+    // 2. 尝试从 Admin 端 Zustand persist 读取
+    const adminAuthStorage = localStorage.getItem('admin-auth-storage');
+    if (adminAuthStorage) {
+      const adminAuthData = JSON.parse(adminAuthStorage);
+      const adminRefreshToken = adminAuthData?.state?.refreshToken;
+      if (adminRefreshToken) {
+        return adminRefreshToken;
+      }
+    }
+
+    // 3. 兜底：从 localStorage 直接读取（向后兼容）
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  } catch (error) {
+    console.error('[API Client] ❌ 获取 Refresh Token 失败:', error);
+    // 兜底：从 localStorage 直接读取
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  }
 };
 
 /** 单例 DefaultApi 实例缓存 */
@@ -100,13 +173,14 @@ export const clearTokens = (): void => {
  * 检查 Token 是否存在
  */
 export const hasToken = (): boolean => {
-  return !!getAccessToken();
+  return !!getAccessTokenInternal();
 };
 
 // ==================== Axios 实例 ====================
 
 /**
  * 创建 Axios 实例（带拦截器）
+ * @updated 使用新的 Token 刷新和错误处理机制
  */
 const createAxiosInstance = (baseURL: string): AxiosInstance => {
   const instance = axios.create({
@@ -121,7 +195,7 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       // 💉 注入 JWT Token
-      const token = getAccessToken();
+      const token = getAccessTokenInternal();
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -139,57 +213,55 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
     }
   );
 
-  // ==================== 响应拦截器 ====================
+  // ==================== 响应拦截器（简单日志） ====================
   instance.interceptors.response.use(
     (response) => {
       console.log(`[API Client] ✅ ${response.config.method?.toUpperCase()} ${response.config.url}`, response.data);
       return response;
     },
-    async (error: AxiosError) => {
-      const { response } = error;
+    (error) => {
+      // 错误会被后续的拦截器处理（Token 刷新和错误处理）
+      return Promise.reject(error);
+    }
+  );
 
-      console.error(`[API Client] ❌ ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
-        status: response?.status,
-        data: response?.data,
-      });
-
-      // 🔄 401 Token 过期处理
-      if (response?.status === 401) {
-        const refreshToken = getRefreshToken();
-        if (refreshToken) {
-          try {
-            // 尝试刷新 Token
-            const refreshEndpoint = joinWithBaseUrl(API_BASE_URL, '/api/auth/refresh');
-            const { data } = await axios.post(refreshEndpoint, { refreshToken });
-            const newAccessToken = data.data?.accessToken;
-
-            if (newAccessToken) {
-              setTokens(newAccessToken);
-              // 重试原请求
-              if (error.config && error.config.headers) {
-                error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-              }
-              return instance.request(error.config!);
-            }
-          } catch (refreshError) {
-            console.error('[API Client] ❌ Token 刷新失败:', refreshError);
-            clearTokens();
-            // 保存当前路径，登录后跳转回来
-            const currentPath = window.location.pathname + window.location.search;
-            window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-          }
-        } else {
-          clearTokens();
-          // 保存当前路径，登录后跳转回来
-          const currentPath = window.location.pathname + window.location.search;
-          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-        }
+  // ==================== 安装 Token 自动刷新拦截器 ====================
+  installTokenRefreshInterceptor(instance, {
+    getAccessToken: getAccessTokenInternal,
+    getRefreshToken: getRefreshTokenInternal,
+    setTokens,
+    clearTokens,
+    refreshEndpoint: joinWithBaseUrl(API_BASE_URL, '/auth/refresh'), // 🔧 BaSui 修复：API_BASE_URL 已包含 /api，避免重复
+    onRefreshFailed: () => {
+      // 🎯 智能判断登录路径：管理端跳转到 /admin/login，门户端跳转到 /login
+      const currentPath = window.location.pathname;
+      const isAdminRoute = currentPath.startsWith('/admin');
+      const loginPath = isAdminRoute ? '/admin/login' : '/login';
+      
+      // ⚠️ 防止无限重定向：如果已经在登录页，不再跳转
+      if (currentPath === loginPath) {
+        console.warn('[API Client] ⚠️ 已在登录页，跳过重定向');
+        return;
       }
+      
+      // 保存当前完整路径（包含 query 参数）用于登录后返回
+      const fullPath = window.location.pathname + window.location.search;
+      window.location.href = `${loginPath}?redirect=${encodeURIComponent(fullPath)}`;
+    },
+  });
 
-      // 📢 错误提示
-      const errorMessage = (response?.data as any)?.message || error.message || '系统内部错误';
-      console.log(`[API Client] 💬 ${errorMessage}`);
-
+  // ==================== 安装全局错误处理拦截器 ====================
+  // 注意：错误处理器需要在 UI 层安装（因为需要 message.error）
+  // 这里只记录日志
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      console.error('[API Client] ❌ 请求失败:', {
+        method: error.config?.method?.toUpperCase(),
+        url: error.config?.url,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
       return Promise.reject(error);
     }
   );
@@ -235,7 +307,7 @@ export const createApi = (options?: CreateApiOptions): DefaultApi => {
   const basePath = resolveBasePath(options);
   const axiosClient = resolveAxiosInstance(options, basePath);
   const configuration = new Configuration({
-    accessToken: options?.accessToken ?? getAccessToken() ?? undefined,
+    accessToken: options?.accessToken ?? getAccessTokenInternal() ?? undefined,
     basePath,
   });
   return new DefaultApi(configuration, basePath, axiosClient);
@@ -253,5 +325,6 @@ export const getApi = (): DefaultApi => {
 
 // ==================== 导出 ====================
 
+export const apiClient = axiosInstance; // 导出 axios 实例，供服务层使用
 export { DefaultApi, Configuration, DEFAULT_BASE_PATH as BASE_PATH };
 export default getApi;

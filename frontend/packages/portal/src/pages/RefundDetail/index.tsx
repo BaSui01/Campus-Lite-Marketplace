@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@campus/shared/components';
-import { refundService, RefundStatus, type RefundRequest } from '@campus/shared/services';
+import { refundService, RefundStatus, type RefundRequest } from '@campus/shared/services';;
 import { useNotificationStore } from '../../store';
 import './RefundDetail.css';
 

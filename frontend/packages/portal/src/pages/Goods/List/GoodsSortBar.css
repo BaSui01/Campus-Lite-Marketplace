@@ -1,0 +1,125 @@
+/**
+ * 商品排序栏样式
+ * @author BaSui 😎
+ */
+
+/* ==================== 主容器 ==================== */
+.goods-sort-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+}
+
+.goods-sort-bar__left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.goods-sort-bar__label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.goods-sort-bar__options {
+  display: flex;
+  gap: 8px;
+}
+
+.goods-sort-bar__option {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.goods-sort-bar__option:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.goods-sort-bar__option.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+.goods-sort-bar__arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.goods-sort-bar__right {
+  display: flex;
+  align-items: center;
+}
+
+.goods-sort-bar__count {
+  font-size: 14px;
+  color: #999;
+}
+
+.goods-sort-bar__count strong {
+  color: #667eea;
+  font-weight: 600;
+}
+
+/* ==================== 响应式 ==================== */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .goods-sort-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .goods-sort-bar__left {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .goods-sort-bar__options {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .goods-sort-bar__right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .goods-sort-bar {
+    padding: 12px 16px;
+    border-radius: 0;
+  }
+
+  .goods-sort-bar__label,
+  .goods-sort-bar__count {
+    font-size: 13px;
+  }
+
+  .goods-sort-bar__option {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+}

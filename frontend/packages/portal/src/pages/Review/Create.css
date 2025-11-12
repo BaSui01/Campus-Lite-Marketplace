@@ -1,0 +1,328 @@
+/**
+ * ReviewCreate 样式
+ * @author BaSui 😎
+ */
+
+.review-create {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.review-create__container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 标题 */
+.review-create__title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+/* 订单商品信息 */
+.review-create__order-info {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.review-create__goods-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.review-create__goods-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.review-create__goods-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.review-create__goods-price {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ff4d4f;
+  margin: 0;
+}
+
+.review-create__order-no {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+}
+
+/* 表单区域 */
+.review-create__section {
+  margin-bottom: 24px;
+}
+
+.review-create__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.review-create__required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+/* 评分区域 */
+.review-create__rating {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 文本输入框 */
+.review-create__textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  resize: vertical;
+  transition: border-color 0.3s;
+  font-family: inherit;
+}
+
+.review-create__textarea:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.review-create__textarea::placeholder {
+  color: #bfbfbf;
+}
+
+/* 字数统计 */
+.review-create__char-count {
+  text-align: right;
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* 表情开关按钮与面板 */
+.emoji-toggle-btn {
+  padding: 6px 10px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.emoji-toggle-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.emoji-panel {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  background: #fff;
+  margin-top: 8px;
+}
+
+.emoji-item {
+  font-size: 20px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.emoji-item:hover {
+  background: #f5f5f5;
+}
+
+/* 匿名选项 */
+.review-create__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  user-select: none;
+}
+
+.review-create__checkbox input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* 错误提示 */
+.review-create__error-message {
+  padding: 12px;
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.review-create__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.review-create__error p {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
+/* 操作按钮 */
+.review-create__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+}
+
+.review-create__btn {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.review-create__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.review-create__btn--cancel {
+  background-color: #fff;
+  color: #666;
+  border: 1px solid #d9d9d9;
+}
+
+.review-create__btn--cancel:hover:not(:disabled) {
+  color: #333;
+  border-color: #999;
+}
+
+.review-create__btn--submit {
+  background-color: #1890ff;
+  color: #fff;
+}
+
+.review-create__btn--submit:hover:not(:disabled) {
+  background-color: #40a9ff;
+}
+
+.review-create__btn--submit:active:not(:disabled) {
+  background-color: #096dd9;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .review-create {
+    padding: 12px;
+  }
+
+  .review-create__container {
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  .review-create__title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .review-create__order-info {
+    padding: 12px;
+  }
+
+  .review-create__goods-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .review-create__goods-title {
+    font-size: 14px;
+  }
+
+  .review-create__goods-price {
+    font-size: 16px;
+  }
+
+  .review-create__section {
+    margin-bottom: 16px;
+  }
+
+  .review-create__textarea {
+    min-height: 120px;
+  }
+
+  .review-create__actions {
+    flex-direction: column-reverse;
+  }
+
+  .review-create__btn {
+    width: 100%;
+  }
+}
+
+/* Pad端适配 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .review-create__container {
+    max-width: 720px;
+  }
+}

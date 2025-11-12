@@ -7,7 +7,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, LoginRequest, RegisterRequest } from '@campus/shared';
-import { authService, setItem, getItem, removeItem, TOKEN_KEY, REFRESH_TOKEN_KEY } from '@campus/shared';
+import { Services } from '@campus/shared';
+import { setItem, getItem, removeItem, TOKEN_KEY, REFRESH_TOKEN_KEY } from '@campus/shared';
+
+// 🔧 BaSui 修复：从 Services 命名空间解构 authService
+const { authService } = Services;
 
 /**
  * 认证状态接口
@@ -40,8 +44,9 @@ interface AuthState {
 
   /**
    * 登录
+   * @returns 如果需要 2FA，返回 { requires2FA: true, tempToken: string }，否则返回 void
    */
-  login: (data: LoginRequest) => Promise<void>;
+  login: (data: LoginRequest) => Promise<void | { requires2FA: true; tempToken?: string }>;
 
   /**
    * 注册
@@ -90,22 +95,48 @@ export const useAuthStore = create<AuthState>()(
           const response = await authService.login(data);
 
           if (response.code === 200 && response.data) {
-            // ✅ 适配后端实际返回的数据结构
-            const { token, userInfo } = response.data;
+            // 🔧 BaSui 修复：后端返回的字段名称是 accessToken, refreshToken, userInfo
+            // ⚠️ 确保与 OpenAPI 生成的 LoginResponse 类型一致
+            const { accessToken, refreshToken, userInfo, requires2FA, tempToken } = response.data;
 
-            // 保存到 LocalStorage
-            setItem(TOKEN_KEY, token || '');
+            // 🔐 检查是否需要 2FA 验证（新增 - BaSui 2025-11-11）
+            if (requires2FA) {
+              set({ isLoading: false });
+              // 返回 2FA 信息而不是抛出错误
+              return { requires2FA: true, tempToken };
+            }
 
-            // 更新状态
+            // ✅ 验证必需字段
+            if (!accessToken) {
+              throw new Error('登录失败：未获取到访问令牌');
+            }
+
+            if (!refreshToken) {
+              throw new Error('登录失败：未获取到刷新令牌');
+            }
+
+            if (!userInfo) {
+              throw new Error('登录失败：未获取到用户信息');
+            }
+
+            // 🔧 BaSui 修复：移除双重存储，只使用 Zustand persist
+            // ❌ 旧代码：同时保存到 localStorage 和 Zustand persist，导致数据不一致
+            // setItem(TOKEN_KEY, accessToken || '');
+            // setItem(REFRESH_TOKEN_KEY, refreshToken || '');
+
+            // ✅ 新代码：只更新 Zustand 状态，由 persist 中间件自动保存到 localStorage
             set({
               user: userInfo as any, // 将 UserInfo 转换为 User
-              accessToken: token,
-              refreshToken: null, // 后端暂不返回 refreshToken
+              accessToken: accessToken, // ✅ 保存 accessToken
+              refreshToken: refreshToken, // ✅ 保存 refreshToken
               isAuthenticated: true,
               isLoading: false,
             });
 
             console.log('✅ 登录成功:', userInfo?.username);
+            console.log('✅ Access Token 已保存:', accessToken ? '是' : '否');
+            console.log('✅ Refresh Token 已保存:', refreshToken ? '是' : '否');
+            console.log('✅ Token 已保存到 Zustand persist（15分钟有效）');
           } else {
             throw new Error(response.message || '登录失败');
           }
@@ -126,11 +157,12 @@ export const useAuthStore = create<AuthState>()(
           if (response.code === 200 && response.data) {
             const { user, accessToken, refreshToken } = response.data;
 
-            // 保存到 LocalStorage
-            setItem(TOKEN_KEY, accessToken);
-            setItem(REFRESH_TOKEN_KEY, refreshToken);
+            // 🔧 BaSui 修复：移除双重存储，只使用 Zustand persist
+            // ❌ 旧代码：同时保存到 localStorage 和 Zustand persist
+            // setItem(TOKEN_KEY, accessToken);
+            // setItem(REFRESH_TOKEN_KEY, refreshToken);
 
-            // 更新状态
+            // ✅ 新代码：只更新 Zustand 状态，由 persist 中间件自动保存
             set({
               user,
               accessToken,
@@ -140,6 +172,7 @@ export const useAuthStore = create<AuthState>()(
             });
 
             console.log('✅ 注册成功:', user.username);
+            console.log('✅ Token 已保存到 Zustand persist');
           } else {
             throw new Error(response.message || '注册失败');
           }
@@ -158,11 +191,12 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error('登出接口调用失败:', error);
         } finally {
-          // 清除本地存储
-          removeItem(TOKEN_KEY);
-          removeItem(REFRESH_TOKEN_KEY);
+          // 🔧 BaSui 修复：移除手动清除 localStorage，由 Zustand persist 自动管理
+          // ❌ 旧代码：手动清除 localStorage
+          // removeItem(TOKEN_KEY);
+          // removeItem(REFRESH_TOKEN_KEY);
 
-          // 清除状态
+          // ✅ 新代码：只清除 Zustand 状态，persist 中间件会自动同步到 localStorage
           set({
             user: null,
             accessToken: null,
@@ -188,17 +222,18 @@ export const useAuthStore = create<AuthState>()(
           if (response.code === 200 && response.data) {
             const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
 
-            // 保存到 LocalStorage
-            setItem(TOKEN_KEY, newAccessToken);
-            setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+            // 🔧 BaSui 修复：移除双重存储，只使用 Zustand persist
+            // ❌ 旧代码：手动保存到 localStorage
+            // setItem(TOKEN_KEY, newAccessToken);
+            // setItem(REFRESH_TOKEN_KEY, newRefreshToken);
 
-            // 更新状态
+            // ✅ 新代码：只更新 Zustand 状态，persist 中间件会自动保存
             set({
               accessToken: newAccessToken,
               refreshToken: newRefreshToken,
             });
 
-            console.log('✅ 令牌刷新成功');
+            console.log('✅ 令牌刷新成功（已保存到 Zustand persist）');
           } else {
             throw new Error(response.message || '令牌刷新失败');
           }
@@ -219,31 +254,32 @@ export const useAuthStore = create<AuthState>()(
 
       // ==================== 初始化 ====================
       init: () => {
-        const accessToken = getItem(TOKEN_KEY);
-        const refreshToken = getItem(REFRESH_TOKEN_KEY);
+        // 🔧 BaSui 修复：从 Zustand persist 恢复状态，不需要手动读取 localStorage
+        // ❌ 旧代码：手动从 localStorage 读取 Token
+        // const accessToken = getItem(TOKEN_KEY);
+        // const refreshToken = getItem(REFRESH_TOKEN_KEY);
 
-        if (accessToken && refreshToken) {
-          // 从 LocalStorage 恢复认证状态
-          set({
-            accessToken,
-            refreshToken,
-            isAuthenticated: true,
-          });
+        // ✅ 新代码：Zustand persist 中间件会自动恢复状态
+        // 只需要检查当前状态是否已认证
+        const { accessToken, refreshToken, isAuthenticated } = get();
 
-          // 获取当前用户信息
-          authService
-            .getCurrentUser()
-            .then((response) => {
-              if (response.code === 200 && response.data) {
-                set({ user: response.data });
-                console.log('✅ 用户信息已恢复:', response.data.username);
-              }
-            })
-            .catch((error) => {
-              console.error('❌ 获取用户信息失败:', error);
-              // 获取失败，清除认证状态
-              get().logout();
-            });
+        if (accessToken && refreshToken && isAuthenticated) {
+          // 获取当前用户信息（如果还没有）
+          if (!get().user) {
+            authService
+              .getCurrentUser()
+              .then((response) => {
+                if (response.code === 200 && response.data) {
+                  set({ user: response.data });
+                  console.log('✅ 用户信息已恢复:', response.data.username);
+                }
+              })
+              .catch((error) => {
+                console.error('❌ 获取用户信息失败:', error);
+                // 获取失败，清除认证状态
+                get().logout();
+              });
+          }
         }
       },
     }),

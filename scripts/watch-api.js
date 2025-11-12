@@ -11,10 +11,12 @@ const { execSync, spawn } = require('child_process');
 const fs = require('fs');
 
 // ==================== 配置区域 ====================
+// 🎯 BaSui提示：无论从哪里启动,都能正确找到项目根目录！
+const projectRoot = path.resolve(__dirname, '..');
 const config = {
-    backendDir: path.resolve(__dirname, '../backend'),
-    frontendDir: path.resolve(__dirname, '../'),
-    apiPackage: path.resolve(__dirname, '../frontend/packages/shared/src/api'),
+    backendDir: path.join(projectRoot, 'backend'),
+    frontendDir: path.join(projectRoot, 'frontend'),  // ✅ 修正：frontend 是实际的前端根目录
+    apiPackage: path.join(projectRoot, 'frontend/packages/shared/src/api'),
     watchPattern: '*Controller*.java',
     debounceDelay: 2000, // 毫秒
     apiGenerateCmd: 'pnpm api:generate'

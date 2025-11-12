@@ -79,6 +79,12 @@ public class User {
     private String nickname;
 
     /**
+     * 个人简介
+     */
+    @Column(length = 500)
+    private String bio;
+
+    /**
      * 用户积分（任务 32 遗漏字段 - 已补充！）
      */
     @Builder.Default
@@ -125,6 +131,45 @@ public class User {
     private UserStatus status = UserStatus.ACTIVE;
 
     /**
+     * 邮箱是否已验证
+     */
+    @Builder.Default
+    @Column(name = "email_verified", nullable = false, columnDefinition = "boolean default false")
+    private Boolean emailVerified = false;
+
+    /**
+     * 手机号是否已验证
+     */
+    @Builder.Default
+    @Column(name = "phone_verified", nullable = false, columnDefinition = "boolean default false")
+    private Boolean phoneVerified = false;
+
+    /**
+     * 两步验证是否启用
+     */
+    @Builder.Default
+    @Column(name = "two_factor_enabled", nullable = false, columnDefinition = "boolean default false")
+    private Boolean twoFactorEnabled = false;
+
+    /**
+     * 两步验证密钥（TOTP Secret）
+     */
+    @Column(name = "two_factor_secret", length = 32)
+    private String twoFactorSecret;
+
+    /**
+     * 2FA 恢复码（JSON 数组，存储加密后的恢复码）
+     */
+    @Column(name = "two_factor_recovery_codes", columnDefinition = "TEXT")
+    private String twoFactorRecoveryCodes;
+
+    /**
+     * 2FA 启用时间
+     */
+    @Column(name = "two_factor_enabled_at")
+    private LocalDateTime twoFactorEnabledAt;
+
+    /**
      * 用户角色（任务 4 遗漏关联 - 已补充！）
      * Many-to-Many 关联
      */
@@ -150,6 +195,12 @@ public class User {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    /**
+     * 最后登录时间
+     */
+    @Column(name = "last_login_time")
+    private LocalDateTime lastLoginTime;
 
     /**
      * 注销时间（软删除时间）

@@ -1,5 +1,8 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.dto.request.RefundFilterRequest;
+import com.campus.marketplace.common.dto.response.RefundResponseDTO;
+import com.campus.marketplace.common.entity.Goods;
 import com.campus.marketplace.common.entity.Order;
 import com.campus.marketplace.common.entity.PaymentLog;
 import com.campus.marketplace.common.entity.RefundRequest;
@@ -264,7 +267,11 @@ class RefundServiceTest {
         when(refundRepository.findByApplicantId(eq(1L), any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(page);
 
-        org.springframework.data.domain.Page<RefundRequest> result = refundService.listMyRefunds(0, 10, null);
+        RefundFilterRequest filterRequest = RefundFilterRequest.builder()
+                .page(0)
+                .size(10)
+                .build();
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listMyRefunds(filterRequest);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getTotalElements()).isEqualTo(2);
@@ -294,7 +301,12 @@ class RefundServiceTest {
         when(refundRepository.findByApplicantIdAndStatus(eq(1L), eq(RefundStatus.REFUNDED), any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(page);
 
-        org.springframework.data.domain.Page<RefundRequest> result = refundService.listMyRefunds(0, 10, RefundStatus.REFUNDED);
+        RefundFilterRequest filterRequest = RefundFilterRequest.builder()
+                .page(0)
+                .size(10)
+                .status(RefundStatus.REFUNDED)
+                .build();
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listMyRefunds(filterRequest);
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getStatus()).isEqualTo(RefundStatus.REFUNDED);
@@ -363,7 +375,11 @@ class RefundServiceTest {
         when(refundRepository.findAll(any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(page);
 
-        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(0, 10, null, null);
+        RefundFilterRequest filterRequest = RefundFilterRequest.builder()
+                .page(0)
+                .size(10)
+                .build();
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(filterRequest);
 
         assertThat(result.getContent()).hasSize(1);
         verify(refundRepository).findAll(any(org.springframework.data.domain.Pageable.class));
@@ -388,7 +404,12 @@ class RefundServiceTest {
         when(refundRepository.findByStatus(eq(RefundStatus.APPLIED), any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(page);
 
-        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(0, 10, RefundStatus.APPLIED, null);
+        RefundFilterRequest filterRequest = RefundFilterRequest.builder()
+                .page(0)
+                .size(10)
+                .status(RefundStatus.APPLIED)
+                .build();
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(filterRequest);
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getStatus()).isEqualTo(RefundStatus.APPLIED);
@@ -414,9 +435,142 @@ class RefundServiceTest {
         when(refundRepository.findByRefundNoContainingOrOrderNoContaining(eq("RFD1"), eq("RFD1"), any(org.springframework.data.domain.Pageable.class)))
                 .thenReturn(page);
 
-        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(0, 10, null, "RFD1");
+        RefundFilterRequest filterRequest = RefundFilterRequest.builder()
+                .page(0)
+                .size(10)
+                .keyword("RFD1")
+                .build();
+        org.springframework.data.domain.Page<RefundRequest> result = refundService.listAllRefunds(filterRequest);
 
         assertThat(result.getContent()).hasSize(1);
         verify(refundRepository).findByRefundNoContainingOrOrderNoContaining(eq("RFD1"), eq("RFD1"), any(org.springframework.data.domain.Pageable.class));
+    }
+
+    @Test
+    @DisplayName("查询退款详情 - 返回包含关联信息的 DTO")
+    void getRefundDetail_shouldReturnRefundResponseDTO() {
+        // 准备测试数据
+        RefundRequest refund = RefundRequest.builder()
+                .refundNo("RFD202511100001")
+                .orderNo("ORD202511100001")
+                .applicantId(1L)
+                .status(RefundStatus.APPLIED)
+                .amount(new BigDecimal("99.99"))
+                .reason("商品不符合描述")
+                .evidence(Map.of("images", java.util.List.of("https://cdn.example.com/evidence1.jpg")))
+                .channel(PaymentMethod.ALIPAY.name())
+                .retryCount(0)
+                .lastError(null)
+                .build();
+        refund.setId(1L);
+
+        // 准备关联的商品、买家、卖家
+        Goods goods = Goods.builder()
+                .title("二手教材 - 高等数学")
+                .images(new String[]{"https://cdn.example.com/goods1.jpg", "https://cdn.example.com/goods2.jpg"})
+                .build();
+        goods.setId(100L);
+
+        User buyer = User.builder()
+                .username("buyer123")
+                .avatar("https://cdn.example.com/avatar/buyer.jpg")
+                .build();
+        buyer.setId(1L);
+
+        User seller = User.builder()
+                .username("seller456")
+                .avatar("https://cdn.example.com/avatar/seller.jpg")
+                .build();
+        seller.setId(2L);
+
+        Order order = Order.builder()
+                .orderNo("ORD202511100001")
+                .goodsId(100L)
+                .buyerId(1L)
+                .sellerId(2L)
+                .paymentMethod(PaymentMethod.ALIPAY.name())
+                .actualAmount(new BigDecimal("99.99"))
+                .build();
+        order.setId(200L);
+
+        // 设置关联关系（模拟 @EntityGraph 懒加载）
+        java.lang.reflect.Field goodsField = null;
+        java.lang.reflect.Field buyerField = null;
+        java.lang.reflect.Field sellerField = null;
+        try {
+            goodsField = Order.class.getDeclaredField("goods");
+            goodsField.setAccessible(true);
+            goodsField.set(order, goods);
+
+            buyerField = Order.class.getDeclaredField("buyer");
+            buyerField.setAccessible(true);
+            buyerField.set(order, buyer);
+
+            sellerField = Order.class.getDeclaredField("seller");
+            sellerField.setAccessible(true);
+            sellerField.set(order, seller);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("反射设置关联失败", e);
+        }
+
+        // Mock repository 行为
+        when(refundRepository.findByRefundNo("RFD202511100001")).thenReturn(Optional.of(refund));
+        when(orderRepository.findByOrderNoWithDetails("ORD202511100001")).thenReturn(Optional.of(order));
+
+        // 执行测试
+        RefundResponseDTO result = refundService.getRefundDetail("RFD202511100001");
+
+        // 验证基础退款信息
+        assertThat(result.id()).isEqualTo(1L);
+        assertThat(result.refundNo()).isEqualTo("RFD202511100001");
+        assertThat(result.orderNo()).isEqualTo("ORD202511100001");
+        assertThat(result.amount()).isEqualByComparingTo(new BigDecimal("99.99"));
+        assertThat(result.reason()).isEqualTo("商品不符合描述");
+        assertThat(result.status()).isEqualTo("APPLIED");
+        assertThat(result.channel()).isEqualTo(PaymentMethod.ALIPAY.name());
+
+        // 验证关联商品信息
+        assertThat(result.goodsId()).isEqualTo(100L);
+        assertThat(result.goodsTitle()).isEqualTo("二手教材 - 高等数学");
+        assertThat(result.goodsImage()).isEqualTo("https://cdn.example.com/goods1.jpg");
+
+        // 验证关联买家信息
+        assertThat(result.buyerId()).isEqualTo(1L);
+        assertThat(result.buyerUsername()).isEqualTo("buyer123");
+        assertThat(result.buyerAvatar()).isEqualTo("https://cdn.example.com/avatar/buyer.jpg");
+
+        // 验证关联卖家信息
+        assertThat(result.sellerId()).isEqualTo(2L);
+        assertThat(result.sellerUsername()).isEqualTo("seller456");
+        assertThat(result.sellerAvatar()).isEqualTo("https://cdn.example.com/avatar/seller.jpg");
+
+        // 验证 repository 调用
+        verify(refundRepository).findByRefundNo("RFD202511100001");
+        verify(orderRepository).findByOrderNoWithDetails("ORD202511100001");
+    }
+
+    @Test
+    @DisplayName("查询退款详情 - 退款不存在应抛出异常")
+    void getRefundDetail_shouldThrowWhenRefundNotFound() {
+        when(refundRepository.findByRefundNo("INVALID")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> refundService.getRefundDetail("INVALID"))
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("code", com.campus.marketplace.common.exception.ErrorCode.NOT_FOUND.getCode());
+    }
+
+    @Test
+    @DisplayName("查询退款详情 - 订单不存在应抛出异常")
+    void getRefundDetail_shouldThrowWhenOrderNotFound() {
+        RefundRequest refund = RefundRequest.builder()
+                .refundNo("RFD1")
+                .orderNo("INVALID_ORDER")
+                .build();
+        when(refundRepository.findByRefundNo("RFD1")).thenReturn(Optional.of(refund));
+        when(orderRepository.findByOrderNoWithDetails("INVALID_ORDER")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> refundService.getRefundDetail("RFD1"))
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("code", com.campus.marketplace.common.exception.ErrorCode.ORDER_NOT_FOUND.getCode());
     }
 }

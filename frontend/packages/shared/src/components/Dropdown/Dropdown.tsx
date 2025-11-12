@@ -160,6 +160,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
   // 容器引用
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // 🎯 hover 延迟定时器（修复下拉菜单消失bug）
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   /**
    * 处理菜单显示/隐藏
    */
@@ -245,6 +248,45 @@ export const Dropdown: React.FC<DropdownProps> = ({
     .filter(Boolean)
     .join(' ');
 
+  /**
+   * 🎯 处理鼠标进入（立即显示）
+   */
+  const handleMouseEnter = () => {
+    if (trigger !== 'hover' || disabled) return;
+
+    // 清除之前的延迟隐藏定时器
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+
+    // 立即显示下拉菜单
+    handleVisibleChange(true);
+  };
+
+  /**
+   * 🎯 处理鼠标离开（延迟隐藏 - 修复bug的关键！）
+   */
+  const handleMouseLeave = () => {
+    if (trigger !== 'hover' || disabled) return;
+
+    // 延迟 300ms 隐藏，给用户时间移动鼠标到下拉菜单
+    hoverTimerRef.current = setTimeout(() => {
+      handleVisibleChange(false);
+    }, 300);
+  };
+
+  /**
+   * 🧹 清理定时器（组件卸载时）
+   */
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div
       ref={containerRef}
@@ -255,23 +297,19 @@ export const Dropdown: React.FC<DropdownProps> = ({
           handleVisibleChange(!visible);
         }
       }}
-      onMouseEnter={() => {
-        if (trigger === 'hover') {
-          handleVisibleChange(true);
-        }
-      }}
-      onMouseLeave={() => {
-        if (trigger === 'hover') {
-          handleVisibleChange(false);
-        }
-      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* 触发元素 */}
       <div className="campus-dropdown__trigger">{children}</div>
 
       {/* 下拉菜单 */}
       {visible && (
-        <div className="campus-dropdown__menu">
+        <div
+          className="campus-dropdown__menu"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           {menu.map((item) => renderMenuItem(item))}
         </div>
       )}

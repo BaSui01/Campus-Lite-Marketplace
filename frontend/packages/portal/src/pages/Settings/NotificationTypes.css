@@ -1,0 +1,261 @@
+/**
+ * 通知类型管理页面样式
+ * @author BaSui 😎
+ */
+
+.notification-types {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+/* 加载状态 */
+.notification-types.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* ==================== 页面头部 ==================== */
+.types-header {
+  margin-bottom: 24px;
+}
+
+.back-button {
+  margin-bottom: 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+.back-button:hover {
+  color: #1890ff;
+}
+
+.types-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.types-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* ==================== 工具栏 ==================== */
+.types-toolbar {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-box {
+  flex: 1;
+}
+
+.search-box .ant-input-affix-wrapper {
+  border-radius: 8px;
+}
+
+.batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.selected-count {
+  font-size: 13px;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+/* ==================== 通知类型列表 ==================== */
+.types-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.type-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.type-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.type-item.selected {
+  border-color: #1890ff;
+  background: #f0f8ff;
+}
+
+.type-item.required {
+  background: #fffbe6;
+  border-left: 4px solid #faad14;
+}
+
+/* 复选框 */
+.type-checkbox {
+  flex-shrink: 0;
+}
+
+/* 图标 */
+.type-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+/* 信息区域 */
+.type-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.type-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.type-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.required-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #faad14;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.type-description {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 开关 */
+.type-item .ant-switch {
+  flex-shrink: 0;
+}
+
+/* ==================== 空状态 ==================== */
+.empty-state {
+  background: #fff;
+  border-radius: 12px;
+  padding: 60px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.empty-state p {
+  font-size: 16px;
+  color: #999;
+  margin: 0;
+}
+
+/* ==================== 底部提示 ==================== */
+.types-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.footer-hint {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  margin: 0;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 768px) {
+  .notification-types {
+    padding: 16px;
+  }
+
+  .types-title {
+    font-size: 24px;
+  }
+
+  .types-toolbar {
+    padding: 12px;
+  }
+
+  .type-item {
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+
+  .type-icon {
+    font-size: 28px;
+  }
+
+  .type-name {
+    font-size: 15px;
+  }
+
+  .type-description {
+    font-size: 12px;
+  }
+
+  .batch-actions {
+    width: 100%;
+  }
+
+  .batch-actions button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .type-item {
+    gap: 12px;
+  }
+
+  .type-checkbox {
+    order: 1;
+  }
+
+  .type-icon {
+    order: 2;
+    font-size: 24px;
+  }
+
+  .type-info {
+    order: 3;
+    width: 100%;
+  }
+
+  .type-item .ant-switch {
+    order: 4;
+    margin-left: auto;
+  }
+}

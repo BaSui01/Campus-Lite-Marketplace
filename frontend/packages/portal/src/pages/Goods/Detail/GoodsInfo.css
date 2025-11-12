@@ -1,0 +1,175 @@
+/**
+ * 商品信息样式
+ * @author BaSui 😎
+ */
+
+.goods-info {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.goods-info__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px;
+  line-height: 1.4;
+}
+
+.goods-info__price-section {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.goods-info__price {
+  display: flex;
+  align-items: baseline;
+  color: #f5222d;
+}
+
+.goods-info__price-symbol {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.goods-info__price-value {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.goods-info__original-price {
+  font-size: 14px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.goods-info__meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.goods-info__meta-item {
+  font-size: 14px;
+  color: #666;
+}
+
+.goods-info__meta-label {
+  color: #999;
+}
+
+.goods-info__meta-value {
+  color: #333;
+  font-weight: 500;
+}
+
+.goods-info__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.goods-info__tag {
+  padding: 4px 12px;
+  background: #f5f5f5;
+  border-radius: 12px;
+  color: #667eea;
+  font-size: 13px;
+}
+
+.goods-info__section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px;
+}
+
+.goods-info__description {
+  margin-bottom: 24px;
+}
+
+.goods-info__description-content {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.goods-info__trade {
+  margin-bottom: 20px;
+}
+
+.goods-info__trade-methods {
+  display: flex;
+  gap: 16px;
+}
+
+.goods-info__trade-method {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+}
+
+.goods-info__trade-icon {
+  font-size: 16px;
+}
+
+.goods-info__status {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.goods-info__status--sold_out {
+  background: #ff4d4f;
+  color: white;
+}
+
+.goods-info__status--off_shelf {
+  background: #999;
+  color: white;
+}
+
+.goods-info__status--pending {
+  background: #faad14;
+  color: white;
+}
+
+@media (max-width: 767px) {
+  .goods-info {
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  .goods-info__title {
+    font-size: 20px;
+  }
+
+  .goods-info__price-value {
+    font-size: 28px;
+  }
+
+  .goods-info__meta {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}

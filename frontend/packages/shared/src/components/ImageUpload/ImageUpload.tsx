@@ -5,7 +5,7 @@
  */
 
 import React, { useRef } from 'react';
-import { useUpload, type UploadFile } from '../../hooks/useUpload';
+import { useUpload } from '../../hooks/useUpload';
 import { Loading } from '../Loading';
 import './ImageUpload.css';
 
@@ -166,7 +166,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         onSuccess?.(file.url);
       }
     },
-    onError: (file, error) => {
+    onError: (_file, error) => {
       onError?.(error);
     },
   });

@@ -1,0 +1,117 @@
+# 🔥 开发环境配置（Spring Boot DevTools 热重载）
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  # 🔥 DevTools 热重载配置
+  devtools:
+    restart:
+      # 启用热重启（修改代码自动重启）
+      enabled: true
+      # 监控路径（默认classpath下所有内容）
+      additional-paths: src/main/java
+      # 排除路径（静态资源不触发重启）
+      exclude: static/**,public/**,templates/**,META-INF/**
+      # 重启触发文件（可选，调试用）
+      # trigger-file: .reloadtrigger
+      # 重启策略（fast = 只重启自定义类，不重启依赖的 jar）
+      poll-interval: 1000  # 轮询间隔 1秒
+      quiet-period: 400    # 静默期 400ms（避免频繁重启）
+    livereload:
+      # 启用 LiveReload（浏览器自动刷新，需安装浏览器插件）
+      enabled: true
+      port: 35729
+    add-properties: true
+
+  # 🔥 禁用 Spring Boot 默认静态资源自动配置（关键修复！）
+  web:
+    resources:
+      add-mappings: false  # 禁用默认静态资源映射，避免与 API 路由冲突
+
+  # JPA 配置（开发环境）
+  jpa:
+    hibernate:
+      # ✅ BaSui: 改为 update，自动建表和更新索引（开发环境）
+      ddl-auto: update
+    show-sql: ${JPA_SHOW_SQL:false}  # ✅ BaSui: 从 .env 读取，默认 false
+    properties:
+      hibernate:
+        format_sql: ${JPA_FORMAT_SQL:false}  # ✅ BaSui: 从 .env 读取，默认 false
+        # 禁用二级缓存（避免开发时缓存问题）
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+
+  # 缓存配置（开发环境使用简单缓存）
+  cache:
+    type: simple
+
+  # Flyway 配置（开发环境禁用，改用 JPA 自动建表）
+  flyway:
+    enabled: false  # ✅ BaSui: 禁用 Flyway，改用 JPA 自动建表
+
+  # 热部署配置（兼容老版本）
+  freemarker:
+    cache: false
+  thymeleaf:
+    cache: false
+
+# 日志配置（开发环境）
+logging:
+  level:
+    root: INFO
+    com.campus.marketplace: DEBUG
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:WARN}  # ✅ BaSui: 改为读取环境变量,默认WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:WARN}  # ✅ BaSui: 参数绑定也降低日志级别
+    org.springframework.security: DEBUG
+    org.redisson: WARN  # Redisson 日志太吵，降低级别
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+
+# 应用级配置（开发环境）
+app:
+  cache:
+    prewarm:
+      enabled: false  # 开发环境禁用缓存预热
+  redis:
+    mode: redis  # 开发环境使用真实 Redis（如果本地没有 Redis，可改为 in-memory）
+  alert:
+    enabled: false  # 开发环境禁用告警
+
+# Actuator 配置（开发环境开放更多端点）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # 开发环境开放所有端点
+  endpoint:
+    health:
+      show-details: always  # 始终显示健康检查详情
+
+# Swagger 配置（开发环境启用）
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+# 服务器配置
+server:
+  port: 8200
+  servlet:
+    context-path: /api
+
+# 推荐配置（🎯 BaSui 新增）
+recommend:
+  enabled: true  # 是否启用推荐功能
+  algorithm: HYBRID  # 推荐算法：HYBRID（混合）、COLLABORATIVE（协同过滤）、CONTENT（基于内容）
+  weights:
+    collaborative: 0.4  # 协同过滤权重
+    content: 0.3  # 基于内容权重
+    hot: 0.2  # 热门榜单权重
+    personalized: 0.1  # 个性化权重
+  params:
+    maxRecommendations: 20  # 最大推荐数量
+    minScore: 0.3  # 最小相似度阈值
+    refreshInterval: 3600  # 缓存刷新间隔（秒）

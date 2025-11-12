@@ -34,7 +34,7 @@ class TraceMdcFilterTest {
 
     @Test
     void addsTraceHeaderAndPropagatesMdc() throws ServletException, IOException {
-        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/api/test");
+        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/test");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
         FilterChain chain = (request, response) -> {
@@ -63,7 +63,7 @@ class TraceMdcFilterTest {
         secMock.when(SecurityUtil::isAuthenticated).thenReturn(true);
         secMock.when(SecurityUtil::getCurrentUsername).thenReturn("u2");
 
-        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/api/test");
+        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/test");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
         filter.doFilter(req, res, (r, s) -> {

@@ -1,5 +1,6 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.dto.response.SystemOverviewDTO;
 import com.campus.marketplace.repository.CategoryRepository;
 import com.campus.marketplace.repository.GoodsRepository;
 import com.campus.marketplace.repository.OrderRepository;
@@ -21,11 +22,12 @@ import static org.mockito.Mockito.*;
 
 /**
  * 数据统计服务测试类
- * 
+ *
  * TDD 开发：先写测试，定义数据统计的预期行为
- * 
+ *
  * @author BaSui
  * @date 2025-10-27
+ * @updated 2025-11-10 - 使用强类型 DTO 替代 Map<String, Object> 😎
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("数据统计服务测试")
@@ -59,21 +61,28 @@ class StatisticsServiceTest {
         when(goodsRepository.count()).thenReturn(0L);
         when(orderRepository.count()).thenReturn(0L);
         when(orderRepository.findAll()).thenReturn(Collections.emptyList());
-        
-        // When: 获取系统概览统计
-        Map<String, Object> overview = statisticsService.getSystemOverview();
+        when(userRepository.findAll()).thenReturn(Collections.emptyList());
+        when(goodsRepository.findAll()).thenReturn(Collections.emptyList());
+
+        // When: 获取系统概览统计（强类型 DTO）
+        SystemOverviewDTO overview = statisticsService.getSystemOverview();
 
         // Then: 返回系统统计数据
         assertNotNull(overview);
-        assertTrue(overview.containsKey("totalUsers"));
-        assertTrue(overview.containsKey("totalGoods"));
-        assertTrue(overview.containsKey("totalOrders"));
-        assertTrue(overview.containsKey("totalRevenue"));
-        
-        // 验证数据类型（允许数据为 0 或 null）
-        assertNotNull(overview.get("totalUsers"));
-        assertNotNull(overview.get("totalGoods"));
-        assertNotNull(overview.get("totalOrders"));
+        assertNotNull(overview.getTotalUsers());
+        assertNotNull(overview.getTotalGoods());
+        assertNotNull(overview.getTotalOrders());
+        assertNotNull(overview.getTotalRevenue());
+        assertNotNull(overview.getTodayNewUsers());
+        assertNotNull(overview.getTodayNewGoods());
+        assertNotNull(overview.getTodayNewOrders());
+        assertNotNull(overview.getActiveUsers());
+        assertNotNull(overview.getPendingGoods());
+
+        // 验证数据值（应该为 0）
+        assertEquals(0L, overview.getTotalUsers());
+        assertEquals(0L, overview.getTotalGoods());
+        assertEquals(0L, overview.getTotalOrders());
     }
 
     @Test

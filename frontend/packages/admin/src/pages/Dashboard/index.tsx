@@ -19,10 +19,8 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Card, Badge } from '@campus/shared';
-import { LineChart, BarChart } from '@/components/Charts';
-import StatCard from '@/components/StatCard';
-import { statisticsService } from '@campus/shared';
+import { StatCard, LineChart, BarChart } from '@campus/shared';
+import { statisticsService } from '@/services';
 import './Dashboard.css';
 
 const { Title, Text } = Typography;
@@ -114,7 +112,7 @@ const Dashboard: React.FC = () => {
       {/* 排行榜 */}
       <Row gutter={[16, 16]} className="ranking-section">
         <Col xs={24} lg={12}>
-          <Card title="🏆 热门商品 Top 10" loading={goodsLoading}>
+          <Card variant="outlined" title="🏆 热门商品 Top 10" loading={goodsLoading}>
             <List
               dataSource={topGoods || []}
               renderItem={(item, index) => (
@@ -139,7 +137,7 @@ const Dashboard: React.FC = () => {
         </Col>
 
         <Col xs={24} lg={12}>
-          <Card title="👥 活跃用户 Top 10" loading={usersLoading}>
+          <Card variant="outlined" title="👥 活跃用户 Top 10" loading={usersLoading}>
             <List
               dataSource={topUsers || []}
               renderItem={(item, index) => (
@@ -171,7 +169,7 @@ const Dashboard: React.FC = () => {
       </Row>
 
       {/* 今日统计 */}
-      <Card title="📅 今日数据" className="today-stats">
+      <Card variant="outlined" title="📅 今日数据" className="today-stats">
         <Row gutter={[16, 16]}>
           <Col xs={12} sm={6}>
             <div className="stat-item">
@@ -203,8 +201,8 @@ const Dashboard: React.FC = () => {
       {/* 图表区域 */}
       <Row gutter={[16, 16]} className="chart-section">
         <Col xs={24} lg={12}>
-          <Card title="📈 用户增长趋势" loading={trendLoading}>
-            <LineChart 
+          <Card variant="outlined" title="📈 用户增长趋势" loading={trendLoading}>
+            <LineChart
               data={trendData || []}
               height={300}
               color="#52c41a"
@@ -212,8 +210,8 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="💰 收入趋势" loading={revenueLoading}>
-            <LineChart 
+          <Card variant="outlined" title="💰 收入趋势" loading={revenueLoading}>
+            <LineChart
               data={revenueData || []}
               height={300}
               color="#faad14"
@@ -225,7 +223,7 @@ const Dashboard: React.FC = () => {
       {/* 商品类别分布 */}
       <Row gutter={[16, 16]} className="chart-section">
         <Col xs={24}>
-          <Card title="📦 商品类别分布" loading={goodsLoading}>
+          <Card variant="outlined" title="📦 商品类别分布" loading={goodsLoading}>
             <BarChart 
               data={topGoods?.map(item => ({ 
                 name: item.category || '其他', 

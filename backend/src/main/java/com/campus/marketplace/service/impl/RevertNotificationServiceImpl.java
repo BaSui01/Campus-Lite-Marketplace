@@ -215,7 +215,17 @@ public class RevertNotificationServiceImpl implements RevertNotificationService 
             log.info("撤销警告通知已发送: requesterId={}", revertRequest.getRequesterId());
             
         } catch (Exception e) {
-            log.error("发送撤销警告通知 失败: revertRequestId={}", revertRequest.getId(), e);
+            log.error("发送撤销警告通知失败: revertRequestId={}", revertRequest.getId(), e);
         }
+    }
+
+    @Override
+    public void sendRevertApprovalNotification(RevertRequest revertRequest) {
+        sendApprovalNotification(revertRequest, true);
+    }
+
+    @Override
+    public void sendRevertRejectionNotification(RevertRequest revertRequest) {
+        sendApprovalNotification(revertRequest, false);
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/recommend")
+@RequestMapping("/recommend")
 @RequiredArgsConstructor
 @Tag(name = "推荐", description = "热门榜与个性化推荐接口")
 public class RecommendController {
@@ -39,7 +39,6 @@ public class RecommendController {
     }
 
         @GetMapping("/personal")
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN','SUPER_ADMIN')")
     @Operation(summary = "个性化推荐", description = "根据用户行为推荐物品，需登录")
     public ApiResponse<List<GoodsResponse>> personal(
             @Parameter(description = "返回数量", example = "20") @RequestParam(defaultValue = "20") int size) {

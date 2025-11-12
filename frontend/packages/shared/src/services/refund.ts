@@ -1,144 +1,164 @@
 /**
+ * ⚠️ 警告：此文件仍使用手写 API 路径（http.get/post/put/delete）
+ * 🔧 需要重构：将所有 http. 调用替换为 getApi() + DefaultApi 方法
+ * 📋 参考：frontend/packages/shared/src/services/order.ts（已完成重构）
+ * 👉 重构步骤：
+ *    1. 找到对应的 OpenAPI 生成的方法名（在 api/api/default-api.ts）
+ *    2. 替换为：const api = getApi(); api.methodName(...)
+ *    3. 更新返回值类型
+ */
+/**
  * 退款 API 服务
  * @author BaSui 😎
- * @description 退款申请、查询、审批等接口（咱可是专业的！）
+ * @description 退款申请、审核、查询等接口
  */
 
-import { http } from '../utils/http';
+import { getApi } from '../utils/apiClient';
 import type { ApiResponse, PageInfo } from '../types';
 
 /**
- * 退款状态枚举（和后端保持一致！）
+ * 退款状态枚举
  */
 export enum RefundStatus {
-  APPLIED = 'APPLIED',       // 已申请
-  APPROVED = 'APPROVED',     // 已审核通过
-  REJECTED = 'REJECTED',     // 审核拒绝
-  PROCESSING = 'PROCESSING', // 渠道退款中
-  REFUNDED = 'REFUNDED',     // 退款成功
-  FAILED = 'FAILED',         // 退款失败
+  /** 待审核 */
+  PENDING = 'PENDING',
+  /** 已批准 */
+  APPROVED = 'APPROVED',
+  /** 已拒绝 */
+  REJECTED = 'REJECTED',
+  /** 已取消 */
+  CANCELLED = 'CANCELLED',
+  /** 已完成 */
+  COMPLETED = 'COMPLETED',
 }
 
 /**
- * 退款请求实体（和后端 RefundRequest 对应）
+ * 退款信息接口
  */
-export interface RefundRequest {
-  id?: number;
-  refundNo: string;          // 退款单号
-  orderNo: string;           // 订单号
-  applicantId: number;       // 申请人ID
-  reason: string;            // 退款原因
-  evidence?: Record<string, any>; // 退款凭证（JSON）
-  status: RefundStatus;      // 退款状态
-  channel?: string;          // 支付渠道（ALIPAY/WECHAT）
-  amount: number;            // 退款金额
-  retryCount?: number;       // 重试次数
-  lastError?: string;        // 最后错误信息
-  createdAt?: string;        // 创建时间
-  updatedAt?: string;        // 更新时间
-}
-
-/**
- * 申请退款请求参数
- */
-export interface ApplyRefundRequest {
+export interface Refund {
+  id: number;
+  refundNo: string;
   orderNo: string;
-  reason: string;
-  evidence?: {
-    images?: string[];       // 图片凭证
-    note?: string;           // 文字说明
-    [key: string]: any;      // 其他凭证
-  };
+  goodsId: number;
+  goodsTitle: string;
+  goodsImage?: string;
+  buyerId: number;
+  buyerName: string;
+  sellerId: number;
+  sellerName: string;
+  refundAmount: number;
+  refundReason: string;
+  refundProof?: string[];
+  status: string;
+  reviewerId?: number;
+  reviewerName?: string;
+  reviewReason?: string;
+  createdAt: string;
+  updatedAt: string;
+  reviewedAt?: string;
 }
 
 /**
  * 退款列表查询参数
  */
-export interface RefundListQuery {
-  page?: number;             // 页码（从0开始）
-  size?: number;             // 每页大小
-  status?: RefundStatus;     // 退款状态筛选
-  keyword?: string;          // 搜索关键词（管理员用）
+export interface RefundListParams {
+  keyword?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  size?: number;
 }
 
 /**
- * 退款 API 服务类（退款功能全靠它了！😎）
+ * 退款审核请求
+ */
+export interface RefundReviewRequest {
+  refundId: number;
+  approved: boolean;
+  reason?: string;
+}
+
+/**
+ * 退款 API 服务类
  */
 export class RefundService {
-  // ==================== 用户端接口 ====================
-
   /**
-   * 申请退款（用户提交退款申请）
-   * @param data 退款申请参数
-   * @returns 退款单号
-   */
-  async applyRefund(data: ApplyRefundRequest): Promise<ApiResponse<string>> {
-    const { orderNo, reason, evidence } = data;
-    return http.post(`/orders/${orderNo}/refunds`, evidence || {}, {
-      params: { reason },
-    });
-  }
-
-  /**
-   * 查询我的退款列表（用户查看自己的退款）
+   * 获取我的退款列表（用户视角）
+   * 💡 BaSui：调用后端 GET /refunds 接口（用户查询自己的退款列表）
    * @param params 查询参数
-   * @returns 分页退款列表
+   * @returns 退款列表（分页）
    */
-  async listMyRefunds(params?: RefundListQuery): Promise<ApiResponse<PageInfo<RefundRequest>>> {
-    return http.get('/refunds', { params });
+  async listMyRefunds(params?: RefundListParams): Promise<ApiResponse<PageInfo<Refund>>> {
+    const api = getApi();
+    // ✅ 构造完整的 RefundFilterRequest 对象
+    const filterRequest = {
+      page: params?.page ?? 0,
+      size: params?.size ?? 20,
+      status: params?.status as any,
+      keyword: params?.keyword,
+      startTime: params?.startDate,
+      endTime: params?.endDate,
+    };
+    const response = await api.listMyRefunds({ filterRequest });
+    return response.data as ApiResponse<PageInfo<Refund>>;
   }
 
   /**
-   * 查询我的退款详情（用户查看自己的退款详情）
+   * 获取退款列表（管理员视角）
+   * @param params 查询参数
+   * @returns 退款列表
+   */
+  async listRefunds(params?: RefundListParams): Promise<ApiResponse<PageInfo<Refund>>> {
+    const api = getApi();
+    // ✅ 构造完整的 RefundFilterRequest 对象
+    const filterRequest = {
+      page: params?.page ?? 0,
+      size: params?.size ?? 20,
+      status: params?.status as any,
+      keyword: params?.keyword,
+      startTime: params?.startDate,
+      endTime: params?.endDate,
+    };
+    const response = await api.listAllRefunds({ filterRequest });
+    return response.data as ApiResponse<PageInfo<Refund>>;
+  }
+
+  /**
+   * 获取我的退款详情（用户视角）
    * @param refundNo 退款单号
    * @returns 退款详情
    */
-  async getMyRefund(refundNo: string): Promise<ApiResponse<RefundRequest>> {
-    return http.get(`/refunds/${refundNo}`);
-  }
-
-  // ==================== 管理员接口 ====================
-
-  /**
-   * 管理员查询所有退款列表（支持筛选和搜索）
-   * @param params 查询参数
-   * @returns 分页退款列表
-   */
-  async listAllRefunds(params?: RefundListQuery): Promise<ApiResponse<PageInfo<RefundRequest>>> {
-    return http.get('/admin/refunds', { params });
+  async getMyRefundDetail(refundNo: string): Promise<ApiResponse<Refund>> {
+    const api = getApi();
+    const response = await api.getMyRefund({ refundNo });
+    return response.data as ApiResponse<Refund>;
   }
 
   /**
-   * 管理员查询退款详情
+   * 审批通过退款（管理员）
    * @param refundNo 退款单号
-   * @returns 退款详情
-   */
-  async getRefundDetail(refundNo: string): Promise<ApiResponse<RefundRequest>> {
-    return http.get(`/admin/refunds/${refundNo}`);
-  }
-
-  /**
-   * 管理员审批通过并退款
-   * @param refundNo 退款单号
-   * @returns 审批结果
+   * @returns 操作结果
    */
   async approveRefund(refundNo: string): Promise<ApiResponse<void>> {
-    return http.put(`/admin/refunds/${refundNo}/approve`);
+    const api = getApi();
+    const response = await api.approve({ refundNo });
+    return response.data as ApiResponse<void>;
   }
 
   /**
-   * 管理员驳回退款申请
+   * 驳回退款（管理员）
    * @param refundNo 退款单号
    * @param reason 驳回原因
-   * @returns 驳回结果
+   * @returns 操作结果
    */
   async rejectRefund(refundNo: string, reason: string): Promise<ApiResponse<void>> {
-    return http.put(`/admin/refunds/${refundNo}/reject`, null, {
-      params: { reason },
-    });
+    const api = getApi();
+    const response = await api.reject({ refundNo, reason });
+    return response.data as ApiResponse<void>;
   }
 }
 
-// 导出单例（全局共享，省内存！🎉）
+// 导出单例
 export const refundService = new RefundService();
 export default refundService;

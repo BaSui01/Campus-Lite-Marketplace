@@ -22,7 +22,7 @@ import java.util.Map;
  * @since 2025-11-03
  */
 @RestController
-@RequestMapping("/api/behavior-analysis")
+@RequestMapping("/behavior-analysis")
 @RequiredArgsConstructor
 @Tag(name = "行为分析", description = "用户行为追踪和画像分析")
 public class BehaviorAnalysisController {
@@ -66,7 +66,7 @@ public class BehaviorAnalysisController {
 
     @PostMapping("/persona/{userId}/build")
     @Operation(summary = "构建/更新用户画像")
-    @PreAuthorize("hasAuthority('SYSTEM_PERSONA_MANAGE')")
+    @PreAuthorize("hasAuthority('system:statistics:view')")
     public ApiResponse<UserPersonaDTO> buildUserPersona(@PathVariable Long userId) {
         UserPersonaDTO persona = behaviorAnalysisService.buildUserPersona(userId);
         return ApiResponse.success(persona);
@@ -74,7 +74,7 @@ public class BehaviorAnalysisController {
 
     @GetMapping("/persona/statistics")
     @Operation(summary = "用户分群统计")
-    @PreAuthorize("hasAuthority('SYSTEM_PERSONA_VIEW')")
+    @PreAuthorize("hasAuthority('system:statistics:view')")
     public ApiResponse<Map<String, Long>> getUserSegmentStatistics() {
         Map<String, Long> statistics = personaService.getUserSegmentStatistics();
         return ApiResponse.success(statistics);
@@ -82,7 +82,7 @@ public class BehaviorAnalysisController {
 
     @GetMapping("/heatmap")
     @Operation(summary = "行为热力图")
-    @PreAuthorize("hasAuthority('SYSTEM_BEHAVIOR_VIEW')")
+    @PreAuthorize("hasAuthority('system:statistics:view')")
     public ApiResponse<Map<String, Object>> getBehaviorHeatmap() {
         Map<String, Object> heatmap = behaviorAnalysisService.getBehaviorHeatmap();
         return ApiResponse.success(heatmap);

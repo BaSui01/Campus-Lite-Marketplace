@@ -36,9 +36,61 @@ export const PERMISSION_CODES = {
   SYSTEM_COMPLIANCE_REVIEW: 'system:compliance:review',
   SYSTEM_REPORT_HANDLE: 'system:report:handle',
 
+  // ===== 纠纷仲裁 =====
+  SYSTEM_DISPUTE_VIEW: 'system:dispute:view',
+  SYSTEM_DISPUTE_HANDLE: 'system:dispute:handle',
+  SYSTEM_DISPUTE_MANAGE: 'system:dispute:manage',
+  SYSTEM_DISPUTE_STATISTICS: 'system:dispute:statistics',
+
+  // ===== 申诉管理 =====
+  SYSTEM_APPEAL_VIEW: 'system:appeal:view',
+  SYSTEM_APPEAL_HANDLE: 'system:appeal:handle',
+  SYSTEM_USER_APPEAL: 'system:user:appeal',
+  SYSTEM_USER_APPEAL_HANDLE: 'system:user:appeal:handle',
+
+  // ===== 订单管理 =====
+  SYSTEM_ORDER_VIEW: 'system:order:view',
+  SYSTEM_ORDER_MANAGE: 'system:order:manage',
+
+  // ===== 评价管理 =====
+  SYSTEM_REVIEW_MANAGE: 'system:review:manage',
+  SYSTEM_REVIEW_DELETE: 'system:review:delete',
+
+  // ===== 批量任务 =====
+  SYSTEM_BATCH_MANAGE: 'system:batch:manage',
+  SYSTEM_BATCH_GOODS_OFFLINE: 'system:batch:goods:offline',
+  SYSTEM_BATCH_GOODS_UPDATE: 'system:batch:goods:update',
+  SYSTEM_BATCH_GOODS_DELETE: 'system:batch:goods:delete',
+  SYSTEM_BATCH_USERS_NOTIFY: 'system:batch:users:notify',
+
+  // ===== 商品管理 =====
+  SYSTEM_GOODS_VIEW: 'system:goods:view',
+
+  // ===== 系统监控 =====
+  SYSTEM_MONITOR_VIEW: 'system:monitor:view',
+  SYSTEM_TASK_MANAGE: 'system:task:manage',
+
+  // ===== 社区管理 =====
+  SYSTEM_TOPIC_MANAGE: 'system:topic:manage',
+  SYSTEM_COMMUNITY_MANAGE: 'system:community:manage',
+
+  // ===== 数据治理 =====
+  SYSTEM_DATA_REVERT: 'system:data:revert',
+  SYSTEM_DATA_TRACK: 'system:data:track',
+
+  // ===== 物流管理 =====
+  SYSTEM_LOGISTICS_VIEW: 'system:logistics:view',
+  SYSTEM_LOGISTICS_MANAGE: 'system:logistics:manage',
+
+  // ===== 用户管理增强 =====
+  SYSTEM_USER_LOCK: 'system:user:lock',
+  SYSTEM_USER_UNLOCK: 'system:user:unlock',
+
   // ===== 市场运营 =====
   MARKET_GOODS_APPROVE: 'market:goods:approve',
   MARKET_ORDER_REFUND: 'market:order:refund',
+  MARKET_ORDER_MANAGE: 'market:order:manage',
+  MARKET_SELLER_CENTER: 'market:seller:center',
 } as const;
 
 export type PermissionCode = (typeof PERMISSION_CODES)[keyof typeof PERMISSION_CODES];
@@ -70,8 +122,49 @@ export const PERMISSION_DESCRIPTIONS: Record<PermissionCode, string> = {
   [PERMISSION_CODES.SYSTEM_COMPLIANCE_REVIEW]: '审核隐私请求',
   [PERMISSION_CODES.SYSTEM_REPORT_HANDLE]: '处理用户举报',
 
+  [PERMISSION_CODES.SYSTEM_DISPUTE_VIEW]: '查看纠纷',
+  [PERMISSION_CODES.SYSTEM_DISPUTE_HANDLE]: '处理纠纷',
+  [PERMISSION_CODES.SYSTEM_DISPUTE_MANAGE]: '管理纠纷仲裁',
+  [PERMISSION_CODES.SYSTEM_DISPUTE_STATISTICS]: '查看纠纷统计',
+
+  [PERMISSION_CODES.SYSTEM_APPEAL_VIEW]: '查看申诉',
+  [PERMISSION_CODES.SYSTEM_APPEAL_HANDLE]: '处理申诉',
+  [PERMISSION_CODES.SYSTEM_USER_APPEAL]: '用户申诉权限',
+  [PERMISSION_CODES.SYSTEM_USER_APPEAL_HANDLE]: '处理用户申诉',
+
+  [PERMISSION_CODES.SYSTEM_ORDER_VIEW]: '查看订单',
+  [PERMISSION_CODES.SYSTEM_ORDER_MANAGE]: '管理订单',
+
+  [PERMISSION_CODES.SYSTEM_REVIEW_MANAGE]: '管理评价',
+  [PERMISSION_CODES.SYSTEM_REVIEW_DELETE]: '删除评价',
+
+  [PERMISSION_CODES.SYSTEM_BATCH_MANAGE]: '管理批量任务',
+  [PERMISSION_CODES.SYSTEM_BATCH_GOODS_OFFLINE]: '批量下架商品',
+  [PERMISSION_CODES.SYSTEM_BATCH_GOODS_UPDATE]: '批量更新商品',
+  [PERMISSION_CODES.SYSTEM_BATCH_GOODS_DELETE]: '批量删除商品',
+  [PERMISSION_CODES.SYSTEM_BATCH_USERS_NOTIFY]: '批量通知用户',
+
+  [PERMISSION_CODES.SYSTEM_GOODS_VIEW]: '查看商品',
+
+  [PERMISSION_CODES.SYSTEM_MONITOR_VIEW]: '查看系统监控',
+  [PERMISSION_CODES.SYSTEM_TASK_MANAGE]: '管理定时任务',
+
+  [PERMISSION_CODES.SYSTEM_TOPIC_MANAGE]: '管理话题',
+  [PERMISSION_CODES.SYSTEM_COMMUNITY_MANAGE]: '管理社区',
+
+  [PERMISSION_CODES.SYSTEM_DATA_REVERT]: '数据回滚权限',
+  [PERMISSION_CODES.SYSTEM_DATA_TRACK]: '数据追踪',
+
+  [PERMISSION_CODES.SYSTEM_LOGISTICS_VIEW]: '查看物流',
+  [PERMISSION_CODES.SYSTEM_LOGISTICS_MANAGE]: '管理物流',
+
+  [PERMISSION_CODES.SYSTEM_USER_LOCK]: '锁定用户',
+  [PERMISSION_CODES.SYSTEM_USER_UNLOCK]: '解锁用户',
+
   [PERMISSION_CODES.MARKET_GOODS_APPROVE]: '运营商品审核',
   [PERMISSION_CODES.MARKET_ORDER_REFUND]: '处理订单退款',
+  [PERMISSION_CODES.MARKET_ORDER_MANAGE]: '管理运营订单',
+  [PERMISSION_CODES.MARKET_SELLER_CENTER]: '卖家中心',
 };
 
 export const ADMIN_DEFAULT_PERMISSIONS: PermissionCode[] = [
@@ -93,6 +186,12 @@ export const ADMIN_DEFAULT_PERMISSIONS: PermissionCode[] = [
   PERMISSION_CODES.SYSTEM_TAG_MANAGE,
   PERMISSION_CODES.SYSTEM_COMPLIANCE_REVIEW,
   PERMISSION_CODES.SYSTEM_REPORT_HANDLE,
+  PERMISSION_CODES.SYSTEM_DISPUTE_VIEW,
+  PERMISSION_CODES.SYSTEM_DISPUTE_HANDLE,
+  PERMISSION_CODES.SYSTEM_DISPUTE_MANAGE,
+  PERMISSION_CODES.SYSTEM_APPEAL_VIEW,
+  PERMISSION_CODES.SYSTEM_APPEAL_HANDLE,
+  PERMISSION_CODES.SYSTEM_USER_APPEAL_HANDLE,
   PERMISSION_CODES.MARKET_GOODS_APPROVE,
   PERMISSION_CODES.MARKET_ORDER_REFUND,
 ];

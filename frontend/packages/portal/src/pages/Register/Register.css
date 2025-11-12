@@ -1,202 +1,486 @@
 /**
- * 注册页面样式 - 让注册变得轻松愉快！🎨
+ * 注册页面样式 - 让注册变得赏心悦目！🎨
  * @author BaSui 😎
- * @updated 2025-11-01 - 优化配色与布局（参考设计稿）
+ * @updated 2025-11-08 - 添加华丽动画和卡片效果
  */
 
 .register-page {
-  /* 🎨 不需要额外背景，使用外层 AuthLayout 的背景 */
+  /* 🎨 使用外层 AuthLayout 的背景 */
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  position: relative;
+}
+
+/* 装饰性浮动元素 */
+.register-page::before,
+.register-page::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: float-decoration 15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.register-page::before {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  top: 10%;
+  left: 5%;
+  animation-delay: 0s;
+}
+
+.register-page::after {
+  width: 350px;
+  height: 350px;
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  bottom: 10%;
+  right: 5%;
+  animation-delay: 7s;
+}
+
+@keyframes float-decoration {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-30px, 30px) scale(0.9);
+  }
 }
 
 .register-container {
   display: flex;
   width: 100%;
-  /* 📐 合理宽度 - 从 1200px → 950px，更紧凑 */
-  max-width: 950px;
-  min-height: 600px;
-  background: #ffffff;
-  border-radius: 16px;
-  /* 🎨 柔和阴影 - 适配深色背景 */
+  max-width: 920px;
+  min-height: 580px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px) saturate(180%);
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.3),
-    0 20px 80px rgba(0, 0, 0, 0.2);
+    0 20px 60px rgba(0, 0, 0, 0.25),
+    0 0 100px rgba(102, 126, 234, 0.1),
+    0 0 1px 0 rgba(255, 255, 255, 0.8) inset;
   overflow: hidden;
   position: relative;
-  z-index: 1;
+  z-index: 10;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: card-entrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes card-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.register-container:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.3),
+    0 0 120px rgba(102, 126, 234, 0.15),
+    0 0 1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 
 /* ==================== 左侧欢迎区域 ==================== */
 
 .register-welcome {
-  /* 📐 左侧占 35% - 给右侧表单更多空间！ */
-  flex: 0 0 35%;
-  padding: 60px 40px;
-  /* 🌸 优雅粉紫渐变 - 与参考图一致！ */
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  flex: 0 0 38%;
+  padding: 60px 45px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 200% 200%;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   position: relative;
   overflow: hidden;
+  animation: gradient-wave 8s ease infinite;
 }
 
-/* 左侧装饰圆圈 */
+@keyframes gradient-wave {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* 左侧装饰圆圈 - 增强动画 */
 .register-welcome::before {
   content: '';
   position: absolute;
-  top: -100px;
-  left: -100px;
-  width: 300px;
-  height: 300px;
-  background: rgba(255, 255, 255, 0.1);
+  top: -120px;
+  left: -120px;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
   border-radius: 50%;
+  animation: float-circle-1 12s ease-in-out infinite;
+}
+
+@keyframes float-circle-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(20px, -20px) scale(1.1);
+  }
 }
 
 .register-welcome::after {
   content: '';
   position: absolute;
-  bottom: -150px;
-  right: -150px;
-  width: 400px;
-  height: 400px;
-  background: rgba(255, 255, 255, 0.08);
+  bottom: -180px;
+  right: -180px;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
   border-radius: 50%;
+  animation: float-circle-2 15s ease-in-out infinite;
+}
+
+@keyframes float-circle-2 {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-20px, 20px) rotate(180deg);
+  }
 }
 
 .register-welcome__title {
-  font-size: 36px;
-  font-weight: bold;
-  margin: 0 0 10px 0;
+  font-size: 38px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
   line-height: 1.2;
   position: relative;
   z-index: 1;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  letter-spacing: 1px;
+  animation: fade-in-left 0.8s ease-out 0.2s both;
+}
+
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .register-welcome__subtitle {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 300;
-  margin: 0 0 30px 0;
+  margin: 0 0 35px 0;
   opacity: 0.95;
   position: relative;
   z-index: 1;
+  letter-spacing: 2px;
+  animation: fade-in-left 0.8s ease-out 0.4s both;
 }
 
 .register-welcome__desc {
   font-size: 16px;
-  line-height: 1.8;
-  opacity: 0.9;
+  line-height: 1.9;
+  opacity: 0.92;
   position: relative;
   z-index: 1;
+  animation: fade-in-left 0.8s ease-out 0.6s both;
 }
 
 /* ==================== 右侧注册表单 ==================== */
 
-.register-form {
-  /* 📐 右侧占 65% - 更宽敞的表单空间！ */
-  flex: 0 0 65%;
-  padding: 45px 60px;
+.register-card {
+  flex: 0 0 62%;
+  padding: 55px 65px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.98);
+  animation: fade-in-right 0.8s ease-out 0.3s both;
   max-height: 100vh;
   overflow-y: auto;
-  background: #ffffff;
 }
 
-.register-form__title {
-  font-size: 32px;
-  font-weight: bold;
+@keyframes fade-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==================== 头部 ==================== */
+.register-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.register-title {
+  font-size: 34px;
+  font-weight: 700;
   color: #262626;
-  margin: 0 0 8px 0;
-  /* 🎯 添加渐变文字效果 */
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  margin: 0 0 10px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: 1.5px;
+  animation: title-shimmer 3s ease-in-out infinite;
 }
 
-.register-form__subtitle {
-  font-size: 14px;
+@keyframes title-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.register-subtitle {
+  font-size: 15px;
   color: #8c8c8c;
-  margin: 0 0 32px 0;
+  margin: 0;
+  font-weight: 400;
 }
 
-/* 表单错误提示 */
-.register-form__error {
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  background: #fff1f0;
-  border: 1px solid #ffa39e;
-  border-radius: 4px;
-  color: #cf1322;
-  font-size: 14px;
-  line-height: 1.5;
+/* ==================== 标签切换 ==================== */
+.register-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  padding: 6px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+  border-radius: 12px;
+  border: 2px solid rgba(102, 126, 234, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.08);
 }
 
-/* 表单字段 */
-.register-form__field {
-  margin-bottom: 18px;
+.register-tab {
+  flex: 1;
+  padding: 14px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: #666;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.register-form__label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: #262626;
-  margin-bottom: 8px;
+.register-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
 }
 
-.register-form__field-error {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #ff4d4f;
+.register-tab:hover {
+  color: #667eea;
+  transform: translateY(-2px);
 }
 
-/* 验证码输入区域 */
-.register-form__code-input {
+.register-tab.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  box-shadow:
+    0 6px 20px rgba(102, 126, 234, 0.35),
+    0 0 20px rgba(102, 126, 234, 0.2) inset;
+  transform: translateY(-2px);
+}
+
+.register-tab.active::before {
+  opacity: 1;
+}
+
+/* ==================== 表单 ==================== */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fade-in-up 0.6s ease-out;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-field-error {
+  font-size: 13px;
+  color: #f5222d;
+  padding-left: 4px;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.form-submit-error {
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(255, 77, 79, 0.08), rgba(245, 34, 45, 0.08));
+  border: 2px solid rgba(255, 77, 79, 0.3);
+  border-radius: 10px;
+  color: #f5222d;
+  font-size: 15px;
+  text-align: center;
+  animation: shake 0.5s;
+  box-shadow: 0 4px 12px rgba(245, 34, 45, 0.15);
+}
+
+/* ==================== 验证码字段 ==================== */
+.verification-code-field {
   display: flex;
   gap: 10px;
-  align-items: flex-start;
 }
 
-.register-form__code-input > div {
+.verification-code-field > div {
   flex: 1;
 }
 
-.register-form__code-button {
-  flex-shrink: 0;
-  min-width: 120px;
+.send-code-btn {
+  padding: 0 24px;
+  height: 48px;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+  position: relative;
+  overflow: hidden;
 }
 
-/* 页脚 */
-.register-form__footer {
-  margin-top: 24px;
+.send-code-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.send-code-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.45);
+  background-position: 100% 50%;
+}
+
+.send-code-btn:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+.send-code-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.send-code-btn:disabled {
+  background: linear-gradient(135deg, #d9d9d9, #bfbfbf);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ==================== 底部链接 ==================== */
+.register-footer {
+  margin-top: 28px;
   text-align: center;
-  font-size: 14px;
-  color: #8c8c8c;
+  font-size: 15px;
+  color: #666;
 }
 
-.register-form__link {
-  font-size: 14px;
-  color: #1890ff;
+.register-footer-link {
+  color: #667eea;
   text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.register-form__link:hover {
-  color: #40a9ff;
-  text-decoration: underline;
-}
-
-.register-form__footer .register-form__link {
+  font-weight: 600;
   margin-left: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+}
+
+.register-footer-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+.register-footer-link:hover {
+  color: #764ba2;
+}
+
+.register-footer-link:hover::after {
+  width: 100%;
 }
 
 /* ==================== 响应式适配 ==================== */
@@ -205,10 +489,18 @@
   .register-container {
     flex-direction: column;
     max-width: 450px;
+    border-radius: 16px;
   }
 
+  /* 移动端左侧区域缩小 */
   .register-welcome {
     padding: 40px 30px;
+    min-height: auto;
+  }
+
+  .register-welcome::before,
+  .register-welcome::after {
+    display: none; /* 移动端隐藏装饰圆圈 */
   }
 
   .register-welcome__title {
@@ -217,27 +509,23 @@
 
   .register-welcome__subtitle {
     font-size: 16px;
+    margin-bottom: 20px;
   }
 
   .register-welcome__desc {
     font-size: 14px;
   }
 
-  .register-form {
+  .register-card {
     padding: 40px 30px;
-    max-height: none;
   }
 
-  .register-form__title {
-    font-size: 24px;
+  .register-title {
+    font-size: 28px;
   }
 
-  .register-form__code-input {
-    flex-direction: column;
-  }
-
-  .register-form__code-button {
-    width: 100%;
+  .register-tabs {
+    flex-direction: row; /* 平板继续横向排列 */
   }
 }
 
@@ -246,15 +534,182 @@
     padding: 10px;
   }
 
+  .register-page::before {
+    display: none; /* 移动端隐藏背景动画 */
+  }
+
+  .register-container {
+    border-radius: 12px;
+  }
+
   .register-welcome {
     padding: 30px 20px;
   }
 
-  .register-form {
+  .register-welcome__title {
+    font-size: 24px;
+  }
+
+  .register-welcome__subtitle {
+    font-size: 14px;
+  }
+
+  .register-welcome__desc {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .register-card {
     padding: 30px 20px;
   }
 
-  .register-form__title {
-    font-size: 22px;
+  .register-title {
+    font-size: 24px;
+  }
+
+  .register-tabs {
+    flex-direction: column; /* 小屏幕纵向排列 */
+  }
+
+  .form-field {
+    margin-bottom: 16px;
+  }
+
+  .verification-code-field {
+    flex-direction: column;
+  }
+
+  .send-code-btn {
+    width: 100%;
+  }
+}
+
+/* ==================== 增强样式 - 在原有基础上添加 ==================== */
+
+/* 输入框增强 */
+.register-form input,
+.register-form textarea {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 10px;
+}
+
+.register-form input:hover,
+.register-form textarea:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.register-form input:focus,
+.register-form textarea:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 20px rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 标签增强 */
+.form-field label {
+  font-weight: 600;
+  color: #262626;
+  transition: color 0.3s ease;
+}
+
+.form-field:focus-within label {
+  color: #667eea;
+}
+
+/* ==================== 实时校验状态样式 ==================== */
+
+/* 输入框容器（带状态图标） */
+.input-with-status {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* 校验状态图标容器 */
+.validation-status {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Loading 状态 */
+.status-loading {
+  font-size: 18px;
+  animation: rotate-loading 1s linear infinite;
+}
+
+@keyframes rotate-loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 成功状态 */
+.status-success {
+  font-size: 18px;
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 错误状态 */
+.status-error {
+  font-size: 18px;
+  animation: shake-error 0.5s;
+}
+
+@keyframes shake-error {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+/* 成功提示文字 */
+.form-field-success {
+  font-size: 13px;
+  color: #52c41a;
+  padding-left: 4px;
+  animation: fade-in-success 0.5s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@keyframes fade-in-success {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

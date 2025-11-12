@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.UpdatePasswordRequest;
 import com.campus.marketplace.common.dto.request.UpdateProfileRequest;
 import com.campus.marketplace.common.dto.response.UserProfileResponse;
@@ -60,7 +59,7 @@ class UserControllerTest {
                 .build();
         when(userService.getCurrentUserProfile()).thenReturn(profile);
 
-        mockMvc.perform(get("/api/users/profile"))
+        mockMvc.perform(get("/users/profile"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.username").value("alice"));
@@ -71,7 +70,7 @@ class UserControllerTest {
     @Test
     @DisplayName("未登录访问个人资料被拒绝")
     void getCurrentUserProfile_forbidden() throws Exception {
-        mockMvc.perform(get("/api/users/profile"))
+        mockMvc.perform(get("/users/profile"))
                 .andExpect(status().isForbidden());
 
         verify(userService, never()).getCurrentUserProfile();
@@ -87,7 +86,7 @@ class UserControllerTest {
                 .build();
         when(userService.getUserProfile(2L)).thenReturn(profile);
 
-        mockMvc.perform(get("/api/users/{userId}", 2L))
+        mockMvc.perform(get("/users/{userId}", 2L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.username").value("bob"));
@@ -100,13 +99,15 @@ class UserControllerTest {
     @WithMockUser(username = "alice")
     void updateProfile_success() throws Exception {
         UpdateProfileRequest request = new UpdateProfileRequest(
+                "小明",
+                "热爱生活，喜欢交友",
                 "alice@example.com",
                 "13812345678",
                 "20240001",
                 "https://cdn.example.com/avatar.png"
         );
 
-        mockMvc.perform(put("/api/users/profile")
+        mockMvc.perform(put("/users/profile")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(status().isOk())
@@ -120,13 +121,15 @@ class UserControllerTest {
     @DisplayName("未登录更新资料被拒绝")
     void updateProfile_forbidden() throws Exception {
         UpdateProfileRequest request = new UpdateProfileRequest(
+                "小明",
+                "热爱生活，喜欢交友",
                 "alice@example.com",
                 "13812345678",
                 "20240001",
                 "https://cdn.example.com/avatar.png"
         );
 
-        mockMvc.perform(put("/api/users/profile")
+        mockMvc.perform(put("/users/profile")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(status().isForbidden());
@@ -140,7 +143,7 @@ class UserControllerTest {
     void updatePassword_success() throws Exception {
         UpdatePasswordRequest request = new UpdatePasswordRequest("OldPass#123", "NewPass#456");
 
-        mockMvc.perform(put("/api/users/password")
+        mockMvc.perform(put("/users/password")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(status().isOk())
@@ -155,7 +158,7 @@ class UserControllerTest {
     void updatePassword_forbidden() throws Exception {
         UpdatePasswordRequest request = new UpdatePasswordRequest("OldPass#123", "NewPass#456");
 
-        mockMvc.perform(put("/api/users/password")
+        mockMvc.perform(put("/users/password")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsBytes(request)))
                 .andExpect(status().isForbidden());

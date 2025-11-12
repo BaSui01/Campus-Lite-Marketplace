@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input, Button, Tabs } from '@campus/shared/components';
 import { SliderCaptcha } from '../../components/SliderCaptcha';
 import { authService } from '@campus/shared/services/auth';
+import { encryptPassword } from '@campus/shared/utils';
 import type { ResetPasswordByEmailRequest, ResetPasswordBySmsRequest } from '@campus/shared/api/models';
 import './ForgotPassword.css';
 
@@ -206,13 +207,32 @@ const ForgotPassword: React.FC = () => {
     setLoading(true);
 
     try {
-      // 2. 调用真实后端 API
+      // 2. 🔐 加密新密码（防止明文传输）
+      let encryptedPassword: string;
+      try {
+        const plainPassword = resetMethod === 'email' ? emailData.newPassword : phoneData.newPassword;
+        encryptedPassword = encryptPassword(plainPassword);
+        console.log('[ForgotPassword] 🔐 密码已加密');
+      } catch (error) {
+        console.error('[ForgotPassword] ❌ 密码加密失败:', error);
+        setErrors({ form: '密码加密失败，请重试！' });
+        setLoading(false);
+        return;
+      }
+
+      // 3. 调用真实后端 API
       if (resetMethod === 'email') {
-        console.log('[ForgotPassword] 🚀 调用邮箱重置密码接口:', emailData);
-        await authService.resetPasswordByEmail(emailData);
+        console.log('[ForgotPassword] 🚀 调用邮箱重置密码接口');
+        await authService.resetPasswordByEmail({
+          ...emailData,
+          newPassword: encryptedPassword,
+        });
       } else {
-        console.log('[ForgotPassword] 🚀 调用手机号重置密码接口:', phoneData);
-        await authService.resetPasswordBySms(phoneData);
+        console.log('[ForgotPassword] 🚀 调用手机号重置密码接口');
+        await authService.resetPasswordBySms({
+          ...phoneData,
+          newPassword: encryptedPassword,
+        });
       }
 
       console.log('[ForgotPassword] ✅ 重置密码成功！');

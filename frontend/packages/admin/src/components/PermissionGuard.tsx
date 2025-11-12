@@ -5,7 +5,8 @@
  */
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Result, Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { usePermission } from '@/hooks';
 
 interface PermissionGuardProps {
@@ -21,8 +22,9 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   permissions,
   requireAll = false,
   children,
-  fallback = <Navigate to="/admin/dashboard" replace />,
+  fallback,
 }) => {
+  const navigate = useNavigate();
   const { hasPermission, hasAnyPermission, hasAllPermissions } = usePermission();
 
   let hasAccess = true;
@@ -30,10 +32,34 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   if (permission) {
     hasAccess = hasPermission(permission);
   } else if (permissions && permissions.length > 0) {
-    hasAccess = requireAll 
+    hasAccess = requireAll
       ? hasAllPermissions(permissions)
       : hasAnyPermission(permissions);
   }
 
-  return <>{hasAccess ? children : fallback}</>;
+  // 如果有权限，直接渲染子组件
+  if (hasAccess) {
+    return <>{children}</>;
+  }
+
+  // 如果提供了自定义 fallback，使用它
+  if (fallback) {
+    return <>{fallback}</>;
+  }
+
+  // 默认显示无权限提示页面
+  return (
+    <div style={{ padding: '48px' }}>
+      <Result
+        status="403"
+        title="无权限访问"
+        subTitle="抱歉，您没有权限访问此页面。请联系管理员获取相应权限。"
+        extra={
+          <Button type="primary" onClick={() => navigate('/admin/dashboard')}>
+            返回首页
+          </Button>
+        }
+      />
+    </div>
+  );
 };

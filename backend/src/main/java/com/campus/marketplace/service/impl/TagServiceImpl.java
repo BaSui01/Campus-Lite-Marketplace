@@ -4,6 +4,7 @@ import com.campus.marketplace.common.dto.request.CreateTagRequest;
 import com.campus.marketplace.common.dto.request.MergeTagRequest;
 import com.campus.marketplace.common.dto.request.UpdateTagRequest;
 import com.campus.marketplace.common.dto.response.TagResponse;
+import com.campus.marketplace.common.dto.response.TagStatisticsResponse;
 import com.campus.marketplace.common.entity.GoodsTag;
 import com.campus.marketplace.common.entity.Tag;
 import com.campus.marketplace.common.exception.BusinessException;
@@ -83,7 +84,7 @@ public class TagServiceImpl implements TagService {
 
         long bindingCount = goodsTagRepository.countByTagId(id);
         if (bindingCount > 0) {
-            throw new BusinessException(ErrorCode.OPERATION_FAILED, "仍有商品绑定该标签，无法删除");
+            throw new BusinessException(ErrorCode.OPERATION_FAILED, "仍有商品绑定该标签,无法删除");
         }
 
         tagRepository.delete(tag);
@@ -125,6 +126,96 @@ public class TagServiceImpl implements TagService {
                 .map(this::toResponse)
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<TagResponse> listTags(String keyword, Boolean enabled, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Tag> tagPage;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            tagPage = tagRepository.findByNameContainingIgnoreCase(keyword.trim(), pageable);
+        } else if (enabled != null) {
+            tagPage = tagRepository.findByEnabled(enabled, pageable);
+        } else {
+            tagPage = tagRepository.findAll(pageable);
+        }
+
+        return tagPage.map(this::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TagStatisticsResponse> getHotTags(int limit) {
+        List<Object[]> results = goodsTagRepository.findTopTagsByUsageCount(org.springframework.data.domain.PageRequest.of(0, limit));
+        return results.stream()
+                .map(row -> {
+                    Long tagId = (Long) row[0];
+                    Long count = (Long) row[1];
+                    Tag tag = tagRepository.findById(tagId).orElse(null);
+                    if (tag == null) return null;
+                    return TagStatisticsResponse.builder()
+                            .tagId(tagId)
+                            .tagName(tag.getName())
+                            .goodsCount(count)
+                            .enabled(tag.getEnabled())
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    // 🎯 BaSui 新增方法实现（标签管理扩展）
+
+    @Override
+    @Transactional(readOnly = true)
+    public Tag getById(Long id) {
+        return tagRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TAG_NOT_FOUND, "标签不存在"));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void toggleEnabled(Long id) {
+        Tag tag = getById(id);
+        tag.setEnabled(!tag.getEnabled());
+        tagRepository.save(tag);
+        log.info("切换标签启用状态成功 tagId={}, enabled={}", id, tag.getEnabled());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int batchDelete(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        int successCount = 0;
+        for (Long id : ids) {
+            try {
+                deleteTag(id);
+                successCount++;
+            } catch (BusinessException e) {
+                log.warn("批量删除标签失败: tagId={}, error={}", id, e.getMessage());
+            }
+        }
+        return successCount;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TagStatisticsResponse getStatistics(Long id) {
+        Tag tag = getById(id);
+        long goodsCount = goodsTagRepository.countByTagId(id);
+
+        return TagStatisticsResponse.builder()
+                .tagId(id)
+                .tagName(tag.getName())
+                .goodsCount(goodsCount)
+                .enabled(tag.getEnabled())
+                .build();
+    }
+
+    // 🔧 私有辅助方法
 
     private String normalizeName(String name) {
         return name.trim();

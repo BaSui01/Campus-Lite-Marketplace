@@ -27,7 +27,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/disputes/arbitrations")
+@RequestMapping("/disputes/arbitrations")
 @RequiredArgsConstructor
 @Tag(name = "纠纷仲裁", description = "仲裁员分配、仲裁决定与执行")
 public class DisputeArbitrationController {

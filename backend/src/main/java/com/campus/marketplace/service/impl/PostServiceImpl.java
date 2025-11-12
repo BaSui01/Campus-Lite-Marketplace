@@ -3,6 +3,8 @@ package com.campus.marketplace.service.impl;
 import com.campus.marketplace.common.dto.request.CreatePostRequest;
 import com.campus.marketplace.common.dto.response.PostResponse;
 import com.campus.marketplace.common.entity.Post;
+import com.campus.marketplace.common.entity.PostTag;
+import com.campus.marketplace.common.entity.Tag;
 import com.campus.marketplace.common.entity.User;
 import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
@@ -11,8 +13,16 @@ import com.campus.marketplace.common.security.PermissionCodes;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.common.utils.SensitiveWordFilter;
 import com.campus.marketplace.repository.PostRepository;
+import com.campus.marketplace.repository.PostTagRepository;
+import com.campus.marketplace.repository.TagRepository;
 import com.campus.marketplace.repository.UserRepository;
 import com.campus.marketplace.service.PostService;
+import com.campus.marketplace.repository.UserFollowRepository;
+import com.campus.marketplace.repository.UserFeedRepository;
+import com.campus.marketplace.common.entity.UserFollow;
+import com.campus.marketplace.common.entity.UserFeed;
+import com.campus.marketplace.common.enums.FeedType;
+import com.campus.marketplace.common.enums.TargetType;
 import com.campus.marketplace.service.MessageService;
 import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.dto.request.UpdatePostRequest;
@@ -26,7 +36,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.springframework.data.domain.PageImpl;
 
 /**
  * 帖子服务实现类
@@ -43,11 +59,17 @@ import java.util.concurrent.TimeUnit;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final PostTagRepository postTagRepository;
+    private final TagRepository tagRepository;
     private final UserRepository userRepository;
+    private final com.campus.marketplace.repository.PostLikeRepository postLikeRepository;
+    private final com.campus.marketplace.repository.PostCollectRepository postCollectRepository;
     private final SensitiveWordFilter sensitiveWordFilter;
     private final com.campus.marketplace.service.ComplianceService complianceService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final MessageService messageService;
+    private final UserFollowRepository userFollowRepository;
+    private final UserFeedRepository userFeedRepository;
 
     /**
      * 每日发帖限制（可配置化）
@@ -82,35 +104,52 @@ public class PostServiceImpl implements PostService {
             throw new BusinessException(ErrorCode.POST_LIMIT_EXCEEDED);
         }
 
-        // 3. 文本合规
+        // 3. 文本合规模块：命中 BLOCK 直接拒绝；命中 REVIEW 进入待审；均未命中则自动通过
         String filteredTitle;
         String filteredContent;
+        GoodsStatus initStatus = GoodsStatus.APPROVED; // 默认自动通过
         if (complianceService != null) {
             var titleMod = complianceService.moderateText(request.title(), "POST_TITLE");
             var contentMod = complianceService.moderateText(request.content(), "POST_CONTENT");
-            if (titleMod.hit() && titleMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK
-                    || contentMod.hit() && contentMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK) {
+
+            // 任一 BLOCK → 拒绝发布
+            boolean block = (titleMod.hit() && titleMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK)
+                    || (contentMod.hit() && contentMod.action() == com.campus.marketplace.common.enums.ComplianceAction.BLOCK);
+            if (block) {
                 throw new com.campus.marketplace.common.exception.BusinessException(
                         com.campus.marketplace.common.exception.ErrorCode.INVALID_PARAM, "包含敏感词，请修改后再发布");
             }
+
+            // 任一 REVIEW → 待审核；否则自动通过
+            boolean review = (titleMod.hit() && titleMod.action() == com.campus.marketplace.common.enums.ComplianceAction.REVIEW)
+                    || (contentMod.hit() && contentMod.action() == com.campus.marketplace.common.enums.ComplianceAction.REVIEW);
+            if (review) {
+                initStatus = GoodsStatus.PENDING;
+            }
+
             filteredTitle = titleMod.filteredText();
             filteredContent = contentMod.filteredText();
         } else {
+            boolean titleHas = sensitiveWordFilter.contains(request.title());
+            boolean contentHas = sensitiveWordFilter.contains(request.content());
+            if (titleHas || contentHas) {
+                initStatus = GoodsStatus.PENDING; // 命中敏感词 → 待审核
+            }
             filteredTitle = sensitiveWordFilter.filter(request.title());
             filteredContent = sensitiveWordFilter.filter(request.content());
         }
 
-        // 4. 创建帖子
+        // 4. 创建帖子（图片合规可能将状态降级为待审）
         Post post = Post.builder()
                 .title(filteredTitle)
                 .content(filteredContent)
                 .authorId(user.getId())
                 .campusId(user.getCampusId())
-                .status(GoodsStatus.PENDING) // 默认待审核；命中REVIEW保持待审核
+                .status(initStatus)
                 .viewCount(0)
                 .replyCount(0)
-                .images(request.images() != null && !request.images().isEmpty() 
-                        ? request.images().toArray(new String[0]) 
+                .images(request.images() != null && !request.images().isEmpty()
+                        ? request.images().toArray(new String[0])
                         : null)
                 .build();
 
@@ -121,11 +160,15 @@ public class PostServiceImpl implements PostService {
                 throw new com.campus.marketplace.common.exception.BusinessException(
                         com.campus.marketplace.common.exception.ErrorCode.INVALID_PARAM, "图片未通过安全检测");
             }
-            // REVIEW 情况保留 PENDING 状态
+            // 图片 REVIEW → 将状态降级为待审
+            if (imgRes.action() == com.campus.marketplace.service.ComplianceService.ImageAction.REVIEW) {
+                post.setStatus(GoodsStatus.PENDING);
+            }
         }
 
         // 5. 保存帖子
         postRepository.save(post);
+        syncPostTags(post.getId(), request.tagIds());
 
         // 6. 更新 Redis 发帖计数（+1）
         redisTemplate.opsForValue().increment(limitKey, 1L);
@@ -133,6 +176,25 @@ public class PostServiceImpl implements PostService {
         redisTemplate.expire(limitKey, 1, TimeUnit.DAYS);
 
         log.info("帖子发布成功: postId={}, authorId={}, title={}", post.getId(), user.getId(), post.getTitle());
+
+        // 7. 生成用户动态：推送给作者的粉丝（targetType=POST）
+        try {
+            List<UserFollow> followers = userFollowRepository.findByFollowingId(user.getId());
+            if (!followers.isEmpty()) {
+                List<UserFeed> feeds = followers.stream().map(f -> UserFeed.builder()
+                        .userId(f.getFollowerId())
+                        .actorId(user.getId())
+                        .feedType(FeedType.POST)
+                        .targetType(TargetType.POST)
+                        .targetId(post.getId())
+                        .build()
+                ).collect(Collectors.toList());
+                userFeedRepository.saveAll(feeds);
+                log.info("已为粉丝生成发帖动态: postId={}, 粉丝数={}", post.getId(), feeds.size());
+            }
+        } catch (Exception e) {
+            log.error("生成用户动态失败（发帖）: postId={}, authorId={}", post.getId(), user.getId(), e);
+        }
 
         return post.getId();
     }
@@ -329,6 +391,7 @@ public class PostServiceImpl implements PostService {
         }
 
         postRepository.save(post);
+        syncPostTags(post.getId(), request.tagIds());
         log.info("帖子修改成功: postId={}, resetToPending={}", id, contentChanged);
     }
 
@@ -345,5 +408,217 @@ public class PostServiceImpl implements PostService {
                 log.warn("增加浏览量失败: postId={}, error={}", post.getId(), e.getMessage());
             }
         });
+    }
+
+    /**
+     * 同步帖子标签
+     *
+     * @param postId 帖子ID
+     * @param tagIds 标签ID列表
+     * @author BaSui 😎
+     */
+    private void syncPostTags(Long postId, List<Long> tagIds) {
+        // 1. 先删除旧关联
+        postTagRepository.deleteByPostId(postId);
+
+        // 2. 如果标签列表为空，直接返回
+        if (tagIds == null || tagIds.isEmpty()) {
+            return;
+        }
+
+        // 3. 去重并过滤空值
+        List<Long> distinct = tagIds.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 4. 校验标签数量限制
+        if (distinct.size() > 10) {
+            throw new BusinessException(ErrorCode.INVALID_PARAMETER, "最多绑定 10 个标签");
+        }
+
+        // 5. 校验标签是否存在
+        List<Tag> tags = StreamSupport.stream(
+                        tagRepository.findAllById(distinct).spliterator(), false)
+                .toList();
+
+        if (tags.size() != distinct.size()) {
+            throw new BusinessException(ErrorCode.TAG_NOT_FOUND, "存在已失效的标签");
+        }
+
+        // 6. 校验标签是否被禁用
+        tags.forEach(tag -> {
+            if (Boolean.FALSE.equals(tag.getEnabled())) {
+                throw new BusinessException(ErrorCode.OPERATION_FAILED, "标签已被禁用: " + tag.getName());
+            }
+        });
+
+        // 7. 创建新关联
+        distinct.forEach(tagId -> postTagRepository.save(
+                PostTag.builder().postId(postId).tagId(tagId).build()
+        ));
+
+        log.info("帖子标签同步成功: postId=, tagIds={}", postId, distinct);
+    }
+
+    // ==================== 新增方法实现（2025-11-09 - BaSui 😎）====================
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> listPendingPosts(int page, int size) {
+        log.info("查询待审核帖子列表: page={}, size={}", page, size);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Post> posts = postRepository.findByStatus(GoodsStatus.PENDING, pageable);
+
+        return posts.map(PostResponse::fromWithAuthor);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> listHotPosts(int page, int size) {
+        log.info("查询热门帖子列表: page={}, size={}", page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postRepository.findHotPostsWithAuthor(GoodsStatus.APPROVED, pageable);
+
+        return posts.map(PostResponse::fromWithAuthor);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> listUserLikes(Long userId, int page, int size) {
+        log.info("查询用户点赞列表: userId={}, page={}, size={}", userId, page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Long> postIds = postRepository.findLikedPostIdsByUserId(userId, pageable);
+
+        if (postIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // 查询帖子详情（保持点赞顺序）
+        List<Post> posts = postRepository.findByIdInWithAuthor(postIds.getContent());
+        Map<Long, Post> postMap = posts.stream().collect(Collectors.toMap(Post::getId, p -> p));
+
+        // 按点赞顺序排列
+        List<PostResponse> responses = postIds.getContent().stream()
+                .map(postMap::get)
+                .filter(Objects::nonNull)
+                .map(PostResponse::fromWithAuthor)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, postIds.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> listUserCollects(Long userId, int page, int size) {
+        log.info("查询用户收藏列表: userId={}, page={}, size={}", userId, page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Long> postIds = postRepository.findCollectedPostIdsByUserId(userId, pageable);
+
+        if (postIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // 查询帖子详情（保持收藏顺序）
+        List<Post> posts = postRepository.findByIdInWithAuthor(postIds.getContent());
+        Map<Long, Post> postMap = posts.stream().collect(Collectors.toMap(Post::getId, p -> p));
+
+        // 按收藏顺序排列
+        List<PostResponse> responses = postIds.getContent().stream()
+                .map(postMap::get)
+                .filter(Objects::nonNull)
+                .map(PostResponse::fromWithAuthor)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, postIds.getTotalElements());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void toggleTopPost(Long id, boolean isTop) {
+        log.info("置顶/取消置顶帖子: postId={}, isTop={}", id, isTop);
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        post.setIsTop(isTop);
+        postRepository.save(post);
+
+        log.info("帖子置顶状态更新成功: postId={}, isTop={}", id, isTop);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int batchApprovePosts(List<Long> ids, boolean approved, String reason) {
+        log.info("批量审核帖子: ids={}, approved={}, reason={}", ids, approved, reason);
+
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+
+        int successCount = 0;
+        for (Long id : ids) {
+            try {
+                approvePost(id, approved, reason);
+                successCount++;
+            } catch (Exception e) {
+                log.warn("批量审核失败: postId={}, error={}", id, e.getMessage());
+            }
+        }
+
+        log.info("批量审核完成: total={}, success={}", ids.size(), successCount);
+        return successCount;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public com.campus.marketplace.common.dto.response.PostStatsResponse getPostStats(Long id) {
+        log.info("获取帖子统计信息: postId={}", id);
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        // 查询点赞用户（最多10个）
+        List<com.campus.marketplace.common.dto.response.PostStatsResponse.UserBriefInfo> likeUsers =
+                postLikeRepository.findByPostId(id).stream()
+                        .limit(10)
+                        .map(like -> {
+                            User user = like.getUser();
+                            return com.campus.marketplace.common.dto.response.PostStatsResponse.UserBriefInfo.builder()
+                                    .userId(user.getId())
+                                    .username(user.getUsername())
+                                    .avatar(user.getAvatar())
+                                    .build();
+                        })
+                        .collect(Collectors.toList());
+
+        // 查询收藏用户（最多10个）
+        List<com.campus.marketplace.common.dto.response.PostStatsResponse.UserBriefInfo> collectUsers =
+                postCollectRepository.findByPostId(id).stream()
+                        .limit(10)
+                        .map(collect -> {
+                            User user = collect.getUser();
+                            return com.campus.marketplace.common.dto.response.PostStatsResponse.UserBriefInfo.builder()
+                                    .userId(user.getId())
+                                    .username(user.getUsername())
+                                    .avatar(user.getAvatar())
+                                    .build();
+                        })
+                        .collect(Collectors.toList());
+
+        return com.campus.marketplace.common.dto.response.PostStatsResponse.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .viewCount(post.getViewCount())
+                .replyCount(post.getReplyCount())
+                .likeCount(post.getLikeCount())
+                .collectCount(post.getCollectCount())
+                .likeUsers(likeUsers)
+                .collectUsers(collectUsers)
+                .build();
     }
 }

@@ -1,9 +1,13 @@
 spring:
   application:
     name: ${APP_NAME:campus-marketplace}
-  
+
   profiles:
     active: ${APP_ENV:${SPRING_PROFILES_ACTIVE:dev}}
+
+  # ✅ BaSui: spring-dotenv 配置 - 加载项目根目录的 .env 文件
+  config:
+    import: optional:file:.env[.properties]
   
   # 数据源配置
   datasource:
@@ -21,6 +25,10 @@ spring:
   
   # JPA 配置
   jpa:
+    # 禁用 OpenEntityManagerInView（避免懒加载问题和性能问题）
+    open-in-view: ${JPA_OPEN_IN_VIEW:false}
+    # 🔧 显式指定 PostgreSQL 方言，避免 LIKE 查询类型转换错误
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       # 临时禁用schema validation，允许应用启动（存在实体类与数据库Schema不匹配问题）
       ddl-auto: ${JPA_DDL_AUTO:none}
@@ -65,9 +73,6 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DATABASE:0}
-      # 使用 Redisson 的独立配置文件，避免误触发哨兵模式
-      redisson:
-        file: classpath:redisson.yaml
       lettuce:
         pool:
           max-active: ${REDIS_POOL_MAX_ACTIVE:50}
@@ -76,11 +81,6 @@ spring:
           max-wait: 3000ms
       repositories:
         enabled: false
-
-  # 供 Redisson Starter 读取的旧前缀（与 Spring Boot 3 兼容）
-  redis:
-    redisson:
-      file: classpath:redisson.yaml
   
   # 文件上传配置
   servlet:
@@ -88,6 +88,15 @@ spring:
       max-file-size: ${FILE_MAX_SIZE:5MB}
       max-request-size: ${FILE_MAX_REQUEST_SIZE:10MB}
       enabled: ${FILE_UPLOAD_ENABLED:true}
+
+  # MVC 配置 - 静态资源路径模式
+  # ✅ BaSui: 已删除 static-path-pattern 配置，使用默认值 /**
+  # 静态资源映射由 WebMvcConfig.addResourceHandlers() 统一管理
+
+  # 🔥 禁用 Spring Boot 默认静态资源自动配置（关键修复！）
+  web:
+    resources:
+      add-mappings: false  # 禁用默认静态资源映射，避免与 API 路由冲突
 
   # 邮件配置（使用真实 SMTP）
   mail:
@@ -108,8 +117,9 @@ spring:
 
 # JWT 配置
 jwt:
-  secret: ${JWT_SECRET:5bwzFhN2dpPiac1wgPaFgb5iu_lEB5JrSxZqv-WIOwRiE_dQOE-fMFxy24-iOXgWm1NxybaJMrkbCXG9mY0a4Q}
-  expiration: ${JWT_EXPIRATION:7200000}
+  secret: ${JWT_SECRET:9K2X7pRhqJYbkbs8pNgEUpNLefMRNOySx2dWFOBxr-sTVZq_nb191fPLvLNaLUN3jkUumjU70TlhQTt5SQOQJA}
+  expiration: ${JWT_EXPIRATION:900000}  # Access Token 过期时间（15分钟 = 900000ms）
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # Refresh Token 过期时间（7天 = 604800000ms）
   header: ${JWT_HEADER:Authorization}
   prefix: ${JWT_PREFIX:Bearer }
 
@@ -123,8 +133,8 @@ logging:
   level:
     root: ${LOG_LEVEL_ROOT:INFO}
     com.campus.marketplace: ${LOG_LEVEL_APP:DEBUG}
-    org.hibernate.SQL: ${LOG_LEVEL_SQL:DEBUG}
-    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:TRACE}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:INFO}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_BINDER:INFO}
     org.springframework.security: ${LOG_LEVEL_SPRING_SECURITY:DEBUG}
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
@@ -171,7 +181,7 @@ management:
 
 # 服务器配置
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8200}  # 修改默认端口为 8200
   servlet:
     # BaSui临时修复：直接硬编码 /api，跳过环境变量
     context-path: /api
@@ -213,7 +223,8 @@ alipay:
   charset: ${ALIPAY_CHARSET:UTF-8}
   format: ${ALIPAY_FORMAT:json}
   sign-type: ${ALIPAY_SIGN_TYPE:RSA2}
-  notify-url: ${ALIPAY_NOTIFY_URL:http://localhost:8080/api/payment/alipay/notify}
+  # 默认与本地后端端口(8200)保持一致，避免端口不一致导致 404
+  notify-url: ${ALIPAY_NOTIFY_URL:http://localhost:8200/api/payment/alipay/notify}
   return-url: ${ALIPAY_RETURN_URL:http://localhost:3000/payment/result}
 
 # 微信支付配置
@@ -250,6 +261,7 @@ app:
       user: PT15M      # 用户缓存15分钟
       "goods:list": PT5M      # 商品列表5分钟
       "goods:detail": PT30M   # 商品详情30分钟
+      "favorite:v2:list": PT10M  # 🆕 我的收藏列表缓存10分钟（用户维度，读多写少，且增删收藏会主动失效）
       category: PT1H  # 分类缓存1小时
       campus: PT1H    # 校区缓存1小时
       "notification:template": PT2H # 通知模板2小时
@@ -272,6 +284,25 @@ app:
     webhook:
       enabled: ${APP_ALERT_WEBHOOK_ENABLED:false}
       url: ${APP_ALERT_WEBHOOK_URL:}
+  # 安全配置
+  security:
+    # 密码加密密钥（AES-256，32字节，Base64编码）
+    # ⚠️ 注意：此密钥必须与前端配置保持一致
+    # 开发环境：随机生成的安全密钥
+    # 生产环境：通过环境变量 BACKEND_ENCRYPT_KEY 注入
+    encrypt-key: ${BACKEND_ENCRYPT_KEY:JMMgf1RSDLBNksxUSNKl/2q94N6cIY7voJRXqlzcCBA=}
+    # 历史密钥列表（用于密钥轮换，支持解密旧密文）
+    # 格式：逗号分隔的密钥列表
+    # 示例：old-key-1,old-key-2,old-key-3
+    legacy-keys: ${BACKEND_LEGACY_KEYS:}
+
+# 订单超时与提醒配置（可覆盖）
+order:
+  timeout:
+    minutes: ${ORDER_TIMEOUT_MINUTES:30}              # 待支付超时分钟数（默认30）
+    reminder:
+      lead-minutes: ${ORDER_TIMEOUT_REMINDER_LEAD:5}  # 超时前提醒的提前分钟数（默认5）
+      interval: ${ORDER_TIMEOUT_REMINDER_INTERVAL:600000} # 提醒任务轮询间隔，默认10分钟（毫秒）
 
 # OpenAPI/Swagger 开关
 springdoc:
@@ -360,6 +391,10 @@ spring:
       enabled: DETECT
   flyway:
     enabled: true
+  # 🔥 禁用 Spring Boot 默认静态资源自动配置（关键修复！）
+  web:
+    resources:
+      add-mappings: false  # 禁用默认静态资源映射，避免与 API 路由冲突
 app:
   cache:
     prewarm:
@@ -374,8 +409,10 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: false
+  # ✅ BaSui: 已删除 mvc.static-path-pattern 配置，使用默认值 /**
 server:
-  port: ${TEST_SERVER_PORT:${SERVER_PORT:8080}}
+  port: ${TEST_SERVER_PORT:${SERVER_PORT:8200}}  # 测试环境也使用 8200
+  # 测试环境不设置 context-path，因为测试代码中已经包含了 /api 前缀
 management:
   endpoints:
     enabled-by-default: false  # ✅ BaSui: 测试环境禁用所有 Actuator 端点
@@ -417,6 +454,10 @@ spring:
           min-idle: ${REDIS_POOL_MIN_IDLE:20}
           max-wait: 3000ms
       timeout: 3000ms
+  # 🔥 禁用 Spring Boot 默认静态资源自动配置（关键修复！）
+  web:
+    resources:
+      add-mappings: false  # 禁用默认静态资源映射，避免与 API 路由冲突
 logging:
   level:
     root: ${LOG_LEVEL_ROOT:WARN}
@@ -446,7 +487,7 @@ management:
     tags:
       environment: ${DEPLOY_ENV:prod}
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8200}  # 生产环境默认端口 8200
   servlet:
     context-path: ${APP_CONTEXT_PATH:/api}
   tomcat:

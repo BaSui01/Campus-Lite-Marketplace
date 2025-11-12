@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/reports")
 @RequiredArgsConstructor
 @Tag(name = "举报管理", description = "内容举报相关接口")
 public class ReportController {
@@ -32,7 +32,6 @@ public class ReportController {
     private final ReportService reportService;
 
     @PostMapping
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "创建举报", description = "举报违规内容")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "创建举报请求体",
@@ -69,7 +68,6 @@ public class ReportController {
     }
 
     @GetMapping("/my")
-    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "查询我的举报记录", description = "用户查询自己的举报记录")
     public ApiResponse<Page<ReportResponse>> listMyReports(
             @Parameter(description = "页码", example = "0") @RequestParam(defaultValue = "0") int page,

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
-@RequestMapping("/api/admin/compliance")
+@RequestMapping("/admin/compliance")
 @RequiredArgsConstructor
 @Tag(name = "合规管理", description = "灰度白名单与审计日志管理")
 public class ComplianceAdminController {

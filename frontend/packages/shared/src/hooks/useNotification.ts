@@ -6,7 +6,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { websocketService } from '../utils/websocket';
-import type { Notification } from '../types';
+// ✅ 使用 API 生成的类型
+import type { NotificationResponse } from '../api/models/notification-response';
+
+// 🔄 类型别名，方便使用
+type Notification = NotificationResponse;
 
 /**
  * useNotification 配置选项
@@ -167,8 +171,8 @@ export const useNotification = (
   // 最新通知
   const [lastNotification, setLastNotification] = useState<Notification | null>(null);
 
-  // 未读通知数量
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  // 未读通知数量（✅ 使用 status 字段判断，而不是 isRead）
+  const unreadCount = notifications.filter((n) => n.status === 'UNREAD').length;
 
   /**
    * 播放通知音效

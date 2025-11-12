@@ -1,0 +1,279 @@
+/**
+ * 订阅动态流页面样式 - 不错过任何心仪商品！📰
+ * @author BaSui 😎
+ * @description 时间轴风格的动态流设计
+ */
+
+.subscription-feed-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.subscription-feed-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.feed-header {
+  margin-bottom: 32px;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(9, 132, 227, 0.3);
+  position: relative;
+}
+
+.back-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(-4px);
+}
+
+.feed-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+  color: white;
+  text-align: center;
+}
+
+.feed-header__subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  text-align: center;
+}
+
+/* ==================== 内容区域 ==================== */
+
+.feed-content {
+  min-height: 400px;
+}
+
+.feed-loading {
+  padding: 20px 0;
+}
+
+/* ==================== 空状态 ==================== */
+
+.feed-empty {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.feed-empty .empty-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+}
+
+.feed-empty .empty-text {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+  color: #2d3436;
+}
+
+.feed-empty .empty-tip {
+  font-size: 16px;
+  color: #636e72;
+  margin: 0 0 16px 0;
+}
+
+.feed-empty .empty-note {
+  margin: 16px 0 24px;
+  padding: 12px;
+  background: #fff3cd;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #856404;
+  line-height: 1.6;
+  display: inline-block;
+}
+
+.feed-empty .empty-note code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+/* ==================== 时间轴 ==================== */
+
+.feed-timeline {
+  position: relative;
+  padding-left: 40px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.timeline-item:last-child .timeline-line {
+  display: none;
+}
+
+/* 时间轴节点 */
+.timeline-dot {
+  position: absolute;
+  left: -40px;
+  top: 12px;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(9, 132, 227, 0.3);
+  z-index: 2;
+}
+
+/* 时间轴线 */
+.timeline-line {
+  position: absolute;
+  left: -33px;
+  top: 28px;
+  width: 2px;
+  height: calc(100% + 32px);
+  background: #dfe6e9;
+  z-index: 1;
+}
+
+/* 时间轴内容 */
+.timeline-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.timeline-content:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.timeline-badge {
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.timeline-keyword {
+  padding: 4px 12px;
+  background: #ffeaa7;
+  color: #2d3436;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.timeline-time {
+  font-size: 13px;
+  color: #636e72;
+  margin-left: auto;
+}
+
+.timeline-goods {
+  padding: 16px;
+}
+
+/* ==================== 加载更多 ==================== */
+
+.feed-loadmore {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+/* ==================== 响应式 ==================== */
+
+@media (max-width: 768px) {
+  .subscription-feed-container {
+    padding: 0 16px;
+  }
+
+  .feed-header {
+    padding: 48px 16px 24px;
+  }
+
+  .feed-header__title {
+    font-size: 24px;
+  }
+
+  .feed-header__subtitle {
+    font-size: 14px;
+  }
+
+  .feed-timeline {
+    padding-left: 30px;
+  }
+
+  .timeline-dot {
+    left: -30px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .timeline-line {
+    left: -25px;
+  }
+
+  .timeline-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .timeline-time {
+    margin-left: 0;
+  }
+
+  .feed-empty {
+    padding: 60px 16px;
+  }
+
+  .feed-empty .empty-icon {
+    font-size: 64px;
+  }
+
+  .feed-empty .empty-text {
+    font-size: 20px;
+  }
+
+  .feed-empty .empty-tip {
+    font-size: 14px;
+  }
+}

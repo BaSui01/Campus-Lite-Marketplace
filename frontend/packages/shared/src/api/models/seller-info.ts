@@ -56,5 +56,17 @@ export interface SellerInfo {
      * @memberof SellerInfo
      */
     'email'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SellerInfo
+     */
+    'rating'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SellerInfo
+     */
+    'goodsCount'?: number;
 }
 

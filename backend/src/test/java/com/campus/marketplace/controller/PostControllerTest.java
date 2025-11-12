@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.request.CreatePostRequest;
 import com.campus.marketplace.common.dto.request.UpdatePostRequest;
 import com.campus.marketplace.common.dto.response.PostResponse;
@@ -60,11 +59,12 @@ class PostControllerTest {
         CreatePostRequest request = new CreatePostRequest(
                 "标题",
                 "帖子内容",
-                List.of("https://img1.png")
+                List.of("https://img1.png"),
+                null  // tagIds
         );
         when(postService.createPost(any(CreatePostRequest.class))).thenReturn(321L);
 
-        mockMvc.perform(post("/api/posts")
+        mockMvc.perform(post("/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -85,7 +85,7 @@ class PostControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/posts")
+        mockMvc.perform(post("/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalid))
                 .andExpect(status().isBadRequest())
@@ -101,10 +101,11 @@ class PostControllerTest {
         UpdatePostRequest request = new UpdatePostRequest(
                 "新标题",
                 "新内容",
-                List.of("https://img2.png")
+                List.of("https://img2.png"),
+                null  // tagIds
         );
 
-        mockMvc.perform(put("/api/posts/{id}", 111L)
+        mockMvc.perform(put("/posts/{id}", 111L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -126,7 +127,7 @@ class PostControllerTest {
         when(postService.listPosts(0, 20, "createdAt", "DESC"))
                 .thenReturn(new PageImpl<>(List.of(resp)));
 
-        mockMvc.perform(get("/api/posts"))
+        mockMvc.perform(get("/posts"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.content[0].id").value(201));
@@ -138,7 +139,7 @@ class PostControllerTest {
         when(postService.searchPosts("耳机", 0, 10))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/posts/search")
+        mockMvc.perform(get("/posts/search")
                         .param("keyword", "耳机")
                         .param("size", "10"))
                 .andExpect(status().isOk())
@@ -153,7 +154,7 @@ class PostControllerTest {
         when(postService.listPostsByAuthor(77L, 1, 5))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/posts/user/{authorId}", 77L)
+        mockMvc.perform(get("/posts/user/{authorId}", 77L)
                         .param("page", "1")
                         .param("size", "5"))
                 .andExpect(status().isOk())
@@ -174,7 +175,7 @@ class PostControllerTest {
                 .build();
         when(postService.getPostDetail(909L)).thenReturn(response);
 
-        mockMvc.perform(get("/api/posts/{id}", 909L))
+        mockMvc.perform(get("/posts/{id}", 909L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.id").value(909));
@@ -186,7 +187,7 @@ class PostControllerTest {
     @DisplayName("管理员审核帖子成功")
     @WithMockUser(authorities = "system:post:approve")
     void approvePost_success() throws Exception {
-        mockMvc.perform(post("/api/posts/{id}/approve", 808L)
+        mockMvc.perform(post("/posts/{id}/approve", 808L)
                         .param("approved", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
@@ -198,7 +199,7 @@ class PostControllerTest {
     @DisplayName("学生角色删除帖子成功")
     @WithMockUser(roles = "STUDENT")
     void deletePost_success() throws Exception {
-        mockMvc.perform(delete("/api/posts/{id}", 606L))
+        mockMvc.perform(delete("/posts/{id}", 606L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

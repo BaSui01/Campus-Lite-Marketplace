@@ -7,9 +7,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Input, Skeleton, Modal } from '@campus/shared/components';
+import { subscriptionService } from '../../services';;
 import { useNotificationStore } from '../../store';
-import { getApi } from '@campus/shared/utils';
-import type { SubscriptionResponse, CreateSubscriptionRequest } from '@campus/shared/api/models';
+import type { SubscriptionResponse } from '@campus/shared/api/models';
 import './Subscriptions.css';
 
 // ==================== 类型定义 ====================
@@ -32,9 +32,6 @@ const Subscriptions: React.FC = () => {
   const [campusId, setCampusId] = useState<number | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
 
-  // API 实例
-  const api = getApi();
-
   // ==================== 数据加载 ====================
 
   /**
@@ -44,12 +41,9 @@ const Subscriptions: React.FC = () => {
     setLoading(true);
 
     try {
-      // 🚀 调用真实后端 API 获取订阅列表
-      const response = await api.listSubscriptions();
-
-      if (response.data.success && response.data.data) {
-        setSubscriptions(response.data.data);
-      }
+      // ✅ 使用 subscriptionService 获取订阅列表
+      const response = await subscriptionService.listSubscriptions();
+      setSubscriptions(response);
     } catch (err: any) {
       console.error('加载订阅列表失败:', err);
       toast.error(err.response?.data?.message || '加载订阅列表失败！😭');
@@ -76,21 +70,17 @@ const Subscriptions: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const request: CreateSubscriptionRequest = {
+      // ✅ 使用 subscriptionService 新增订阅
+      await subscriptionService.subscribe({
         keyword: keyword.trim(),
         campusId: campusId,
-      };
+      });
 
-      // 🚀 调用真实后端 API 新增订阅
-      const response = await api.subscribe({ createSubscriptionRequest: request });
-
-      if (response.data.success) {
-        toast.success('订阅成功！有新商品会通知你！🎉');
-        setShowAddModal(false);
-        setKeyword('');
-        setCampusId(undefined);
-        loadSubscriptions();
-      }
+      toast.success('订阅成功！有新商品会通知你！🎉');
+      setShowAddModal(false);
+      setKeyword('');
+      setCampusId(undefined);
+      loadSubscriptions();
     } catch (err: any) {
       console.error('新增订阅失败:', err);
       toast.error(err.response?.data?.message || '新增订阅失败！😭');
@@ -111,8 +101,8 @@ const Subscriptions: React.FC = () => {
       // 乐观更新 UI
       setSubscriptions((prev) => prev.filter((s) => s.id !== id));
 
-      // 🚀 调用真实后端 API 取消订阅
-      await api.unsubscribe({ id });
+      // ✅ 使用 subscriptionService 取消订阅
+      await subscriptionService.unsubscribe(id);
 
       toast.success('取消订阅成功！👋');
     } catch (err: any) {
@@ -155,15 +145,22 @@ const Subscriptions: React.FC = () => {
       <div className="subscriptions-container">
         {/* ==================== 头部 ==================== */}
         <div className="subscriptions-header">
-          <h1 className="subscriptions-header__title">🔔 我的订阅</h1>
-          <p className="subscriptions-header__subtitle">
-            {subscriptions.length > 0
-              ? `订阅了 ${subscriptions.length} 个关键词，不错过心仪商品！`
-              : '还没有订阅哦，快去添加吧！'}
-          </p>
-          <Button type="primary" size="large" onClick={() => setShowAddModal(true)}>
-            ➕ 新增订阅
-          </Button>
+          <div className="subscriptions-header__info">
+            <h1 className="subscriptions-header__title">🔔 我的订阅</h1>
+            <p className="subscriptions-header__subtitle">
+              {subscriptions.length > 0
+                ? `订阅了 ${subscriptions.length} 个关键词，不错过心仪商品！`
+                : '还没有订阅哦，快去添加吧！'}
+            </p>
+          </div>
+          <div className="subscriptions-header__actions">
+            <Button type="default" size="large" onClick={() => navigate('/subscriptions/feed')}>
+              📰 查看动态流
+            </Button>
+            <Button type="primary" size="large" onClick={() => setShowAddModal(true)}>
+              ➕ 新增订阅
+            </Button>
+          </div>
         </div>
 
         {/* ==================== 订阅列表 ==================== */}

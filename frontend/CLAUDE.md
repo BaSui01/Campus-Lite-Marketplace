@@ -170,438 +170,384 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 ---
 
-### 🔍 验证配置生效
+## 🚀 API 集成规范（核心铁律！）
 
-#### **检查环境变量是否正确加载：**
-```typescript
-// 在任意组件中打印环境变量
-console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL);
-console.log('WS URL:', import.meta.env.VITE_WS_URL);
-console.log('Static Base URL:', import.meta.env.VITE_STATIC_BASE_URL);
-```
-
-#### **启动服务验证：**
-```bash
-# 1. 确认根目录 .env 配置正确
-cat .env | grep VITE_
-
-# 2. 启动前端服务
-cd frontend
-pnpm dev
-
-# 3. 检查控制台输出的端口是否匹配 VITE_PORTAL_PORT
-```
-
----
-
-## 🎯 核心原则（必须遵守）
-
-### 1. ✅ 使用 OpenAPI 生成的代码（强制）
-
-**❌ 禁止手动维护 API 路径：**
-```typescript
-// ❌ 错误示例 - 手动写死路径
-async login(data: LoginRequest) {
-  return http.post('/api/auth/login', data);  // 路径容易出错
-}
-```
-
-**✅ 必须使用 OpenAPI 生成的 DefaultApi：**
-```typescript
-// ✅ 正确示例 - 使用生成的代码
-class AuthService {
-  private api: DefaultApi;
-
-  constructor() {
-    this.api = new DefaultApi(createApiConfig(), undefined, axiosInstance);
-  }
-
-  async login(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-    const response = await this.api.login({ loginRequest: data });
-    return response.data as ApiResponse<LoginResponse>;
-  }
-}
-```
-
-**优势：**
-- ✅ 类型安全：完整的 TypeScript 类型定义
-- ✅ 路径统一：所有路径由 OpenAPI 规范管理
-- ✅ 自动同步：后端 API 变更后重新生成即可
-- ✅ 减少维护：无需手动维护路径和参数
-
----
-
-### 2. 📁 Monorepo 包结构规范
+### 📦 架构总览
 
 ```
-frontend/
-├── packages/
-│   ├── portal/          # 前台用户界面
-│   │   ├── src/
-│   │   │   ├── pages/          # 页面组件
-│   │   │   ├── components/     # 页面级组件
-│   │   │   ├── layouts/        # 布局组件
-│   │   │   └── router/         # 路由配置
-│   │   └── package.json
-│   │
-│   ├── admin/           # 后台管理界面
-│   │   └── (同 portal 结构)
-│   │
-│   └── shared/          # 共享代码库 ⭐ 核心包
-│       ├── src/
-│       │   ├── api/            # OpenAPI 生成的代码（自动生成）
-│       │   ├── services/       # 业务服务层（基于 api/）
-│       │   ├── components/     # 共享 UI 组件
-│       │   ├── utils/          # 工具函数
-│       │   ├── hooks/          # React Hooks
-│       │   ├── types/          # 类型定义
-│       │   └── constants/      # 常量定义
-│       └── package.json
+📦 API 集成架构（三层架构）
+├── 第一层：OpenAPI 自动生成（frontend/packages/shared/src/api/）
+│   ├── api.ts                    # API 导出入口
+│   ├── api/default-api.ts        # DefaultApi 类（所有接口）
+│   ├── models/                   # 类型定义（DTO/Response）
+│   └── base.ts                   # 基础配置
+│
+├── 第二层：API 客户端封装（frontend/packages/shared/src/utils/apiClient.ts）
+│   ├── getApi()                  # 获取 DefaultApi 单例
+│   ├── Token 管理                # JWT Token 自动注入
+│   ├── 请求/响应拦截器           # 统一错误处理
+│   └── Token 自动刷新            # 401 自动刷新 Token
+│
+└── 第三层：Service 层封装（业务逻辑）
+    ├── 共享服务（frontend/packages/shared/src/services/）
+    │   ├── goods.ts              # 商品服务
+    │   ├── order.ts              # 订单服务
+    │   ├── user.ts               # 用户服务
+    │   └── ...                   # 其他共享服务
+    │
+    └── 管理端专属服务（frontend/packages/admin/src/services/）
+        ├── statistics.ts         # 统计服务
+        ├── adminUser.ts          # 管理员用户服务
+        ├── dispute.ts            # 纠纷服务
+        └── ...                   # 其他管理端服务
 ```
 
 ---
 
-### 3. 🔧 API 调用规范
+### 🎯 核心规则（必须遵守！）
 
-#### **配置层** (`shared/src/utils/http.ts`)
+#### **1️⃣ 禁止手写 API 调用（铁律）**
+
+❌ **绝对禁止**：
 ```typescript
-// ⚠️ 注意：baseURL 不加 /api，因为 OpenAPI 生成的代码已包含
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8200';
-
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,  // 不要加 /api
-  timeout: 30000,
-});
-```
-
-#### **服务层** (`shared/src/services/*.ts`)
-```typescript
-// ✅ 基于 OpenAPI 生成的 DefaultApi
-class GoodsService {
-  private api: DefaultApi;
-
-  constructor() {
-    this.api = new DefaultApi(createApiConfig(), undefined, axiosInstance);
-  }
-
-  async listGoods(params?: GoodsListParams): Promise<PageGoodsResponse> {
-    const response = await this.api.listGoods(
-      params?.keyword,
-      params?.categoryId,
-      // ...其他参数
-    );
-    return response.data.data as PageGoodsResponse;
-  }
-}
-
-export const goodsService = new GoodsService();
-```
-
-#### **页面层** (`portal/src/pages/*.tsx`)
-```typescript
-import { goodsService } from '@campus/shared/services';
-
-const GoodsPage: React.FC = () => {
-  const loadGoods = async () => {
-    const data = await goodsService.listGoods({ page: 0, size: 10 });
-    // 使用数据...
-  };
-};
-```
-
----
-
-### 4. 🎨 UI 组件规范
-
-#### **组件分类：**
-- **P0 基础组件** (`shared/src/components/`): Button, Input, Modal 等
-- **P1 表单组件** (`shared/src/components/`): Form, Select, DatePicker 等
-- **P2 业务组件** (`shared/src/components/`): GoodsCard, OrderCard, UserAvatar 等
-- **页面组件** (`portal/src/components/`): 页面特有组件
-
-#### **组件开发原则：**
-```typescript
-// ✅ 组件必须有 TypeScript 类型
-interface ButtonProps {
-  type?: 'primary' | 'default' | 'danger';
-  size?: 'small' | 'medium' | 'large';
-  loading?: boolean;
-  disabled?: boolean;
-  onClick?: () => void;
-  children?: React.ReactNode;
-}
-
-// ✅ 使用 FC 类型 + Props 接口
-export const Button: React.FC<ButtonProps> = ({
-  type = 'default',
-  size = 'medium',
-  loading = false,
-  disabled = false,
-  onClick,
-  children,
-}) => {
-  // 实现...
-};
-```
-
----
-
-### 5. 🔒 认证与路由规范
-
-#### **Token 管理** (`shared/src/utils/http.ts`)
-```typescript
-// Token 存储
-export const setTokens = (accessToken: string, refreshToken?: string): void => {
-  localStorage.setItem('auth_token', accessToken);
-  if (refreshToken) {
-    localStorage.setItem('refresh_token', refreshToken);
-  }
-};
-
-// 自动注入 Token
-axiosInstance.interceptors.request.use(config => {
-  const token = getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-```
-
-#### **路由守卫** (`portal/src/router/index.tsx`)
-```typescript
-import { Navigate } from 'react-router-dom';
-import { hasToken } from '@campus/shared/utils/http';
-
-// 需要登录的路由
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  if (!hasToken()) {
-    return <Navigate to="/login" replace />;
-  }
-  return <>{children}</>;
-};
-```
-
----
-
-### 6. 📝 命名规范
-
-#### **文件命名：**
-- 组件文件：`PascalCase.tsx` (例：`Button.tsx`, `GoodsCard.tsx`)
-- 工具文件：`camelCase.ts` (例：`http.ts`, `storage.ts`)
-- 样式文件：与组件同名 (例：`Button.css`, `GoodsCard.css`)
-
-#### **变量命名：**
-- 组件：`PascalCase` (例：`Button`, `GoodsCard`)
-- 函数/变量：`camelCase` (例：`handleClick`, `isLoading`)
-- 常量：`UPPER_SNAKE_CASE` (例：`API_BASE_URL`, `TOKEN_KEY`)
-- 接口/类型：`PascalCase` (例：`LoginRequest`, `ApiResponse`)
-
----
-
-### 7. 🔄 OpenAPI 代码生成流程（重要！）
-
-#### **生成命令：**
-```bash
-# 1. 确保后端服务已启动（http://localhost:8200）
-# 2. 在后端目录运行生成命令
-cd backend
-mvn -P openapi openapi-generator:generate
-
-# 或者使用前端根目录的快捷命令（需要后端启动）
-cd frontend
-pnpm api:generate
-```
-
-#### **生成流程：**
-1. 📡 从后端 `/v3/api-docs` 获取 OpenAPI JSON 规范
-2. 📄 保存到 `backend/target/openapi-frontend.json`
-3. 🔧 使用 OpenAPI Generator Maven 插件生成前端代码
-4. 📦 输出到 `frontend/packages/shared/src/api/`
-
-#### **生成的文件：**
-```
-frontend/packages/shared/src/api/
-├── api/
-│   └── default-api.ts      # ⭐ API 客户端（所有接口）
-├── models/
-│   ├── login-request.ts    # 请求模型
-│   ├── login-response.ts   # 响应模型
-│   └── ...                 # 其他模型
-├── base.ts                 # 基础配置
-├── common.ts               # 公共工具
-└── configuration.ts        # 配置接口
-```
-
-#### **🚨 铁律：禁止手写 API 路径！**
-
-**❌ 错误示例（手写路径）：**
-```typescript
-// ❌ 直接使用 axios 手写路径
-async checkUsername(username: string) {
-  const response = await axiosInstance.get('/api/auth/check-username', {
-    params: { username },
-  });
-  return response.data;
-}
-```
-
-**✅ 正确示例（使用生成的 API）：**
-```typescript
-// ✅ 使用 OpenAPI 生成的 DefaultApi
-async checkUsername(username: string): Promise<ApiResponse<boolean>> {
-  const response = await this.api.checkUsername({ username });
-  return response.data as ApiResponse<boolean>;
-}
-```
-
-#### **违规检查：**
-```bash
-# 检查是否有手写的 API 路径调用
-grep -r "axiosInstance.get\|axiosInstance.post" frontend/packages/shared/src/services/
-
-# 如果有结果，说明有手写路径，必须改为使用 DefaultApi！
-```
-
-#### **注意事项：**
-- ⚠️ **不要手动修改** `src/api/` 目录下的文件（自动生成）
-- ✅ 服务层 (`src/services/`) **只能**基于 `DefaultApi` 封装
-- ✅ 后端 API 变更后，**必须**重新生成前端代码
-- 🚫 **禁止**在服务层直接使用 `axiosInstance.get/post/put/delete`
-- ✅ 后端新增接口时，先添加 Swagger 注解，再生成前端代码
-
----
-
-### 8. 🎯 开发最佳实践
-
-#### **状态管理：**
-```typescript
-// ✅ 使用 React Hooks
-const [loading, setLoading] = useState(false);
-const [data, setData] = useState<GoodsResponse[]>([]);
-
-// ✅ 封装自定义 Hook
-const useGoodsList = () => {
-  const [goods, setGoods] = useState<GoodsResponse[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const loadGoods = async () => {
-    setLoading(true);
-    try {
-      const data = await goodsService.listGoods();
-      setGoods(data.content);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { goods, loading, loadGoods };
-};
-```
-
-#### **错误处理：**
-```typescript
-// ✅ 统一错误处理
-try {
-  const response = await authService.login(data);
-  setTokens(response.data.token);
-  navigate('/');
-} catch (error: any) {
-  const errorMessage = error?.response?.data?.message || '登录失败';
-  toast.error(errorMessage);
-}
-```
-
----
-
-### 9. 🚀 性能优化
-
-#### **代码分割：**
-```typescript
-// ✅ 懒加载路由
-const Home = lazy(() => import('./pages/Home'));
-const GoodsDetail = lazy(() => import('./pages/GoodsDetail'));
-
-const routes = [
-  {
-    path: '/',
-    element: <Suspense fallback={<Loading />}><Home /></Suspense>,
+// ❌ 错误 - 禁止直接使用 fetch()
+const response = await fetch(`${API_BASE_URL}/api/goods`, {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
   },
-];
-```
-
-#### **避免不必要的渲染：**
-```typescript
-// ✅ 使用 React.memo
-export const GoodsCard = React.memo<GoodsCardProps>(({ goods }) => {
-  return <div>{goods.title}</div>;
 });
 
-// ✅ 使用 useCallback
-const handleClick = useCallback(() => {
-  console.log('clicked');
-}, []);
+// ❌ 错误 - 禁止直接使用 axios
+import axios from 'axios';
+const response = await axios.get('/api/goods');
+
+// ❌ 错误 - 禁止硬编码 API 路径
+const API_PATH = '/api/goods/list';
+```
+
+✅ **正确做法**：
+```typescript
+// ✅ 正确 - 使用 Service 层
+import { goodsService } from '@campus/shared/services/goods';
+
+const goods = await goodsService.listGoods({ page: 0, size: 20 });
 ```
 
 ---
 
-### 10. 📋 开发 Checklist
+#### **2️⃣ 使用 Service 层（标准流程）**
 
-**开发新功能前：**
-- [ ] 确认后端 API 已定义（Swagger 文档）
-- [ ] 运行 `npm run generate:api` 生成最新代码
-- [ ] 在 `shared/src/services/` 封装服务层
-- [ ] 在页面中使用服务层（不直接调用 API）
+**共享服务（两端通用）**：
+```typescript
+// ✅ 从共享层导入
+import { goodsService } from '@campus/shared/services/goods';
+import { orderService } from '@campus/shared/services/order';
+import { userService } from '@campus/shared/services/user';
+import type { GoodsResponse, PageGoodsResponse } from '@campus/shared/api';
 
-**提交代码前：**
-- [ ] 代码通过 ESLint 检查
-- [ ] 组件有完整的 TypeScript 类型定义
-- [ ] 没有 `console.log` 残留
-- [ ] 没有手动维护的 API 路径
-- [ ] 样式适配移动端（响应式设计）
+// ✅ 使用 React Query
+const { data, isLoading } = useQuery({
+  queryKey: ['goods', 'list', params],
+  queryFn: () => goodsService.listGoods(params),
+});
+```
+
+**管理端专属服务**：
+```typescript
+// ✅ 从管理端服务导入
+import { statisticsService } from '@/services';
+import { adminUserService } from '@/services';
+import { disputeService } from '@/services';
+
+// ✅ 使用 React Query
+const { data } = useQuery({
+  queryKey: ['statistics', 'overview'],
+  queryFn: () => statisticsService.getOverview(),
+});
+```
 
 ---
 
-### 11. 🐛 常见问题与解决
+#### **3️⃣ API 更新流程（定期执行）**
 
-#### **问题 1：请求路径出现 `/api/api`**
-**原因**：`http.ts` 的 `baseURL` 包含了 `/api`，但 OpenAPI 生成的代码也包含 `/api`
-**解决**：`baseURL` 不要加 `/api` 前缀
+**当后端接口变更时，必须执行以下步骤：**
+
+```bash
+# 步骤 1：确保后端服务运行
+# 访问 http://localhost:8200/api/actuator/health 检查状态
+
+# 步骤 2：生成前端 API 代码
+cd frontend
+pnpm run api:generate
+
+# 步骤 3：检查生成的代码
+# 查看 frontend/packages/shared/src/api/ 目录
+
+# 步骤 4：更新 Service 层（如有需要）
+# 如果新增了接口，需要在对应的 Service 中添加方法
+```
+
+**自动化脚本**：
+```json
+// package.json
+{
+  "scripts": {
+    "api:generate": "cd ../backend && mvn clean && mvn -Dspring-boot.run.arguments=\"--openapi.export.enabled=true,--openapi.export.path=target/openapi-frontend.json\" spring-boot:run && mvn -P openapi openapi-generator:generate"
+  }
+}
+```
+
+---
+
+#### **4️⃣ Service 层开发规范**
+
+**创建新 Service 的标准模板**：
+
+```typescript
+/**
+ * XXX API 服务
+ * @author BaSui 😎
+ * @description XXX 相关接口（基于 OpenAPI 生成代码）
+ */
+
+import { getApi } from '../utils/apiClient';
+import type {
+  XxxResponse,
+  XxxRequest,
+  PageXxxResponse,
+} from '../api/models';
+
+/**
+ * XXX 列表查询参数
+ */
+export interface XxxListParams {
+  keyword?: string;
+  page?: number;
+  size?: number;
+  sortBy?: string;
+  sortDirection?: string;
+}
+
+/**
+ * XXX API 服务类
+ */
+export class XxxService {
+  /**
+   * 获取 XXX 列表（分页）
+   * @param params 查询参数
+   * @returns XXX 列表（分页）
+   */
+  async list(params?: XxxListParams): Promise<PageXxxResponse> {
+    const api = getApi();
+    const response = await api.listXxx(
+      params?.keyword,
+      params?.page,
+      params?.size,
+      params?.sortBy,
+      params?.sortDirection
+    );
+    return response.data.data as PageXxxResponse;
+  }
+
+  /**
+   * 获取 XXX 详情
+   * @param id XXX ID
+   * @returns XXX 详情
+   */
+  async getDetail(id: number): Promise<XxxResponse> {
+    const api = getApi();
+    const response = await api.getXxxDetail(id);
+    return response.data.data as XxxResponse;
+  }
+
+  /**
+   * 创建 XXX
+   * @param data XXX 信息
+   * @returns 创建的 XXX ID
+   */
+  async create(data: XxxRequest): Promise<number> {
+    const api = getApi();
+    const response = await api.createXxx(data);
+    return response.data.data as number;
+  }
+
+  /**
+   * 更新 XXX
+   * @param id XXX ID
+   * @param data XXX 信息
+   */
+  async update(id: number, data: XxxRequest): Promise<void> {
+    const api = getApi();
+    await api.updateXxx(id, data);
+  }
+
+  /**
+   * 删除 XXX
+   * @param id XXX ID
+   */
+  async delete(id: number): Promise<void> {
+    const api = getApi();
+    await api.deleteXxx(id);
+  }
+}
+
+// 导出单例
+export const xxxService = new XxxService();
+export default xxxService;
+```
+
+---
+
+### 📋 代码审查 Checklist
+
+**在提交代码前，必须检查以下项目：**
+
+- [ ] ✅ 没有使用 `fetch()` 直接调用 API
+- [ ] ✅ 没有使用 `axios` 直接调用 API
+- [ ] ✅ 没有硬编码 API 路径
+- [ ] ✅ 所有 API 调用都使用 Service 层
+- [ ] ✅ 所有类型都从 `@campus/shared/api` 导入
+- [ ] ✅ 使用 React Query 管理异步状态
+- [ ] ✅ 错误处理统一使用 apiClient 的拦截器
+- [ ] ✅ Token 管理由 apiClient 自动处理
+
+---
+
+### 🎯 最佳实践
+
+#### **1. 使用 React Query 管理异步状态**
+
+```typescript
+// ✅ 查询数据
+const { data, isLoading, error, refetch } = useQuery({
+  queryKey: ['goods', 'list', params],
+  queryFn: () => goodsService.listGoods(params),
+  staleTime: 5 * 60 * 1000, // 缓存 5 分钟
+});
+
+// ✅ 修改数据
+const mutation = useMutation({
+  mutationFn: (data: GoodsRequest) => goodsService.create(data),
+  onSuccess: () => {
+    message.success('创建成功');
+    queryClient.invalidateQueries({ queryKey: ['goods'] });
+  },
+  onError: (error: any) => {
+    message.error(error?.message || '创建失败');
+  },
+});
+```
+
+#### **2. 统一错误处理**
+
+```typescript
+// ✅ apiClient 已经统一处理了错误
+// 不需要在每个请求中重复处理 401、403、500 等错误
+
+// ✅ 只需要处理业务错误
+const mutation = useMutation({
+  mutationFn: (data) => goodsService.create(data),
+  onError: (error: any) => {
+    // 业务错误提示
+    message.error(error?.message || '操作失败');
+  },
+});
+```
+
+#### **3. Token 自动管理**
+
+```typescript
+// ✅ Token 由 apiClient 自动管理
+// - 登录后自动保存 Token
+// - 请求时自动注入 Token
+// - 401 错误自动刷新 Token
+// - 刷新失败自动跳转登录页
+
+// 不需要手动处理 Token！
+```
+
+---
+
+### 🚨 常见错误和解决方案
+
+#### **错误 1：直接使用 fetch()**
+
 ```typescript
 // ❌ 错误
-const API_BASE_URL = 'http://localhost:8200/api';
+const response = await fetch('/api/goods');
 
 // ✅ 正确
-const API_BASE_URL = 'http://localhost:8200';
+import { goodsService } from '@campus/shared/services/goods';
+const goods = await goodsService.listGoods();
 ```
 
-#### **问题 2：401 未授权错误**
-**原因**：Token 未正确保存或未注入到请求头
-**解决**：
-1. 检查 `setTokens()` 是否被调用
-2. 检查 Axios 拦截器是否正确注入 Token
-3. 检查 localStorage 中是否有 `auth_token`
+#### **错误 2：硬编码 API 路径**
 
-#### **问题 3：类型定义不匹配**
-**原因**：后端 API 变更但前端代码未更新
-**解决**：重新生成 OpenAPI 代码
-```bash
-cd frontend/packages/shared
-npm run generate:api
+```typescript
+// ❌ 错误
+const API_PATH = '/api/goods/list';
+const response = await api.get(API_PATH);
+
+// ✅ 正确
+const goods = await goodsService.listGoods();
+```
+
+#### **错误 3：重复处理 Token**
+
+```typescript
+// ❌ 错误 - 不需要手动处理 Token
+const token = localStorage.getItem('token');
+const response = await fetch('/api/goods', {
+  headers: { Authorization: `Bearer ${token}` },
+});
+
+// ✅ 正确 - apiClient 自动处理
+const goods = await goodsService.listGoods();
+```
+
+#### **错误 4：重复处理错误**
+
+```typescript
+// ❌ 错误 - 不需要重复处理 401、403、500
+try {
+  const response = await fetch('/api/goods');
+  if (response.status === 401) {
+    // 跳转登录...
+  }
+} catch (error) {
+  // 错误处理...
+}
+
+// ✅ 正确 - apiClient 已统一处理
+const { data, error } = useQuery({
+  queryKey: ['goods'],
+  queryFn: () => goodsService.listGoods(),
+});
 ```
 
 ---
 
-## 📚 参考资源
+### 📊 架构优势
 
-- [React 官方文档](https://react.dev/)
-- [TypeScript 官方文档](https://www.typescriptlang.org/)
-- [Vite 官方文档](https://vitejs.dev/)
-- [Axios 官方文档](https://axios-http.com/)
-- [OpenAPI Generator](https://openapi-generator.tech/)
+| 优势 | 说明 |
+|------|------|
+| **类型安全** | 完整的 TypeScript 类型定义，编译时检查 |
+| **自动同步** | 后端接口变更自动同步到前端 |
+| **统一管理** | 所有 API 调用统一管理，易于维护 |
+| **错误处理** | 统一的错误处理和提示 |
+| **Token 管理** | 自动注入和刷新 Token |
+| **易于测试** | Service 层易于单元测试 |
+| **代码复用** | Service 层可在多个组件中复用 |
 
 ---
 
 **最后提醒：**
 > 前端服务层必须继承或直接使用 OpenAPI 生成的代码，
 > 而不是手动维护接口路径！这是铁律！💪✨
+>
+> **记住三条黄金法则：**
+> 1. 🚫 **禁止手写 API 调用**（fetch/axios）
+> 2. ✅ **必须使用 Service 层**（共享/管理端服务）
+> 3. 🔄 **定期更新 API 代码**（pnpm run api:generate）

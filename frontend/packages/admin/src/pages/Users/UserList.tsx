@@ -15,19 +15,18 @@ import React, { useState } from 'react';
 import {
   Table,
   Card,
-  Input,
   Button,
   Tag,
   Space,
   Avatar,
-  Modal,
   Form,
   DatePicker,
-  message,
   Tooltip,
+  App,
+  Input,
+  Modal,
 } from 'antd';
 import {
-  SearchOutlined,
   StopOutlined,
   CheckCircleOutlined,
   EyeOutlined,
@@ -36,33 +35,85 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Table } from '@campus/shared';
-import { userService, adminUserService } from '@campus/shared';
+import { userService } from '@campus/shared';
+import { adminUserService } from '@/services';
 import type { User, UserListQuery } from '@campus/shared';
+import { FilterPanel } from '@campus/shared/components';
+import type { FilterConfig, FilterValues } from '@campus/shared/types/filter';
 import dayjs from 'dayjs';
 import './UserList.css';
 
-const { Search } = Input;
 const { TextArea } = Input;
+
+// 用户状态选项
+const USER_STATUS_OPTIONS = [
+  { label: '正常', value: 'ACTIVE' },
+  { label: '已封禁', value: 'BANNED' },
+  { label: '未激活', value: 'INACTIVE' },
+];
+
+// 角色选项
+const ROLE_OPTIONS = [
+  { label: '普通用户', value: 'USER' },
+  { label: '管理员', value: 'ADMIN' },
+  { label: '超级管理员', value: 'SUPER_ADMIN' },
+];
+
+// 用户筛选配置
+const userFilters: FilterConfig[] = [
+  {
+    type: 'input',
+    field: 'keyword',
+    label: '关键词',
+    placeholder: '搜索昵称/用户名/学号',
+    width: 220,
+  },
+  {
+    type: 'select',
+    field: 'status',
+    label: '用户状态',
+    placeholder: '选择状态',
+    options: USER_STATUS_OPTIONS,
+    width: 130,
+  },
+  {
+    type: 'select',
+    field: 'role',
+    label: '角色',
+    placeholder: '选择角色',
+    options: ROLE_OPTIONS,
+    width: 150,
+  },
+];
 
 const UserList: React.FC = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useState<UserListQuery>({
-    page: 0,
-    pageSize: 20,
-  });
+  const { message, modal } = App.useApp();
+
+  // 筛选参数（使用 FilterPanel 统一管理）
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
+  const [page, setPage] = useState<number>(0);
+  const [size, setSize] = useState<number>(20);
+
   const [banModalVisible, setBanModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [banForm] = Form.useForm();
 
   // ===== 查询用户列表 =====
-  const { data, isLoading } = useQuery({
-    queryKey: ['users', searchParams],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['users', filterValues, page, size],
     queryFn: async () => {
-      const response = await userService.getUserList(searchParams);
+      const response = await userService.getUserList({
+        keyword: filterValues.keyword,
+        status: filterValues.status,
+        role: filterValues.role,
+        page,
+        pageSize: size,
+      });
       return response.data;
     },
+    staleTime: 5 * 60 * 1000, // 缓存5分钟
   });
 
   // ===== 封禁用户 Mutation =====
@@ -96,17 +147,9 @@ const UserList: React.FC = () => {
   });
 
   // ===== 处理搜索 =====
-  const handleSearch = (keyword: string) => {
-    setSearchParams({ ...searchParams, keyword, page: 0 });
-  };
-
-  // ===== 处理分页 =====
-  const handleTableChange = (pagination: any) => {
-    setSearchParams({
-      ...searchParams,
-      page: pagination.current - 1,
-      pageSize: pagination.pageSize,
-    });
+  const handleSearch = () => {
+    setPage(0);
+    refetch();
   };
 
   // ===== 打开封禁弹窗 =====
@@ -134,7 +177,7 @@ const UserList: React.FC = () => {
 
   // ===== 确认解封 =====
   const handleUnbanUser = (user: User) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认解封用户？',
       content: `确定要解封用户 "${user.nickname}" 吗？`,
       onOk: () => unbanMutation.mutate(user.id),
@@ -255,37 +298,39 @@ const UserList: React.FC = () => {
 
   return (
     <div className="user-list">
-      <Card>
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          {/* 搜索栏 */}
-          <div className="search-bar">
-            <Search
-              placeholder="搜索昵称、用户名、学号"
-              allowClear
-              enterButton={<SearchOutlined />}
-              size="large"
-              onSearch={handleSearch}
-              style={{ width: 400 }}
-            />
-          </div>
+      {/* 筛选面板 */}
+      <FilterPanel
+        config={{ filters: userFilters }}
+        values={filterValues}
+        onChange={setFilterValues}
+        onSearch={handleSearch}
+        onReset={() => {
+          setFilterValues({});
+          setPage(0);
+        }}
+      />
 
-          {/* 用户表格 */}
-          <Table
-            columns={columns}
-            dataSource={data?.content || []}
-            loading={isLoading}
-            pagination={{
-              current: (searchParams.page || 0) + 1,
-              pageSize: searchParams.pageSize || 20,
-              total: data?.totalElements || 0,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total) => `共 ${total} 个用户`,
-            }}
-            onChange={handleTableChange}
-            scroll={{ x: 1200 }}
-          />
-        </Space>
+      {/* 用户表格 */}
+      <Card style={{ marginTop: 16 }}>
+        <Table
+          columns={columns}
+          dataSource={data?.content || []}
+          rowKey="id"
+          loading={isLoading}
+          pagination={{
+            current: page + 1,
+            pageSize: size,
+            total: data?.totalElements || 0,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `共 ${total} 个用户`,
+            onChange: (newPage, newSize) => {
+              setPage(newPage - 1);
+              setSize(newSize!);
+            },
+          }}
+          scroll={{ x: 1200 }}
+        />
       </Card>
 
       {/* 封禁用户弹窗 */}

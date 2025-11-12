@@ -5,16 +5,26 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // 🎯 BaSui优化：从根目录加载环境变量
-  const env = loadEnv(mode, path.resolve(__dirname, '../../..'), 'VITE_');
+  const rootDir = path.resolve(__dirname, '../../..');
+  const env = loadEnv(mode, rootDir, 'VITE_');
 
   return {
     plugins: [react()],
+
+    // 🌍 环境变量目录配置（关键！让 Vite 从根目录读取 .env）
+    envDir: rootDir,
 
     // 🌐 开发服务器配置
     server: {
       port: parseInt(env.VITE_ADMIN_PORT || '3000'),
       host: true, // 允许外部访问
       open: false, // 不自动打开浏览器
+      // 🎯 SPA 路由回退配置（修复404问题 - BaSui 2025-11-10）
+      proxy: {
+        // 所有非API请求都返回 index.html
+      },
+      // 配置开发服务器的中间件，处理 SPA 路由
+      middlewareMode: false,
     },
 
     // 📦 构建配置

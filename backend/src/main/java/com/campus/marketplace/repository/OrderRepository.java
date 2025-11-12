@@ -33,14 +33,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     /**
      * 根据订单号查询订单（包含关联数据）
      */
-    @EntityGraph(attributePaths = {"goods", "buyer", "seller"})
+    @EntityGraph(attributePaths = {"goods", "goods.category", "goods.seller", "buyer", "seller"})
     @Query("SELECT o FROM Order o WHERE o.orderNo = :orderNo")
     Optional<Order> findByOrderNoWithDetails(@Param("orderNo") String orderNo);
 
     /**
      * 查询买家订单列表（包含关联数据）
      */
-    @EntityGraph(attributePaths = {"goods", "seller"})
+    @EntityGraph(attributePaths = {"goods", "buyer", "seller"})
     @Query("SELECT o FROM Order o WHERE o.buyerId = :buyerId " +
            "AND (:status IS NULL OR o.status = :status) " +
            "ORDER BY o.createdAt DESC")
@@ -53,7 +53,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     /**
      * 查询卖家订单列表（包含关联数据）
      */
-    @EntityGraph(attributePaths = {"goods", "buyer"})
+    @EntityGraph(attributePaths = {"goods", "buyer", "seller"})
     @Query("SELECT o FROM Order o WHERE o.sellerId = :sellerId " +
            "AND (:status IS NULL OR o.status = :status) " +
            "ORDER BY o.createdAt DESC")
@@ -127,4 +127,20 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @return 订单列表
      */
     List<Order> findByGoodsId(Long goodsId);
+
+    /**
+     * 查询某个商品的指定状态的第一条订单（用于 LOCKED 可见性与幂等校验）
+     */
+    Optional<Order> findFirstByGoodsIdAndStatus(Long goodsId, OrderStatus status);
+
+    /**
+     * 查找即将超时的待支付订单（用于提醒）
+     * createdAt < :createdBefore AND createdAt >= :createdAfter
+     */
+    @Query("SELECT o FROM Order o WHERE o.status = :status AND o.createdAt < :createdBefore AND o.createdAt >= :createdAfter")
+    List<Order> findPendingPaymentBetweenCreatedAt(
+            @Param("status") OrderStatus status,
+            @Param("createdBefore") java.time.LocalDateTime createdBefore,
+            @Param("createdAfter") java.time.LocalDateTime createdAfter
+    );
 }

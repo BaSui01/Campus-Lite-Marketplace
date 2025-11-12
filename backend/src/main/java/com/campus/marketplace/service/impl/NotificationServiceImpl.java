@@ -10,6 +10,7 @@ import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.common.utils.SecurityUtil;
 import com.campus.marketplace.repository.NotificationRepository;
 import com.campus.marketplace.repository.UserRepository;
+import com.campus.marketplace.service.EmailTemplateService;
 import com.campus.marketplace.service.NotificationService;
 import com.campus.marketplace.service.NotificationPreferenceService;
 import com.campus.marketplace.service.WebPushService;
@@ -22,9 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,15 +46,12 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
-    private final JavaMailSender mailSender;
+    private final EmailTemplateService emailTemplateService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final NotificationPreferenceService preferenceService;
     private final WebPushService webPushService;
     private final com.campus.marketplace.service.NotificationTemplateService templateService;
     private final Environment environment;
-
-    @Value("${spring.mail.from:${spring.mail.username:}}")
-    private String mailFrom;
 
     private static final String UNREAD_COUNT_KEY = "notification:unread:";
     private static final String EMAIL_RATE_KEY = "notification:email:rate:";
@@ -137,22 +132,12 @@ public class NotificationServiceImpl implements NotificationService {
             log.warn("邮件速率限制检查失败，忽略: {}", e.getMessage());
         }
 
-        // 🎯 构建邮件
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
-        message.setSubject(subject);
-        message.setText(text);
-        // 发件人（优先 spring.mail.from，其次 spring.mail.username）
-        if (mailFrom != null && !mailFrom.isBlank()) {
-            message.setFrom(mailFrom);
-        }
-
-        // 🎯 发送邮件
+        // 🎯 发送HTML邮件
         try {
-            mailSender.send(message);
-            log.info("邮件通知发送成功: receiverId={}, email={}, subject={}", receiverId, user.getEmail(), subject);
+            emailTemplateService.sendNotification(user.getEmail(), subject, subject, text, null);
+            log.info("✅ HTML邮件通知发送成功: receiverId={}, email={}, subject={}", receiverId, user.getEmail(), subject);
         } catch (Exception e) {
-            log.error("邮件通知发送失败: receiverId={}, error={}", receiverId, e.getMessage(), e);
+            log.error("❌ HTML邮件通知发送失败: receiverId={}, error={}", receiverId, e.getMessage(), e);
             // 邮件发送失败不影响主流程，只记录错误日志
         }
     }
@@ -310,6 +295,14 @@ public class NotificationServiceImpl implements NotificationService {
         // 🎯 软删除通知
         int deletedCount = notificationRepository.deleteByIds(currentUserId, notificationIds);
 
+        // 🎯 清理 Redis 未读数缓存，避免前端角标不更新
+        try {
+            String redisKey = UNREAD_COUNT_KEY + currentUserId;
+            redisTemplate.delete(redisKey);
+        } catch (Exception e) {
+            log.warn("删除通知后清理未读数缓存失败: userId={}, err={}", currentUserId, e.getMessage());
+        }
+
         log.info("删除通知: userId={}, count={}", currentUserId, deletedCount);
     }
 
@@ -343,8 +336,45 @@ public class NotificationServiceImpl implements NotificationService {
                                          String link) {
         var locale = org.springframework.context.i18n.LocaleContextHolder.getLocale();
         var rendered = templateService.render(templateCode, locale, params == null ? Map.of() : params);
-        // 站内 + 邮件 + WebPush 联动
-        sendNotificationWithEmail(receiverId, type, rendered.title(), rendered.content(), relatedId, relatedType, link);
+
+        boolean enableInApp = rendered.channels() != null && rendered.channels().contains(com.campus.marketplace.common.enums.NotificationChannel.IN_APP);
+        boolean enableEmail = rendered.channels() != null && rendered.channels().contains(com.campus.marketplace.common.enums.NotificationChannel.EMAIL);
+        boolean enableWebPush = rendered.channels() != null && rendered.channels().contains(com.campus.marketplace.common.enums.NotificationChannel.WEB_PUSH);
+
+        // 站内通知（受退订控制）
+        if (enableInApp) {
+            try {
+                sendNotification(receiverId, type, rendered.title(), rendered.content(), relatedId, relatedType, link);
+            } catch (Exception e) {
+                log.warn("站内通知发送失败（模板）：userId={}, tpl={}", receiverId, templateCode, e);
+            }
+        }
+
+        // 邮件通知（受退订与静默控制）
+        if (enableEmail) {
+            boolean unsubEmail = preferenceService.isUnsubscribed(receiverId, type.name(), NotificationChannel.EMAIL);
+            if (!unsubEmail) {
+                try {
+                    sendEmailNotification(receiverId, rendered.title(), rendered.content());
+                } catch (Exception e) {
+                    log.warn("邮件通知发送失败（模板）：userId={}, tpl={}", receiverId, templateCode, e);
+                }
+            } else {
+                log.debug("用户退订了邮件渠道，跳过：userId={}, template={}", receiverId, templateCode);
+            }
+        }
+
+        // WebPush（受退订控制）
+        if (enableWebPush) {
+            boolean unsubWebPush = preferenceService.isUnsubscribed(receiverId, type.name(), NotificationChannel.WEB_PUSH);
+            if (!unsubWebPush) {
+                try {
+                    webPushService.send(receiverId, rendered.title(), rendered.content(), link);
+                } catch (Exception e) {
+                    log.warn("WebPush 发送失败（模板）：userId={}, tpl={}", receiverId, templateCode, e);
+                }
+            }
+        }
     }
 
     private int resolvePriority(NotificationType type) {

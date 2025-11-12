@@ -26,23 +26,22 @@ import {
   FileSearchOutlined,
   SafetyOutlined,
 } from '@ant-design/icons';
-import { PermissionGuard } from '../components';
-import { PERMISSION_CODES } from '@campus/shared';
-import {
+import { PermissionGuard ,
   StatCard,
   LineChart,
   BarChart,
 } from '../components';
+import { PERMISSION_CODES } from '@campus/shared';
+
 import {
   EmptyState,
   NoDataEmpty,
   NoPermissionEmpty,
-} from '../components/Feedback';
-import {
+
   CreateSuccess,
   UpdateSuccess,
-  DeleteSuccess,
-} from '../components/Feedback';
+  DeleteSuccess} from '../components/Feedback';
+
 import PageTransition from '../components/Transitions';
 import { usePermission } from '../hooks';
 

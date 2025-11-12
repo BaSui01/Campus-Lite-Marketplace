@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 举报类型枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-10-27
  */
 @Getter
-@RequiredArgsConstructor
 public enum ReportType {
     
     /**
@@ -34,4 +32,8 @@ public enum ReportType {
     USER("举报用户");
     
     private final String description;
+
+    ReportType(String description) {
+        this.description = description;
+    }
 }

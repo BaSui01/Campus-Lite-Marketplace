@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.response.NotificationResponse;
 import com.campus.marketplace.common.enums.NotificationStatus;
 import com.campus.marketplace.common.enums.NotificationType;
@@ -52,7 +51,7 @@ class NotificationControllerMockMvcTest {
     @Test
     @DisplayName("未登录访问通知列表返回 403")
     void listNotifications_requiresAuthentication() throws Exception {
-        mockMvc.perform(get("/api/notifications"))
+        mockMvc.perform(get("/notifications"))
                 .andExpect(status().isForbidden());
 
         verify(notificationService, never()).listNotifications(any(), any());
@@ -73,7 +72,7 @@ class NotificationControllerMockMvcTest {
         when(notificationService.listNotifications(eq(NotificationStatus.UNREAD), any()))
                 .thenReturn(new PageImpl<>(List.of(notification)));
 
-        mockMvc.perform(get("/api/notifications")
+        mockMvc.perform(get("/notifications")
                         .param("status", "UNREAD")
                         .param("page", "0")
                         .param("size", "10"))
@@ -88,7 +87,7 @@ class NotificationControllerMockMvcTest {
     void getUnreadCount_success() throws Exception {
         when(notificationService.getUnreadCount()).thenReturn(5L);
 
-        mockMvc.perform(get("/api/notifications/unread-count"))
+        mockMvc.perform(get("/notifications/unread-count"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(5));
@@ -100,7 +99,7 @@ class NotificationControllerMockMvcTest {
     void markAsRead_success() throws Exception {
         String body = "[101,102]";
 
-        mockMvc.perform(put("/api/notifications/mark-read")
+        mockMvc.perform(put("/notifications/mark-read")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
@@ -118,7 +117,7 @@ class NotificationControllerMockMvcTest {
         org.mockito.Mockito.doThrow(ex)
                 .when(notificationService).deleteNotifications(any());
 
-        mockMvc.perform(delete("/api/notifications")
+        mockMvc.perform(delete("/notifications")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("[201]"))
                 .andExpect(status().isOk())
@@ -130,7 +129,7 @@ class NotificationControllerMockMvcTest {
     @DisplayName("全部标记为已读调用服务层")
     @WithMockUser
     void markAllAsRead_success() throws Exception {
-        mockMvc.perform(put("/api/notifications/mark-all-read"))
+        mockMvc.perform(put("/notifications/mark-all-read"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

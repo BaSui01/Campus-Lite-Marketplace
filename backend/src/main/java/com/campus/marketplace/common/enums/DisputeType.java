@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 纠纷类型枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @since 2025-11-03
  */
 @Getter
-@RequiredArgsConstructor
 public enum DisputeType {
 
     GOODS_MISMATCH("商品不符"),
@@ -20,4 +18,8 @@ public enum DisputeType {
     OTHER("其他");
 
     private final String description;
+
+    DisputeType(String description) {
+        this.description = description;
+    }
 }

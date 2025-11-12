@@ -70,6 +70,12 @@ export interface User {
     'nickname'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof User
+     */
+    'bio'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof User
      */
@@ -106,6 +112,42 @@ export interface User {
     'status'?: UserStatusEnum;
     /**
      * 
+     * @type {boolean}
+     * @memberof User
+     */
+    'emailVerified'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof User
+     */
+    'phoneVerified'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof User
+     */
+    'twoFactorEnabled'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'twoFactorSecret'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'twoFactorRecoveryCodes'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'twoFactorEnabledAt'?: string;
+    /**
+     * 
      * @type {Set<Role>}
      * @memberof User
      */
@@ -122,6 +164,12 @@ export interface User {
      * @memberof User
      */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof User
+     */
+    'lastLoginTime'?: string;
     /**
      * 
      * @type {string}

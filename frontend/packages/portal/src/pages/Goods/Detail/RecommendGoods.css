@@ -1,0 +1,46 @@
+/**
+ * 相似推荐样式
+ * @author BaSui 😎
+ */
+
+.recommend-goods {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.recommend-goods__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px;
+}
+
+.recommend-goods__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .recommend-goods__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .recommend-goods {
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  .recommend-goods__title {
+    font-size: 18px;
+  }
+
+  .recommend-goods__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}

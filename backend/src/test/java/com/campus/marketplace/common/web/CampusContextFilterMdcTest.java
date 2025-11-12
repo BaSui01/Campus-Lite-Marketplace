@@ -46,7 +46,7 @@ class CampusContextFilterMdcTest {
         u.setId(1L);
         when(userRepo.findByUsername("u1")).thenReturn(Optional.of(u));
 
-        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/api/x");
+        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/x");
         MockHttpServletResponse res = new MockHttpServletResponse();
 
         FilterChain chain = (r, s) -> {

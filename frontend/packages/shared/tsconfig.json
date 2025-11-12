@@ -19,6 +19,7 @@
     "emitDeclarationOnly": true,
 
     // 输出配置
+    "rootDir": "./src",
     "outDir": "./dist",
     "noEmit": false,
 

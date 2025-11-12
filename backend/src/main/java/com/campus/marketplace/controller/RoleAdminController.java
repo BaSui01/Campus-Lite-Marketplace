@@ -24,7 +24,7 @@ import java.util.List;
  * @date 2025-10-29
  */
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 @Tag(name = "角色管理", description = "系统角色与权限管理接口")
 public class RoleAdminController {

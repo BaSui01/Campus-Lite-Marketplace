@@ -59,7 +59,7 @@ class AuthControllerValidationTest {
             when(userRepository.existsByUsername("basui")).thenReturn(true);
 
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-username")
+            mockMvc.perform(get("/auth/check-username")
                             .param("username", "basui")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -78,7 +78,7 @@ class AuthControllerValidationTest {
             when(userRepository.existsByUsername("newuser")).thenReturn(false);
 
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-username")
+            mockMvc.perform(get("/auth/check-username")
                             .param("username", "newuser")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -93,7 +93,7 @@ class AuthControllerValidationTest {
         @DisplayName("失败 - 缺少 username 参数")
         void checkUsername_MissingParameter() throws Exception {
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-username")
+            mockMvc.perform(get("/auth/check-username")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest());
 
@@ -105,7 +105,7 @@ class AuthControllerValidationTest {
         @DisplayName("失败 - username 为空字符串")
         void checkUsername_EmptyString() throws Exception {
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-username")
+            mockMvc.perform(get("/auth/check-username")
                             .param("username", "")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest());
@@ -120,7 +120,7 @@ class AuthControllerValidationTest {
             when(userRepository.existsByUsername("八岁啊")).thenReturn(false);
 
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-username")
+            mockMvc.perform(get("/auth/check-username")
                             .param("username", "八岁啊")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -145,7 +145,7 @@ class AuthControllerValidationTest {
             when(userRepository.existsByEmail("basui@campus.edu")).thenReturn(true);
 
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-email")
+            mockMvc.perform(get("/auth/check-email")
                             .param("email", "basui@campus.edu")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -163,7 +163,7 @@ class AuthControllerValidationTest {
             when(userRepository.existsByEmail("newuser@campus.edu")).thenReturn(false);
 
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-email")
+            mockMvc.perform(get("/auth/check-email")
                             .param("email", "newuser@campus.edu")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -178,7 +178,7 @@ class AuthControllerValidationTest {
         @DisplayName("失败 - 缺少 email 参数")
         void checkEmail_MissingParameter() throws Exception {
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-email")
+            mockMvc.perform(get("/auth/check-email")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest());
 
@@ -189,7 +189,7 @@ class AuthControllerValidationTest {
         @DisplayName("失败 - email 为空字符串")
         void checkEmail_EmptyString() throws Exception {
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-email")
+            mockMvc.perform(get("/auth/check-email")
                             .param("email", "")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest());
@@ -201,7 +201,7 @@ class AuthControllerValidationTest {
         @DisplayName("失败 - email 格式错误（无 @ 符号）")
         void checkEmail_InvalidFormat_NoAtSymbol() throws Exception {
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-email")
+            mockMvc.perform(get("/auth/check-email")
                             .param("email", "invalidemail")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest());
@@ -213,7 +213,7 @@ class AuthControllerValidationTest {
         @DisplayName("边界 - email 格式错误（无域名）")
         void checkEmail_InvalidFormat_NoDomain() throws Exception {
             // Act & Assert
-            mockMvc.perform(get("/api/auth/check-email")
+            mockMvc.perform(get("/auth/check-email")
                             .param("email", "test@")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest());
@@ -236,7 +236,7 @@ class AuthControllerValidationTest {
 
             // Act
             long startTime = System.currentTimeMillis();
-            mockMvc.perform(get("/api/auth/check-username")
+            mockMvc.perform(get("/auth/check-username")
                             .param("username", "basui")
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk());

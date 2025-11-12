@@ -5,28 +5,13 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { WebSocketReadyState } from '../utils/websocket';
 
 /**
- * WebSocket 连接状态
+ * 🎯 重要：WebSocketReadyState 已从 utils/websocket 导入，避免重复定义！
+ * 🔄 重新导出供外部使用
  */
-export enum WebSocketReadyState {
-  /**
-   * 正在连接
-   */
-  CONNECTING = 0,
-  /**
-   * 已连接
-   */
-  OPEN = 1,
-  /**
-   * 正在关闭
-   */
-  CLOSING = 2,
-  /**
-   * 已关闭
-   */
-  CLOSED = 3,
-}
+export { WebSocketReadyState };
 
 /**
  * useWebSocket 配置选项

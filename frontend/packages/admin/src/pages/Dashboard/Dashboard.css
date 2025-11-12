@@ -1,30 +1,276 @@
 /**
- * 仪表盘样式
+ * 仪表盘样式 - 现代化美化版本
  *
  * @author BaSui 😎
  * @date 2025-11-01
+ * @updated 2025-11-09 - 添加动画效果、渐变背景、卡片优化
  */
 
+/* ===== 页面容器 ===== */
 .dashboard {
   padding: 0;
+  animation: fade-in 0.6s ease-out;
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 标题美化 ===== */
+.dashboard h2 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  margin-bottom: 24px;
+  animation: slide-in-left 0.8s ease-out;
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== 统计卡片区域 ===== */
 .stat-cards {
   margin-bottom: 24px;
 }
 
+.stat-cards .ant-col {
+  animation: fade-in-up 0.6s ease-out backwards;
+}
+
+.stat-cards .ant-col:nth-child(1) { animation-delay: 0.1s; }
+.stat-cards .ant-col:nth-child(2) { animation-delay: 0.2s; }
+.stat-cards .ant-col:nth-child(3) { animation-delay: 0.3s; }
+.stat-cards .ant-col:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 卡片美化 ===== */
+.dashboard .ant-card {
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+}
+
+.dashboard .ant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.dashboard .ant-card-head {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+  font-weight: 600;
+  padding: 16px 24px;
+}
+
+.dashboard .ant-card-head-title {
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.dashboard .ant-card-body {
+  padding: 20px 24px;
+}
+
+/* ===== 排行榜区域 ===== */
 .ranking-section {
   margin-bottom: 24px;
+}
+
+.ranking-section .ant-col {
+  animation: fade-in-up 0.6s ease-out backwards;
+}
+
+.ranking-section .ant-col:nth-child(1) { animation-delay: 0.5s; }
+.ranking-section .ant-col:nth-child(2) { animation-delay: 0.6s; }
+
+.ranking-section .ant-list-item {
+  padding: 12px 0;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin: 0 -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.ranking-section .ant-list-item:hover {
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, transparent 100%);
+  transform: translateX(4px);
+}
+
+.ranking-section .ant-list-item-meta-avatar {
+  animation: pop-in 0.5s ease-out backwards;
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== 今日统计区域 ===== */
+.today-stats {
+  animation: fade-in-up 0.6s ease-out 0.7s backwards;
 }
 
 .today-stats .stat-item {
   text-align: center;
   padding: 16px 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.today-stats .stat-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.today-stats .stat-item:hover::after {
+  width: 60%;
 }
 
 .today-stats .stat-value {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1677ff;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-top: 8px;
+  animation: number-count 1s ease-out;
+}
+
+@keyframes number-count {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.today-stats .ant-typography {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  font-weight: 500;
+}
+
+/* ===== 图表区域 ===== */
+.chart-section {
+  margin-bottom: 24px;
+}
+
+.chart-section .ant-col {
+  animation: fade-in-up 0.6s ease-out backwards;
+}
+
+.chart-section .ant-col:nth-child(1) { animation-delay: 0.8s; }
+.chart-section .ant-col:nth-child(2) { animation-delay: 0.9s; }
+
+/* ===== 加载状态优化 ===== */
+.dashboard .ant-spin-container {
+  min-height: 200px;
+}
+
+.dashboard .ant-skeleton {
+  padding: 20px;
+}
+
+/* ===== Tag 美化 ===== */
+.ranking-section .ant-tag {
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 响应式适配 ===== */
+@media (max-width: 768px) {
+  .dashboard h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .dashboard .ant-card {
+    border-radius: 12px;
+  }
+
+  .dashboard .ant-card-head {
+    padding: 12px 16px;
+  }
+
+  .dashboard .ant-card-body {
+    padding: 16px;
+  }
+
+  .today-stats .stat-value {
+    font-size: 28px;
+  }
+
+  .ranking-section .ant-list-item {
+    padding: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard .ant-card {
+    border-radius: 10px;
+  }
+
+  .today-stats .stat-value {
+    font-size: 24px;
+  }
+
+  .dashboard .ant-card-head-title {
+    font-size: 14px;
+  }
 }

@@ -1,158 +1,60 @@
 /**
- * 注册页面 - 欢迎加入我们！🎉
+ * 注册页面 📝
  * @author BaSui 😎
- * @description 邮箱验证码注册 + 滑块验证
+ * @description 手机号/邮箱注册，验证码验证
  */
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import { Input, Button } from '@campus/shared/components';
-import { SliderCaptcha } from '../../components/SliderCaptcha';
-import { authService } from '@campus/shared/services/auth';
-import type { ConfirmRegisterByEmailRequest } from '@campus/shared/api/models';
+import { authService } from '@campus/shared/services';;
+import { encryptPassword } from '@campus/shared/utils';
+import { useAuthStore } from '../../store';
 import './Register.css';
 
-/**
- * 注册页面组件
- */
-const Register: React.FC = () => {
+type RegisterType = 'phone' | 'email';
+
+export const Register: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
-  // 表单状态
-  const [formData, setFormData] = useState<ConfirmRegisterByEmailRequest>({
-    username: '',
-    password: '',
+  const [registerType, setRegisterType] = useState<RegisterType>('phone');
+  const [formData, setFormData] = useState({
+    phone: '',
     email: '',
-    code: '',
+    password: '',
+    confirmPassword: '',
+    verificationCode: '',
+    username: '',
   });
-
-  // BaSui新增：确认密码字段（用于验证，不提交到后端）
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  // UI 状态
-  const [loading, setLoading] = useState(false);
-  const [sendingCode, setSendingCode] = useState(false);
-  const [countdown, setCountdown] = useState(0); // 倒计时（秒）
-  const [isVerified, setIsVerified] = useState(false); // 是否通过滑块验证
-  const [resetCaptcha, setResetCaptcha] = useState(false); // 重置验证码
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [checkingUsername, setCheckingUsername] = useState(false); // 正在校验用户名
-  const [checkingEmail, setCheckingEmail] = useState(false); // 正在校验邮箱
+  const [codeSent, setCodeSent] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
-  /**
-   * 🔍 实时校验用户名是否已存在（BaSui 新增 🎯）
-   */
-  const handleCheckUsername = async (username: string) => {
-    // 跳过空值和过短的用户名
-    if (!username.trim() || username.length < 3) {
-      return;
-    }
+  // 实时校验状态
+  const [usernameChecking, setUsernameChecking] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null);
 
-    setCheckingUsername(true);
-
-    try {
-      console.log('[Register] 🔍 校验用户名:', username);
-      const response = await authService.checkUsername(username);
-
-      if (response.data === true) {
-        // 用户名已存在
-        setErrors(prev => ({ ...prev, username: '❌ 用户名已被占用！' }));
+  // 发送验证码
+  const sendCodeMutation = useMutation({
+    mutationFn: async () => {
+      if (registerType === 'phone') {
+        await authService.sendRegisterSmsCode(formData.phone);
       } else {
-        // 用户名可用
-        setErrors(prev => ({ ...prev, username: '✅ 用户名可用！' }));
-        // 3秒后清除成功提示
-        setTimeout(() => {
-          setErrors(prev => ({ ...prev, username: '' }));
-        }, 3000);
+        await authService.sendRegisterEmailCode(formData.email);
       }
-    } catch (error: any) {
-      console.error('[Register] ❌ 校验用户名失败:', error);
-      // 网络错误不显示，避免干扰用户
-    } finally {
-      setCheckingUsername(false);
-    }
-  };
-
-  /**
-   * 🔍 实时校验邮箱是否已存在（BaSui 新增 🎯）
-   */
-  const handleCheckEmail = async (email: string) => {
-    // 跳过空值和格式错误的邮箱
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim() || !emailRegex.test(email)) {
-      return;
-    }
-
-    setCheckingEmail(true);
-
-    try {
-      console.log('[Register] 🔍 校验邮箱:', email);
-      const response = await authService.checkEmail(email);
-
-      if (response.data === true) {
-        // 邮箱已被注册
-        setErrors(prev => ({ ...prev, email: '❌ 邮箱已被注册！' }));
-      } else {
-        // 邮箱可用
-        setErrors(prev => ({ ...prev, email: '✅ 邮箱可用！' }));
-        // 3秒后清除成功提示
-        setTimeout(() => {
-          setErrors(prev => ({ ...prev, email: '' }));
-        }, 3000);
-      }
-    } catch (error: any) {
-      console.error('[Register] ❌ 校验邮箱失败:', error);
-      // 网络错误不显示，避免干扰用户
-    } finally {
-      setCheckingEmail(false);
-    }
-  };
-
-  /**
-   * 📝 处理表单输入
-   */
-  const handleInputChange = (field: keyof ConfirmRegisterByEmailRequest) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: event.target.value,
-    }));
-    // 清除该字段的错误提示
-    setErrors(prev => ({ ...prev, [field]: '' }));
-  };
-
-  /**
-   * 📧 发送邮箱验证码
-   */
-  const handleSendCode = async () => {
-    // 验证邮箱格式
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      setErrors(prev => ({ ...prev, email: '邮箱不能为空！' }));
-      return;
-    }
-    if (!emailRegex.test(formData.email)) {
-      setErrors(prev => ({ ...prev, email: '邮箱格式不正确！' }));
-      return;
-    }
-
-    // 检查滑块验证
-    if (!isVerified) {
-      setErrors(prev => ({ ...prev, captcha: '请先完成滑块验证！' }));
-      return;
-    }
-
-    setSendingCode(true);
-
-    try {
-      console.log('[Register] 📧 发送邮箱验证码:', formData.email);
-      await authService.sendRegisterEmailCode(formData.email);
-
-      console.log('[Register] ✅ 验证码发送成功！');
-
-      // 开始倒计时（60 秒）
+    },
+    onSuccess: () => {
+      setCodeSent(true);
       setCountdown(60);
+      
+      // 倒计时
       const timer = setInterval(() => {
-        setCountdown(prev => {
+        setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
             return 0;
@@ -160,127 +62,255 @@ const Register: React.FC = () => {
           return prev - 1;
         });
       }, 1000);
-    } catch (error: any) {
-      console.error('[Register] ❌ 发送验证码失败:', error);
+    },
+    onError: (error: any) => {
+      setErrors({ code: error?.message || '发送验证码失败' });
+    },
+  });
 
-      const errorMessage = error?.response?.data?.message || error?.message || '发送失败，请重试！';
-      setErrors(prev => ({ ...prev, email: errorMessage }));
-    } finally {
-      setSendingCode(false);
-    }
-  };
+  // 注册
+  const registerMutation = useMutation({
+    mutationFn: async () => {
+      // 🔐 加密密码（防止明文传输）
+      let encryptedPassword: string;
+      try {
+        encryptedPassword = encryptPassword(formData.password);
+      } catch (error) {
+        console.error('❌ 密码加密失败:', error);
+        throw new Error('密码加密失败，请重试');
+      }
+      
+      const data = registerType === 'phone'
+        ? {
+            phone: formData.phone,
+            password: encryptedPassword,
+            code: formData.verificationCode,
+            username: formData.username,
+          }
+        : {
+            email: formData.email,
+            password: encryptedPassword,
+            code: formData.verificationCode,
+            username: formData.username,
+          };
+      
+      const response = registerType === 'phone'
+        ? await authService.registerByPhone(data)
+        : await authService.registerByEmail(data);
+      
+      return response;
+    },
+    onSuccess: () => {
+      alert('🎉 注册成功！即将跳转到登录页...');
+      navigate('/login', {
+        state: {
+          username: formData.username,
+          password: formData.password,
+        },
+      });
+    },
+    onError: (error: any) => {
+      console.error('[Register] ❌ 注册失败:', error);
+      // 提取后端返回的错误信息
+      const errorMessage = error?.response?.data?.message 
+        || error?.message 
+        || '注册失败，请检查输入信息';
+      setErrors({ submit: errorMessage });
+    },
+  });
 
-  /**
-   * ✅ 验证表单数据
-   */
+  // 表单验证
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    // 用户名验证（与后端规则一致：3-50字符）
     if (!formData.username.trim()) {
-      newErrors.username = '用户名不能为空！';
-    } else if (formData.username.length < 3) {
-      newErrors.username = '用户名至少 3 位！';
-    } else if (formData.username.length > 20) {
-      newErrors.username = '用户名最多 20 位！';
+      newErrors.username = '请输入用户名';
+    } else if (formData.username.length < 3 || formData.username.length > 50) {
+      newErrors.username = '用户名长度为3-50个字符';
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      newErrors.username = '用户名只能包含字母、数字和下划线';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = '邮箱不能为空！';
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = '邮箱格式不正确！';
+    // 手机号/邮箱验证
+    if (registerType === 'phone') {
+      if (!formData.phone.trim()) {
+        newErrors.phone = '请输入手机号';
+      } else if (!/^1[3-9]\d{9}$/.test(formData.phone)) {
+        newErrors.phone = '请输入有效的手机号';
+      }
+    } else {
+      if (!formData.email.trim()) {
+        newErrors.email = '请输入邮箱';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = '请输入有效的邮箱地址';
+      }
     }
 
-    if (!formData.code.trim()) {
-      newErrors.code = '验证码不能为空！';
-    } else if (formData.code.length !== 6) {
-      newErrors.code = '验证码为 6 位数字！';
-    }
-
-    if (!formData.password.trim()) {
-      newErrors.password = '密码不能为空！';
+    // 密码验证
+    if (!formData.password) {
+      newErrors.password = '请输入密码';
     } else if (formData.password.length < 6) {
-      newErrors.password = '密码至少 6 位！';
-    } else if (formData.password.length > 20) {
-      newErrors.password = '密码最多 20 位！';
+      newErrors.password = '密码长度至少6位';
     }
 
-    // ✅ BaSui新增：密码确认验证
-    if (!confirmPassword.trim()) {
-      newErrors.confirmPassword = '请再次输入密码！';
-    } else if (confirmPassword !== formData.password) {
-      newErrors.confirmPassword = '两次密码不一致！';
+    // 确认密码验证
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = '请确认密码';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = '两次输入的密码不一致';
     }
 
-    if (!isVerified) {
-      newErrors.captcha = '请先完成滑块验证！';
+    // 验证码验证
+    if (!formData.verificationCode.trim()) {
+      newErrors.verificationCode = '请输入验证码';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  /**
-   * 🚀 处理注册提交
-   */
-  const handleRegister = async () => {
-    // 1. 验证表单
-    if (!validateForm()) {
-      console.warn('[Register] 表单验证失败');
+  // 发送验证码
+  const handleSendCode = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (registerType === 'phone') {
+      if (!formData.phone.trim()) {
+        newErrors.phone = '请输入手机号';
+      } else if (!/^1[3-9]\d{9}$/.test(formData.phone)) {
+        newErrors.phone = '请输入有效的手机号';
+      }
+    } else {
+      if (!formData.email.trim()) {
+        newErrors.email = '请输入邮箱';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = '请输入有效的邮箱地址';
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
-    setLoading(true);
+    sendCodeMutation.mutate();
+  };
 
-    try {
-      // 2. 调用真实后端 API
-      console.log('[Register] 🚀 调用注册接口:', formData);
-      await authService.registerByEmail(formData);
-
-      console.log('[Register] ✅ 注册成功！');
-
-      // 3. 跳转到登录页面
-      setTimeout(() => {
-        navigate('/login');
-      }, 500);
-    } catch (error: any) {
-      console.error('[Register] ❌ 注册失败:', error);
-
-      // 显示错误提示
-      const errorMessage = error?.response?.data?.message || error?.message || '注册失败，请重试！';
-      setErrors({ form: errorMessage });
-
-      // 重置滑块验证
-      setIsVerified(false);
-      setResetCaptcha(prev => !prev);
-    } finally {
-      setLoading(false);
+  // 提交注册
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
     }
+
+    registerMutation.mutate();
   };
 
-  /**
-   * 🎯 滑块验证成功
-   */
-  const handleCaptchaSuccess = () => {
-    console.log('[Register] ✅ 滑块验证通过！');
-    setIsVerified(true);
-    setErrors(prev => ({ ...prev, captcha: '' }));
+  // 切换注册方式
+  const handleSwitchType = (type: RegisterType) => {
+    setRegisterType(type);
+    setErrors({});
+    setCodeSent(false);
+    setCountdown(0);
   };
 
-  /**
-   * 🎯 滑块验证失败
-   */
-  const handleCaptchaFail = () => {
-    console.warn('[Register] ❌ 滑块验证失败！');
-    setIsVerified(false);
-  };
+  // ==================== 实时校验逻辑 ====================
 
   /**
-   * ⌨️ 按下回车键注册
+   * 用户名实时校验（防抖 500ms）
    */
-  const handlePressEnter = () => {
-    handleRegister();
-  };
+  useEffect(() => {
+    // 重置校验状态
+    setUsernameAvailable(null);
+
+    // 用户名长度不足，不校验
+    if (formData.username.length < 2) {
+      return;
+    }
+
+    // 防抖：500ms 后执行校验
+    const timer = setTimeout(async () => {
+      setUsernameChecking(true);
+
+      try {
+        console.log('[Register] 🔍 校验用户名:', formData.username);
+        const response = await authService.checkUsername(formData.username);
+        const exists = response.data; // true-已存在，false-可用
+
+        setUsernameAvailable(!exists);
+
+        if (exists) {
+          setErrors((prev) => ({ ...prev, username: '❌ 用户名已被占用' }));
+        } else {
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.username;
+            return newErrors;
+          });
+        }
+
+        console.log('[Register] ✅ 用户名校验完成:', exists ? '已占用' : '可用');
+      } catch (error: any) {
+        console.error('[Register] ❌ 用户名校验失败:', error);
+        // 校验失败不影响注册流程
+      } finally {
+        setUsernameChecking(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.username]);
+
+  /**
+   * 邮箱实时校验（防抖 500ms）
+   */
+  useEffect(() => {
+    // 只在邮箱注册模式下校验
+    if (registerType !== 'email') {
+      return;
+    }
+
+    // 重置校验状态
+    setEmailAvailable(null);
+
+    // 邮箱格式不正确，不校验
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return;
+    }
+
+    // 防抖：500ms 后执行校验
+    const timer = setTimeout(async () => {
+      setEmailChecking(true);
+
+      try {
+        console.log('[Register] 🔍 校验邮箱:', formData.email);
+        const response = await authService.checkEmail(formData.email);
+        const exists = response.data; // true-已存在，false-可用
+
+        setEmailAvailable(!exists);
+
+        if (exists) {
+          setErrors((prev) => ({ ...prev, email: '❌ 邮箱已被注册' }));
+        } else {
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.email;
+            return newErrors;
+          });
+        }
+
+        console.log('[Register] ✅ 邮箱校验完成:', exists ? '已注册' : '可用');
+      } catch (error: any) {
+        console.error('[Register] ❌ 邮箱校验失败:', error);
+        // 校验失败不影响注册流程
+      } finally {
+        setEmailChecking(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.email, registerType]);
 
   return (
     <div className="register-page">
@@ -288,157 +318,219 @@ const Register: React.FC = () => {
         {/* 左侧欢迎区域 */}
         <div className="register-welcome">
           <h1 className="register-welcome__title">加入我们</h1>
-          <p className="register-welcome__subtitle">Join Campus Lite Marketplace</p>
+          <p className="register-welcome__subtitle">Join Campus Marketplace</p>
           <p className="register-welcome__desc">
-            🌟 开启你的校园二手交易之旅
+            🎓 学生专属的二手交易平台
             <br />
-            📦 发布闲置 | 淘好物 | 交朋友
+            💡 买卖闲置 | 交友互动 | 绿色环保
             <br />
-            🎁 注册即送 100 积分！
+            🔥 注册即刻开启你的轻享之旅
           </p>
         </div>
 
         {/* 右侧注册表单 */}
-        <div className="register-form">
-          <h2 className="register-form__title">创建账号 🚀</h2>
-          <p className="register-form__subtitle">填写信息完成注册</p>
+        <div className="register-card">
+          {/* Logo和标题 */}
+          <div className="register-header">
+            <h1 className="register-title">创建新账号 🎉</h1>
+            <p className="register-subtitle">快速注册，开启轻享生活</p>
+          </div>
 
-          {/* 表单错误提示 */}
-          {errors.form && (
-            <div className="register-form__error">
-              ⚠️ {errors.form}
+          {/* 注册方式切换 */}
+          <div className="register-tabs">
+            <button
+              className={`register-tab ${registerType === 'phone' ? 'active' : ''}`}
+              onClick={() => handleSwitchType('phone')}
+            >
+              📱 手机号注册
+            </button>
+            <button
+              className={`register-tab ${registerType === 'email' ? 'active' : ''}`}
+              onClick={() => handleSwitchType('email')}
+            >
+              📧 邮箱注册
+            </button>
+          </div>
+
+          {/* 注册表单 */}
+          <form className="register-form" onSubmit={handleSubmit}>
+            {/* 用户名 */}
+            <div className="form-field">
+              <label>用户名</label>
+              <div className="input-with-status">
+                <Input
+                  size="large"
+                  placeholder="请输入用户名（2-20个字符）"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  prefix={<span>👤</span>}
+                  allowClear
+                />
+                {/* 校验状态图标 */}
+                {formData.username.length >= 2 && (
+                  <span className="validation-status">
+                    {usernameChecking ? (
+                      <span className="status-loading">🔄</span>
+                    ) : usernameAvailable === true ? (
+                      <span className="status-success">✅</span>
+                    ) : usernameAvailable === false ? (
+                      <span className="status-error">❌</span>
+                    ) : null}
+                  </span>
+                )}
+              </div>
+              {/* 错误提示 */}
+              {errors.username && (
+                <div className="form-field-error">{errors.username}</div>
+              )}
+              {/* 成功提示 */}
+              {!errors.username && usernameAvailable === true && (
+                <div className="form-field-success">✅ 用户名可用</div>
+              )}
             </div>
-          )}
 
-          {/* 用户名输入框 */}
-          <div className="register-form__field">
-            <label className="register-form__label">用户名</label>
-            <Input
-              size="large"
-              placeholder="请输入用户名（3-20位）"
-              value={formData.username}
-              onChange={handleInputChange('username')}
-              onBlur={(e) => handleCheckUsername(e.target.value)} // ✅ BaSui 新增：失焦时校验
-              error={!!errors.username && !errors.username.startsWith('✅')}
-              errorMessage={errors.username}
-              prefix={<span>👤</span>}
-              suffix={checkingUsername ? <span>⏳</span> : null} // 显示加载状态
-              allowClear
-              maxLength={20}
-            />
-          </div>
+            {/* 手机号/邮箱 */}
+            {registerType === 'phone' ? (
+              <div className="form-field">
+                <label>手机号</label>
+                <Input
+                  size="large"
+                  placeholder="请输入手机号"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  prefix={<span>📱</span>}
+                  allowClear
+                />
+                {errors.phone && (
+                  <div className="form-field-error">{errors.phone}</div>
+                )}
+              </div>
+            ) : (
+              <div className="form-field">
+                <label>邮箱</label>
+                <div className="input-with-status">
+                  <Input
+                    size="large"
+                    type="email"
+                    placeholder="请输入邮箱"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    prefix={<span>📧</span>}
+                    allowClear
+                  />
+                  {/* 校验状态图标 */}
+                  {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && (
+                    <span className="validation-status">
+                      {emailChecking ? (
+                        <span className="status-loading">🔄</span>
+                      ) : emailAvailable === true ? (
+                        <span className="status-success">✅</span>
+                      ) : emailAvailable === false ? (
+                        <span className="status-error">❌</span>
+                      ) : null}
+                    </span>
+                  )}
+                </div>
+                {/* 错误提示 */}
+                {errors.email && (
+                  <div className="form-field-error">{errors.email}</div>
+                )}
+                {/* 成功提示 */}
+                {!errors.email && emailAvailable === true && (
+                  <div className="form-field-success">✅ 邮箱可用</div>
+                )}
+              </div>
+            )}
 
-          {/* 邮箱输入框 */}
-          <div className="register-form__field">
-            <label className="register-form__label">校园邮箱</label>
-            <Input
-              type="email"
-              size="large"
-              placeholder="请输入校园邮箱"
-              value={formData.email}
-              onChange={handleInputChange('email')}
-              onBlur={(e) => handleCheckEmail(e.target.value)} // ✅ BaSui 新增：失焦时校验
-              error={!!errors.email && !errors.email.startsWith('✅')}
-              errorMessage={errors.email}
-              prefix={<span>📧</span>}
-              suffix={checkingEmail ? <span>⏳</span> : null} // 显示加载状态
-              allowClear
-            />
-          </div>
+            {/* 验证码 */}
+            <div className="form-field">
+              <label>验证码</label>
+              <div className="verification-code-field">
+                <Input
+                  size="large"
+                  placeholder="请输入验证码"
+                  value={formData.verificationCode}
+                  onChange={(e) => setFormData({ ...formData, verificationCode: e.target.value })}
+                  prefix={<span>🔐</span>}
+                />
+                <button
+                  type="button"
+                  className="send-code-btn"
+                  onClick={handleSendCode}
+                  disabled={countdown > 0 || sendCodeMutation.isPending}
+                >
+                  {countdown > 0
+                    ? `${countdown}秒后重试`
+                    : sendCodeMutation.isPending
+                    ? '发送中...'
+                    : codeSent
+                    ? '重新发送'
+                    : '获取验证码'}
+                </button>
+              </div>
+              {errors.verificationCode && (
+                <div className="form-field-error">{errors.verificationCode}</div>
+              )}
+              {errors.code && (
+                <div className="form-field-error">{errors.code}</div>
+              )}
+            </div>
 
-          {/* 验证码输入框 */}
-          <div className="register-form__field">
-            <label className="register-form__label">邮箱验证码</label>
-            <div className="register-form__code-input">
+            {/* 密码 */}
+            <div className="form-field">
+              <label>密码</label>
               <Input
                 size="large"
-                placeholder="请输入 6 位验证码"
-                value={formData.code}
-                onChange={handleInputChange('code')}
-                error={!!errors.code}
-                errorMessage={errors.code}
-                prefix={<span>🔢</span>}
-                maxLength={6}
+                type="password"
+                placeholder="请输入密码（至少6位）"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                prefix={<span>🔒</span>}
               />
-              <Button
-                type="primary"
-                size="large"
-                loading={sendingCode}
-                disabled={countdown > 0}
-                onClick={handleSendCode}
-                className="register-form__code-button"
-              >
-                {countdown > 0 ? `${countdown}s` : sendingCode ? '发送中...' : '发送验证码'}
-              </Button>
+              {errors.password && (
+                <div className="form-field-error">{errors.password}</div>
+              )}
             </div>
-          </div>
 
-          {/* 密码输入框 */}
-          <div className="register-form__field">
-            <label className="register-form__label">密码</label>
-            <Input
-              type="password"
-              size="large"
-              placeholder="请输入密码（6-20位）"
-              value={formData.password}
-              onChange={handleInputChange('password')}
-              error={!!errors.password}
-              errorMessage={errors.password}
-              prefix={<span>🔒</span>}
-              maxLength={20}
-            />
-          </div>
+            {/* 确认密码 */}
+            <div className="form-field">
+              <label>确认密码</label>
+              <Input
+                size="large"
+                type="password"
+                placeholder="请再次输入密码"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                prefix={<span>🔒</span>}
+              />
+              {errors.confirmPassword && (
+                <div className="form-field-error">{errors.confirmPassword}</div>
+              )}
+            </div>
 
-          {/* ✅ BaSui新增：确认密码输入框 */}
-          <div className="register-form__field">
-            <label className="register-form__label">确认密码</label>
-            <Input
-              type="password"
-              size="large"
-              placeholder="请再次输入密码"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                // 清除确认密码的错误提示
-                setErrors(prev => ({ ...prev, confirmPassword: '' }));
-              }}
-              onPressEnter={handlePressEnter}
-              error={!!errors.confirmPassword}
-              errorMessage={errors.confirmPassword}
-              prefix={<span>🔑</span>}
-              maxLength={20}
-            />
-          </div>
-
-          {/* 滑块验证 */}
-          <div className="register-form__field">
-            <SliderCaptcha
-              onSuccess={handleCaptchaSuccess}
-              onFail={handleCaptchaFail}
-              reset={resetCaptcha}
-            />
-            {errors.captcha && (
-              <div className="register-form__field-error">{errors.captcha}</div>
+            {/* 提交错误 */}
+            {errors.submit && (
+              <div className="form-submit-error">⚠️ {errors.submit}</div>
             )}
-          </div>
 
-          {/* 注册按钮 */}
-          <Button
-            type="primary"
-            size="large"
-            block
-            loading={loading}
-            onClick={handleRegister}
-          >
-            {loading ? '注册中...' : '立即注册'}
-          </Button>
+            {/* 注册按钮 */}
+            <Button
+              type="primary"
+              size="large"
+              htmlType="submit"
+              loading={registerMutation.isPending}
+              block
+            >
+              {registerMutation.isPending ? '注册中...' : '注册'}
+            </Button>
+          </form>
 
-          {/* 登录链接 */}
-          <div className="register-form__footer">
-            已有账号？
-            <a href="/login" className="register-form__link">
+          {/* 底部链接 */}
+          <div className="register-footer">
+            <span>已有账号？</span>
+            <Link to="/login" className="register-footer-link">
               立即登录
-            </a>
+            </Link>
           </div>
         </div>
       </div>

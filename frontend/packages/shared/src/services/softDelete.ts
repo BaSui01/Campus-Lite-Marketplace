@@ -1,22 +1,56 @@
 /**
- * 软删除治理服务
+ * ✅ 软删除治理服务 - 已重构为 OpenAPI
+ * @author BaSui 😎
+ * @description 基于 OpenAPI 生成的 DefaultApi，零手写路径！
+ *
+ * 功能：
+ * - 查询支持软删除的实体列表
+ * - 恢复已软删除的记录
+ * - 彻底删除记录（绕过软删除）
+ *
+ * ⚠️ 注意：所有接口需要管理员权限（ADMIN角色）
+ * 📋 API 路径：/api/admin/soft-delete/*
  */
 
-import { http } from '../utils/http';
-import type { ApiResponse } from '../types';
+import { getApi } from '../utils/apiClient';
 
+/**
+ * 软删除治理服务类
+ */
 export class SoftDeleteService {
+  /**
+   * 查询支持软删除的实体列表
+   * GET /api/admin/soft-delete/targets
+   * @returns 实体标识列表（如：["post", "goods", "user"]）
+   * TODO: 等待后端实现 listSoftDeleteTargets API
+   */
   async listTargets(): Promise<string[]> {
-    const res = await http.get<ApiResponse<string[]>>('/api/admin/soft-delete/targets');
-    return res.data;
+    // const api = getApi();
+    // const response = await api.listSoftDeleteTargets();
+    // return response.data.data as string[];
+    throw new Error('查询软删除实体列表功能暂未实现');
   }
 
+  /**
+   * 恢复已软删除的记录
+   * POST /api/admin/soft-delete/{entity}/{id}/restore
+   * @param entity 实体标识（如："post", "goods", "user"）
+   * @param id 记录ID
+   */
   async restore(entity: string, id: number): Promise<void> {
-    await http.post<ApiResponse<void>>(`/api/admin/soft-delete/${entity}/${id}/restore`);
+    const api = getApi();
+    await api.restore({ entity, id });
   }
 
+  /**
+   * 彻底删除记录（绕过软删除）
+   * DELETE /api/admin/soft-delete/{entity}/{id}/purge
+   * @param entity 实体标识（如："post", "goods", "user"）
+   * @param id 记录ID
+   */
   async purge(entity: string, id: number): Promise<void> {
-    await http.delete<ApiResponse<void>>(`/api/admin/soft-delete/${entity}/${id}/purge`);
+    const api = getApi();
+    await api.purge({ entity, id });
   }
 }
 

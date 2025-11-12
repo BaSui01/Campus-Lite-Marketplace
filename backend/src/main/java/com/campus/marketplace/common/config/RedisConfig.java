@@ -3,10 +3,10 @@ package com.campus.marketplace.common.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -28,7 +28,8 @@ import java.time.Duration;
  * @date 2025-10-25
  */
 @Configuration
-@ConditionalOnProperty(name = "app.redis.mode", havingValue = "redis", matchIfMissing = true)
+// 🔧 临时移除条件注解，确保Redis配置一定会被加载
+// @ConditionalOnProperty(name = "app.redis.mode", havingValue = "redis", matchIfMissing = true)
 public class RedisConfig {
 
     /**
@@ -58,6 +59,27 @@ public class RedisConfig {
         template.setValueSerializer(serializer);
         // hash 的 value 序列化方式采用 jackson
         template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    /**
+     * 配置自定义 StringRedisTemplate（用于验证码等简单字符串存储）
+     * Value 也使用 String 序列化（不使用 JSON）
+     * 🔧 重命名为 customStringRedisTemplate 避免与 Spring Boot 自动配置冲突
+     */
+    @Bean(name = "customStringRedisTemplate")
+    public RedisTemplate<String, String> customStringRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        // Key 和 Value 都使用 String 序列化
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringSerializer);
+        template.setValueSerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
+        template.setHashValueSerializer(stringSerializer);
 
         template.afterPropertiesSet();
         return template;
@@ -97,6 +119,8 @@ public class RedisConfig {
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        // ✅ 关键修复：全局忽略未知字段，兼容老版本缓存结构
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         // 🔧 修复 PageImpl 反序列化问题: 添加 PageImpl 的 MixIn
         mapper.addMixIn(org.springframework.data.domain.PageImpl.class, PageImplMixin.class);
@@ -104,6 +128,8 @@ public class RedisConfig {
         mapper.addMixIn(org.springframework.data.domain.PageRequest.class, PageRequestMixin.class);
         // 🔧 修复 Sort 反序列化问题: 添加 Sort 的 MixIn
         mapper.addMixIn(org.springframework.data.domain.Sort.class, SortMixin.class);
+        // 🔧 修复 Sort.Order 反序列化问题: 添加 Sort.Order 的 MixIn（与 RedisCacheConfig 保持一致）
+        mapper.addMixIn(org.springframework.data.domain.Sort.Order.class, SortOrderMixin.class);
 
         return mapper;
     }
@@ -112,6 +138,7 @@ public class RedisConfig {
      * PageImpl 的 Jackson MixIn 类,提供反序列化所需的构造函数信息
      * 🎯 解决 "Cannot construct instance of PageImpl (no Creators)" 错误
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class PageImplMixin {
         @com.fasterxml.jackson.annotation.JsonCreator
         PageImplMixin(
@@ -125,6 +152,7 @@ public class RedisConfig {
      * PageRequest 的 Jackson MixIn 类,提供反序列化所需的构造函数信息
      * 🎯 解决 "Cannot construct instance of PageRequest (no Creators)" 错误
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class PageRequestMixin {
         @com.fasterxml.jackson.annotation.JsonCreator
         PageRequestMixin(
@@ -138,10 +166,26 @@ public class RedisConfig {
      * Sort 的 Jackson MixIn 类,提供反序列化所需的构造函数信息
      * 🎯 解决 "Cannot construct instance of Sort (no Creators)" 错误
      */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
     private abstract static class SortMixin {
         @com.fasterxml.jackson.annotation.JsonCreator
         SortMixin(
                 @com.fasterxml.jackson.annotation.JsonProperty("orders") java.util.List<org.springframework.data.domain.Sort.Order> orders) {
+        }
+    }
+
+    /**
+     * Sort.Order 的 Jackson MixIn 类,提供反序列化所需的构造函数信息
+     * 🎯 忽略未知字段（如 empty/sorted/unsorted/ascending 等历史缓存产物）
+     */
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+    private abstract static class SortOrderMixin {
+        @com.fasterxml.jackson.annotation.JsonCreator
+        SortOrderMixin(
+                @com.fasterxml.jackson.annotation.JsonProperty("direction") org.springframework.data.domain.Sort.Direction direction,
+                @com.fasterxml.jackson.annotation.JsonProperty("property") String property,
+                @com.fasterxml.jackson.annotation.JsonProperty("ignoreCase") boolean ignoreCase,
+                @com.fasterxml.jackson.annotation.JsonProperty("nullHandling") org.springframework.data.domain.Sort.NullHandling nullHandling) {
         }
     }
 }

@@ -6,7 +6,7 @@
 
 import React from 'react';
 import * as echarts from 'echarts/core';
-import { BarChart } from 'echarts/charts';
+import { BarChart as EChartsBarChart } from 'echarts/charts';
 import {
   TitleComponent,
   TooltipComponent,
@@ -21,7 +21,7 @@ echarts.use([
   TooltipComponent,
   GridComponent,
   LegendComponent,
-  BarChart,
+  EChartsBarChart,
   CanvasRenderer,
 ]);
 

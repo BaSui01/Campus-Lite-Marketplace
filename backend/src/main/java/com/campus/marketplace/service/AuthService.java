@@ -40,11 +40,12 @@ public interface AuthService {
 
     /**
      * 用户登录
-     * 
+     *
      * @param request 登录请求
+     * @param httpRequest HTTP 请求（用于获取设备信息和发送登录通知）
      * @return 登录响应（包含 Token 和用户信息）
      */
-    LoginResponse login(LoginRequest request);
+    LoginResponse login(LoginRequest request, jakarta.servlet.http.HttpServletRequest httpRequest);
 
     /**
      * 用户登出

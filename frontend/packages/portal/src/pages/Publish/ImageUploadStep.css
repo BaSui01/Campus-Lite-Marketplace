@@ -1,0 +1,213 @@
+/**
+ * 图片上传步骤样式
+ * @author BaSui 😎
+ */
+
+.image-upload-step__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 16px;
+}
+
+.image-upload-step__hint {
+  margin-bottom: 32px;
+  padding: 16px;
+  background: #f0f7ff;
+  border-radius: 8px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.image-upload-step__hint p {
+  margin: 0;
+}
+
+/* ==================== 图片网格 ==================== */
+.image-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+/* ==================== 图片项 ==================== */
+.image-upload-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f5f5f5;
+}
+
+.image-upload-item__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-upload-item__cover-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 12px;
+  background: rgba(255, 77, 79, 0.9);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.image-upload-item__actions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-upload-item:hover .image-upload-item__actions {
+  opacity: 1;
+}
+
+.image-upload-item__btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.image-upload-item__btn:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.image-upload-item__btn--delete:hover {
+  background: #ff4d4f;
+  color: white;
+}
+
+/* ==================== 上传占位符 ==================== */
+.image-upload-placeholder {
+  aspect-ratio: 1;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.image-upload-placeholder:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.image-upload-placeholder.drag-over {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.image-upload-placeholder__input {
+  display: none;
+}
+
+.image-upload-placeholder__label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.image-upload-placeholder__icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.image-upload-placeholder__text {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.image-upload-placeholder__subtext {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ==================== 操作按钮 ==================== */
+.image-upload-step__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 32px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.image-upload-step__btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.image-upload-step__btn--prev {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.image-upload-step__btn--prev:hover {
+  background: #e0e0e0;
+}
+
+.image-upload-step__btn--next {
+  background: #667eea;
+  color: white;
+}
+
+.image-upload-step__btn--next:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 767px) {
+  .image-upload-step__title {
+    font-size: 20px;
+  }
+
+  .image-upload-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .image-upload-step__actions {
+    flex-direction: column-reverse;
+  }
+
+  .image-upload-step__btn {
+    width: 100%;
+  }
+}

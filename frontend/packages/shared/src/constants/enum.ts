@@ -71,16 +71,7 @@ export const DATE_RANGE_OPTIONS = [
 ] as const;
 
 // ==================== 分页 ====================
-
-/**
- * 每页条数选项
- */
-export const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100] as const;
-
-/**
- * 默认每页条数
- */
-export const DEFAULT_PAGE_SIZE = 20;
+// 注意：PAGE_SIZE_OPTIONS 和 DEFAULT_PAGE_SIZE 已在 config.ts 中定义，避免重复
 
 /**
  * 默认页码（从 1 开始）

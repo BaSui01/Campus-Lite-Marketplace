@@ -1,8 +1,13 @@
 package com.campus.marketplace.service;
 
+import com.campus.marketplace.common.dto.MessageSearchHistory;
+import com.campus.marketplace.common.dto.MessageSearchSuggestion;
+import com.campus.marketplace.common.dto.MessageSearchStatistics;
+import com.campus.marketplace.common.dto.request.MessageSearchRequest;
 import com.campus.marketplace.common.dto.request.SendMessageRequest;
 import com.campus.marketplace.common.dto.response.ConversationResponse;
 import com.campus.marketplace.common.dto.response.MessageResponse;
+import com.campus.marketplace.common.dto.response.MessageSearchResponse;
 import org.springframework.data.domain.Page;
 
 /**
@@ -77,4 +82,53 @@ public interface MessageService {
      * @param messageId 消息ID
      */
     void recallMessage(Long messageId);
+
+    /**
+     * 搜索协商消息
+     *
+     * @param request 搜索请求
+     * @param currentUserId 当前用户ID
+     * @return 搜索结果
+     */
+    Page<MessageSearchResponse> searchMessages(MessageSearchRequest request, Long currentUserId);
+
+    /**
+     * 获取搜索建议
+     *
+     * @param disputeId 纠纷ID
+     * @param keyword 关键词
+     * @param type 建议类型
+     * @param limit 返回数量限制
+     * @param currentUserId 当前用户ID
+     * @return 搜索建议列表
+     */
+    java.util.List<MessageSearchSuggestion> getSearchSuggestions(
+            Long disputeId, String keyword, String type, int limit, Long currentUserId);
+
+    /**
+     * 获取搜索历史
+     *
+     * @param disputeId 纠纷ID
+     * @param limit 返回数量限制
+     * @param currentUserId 当前用户ID
+     * @return 搜索历史列表
+     */
+    java.util.List<MessageSearchHistory> getSearchHistory(Long disputeId, int limit, Long currentUserId);
+
+    /**
+     * 清空搜索历史
+     *
+     * @param disputeId 纠纷ID
+     * @param currentUserId 当前用户ID
+     */
+    void clearSearchHistory(Long disputeId, Long currentUserId);
+
+    /**
+     * 获取搜索统计
+     *
+     * @param disputeId 纠纷ID
+     * @param currentUserId 当前用户ID
+     * @return 搜索统计信息
+     */
+    MessageSearchStatistics getSearchStatistics(Long disputeId, Long currentUserId);
 }

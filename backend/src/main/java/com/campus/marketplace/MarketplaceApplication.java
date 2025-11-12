@@ -2,6 +2,7 @@ package com.campus.marketplace;
 
 import com.campus.marketplace.common.config.init.DevDatabaseInitializer;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.spring.starter.RedissonAutoConfigurationV2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -15,14 +16,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 校园轻享集市系统 - 主启动类
- * 
+ *
  * 基于 Spring Boot 3.x + Java 21 的企业级单体应用
  * 提供二手物品交易、论坛交流、即时通讯等功能
- * 
+ *
  * @author BaSui
- * @date 2025-10-25
+ * @date 2025-11-07
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {RedissonAutoConfigurationV2.class})  // 🎯 禁用 Redisson 自动配置V2，使用我们的自定义配置！
 @Slf4j
 @EnableCaching
 @EnableAsync

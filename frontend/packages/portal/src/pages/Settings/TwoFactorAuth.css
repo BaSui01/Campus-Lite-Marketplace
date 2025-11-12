@@ -1,0 +1,230 @@
+/**
+ * 双因素认证设置页面样式
+ * @author BaSui 😎
+ * @date 2025-11-09
+ */
+
+.two-factor-auth {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.two-factor-auth__title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+.two-factor-auth__desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+/* 提示框 */
+.two-factor-auth__alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.two-factor-auth__alert--error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #cf1322;
+}
+
+.two-factor-auth__alert--success {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+/* 状态显示 */
+.two-factor-auth__status {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.two-factor-auth__status--disabled {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.two-factor-auth__status--enabled {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+/* 设置区域 */
+.two-factor-auth__section {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.two-factor-auth__setup {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.two-factor-auth__setup-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+.two-factor-auth__setup-desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* QR 码 */
+.two-factor-auth__qr {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  padding: 24px;
+  background: #f5f5f5;
+  border-radius: 12px;
+}
+
+.two-factor-auth__qr img {
+  max-width: 256px;
+  width: 100%;
+  height: auto;
+}
+
+/* 密钥 */
+.two-factor-auth__secret {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.two-factor-auth__secret p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.two-factor-auth__secret code {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  color: #1890ff;
+  background: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  word-break: break-all;
+}
+
+/* 恢复码 */
+.two-factor-auth__recovery {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+}
+
+.two-factor-auth__recovery h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #d48806;
+}
+
+.two-factor-auth__recovery-desc {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 16px;
+}
+
+.two-factor-auth__recovery-codes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.two-factor-auth__recovery-code {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: #d48806;
+  background: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid #ffe58f;
+}
+
+/* 验证区域 */
+.two-factor-auth__verify {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.two-factor-auth__verify h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.two-factor-auth__verify p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.two-factor-auth__verify input {
+  margin-bottom: 16px;
+}
+
+/* 操作区域 */
+.two-factor-auth__actions {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.two-factor-auth__actions h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.two-factor-auth__actions p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.two-factor-auth__actions input {
+  margin-bottom: 16px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .two-factor-auth {
+    padding: 16px;
+  }
+
+  .two-factor-auth__recovery-codes {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}

@@ -27,10 +27,10 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userService, adminUserService } from '@campus/shared';
+import { userService, PERMISSION_CODES } from '@campus/shared';
+import { adminUserService } from '@/services';
 import { useVirtualList, debounce, useBatchProcessor, useLazyImage } from '@/utils/performance';
 import { PermissionGuard } from '@/components';
-import { PERMISSION_CODES } from '@campus/shared';
 import type { User, UserListQuery } from '@campus/shared';
 import dayjs from 'dayjs';
 

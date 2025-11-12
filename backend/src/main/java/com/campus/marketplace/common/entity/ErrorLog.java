@@ -29,7 +29,7 @@ public class ErrorLog extends BaseEntity {
     /**
      * 错误类型（异常类名）
      */
-    @Column(name = "error_type", nullable = false, length = 50)
+    @Column(name = "error_type", nullable = false, length = 255)
     private String errorType;
 
     /**

@@ -1,15 +1,17 @@
 /**
  * 搜索结果页面 - 快速找到你想要的！🔍
  * @author BaSui 😎
- * @description 支持商品搜索、用户搜索、筛选排序
+ * @description 支持商品搜索、用户搜索、筛选排序 + 新手引导
  */
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Input, Button, Skeleton, Tabs } from '@campus/shared/components';
-import { goodsService } from '@campus/shared/services';
+import { goodsService } from '@campus/shared/services';;
 import { highlightText } from '@campus/shared/utils/highlight';
 import { useNotificationStore } from '../../store';
+import { SearchGuide } from '../../components/SearchGuide';
+import { useLocalStorage } from '@campus/shared/hooks';
 import type { GoodsResponse, CategoryNodeResponse, TagResponse } from '@campus/shared/api/models';
 import './Search.css';
 
@@ -61,6 +63,10 @@ const Search: React.FC = () => {
   const [hotSearches] = useState<string[]>(['二手电脑', '自行车', '教材', '吉他', '台灯']);
   const [showHistory, setShowHistory] = useState(false);
 
+  // 🎯 搜索引导状态
+  const [guideCompleted, setGuideCompleted] = useLocalStorage('search-guide-completed', false);
+  const [showSearchGuide, setShowSearchGuide] = useState(false);
+
   // 商品搜索结果
   const [goodsResults, setGoodsResults] = useState<GoodsResponse[]>([]);
   const [goodsLoading, setGoodsLoading] = useState(false);
@@ -77,10 +83,29 @@ const Search: React.FC = () => {
   const [postTotal, setPostTotal] = useState(0);
 
   // 分页
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [pageSize] = useState(20);
 
   // ==================== 数据加载 ====================
+
+  /**
+   * 检查是否需要显示搜索引导
+   */
+  useEffect(() => {
+    const shouldShowGuide = !guideCompleted &&
+                           !searchParams.get('q') &&
+                           !keyword.trim() &&
+                           searchHistory.length === 0;
+
+    if (shouldShowGuide) {
+      // 延迟显示引导，给用户时间看到页面
+      const timer = setTimeout(() => {
+        setShowSearchGuide(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [guideCompleted, searchParams, keyword, searchHistory]);
 
   /**
    * 搜索商品
@@ -105,11 +130,16 @@ const Search: React.FC = () => {
         page,
         size: pageSize,
         sortBy: sortType === 'newest' ? 'createdAt' : sortType === 'price_asc' ? 'price' : sortType === 'price_desc' ? 'price' : undefined,
-        sortDirection: sortType === 'price_asc' ? 'asc' : 'desc',
+        sortDirection: sortType === 'price_asc' ? 'ASC' : 'DESC',
       });
 
-      setGoodsResults(response.content || []);
-      setGoodsTotal(response.totalElements || 0);
+      // 前端过滤仅保留审核通过的商品，避免后端不支持 status 参数导致 500
+      const filtered = (response.content || []).filter(
+        (g) => (g.status || '').toUpperCase() === 'APPROVED'
+      );
+      setGoodsResults(filtered);
+      // 仅展示本页条数，避免与后端总数不一致造成困惑
+      setGoodsTotal(filtered.length);
     } catch (err: any) {
       console.error('搜索商品失败：', err);
       toast.error(err.response?.data?.message || '搜索失败！😭');
@@ -365,7 +395,7 @@ const Search: React.FC = () => {
    * 处理搜索输入
    */
   const handleSearch = () => {
-    setPage(1);
+    setPage(0);
     setShowHistory(false);
     saveToHistory(keyword); // 🌟 保存搜索历史
     performSearch();
@@ -385,7 +415,7 @@ const Search: React.FC = () => {
    */
   const handleTypeChange = (value: string) => {
     setSearchType(value as SearchType);
-    setPage(1);
+    setPage(0);
   };
 
   /**
@@ -427,20 +457,32 @@ const Search: React.FC = () => {
    * 💰 应用价格筛选
    */
   const handleApplyPriceFilter = () => {
-    const min = minPriceInput.trim() ? parseFloat(minPriceInput) : undefined;
-    const max = maxPriceInput.trim() ? parseFloat(maxPriceInput) : undefined;
+    const minInput = minPriceInput.trim();
+    const maxInput = maxPriceInput.trim();
 
-    // 验证价格输入
+    // 空输入直接清除价格筛选
+    if (!minInput && !maxInput) {
+      handleClearPriceFilter();
+      return;
+    }
+
+    const min = minInput ? parseFloat(minInput) : undefined;
+    const max = maxInput ? parseFloat(maxInput) : undefined;
+
+    // 价格验证
     if (min !== undefined && (isNaN(min) || min < 0)) {
       console.warn('[Search] 💰 最低价格无效:', minPriceInput);
+      alert('❌ 最低价格必须为非负数！');
       return;
     }
     if (max !== undefined && (isNaN(max) || max < 0)) {
       console.warn('[Search] 💰 最高价格无效:', maxPriceInput);
+      alert('❌ 最高价格必须为非负数！');
       return;
     }
     if (min !== undefined && max !== undefined && min > max) {
       console.warn('[Search] 💰 最低价格不能大于最高价格');
+      alert('❌ 最低价格不能大于最高价格！\n请调整价格范围后重试。');
       return;
     }
 
@@ -477,11 +519,28 @@ const Search: React.FC = () => {
   };
 
   /**
+   * 🎯 处理搜索引导完成
+   */
+  const handleGuideComplete = () => {
+    setGuideCompleted(true);
+    setShowSearchGuide(false);
+    toast.success('搜索引导完成！现在试试搜索功能吧！🎉');
+  };
+
+  /**
+   * 🎯 手动显示搜索引导
+   */
+  const handleShowGuide = () => {
+    setShowSearchGuide(true);
+  };
+
+  /**
    * 格式化价格
    */
   const formatPrice = (price?: number) => {
     if (!price) return '¥0.00';
-    return `¥${(price / 100).toFixed(2)}`;
+    // ✅ 后端金额单位为“元”（BigDecimal），无需再除以 100
+    return `¥${price.toFixed(2)}`;
   };
 
   // ==================== 渲染 ====================
@@ -492,6 +551,19 @@ const Search: React.FC = () => {
   return (
     <div className="search-page">
       <div className="search-container">
+        {/* ==================== 搜索引导帮助按钮 ==================== */}
+        <div className="search-help-btn">
+          <Button
+            type="text"
+            size="small"
+            onClick={handleShowGuide}
+            className="help-guide-btn"
+            title="搜索功能帮助"
+          >
+            🧭 搜索帮助
+          </Button>
+        </div>
+
         {/* ==================== 搜索栏 ==================== */}
         <div className="search-header">
           <div className="search-header__input">
@@ -693,6 +765,15 @@ const Search: React.FC = () => {
               <div className="empty-icon">🔍</div>
               <p className="empty-text">输入关键词开始搜索</p>
               <p className="empty-tip">试试搜索"自行车"、"书籍"等关键词</p>
+              {!guideCompleted && (
+                <Button
+                  type="primary"
+                  onClick={handleShowGuide}
+                  className="guide-cta-btn"
+                >
+                  🧭 查看搜索引导
+                </Button>
+              )}
             </div>
           )}
 
@@ -791,6 +872,14 @@ const Search: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* ==================== 搜索引导组件 ==================== */}
+      {showSearchGuide && (
+        <SearchGuide
+          visible={showSearchGuide}
+          onComplete={handleGuideComplete}
+        />
+      )}
     </div>
   );
 };

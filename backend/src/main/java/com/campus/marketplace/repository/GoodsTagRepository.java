@@ -41,4 +41,7 @@ public interface GoodsTagRepository extends JpaRepository<GoodsTag, Long> {
 
     @Query("SELECT gt.goodsId FROM GoodsTag gt WHERE gt.tagId IN (:tagIds) GROUP BY gt.goodsId HAVING COUNT(DISTINCT gt.tagId) = :size")
     List<Long> findGoodsIdsByAllTagIds(@Param("tagIds") Collection<Long> tagIds, @Param("size") long size);
+
+    @Query("SELECT gt.tagId, COUNT(gt.goodsId) FROM GoodsTag gt GROUP BY gt.tagId ORDER BY COUNT(gt.goodsId) DESC")
+    List<Object[]> findTopTagsByUsageCount(org.springframework.data.domain.Pageable pageable);
 }

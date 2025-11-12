@@ -136,6 +136,36 @@ export interface Goods {
     'favoriteCount'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof Goods
+     */
+    'stock'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Goods
+     */
+    'soldCount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Goods
+     */
+    'originalPrice'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Goods
+     */
+    'condition'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Goods
+     */
+    'deliveryMethod'?: string;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof Goods
      */

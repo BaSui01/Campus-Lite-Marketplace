@@ -184,29 +184,85 @@ public class RefundServiceImpl implements RefundService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "退款不存在"));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public com.campus.marketplace.common.dto.response.RefundResponseDTO getRefundDetail(String refundNo) {
+        RefundRequest refund = refundRepository.findByRefundNo(refundNo)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "退款不存在"));
+
+        // 通过订单号查询订单及其关联的商品、买家、卖家信息
+        Order order = orderRepository.findByOrderNoWithDetails(refund.getOrderNo())
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        return convertToResponseDTO(refund, order);
+    }
+
     /**
-     * 用户查询自己的退款列表（带分页和状态筛选）
+     * 将 RefundRequest 转换为 RefundResponseDTO（包含关联信息）
      *
-     * @param page 页码（从0开始）
-     * @param size 每页大小
-     * @param status 退款状态（可选）
+     * @param refund 退款实体
+     * @param order 订单实体（已加载关联的 goods、buyer、seller）
+     * @return RefundResponseDTO
+     */
+    private com.campus.marketplace.common.dto.response.RefundResponseDTO convertToResponseDTO(
+            RefundRequest refund, Order order) {
+        return com.campus.marketplace.common.dto.response.RefundResponseDTO.builder()
+                // 基础退款信息
+                .id(refund.getId())
+                .refundNo(refund.getRefundNo())
+                .orderNo(refund.getOrderNo())
+                .amount(refund.getAmount())
+                .reason(refund.getReason())
+                .evidence(refund.getEvidence())
+                .status(refund.getStatus().name())
+                .channel(refund.getChannel())
+                .retryCount(refund.getRetryCount())
+                .lastError(refund.getLastError())
+                .createdAt(refund.getCreatedAt())
+                .updatedAt(refund.getUpdatedAt())
+                // 关联商品信息
+                .goodsId(order.getGoods() != null ? order.getGoods().getId() : order.getGoodsId())
+                .goodsTitle(order.getGoods() != null ? order.getGoods().getTitle() : null)
+                .goodsImage(order.getGoods() != null && order.getGoods().getImages() != null 
+                        && order.getGoods().getImages().length > 0 ? order.getGoods().getImages()[0] : null)
+                // 关联买家信息
+                .buyerId(order.getBuyer() != null ? order.getBuyer().getId() : order.getBuyerId())
+                .buyerUsername(order.getBuyer() != null ? order.getBuyer().getUsername() : null)
+                .buyerAvatar(order.getBuyer() != null ? order.getBuyer().getAvatar() : null)
+                // 关联卖家信息
+                .sellerId(order.getSeller() != null ? order.getSeller().getId() : order.getSellerId())
+                .sellerUsername(order.getSeller() != null ? order.getSeller().getUsername() : null)
+                .sellerAvatar(order.getSeller() != null ? order.getSeller().getAvatar() : null)
+                .build();
+    }
+
+    /**
+     * 用户查询自己的退款列表（使用统一筛选参数）
+     *
+     * @param filterRequest 筛选请求参数
      * @return 分页退款列表
      */
     @Override
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<RefundRequest> listMyRefunds(int page, int size, RefundStatus status) {
+    public org.springframework.data.domain.Page<RefundRequest> listMyRefunds(com.campus.marketplace.common.dto.request.RefundFilterRequest filterRequest) {
         String username = SecurityUtil.getCurrentUsername();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
+        // 构建分页排序对象
+        org.springframework.data.domain.Sort.Direction direction = "ASC".equalsIgnoreCase(filterRequest.getSortDirectionOrDefault())
+                ? org.springframework.data.domain.Sort.Direction.ASC
+                : org.springframework.data.domain.Sort.Direction.DESC;
+
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
-                page,
-                size,
-                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")
+                filterRequest.getPageOrDefault(),
+                filterRequest.getSizeOrDefault(),
+                org.springframework.data.domain.Sort.by(direction, filterRequest.getSortByOrDefault())
         );
 
-        if (status != null) {
-            return refundRepository.findByApplicantIdAndStatus(user.getId(), status, pageable);
+        // 根据状态筛选
+        if (filterRequest.getStatus() != null) {
+            return refundRepository.findByApplicantIdAndStatus(user.getId(), filterRequest.getStatus(), pageable);
         } else {
             return refundRepository.findByApplicantId(user.getId(), pageable);
         }
@@ -238,22 +294,27 @@ public class RefundServiceImpl implements RefundService {
     }
 
     /**
-     * 管理员查询所有退款列表（带分页、状态筛选、关键词搜索）
+     * 管理员查询所有退款列表（使用统一筛选参数）
      *
-     * @param page 页码（从0开始）
-     * @param size 每页大小
-     * @param status 退款状态（可选）
-     * @param keyword 搜索关键词（可选，匹配退款单号或订单号）
+     * @param filterRequest 筛选请求参数
      * @return 分页退款列表
      */
     @Override
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<RefundRequest> listAllRefunds(int page, int size, RefundStatus status, String keyword) {
+    public org.springframework.data.domain.Page<RefundRequest> listAllRefunds(com.campus.marketplace.common.dto.request.RefundFilterRequest filterRequest) {
+        // 构建分页排序对象
+        org.springframework.data.domain.Sort.Direction direction = "ASC".equalsIgnoreCase(filterRequest.getSortDirectionOrDefault())
+                ? org.springframework.data.domain.Sort.Direction.ASC
+                : org.springframework.data.domain.Sort.Direction.DESC;
+
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
-                page,
-                size,
-                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")
+                filterRequest.getPageOrDefault(),
+                filterRequest.getSizeOrDefault(),
+                org.springframework.data.domain.Sort.by(direction, filterRequest.getSortByOrDefault())
         );
+
+        String keyword = filterRequest.getKeyword();
+        RefundStatus status = filterRequest.getStatus();
 
         // 优先级：关键词搜索 > 状态筛选 > 全部
         if (keyword != null && !keyword.isBlank()) {

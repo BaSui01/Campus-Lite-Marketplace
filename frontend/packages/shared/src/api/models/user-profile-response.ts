@@ -33,6 +33,12 @@ export interface UserProfileResponse {
      */
     'username'?: string;
     /**
+     * 昵称
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'nickname'?: string;
+    /**
      * 邮箱（脱敏后）
      * @type {string}
      * @memberof UserProfileResponse
@@ -69,6 +75,24 @@ export interface UserProfileResponse {
      */
     'points'?: number;
     /**
+     * 校区ID
+     * @type {number}
+     * @memberof UserProfileResponse
+     */
+    'campusId'?: number;
+    /**
+     * 校区名称
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'campusName'?: string;
+    /**
+     * 封禁原因（仅封禁状态时有值）
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'banReason'?: string;
+    /**
      * 角色列表
      * @type {Array<string>}
      * @memberof UserProfileResponse
@@ -80,5 +104,41 @@ export interface UserProfileResponse {
      * @memberof UserProfileResponse
      */
     'createdAt'?: string;
+    /**
+     * 最后登录时间
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'lastLoginAt'?: string;
+    /**
+     * 个人简介
+     * @type {string}
+     * @memberof UserProfileResponse
+     */
+    'bio'?: string;
+    /**
+     * 信誉分（0-200）
+     * @type {number}
+     * @memberof UserProfileResponse
+     */
+    'creditScore'?: number;
+    /**
+     * 邮箱是否已验证
+     * @type {boolean}
+     * @memberof UserProfileResponse
+     */
+    'emailVerified'?: boolean;
+    /**
+     * 手机号是否已验证
+     * @type {boolean}
+     * @memberof UserProfileResponse
+     */
+    'phoneVerified'?: boolean;
+    /**
+     * 是否启用两步验证
+     * @type {boolean}
+     * @memberof UserProfileResponse
+     */
+    'twoFactorEnabled'?: boolean;
 }
 

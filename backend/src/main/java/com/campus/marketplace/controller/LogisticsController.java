@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/logistics")
+@RequestMapping("/logistics")
 @RequiredArgsConstructor
 @Tag(name = "物流管理", description = "物流信息查询、创建、同步等接口")
 public class LogisticsController {

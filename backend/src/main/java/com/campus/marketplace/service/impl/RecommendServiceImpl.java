@@ -1,5 +1,8 @@
 package com.campus.marketplace.service.impl;
 
+import com.campus.marketplace.common.config.RecommendConfigProperties;
+import com.campus.marketplace.common.dto.RecommendConfigDTO;
+import com.campus.marketplace.common.dto.RecommendStatisticsDTO;
 import com.campus.marketplace.common.dto.response.GoodsResponse;
 import com.campus.marketplace.common.entity.Category;
 import com.campus.marketplace.common.entity.Goods;
@@ -27,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -51,6 +55,7 @@ public class RecommendServiceImpl implements RecommendService {
     private final DistributedLockManager lockManager;
     private final com.campus.marketplace.repository.UserSimilarityRepository userSimilarityRepository;
     private final com.campus.marketplace.repository.UserBehaviorLogRepository userBehaviorLogRepository;
+    private final RecommendConfigProperties recommendConfigProperties;
 
     private static final String HOT_KEY_PREFIX = "goods:rank:"; // goods:rank:{campus}
     private static final long BASE_HOT_TTL_SECONDS = Duration.ofMinutes(5).toSeconds();
@@ -200,9 +205,12 @@ public class RecommendServiceImpl implements RecommendService {
         String categoryName = categoryRepository.findById(goods.getCategoryId())
                 .map(Category::getName)
                 .orElse("未知分类");
-        String sellerUsername = userRepository.findById(goods.getSellerId())
-                .map(User::getUsername)
-                .orElse("未知用户");
+
+        // 获取卖家信息（包括头像）
+        User seller = userRepository.findById(goods.getSellerId()).orElse(null);
+        String sellerUsername = seller != null ? seller.getUsername() : "未知用户";
+        String sellerAvatar = seller != null ? seller.getAvatar() : null;
+
         String coverImage = goods.getImages() != null && goods.getImages().length > 0 ? goods.getImages()[0] : null;
 
         return GoodsResponse.builder()
@@ -214,10 +222,15 @@ public class RecommendServiceImpl implements RecommendService {
                 .categoryName(categoryName)
                 .sellerId(goods.getSellerId())
                 .sellerUsername(sellerUsername)
+                .sellerAvatar(sellerAvatar)  // ✅ 新增
                 .status(goods.getStatus())
                 .viewCount(goods.getViewCount())
                 .favoriteCount(goods.getFavoriteCount())
+                .stock(goods.getStock())  // ✅ 新增
+                .soldCount(goods.getSoldCount())  // ✅ 新增
+                .originalPrice(goods.getOriginalPrice())  // ✅ 新增
                 .coverImage(coverImage)
+                .images(goods.getImages())  // ✅ 新增：所有图片（支持轮播）
                 .createdAt(goods.getCreatedAt())
                 .build();
     }
@@ -544,7 +557,100 @@ public class RecommendServiceImpl implements RecommendService {
                 log.error("预计算用户{}的推荐结果失败: {}", userId, e.getMessage());
             }
         }
-        
+
         log.info("推荐结果预计算完成，共缓存{}个用户的推荐结果", cachedCount);
+    }
+
+    @Override
+    public RecommendConfigDTO getRecommendConfig() {
+        log.info("🎯 BaSui：获取推荐配置");
+
+        // 从 ConfigurationProperties 读取配置
+        Map<String, Double> weights = Map.of(
+                "collaborative", recommendConfigProperties.getWeights().getCollaborative(),
+                "content", recommendConfigProperties.getWeights().getContent(),
+                "hot", recommendConfigProperties.getWeights().getHot(),
+                "personalized", recommendConfigProperties.getWeights().getPersonalized()
+        );
+
+        Map<String, Object> params = Map.of(
+                "maxRecommendations", recommendConfigProperties.getParams().getMaxRecommendations(),
+                "minScore", recommendConfigProperties.getParams().getMinScore(),
+                "refreshInterval", recommendConfigProperties.getParams().getRefreshInterval()
+        );
+
+        return RecommendConfigDTO.builder()
+                .enabled(recommendConfigProperties.getEnabled())
+                .algorithm(recommendConfigProperties.getAlgorithm())
+                .weights(weights)
+                .params(params)
+                .build();
+    }
+
+    @Override
+    public void updateRecommendConfig(RecommendConfigDTO configDTO) {
+        log.info("🎯 BaSui：更新推荐配置 - enabled={}, algorithm={}",
+                configDTO.getEnabled(), configDTO.getAlgorithm());
+
+        // 更新配置（直接修改Properties对象，运行时生效）
+        recommendConfigProperties.setEnabled(configDTO.getEnabled());
+        recommendConfigProperties.setAlgorithm(configDTO.getAlgorithm());
+
+        // 更新权重
+        if (configDTO.getWeights() != null) {
+            recommendConfigProperties.getWeights().setCollaborative(
+                    configDTO.getWeights().getOrDefault("collaborative", 0.4));
+            recommendConfigProperties.getWeights().setContent(
+                    configDTO.getWeights().getOrDefault("content", 0.3));
+            recommendConfigProperties.getWeights().setHot(
+                    configDTO.getWeights().getOrDefault("hot", 0.2));
+            recommendConfigProperties.getWeights().setPersonalized(
+                    configDTO.getWeights().getOrDefault("personalized", 0.1));
+        }
+
+        // 更新参数
+        if (configDTO.getParams() != null) {
+            recommendConfigProperties.getParams().setMaxRecommendations(
+                    (Integer) configDTO.getParams().getOrDefault("maxRecommendations", 20));
+            recommendConfigProperties.getParams().setMinScore(
+                    (Double) configDTO.getParams().getOrDefault("minScore", 0.3));
+            recommendConfigProperties.getParams().setRefreshInterval(
+                    (Integer) configDTO.getParams().getOrDefault("refreshInterval", 3600));
+        }
+
+        log.info("✅ BaSui：推荐配置更新成功");
+    }
+
+    @Override
+    public RecommendStatisticsDTO getRecommendStatistics() {
+        log.info("🎯 BaSui：获取推荐统计");
+
+        // 从Redis统计推荐总数（使用热榜统计）
+        long totalRecommendations = goodsRepository.count(); // 简化统计：商品总数
+
+        // 统计点击率（浏览数 / 推荐数）
+        long totalViews = viewLogRepository.count();
+        double clickRate = totalRecommendations > 0
+                ? (double) totalViews / totalRecommendations
+                : 0.0;
+
+        // 统计转化率（收藏数 / 推荐数）
+        long totalFavorites = favoriteRepository.count();
+        double conversionRate = totalRecommendations > 0
+                ? (double) totalFavorites / totalRecommendations
+                : 0.0;
+
+        // 平均评分（基于商品评分，暂时使用模拟值）
+        double avgScore = 0.8; // 后续可从评价系统计算
+
+        log.info("✅ BaSui：统计完成 - total={}, clickRate={}, conversionRate={}",
+                totalRecommendations, clickRate, conversionRate);
+
+        return RecommendStatisticsDTO.builder()
+                .totalRecommendations(totalRecommendations)
+                .clickRate(clickRate)
+                .conversionRate(conversionRate)
+                .avgScore(avgScore)
+                .build();
     }
 }

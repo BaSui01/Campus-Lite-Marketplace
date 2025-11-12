@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2025-10-27
  */
 @RestController
-@RequestMapping("/api/favorites")
+@RequestMapping("/favorites")
 @RequiredArgsConstructor
 @Tag(name = "收藏管理", description = "物品收藏、取消收藏、查询收藏列表等接口")
 public class FavoriteController {
@@ -28,7 +27,7 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
 
         @PostMapping("/{goodsId}")
-    @PreAuthorize("hasRole('STUDENT')")
+
     @Operation(summary = "添加收藏", description = "用户收藏物品")
     public ApiResponse<Void> addFavorite(
             @Parameter(description = "物品 ID", example = "12345") @PathVariable Long goodsId
@@ -38,7 +37,7 @@ public class FavoriteController {
     }
 
         @DeleteMapping("/{goodsId}")
-    @PreAuthorize("hasRole('STUDENT')")
+
     @Operation(summary = "取消收藏", description = "用户取消收藏物品")
     public ApiResponse<Void> removeFavorite(
             @Parameter(description = "物品 ID", example = "12345") @PathVariable Long goodsId
@@ -48,7 +47,7 @@ public class FavoriteController {
     }
 
         @GetMapping
-    @PreAuthorize("hasRole('STUDENT')")
+
     @Operation(summary = "查询收藏列表", description = "查询当前用户的收藏列表")
     public ApiResponse<Page<GoodsResponse>> listFavorites(
             @Parameter(description = "页码（从 0 开始）", example = "0") @RequestParam(defaultValue = "0") int page,

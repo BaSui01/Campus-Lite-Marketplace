@@ -6,9 +6,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Skeleton, Avatar } from '@campus/shared/components';
+import { Button, Skeleton, Avatar, Tabs, GoodsCard } from '@campus/shared/components';
+import { followService } from '../../services';;
 import { useNotificationStore } from '../../store';
-import { getApi } from '@campus/shared/utils';
 import './Following.css';
 
 // ==================== 类型定义 ====================
@@ -29,11 +29,11 @@ const Following: React.FC = () => {
 
   // ==================== 状态管理 ====================
 
+  const [activeTab, setActiveTab] = useState<'list' | 'activities'>('list');
   const [followings, setFollowings] = useState<Following[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // API 实例
-  const api = getApi();
+  const [activitiesLoading, setActivitiesLoading] = useState(false);
+  const [activities, setActivities] = useState<any[]>([]);
 
   // ==================== 数据加载 ====================
 
@@ -44,19 +44,17 @@ const Following: React.FC = () => {
     setLoading(true);
 
     try {
-      // 🚀 调用真实后端 API 获取关注列表
-      const response = await api.listFollowings();
+      // ✅ 使用 followService 获取关注列表
+      const response = await followService.listFollowings();
 
-      if (response.data.success && response.data.data) {
-        const apiFollowings: Following[] = response.data.data.map((item: any) => ({
-          sellerId: item.sellerId,
-          sellerName: item.sellerName || '未知用户',
-          sellerAvatar: item.sellerAvatar,
-          followedAt: item.followedAt,
-        }));
+      const apiFollowings: Following[] = response.map((item) => ({
+        sellerId: item.sellerId || 0,
+        sellerName: item.sellerName || '未知用户',
+        sellerAvatar: item.sellerAvatar,
+        followedAt: item.followedAt || '',
+      }));
 
-        setFollowings(apiFollowings);
-      }
+      setFollowings(apiFollowings);
     } catch (err: any) {
       console.error('加载关注列表失败:', err);
       toast.error(err.response?.data?.message || '加载关注列表失败!😭');
@@ -68,6 +66,31 @@ const Following: React.FC = () => {
   useEffect(() => {
     loadFollowings();
   }, []);
+
+  /**
+   * 加载关注用户动态
+   */
+  const loadActivities = async () => {
+    setActivitiesLoading(true);
+
+    try {
+      // ⚠️ 使用 followService.getFollowingActivities()
+      // 注意：该方法目前是占位实现，需要后端提供 API 支持
+      const response = await followService.getFollowingActivities();
+      setActivities(response);
+    } catch (err: any) {
+      console.error('加载关注动态失败:', err);
+      // 不显示错误提示，因为这是预期的（后端未实现）
+    } finally {
+      setActivitiesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'activities' && activities.length === 0) {
+      loadActivities();
+    }
+  }, [activeTab]);
 
   // ==================== 事件处理 ====================
 
@@ -83,8 +106,8 @@ const Following: React.FC = () => {
       // 乐观更新 UI
       setFollowings((prev) => prev.filter((f) => f.sellerId !== sellerId));
 
-      // 🚀 调用真实后端 API 取消关注
-      await api.unfollow({ sellerId });
+      // ✅ 使用 followService 取消关注
+      await followService.unfollowSeller(sellerId);
 
       toast.success('取消关注成功!👋');
     } catch (err: any) {
@@ -138,13 +161,30 @@ const Following: React.FC = () => {
           </p>
         </div>
 
-        {/* ==================== 关注列表 ==================== */}
+        {/* ==================== 标签页切换 ==================== */}
+        {followings.length > 0 && (
+          <div className="following-tabs">
+            <Tabs
+              value={activeTab}
+              onChange={(value) => setActiveTab(value as 'list' | 'activities')}
+              tabs={[
+                { label: '👥 关注列表', value: 'list' },
+                { label: '📰 最新动态', value: 'activities' },
+              ]}
+            />
+          </div>
+        )}
+
+        {/* ==================== 内容区域 ==================== */}
         <div className="following-content">
-          {loading ? (
-            <div className="following-loading">
-              <Skeleton type="list" count={6} animation="wave" />
-            </div>
-          ) : followings.length === 0 ? (
+          {/* 关注列表 */}
+          {activeTab === 'list' && (
+            <>
+              {loading ? (
+                <div className="following-loading">
+                  <Skeleton type="list" count={6} animation="wave" />
+                </div>
+              ) : followings.length === 0 ? (
             <div className="following-empty">
               <div className="empty-icon">👤</div>
               <h3 className="empty-text">还没有关注哦!</h3>
@@ -189,6 +229,61 @@ const Following: React.FC = () => {
                 </div>
               ))}
             </div>
+              )}
+            </>
+          )}
+
+          {/* 最新动态 */}
+          {activeTab === 'activities' && (
+            <>
+              {activitiesLoading ? (
+                <div className="following-loading">
+                  <Skeleton type="grid" count={6} animation="wave" />
+                </div>
+              ) : activities.length === 0 ? (
+                <div className="following-empty">
+                  <div className="empty-icon">📰</div>
+                  <h3 className="empty-text">暂无动态</h3>
+                  <p className="empty-tip">
+                    关注的用户发布新商品后会在这里显示
+                  </p>
+                  <p className="empty-note">
+                    ⚠️ 该功能需要后端 API 支持：<br/>
+                    <code>GET /following/activities</code>
+                  </p>
+                </div>
+              ) : (
+                <div className="activities-list">
+                  {activities.map((activity, index) => (
+                    <div key={index} className="activity-item">
+                      <div className="activity-header">
+                        <div className="activity-user">
+                          {activity.sellerAvatar ? (
+                            <img src={activity.sellerAvatar} alt={activity.sellerName} className="user-avatar" />
+                          ) : (
+                            <div className="user-avatar-placeholder">👤</div>
+                          )}
+                          <span className="user-name">{activity.sellerName}</span>
+                          <span className="activity-time">{formatTime(activity.publishedAt)}</span>
+                        </div>
+                      </div>
+                      <div className="activity-content">
+                        <GoodsCard
+                          id={activity.goods.id}
+                          title={activity.goods.title}
+                          price={activity.goods.price}
+                          coverImage={activity.goods.images?.[0]}
+                          sellerName={activity.sellerName}
+                          viewCount={activity.goods.viewCount}
+                          favoriteCount={activity.goods.favoriteCount}
+                          onClick={() => navigate(`/goods/${activity.goods.id}`)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

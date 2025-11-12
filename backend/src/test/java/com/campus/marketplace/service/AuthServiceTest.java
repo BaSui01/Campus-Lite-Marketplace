@@ -46,6 +46,18 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private com.campus.marketplace.common.utils.CryptoUtil cryptoUtil;
+
+    @Mock
+    private com.campus.marketplace.common.utils.JwtUtil jwtUtil;
+
+    @Mock
+    private org.springframework.data.redis.core.RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private VerificationCodeService verificationCodeService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -66,6 +78,9 @@ class AuthServiceTest {
                 .name("ROLE_STUDENT")
                 .description("学生角色")
                 .build();
+
+        // 🎯 Mock CryptoUtil 行为：默认返回明文密码（兼容模式）
+        when(cryptoUtil.isEncrypted(anyString())).thenReturn(false);
     }
 
     @Test

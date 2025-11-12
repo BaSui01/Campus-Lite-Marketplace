@@ -3,7 +3,9 @@ package com.campus.marketplace.service.impl;
 import com.campus.marketplace.common.dto.request.CreateCategoryRequest;
 import com.campus.marketplace.common.dto.request.UpdateCategoryRequest;
 import com.campus.marketplace.common.dto.response.CategoryNodeResponse;
+import com.campus.marketplace.common.dto.response.CategoryStatisticsResponse;
 import com.campus.marketplace.common.entity.Category;
+import com.campus.marketplace.common.enums.GoodsStatus;
 import com.campus.marketplace.common.exception.BusinessException;
 import com.campus.marketplace.common.exception.ErrorCode;
 import com.campus.marketplace.repository.CategoryRepository;
@@ -118,6 +120,69 @@ public class CategoryServiceImpl implements CategoryService {
 
         return buildTree(groupedByParent, 0L);
     }
+
+    // 🎯 BaSui 新增方法实现（分类管理扩展）
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Category> listAll() {
+        return categoryRepository.findAll(SortBySortOrder());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Category getById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, "分类不存在"));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchUpdateSort(Map<Long, Integer> sortMap) {
+        if (sortMap == null || sortMap.isEmpty()) {
+            return;
+        }
+
+        List<Category> categories = categoryRepository.findAllById(sortMap.keySet());
+        if (categories.size() != sortMap.size()) {
+            throw new BusinessException(ErrorCode.CATEGORY_NOT_FOUND, "部分分类不存在");
+        }
+
+        categories.forEach(category -> {
+            Integer newSortOrder = sortMap.get(category.getId());
+            if (newSortOrder != null) {
+                category.setSortOrder(newSortOrder);
+            }
+        });
+
+        categoryRepository.saveAll(categories);
+        log.info("批量更新分类排序成功，共更新 {} 个分类", categories.size());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CategoryStatisticsResponse getStatistics(Long id) {
+        Category category = getById(id);
+
+        // 统计商品数量
+        long goodsCount = goodsRepository.countByCategoryId(id);
+        long onSaleCount = goodsRepository.countByCategoryIdAndStatus(id, GoodsStatus.APPROVED);
+        long soldCount = goodsRepository.countByCategoryIdAndStatus(id, GoodsStatus.SOLD);
+
+        // 统计子分类数量
+        long childrenCount = categoryRepository.findByParentIdOrderBySortOrder(id).size();
+
+        return CategoryStatisticsResponse.builder()
+                .categoryId(id)
+                .categoryName(category.getName())
+                .goodsCount(goodsCount)
+                .childrenCount(childrenCount)
+                .onSaleGoodsCount(onSaleCount)
+                .soldGoodsCount(soldCount)
+                .build();
+    }
+
+    // 🔧 私有辅助方法
 
     private List<CategoryNodeResponse> buildTree(Map<Long, List<Category>> grouped, Long parentId) {
         List<Category> categories = grouped.getOrDefault(parentId, Collections.emptyList());

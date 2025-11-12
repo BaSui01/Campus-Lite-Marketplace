@@ -21,6 +21,18 @@
  */
 export interface UpdateProfileRequest {
     /**
+     * 昵称
+     * @type {string}
+     * @memberof UpdateProfileRequest
+     */
+    'nickname'?: string;
+    /**
+     * 个人简介
+     * @type {string}
+     * @memberof UpdateProfileRequest
+     */
+    'bio'?: string;
+    /**
      * 联系邮箱
      * @type {string}
      * @memberof UpdateProfileRequest

@@ -19,6 +19,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
+import com.campus.marketplace.common.exception.BusinessException;
+import com.campus.marketplace.common.exception.ErrorCode;
+
+import java.util.Map;
 
 /**
  * 认证控制器
@@ -30,7 +34,7 @@ import org.springframework.validation.annotation.Validated;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "认证管理", description = "用户注册、登录、登出等认证相关接口")
@@ -122,9 +126,10 @@ public class AuthController {
                     description = "登录凭证",
                     required = true
             )
-            @Valid @RequestBody LoginRequest request) {
+            @Valid @RequestBody LoginRequest request,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
         log.info("收到登录请求: username={}", request.username());
-        LoginResponse response = authService.login(request);
+        LoginResponse response = authService.login(request, httpRequest);
         return ApiResponse.success(response);
     }
 
@@ -140,14 +145,21 @@ public class AuthController {
         return ApiResponse.success("登出成功", null);
     }
 
-    @Operation(summary = "刷新Token")
+    @Operation(
+            summary = "刷新Token",
+            description = "使用 Refresh Token 刷新 Access Token，返回新的双 Token"
+    )
     @PostMapping("/refresh")
-    public ApiResponse<LoginResponse> refresh(@RequestHeader("Authorization") String authorization) {
+    public ApiResponse<LoginResponse> refresh(@RequestBody Map<String, String> request) {
         log.info("收到刷新 Token 请求");
 
-        // 提取 Token（去掉 "Bearer " 前缀）
-        String token = authorization.substring(7);
-        LoginResponse response = authService.refreshToken(token);
+        // 从请求体获取 Refresh Token
+        String refreshToken = request.get("refreshToken");
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "refreshToken 不能为空");
+        }
+
+        LoginResponse response = authService.refreshToken(refreshToken);
 
         return ApiResponse.success(response);
     }

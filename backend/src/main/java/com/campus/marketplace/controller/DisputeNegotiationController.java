@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.Optional;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/disputes/negotiations")
+@RequestMapping("/disputes/negotiations")
 @RequiredArgsConstructor
 @Tag(name = "纠纷协商", description = "协商消息、解决方案提议与响应")
 public class DisputeNegotiationController {
@@ -45,7 +44,6 @@ public class DisputeNegotiationController {
      * @return 消息ID
      */
     @PostMapping("/messages")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Operation(summary = "发送协商消息", description = "买卖双方发送文字消息进行沟通")
     public ApiResponse<Long> sendMessage(@Valid @RequestBody SendNegotiationRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
@@ -63,7 +61,6 @@ public class DisputeNegotiationController {
      * @return 方案ID
      */
     @PostMapping("/proposals")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Operation(summary = "提出解决方案", description = "买卖双方提出纠纷解决方案（包含退款金额）")
     public ApiResponse<Long> proposeResolution(@Valid @RequestBody ProposeDisputeRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
@@ -83,7 +80,6 @@ public class DisputeNegotiationController {
      * @return 是否成功
      */
     @PostMapping("/proposals/{proposalId}/respond")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER')")
     @Operation(summary = "响应解决方案", description = "接受或拒绝对方提出的解决方案")
     public ApiResponse<Boolean> respondToProposal(
             @Parameter(description = "方案ID", example = "1")
@@ -108,7 +104,6 @@ public class DisputeNegotiationController {
      * @return 协商历史列表
      */
     @GetMapping("/{disputeId}/history")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
     @Operation(summary = "查询协商历史", description = "查询纠纷的所有协商消息和方案")
     public ApiResponse<List<NegotiationMessageDTO>> getNegotiationHistory(
             @Parameter(description = "纠纷ID", example = "1")
@@ -128,7 +123,6 @@ public class DisputeNegotiationController {
      * @return 待响应方案
      */
     @GetMapping("/{disputeId}/pending-proposal")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
     @Operation(summary = "查询待响应方案", description = "查询纠纷当前待响应的解决方案")
     public ApiResponse<Optional<NegotiationMessageDTO>> getPendingProposal(
             @Parameter(description = "纠纷ID", example = "1")
@@ -148,7 +142,6 @@ public class DisputeNegotiationController {
      * @return 已接受方案
      */
     @GetMapping("/{disputeId}/accepted-proposal")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
     @Operation(summary = "查询已接受方案", description = "查询纠纷已接受的解决方案")
     public ApiResponse<Optional<NegotiationMessageDTO>> getAcceptedProposal(
             @Parameter(description = "纠纷ID", example = "1")

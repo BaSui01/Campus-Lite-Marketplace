@@ -1,7 +1,6 @@
 package com.campus.marketplace.common.enums;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * 审计操作类型枚举
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
  * @date 2025-10-27
  */
 @Getter
-@RequiredArgsConstructor
 public enum AuditActionType {
     
     USER_LOGIN("用户登录"),
@@ -52,4 +50,8 @@ public enum AuditActionType {
     DELETE("删除操作");
     
     private final String description;
+
+    AuditActionType(String description) {
+        this.description = description;
+    }
 }

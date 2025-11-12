@@ -22,9 +22,9 @@ import java.util.List;
  * @author BaSui
  * @date 2025-10-29
  */
-
+// /http://localhost:8211/exports/{id}/cancel
 @RestController
-@RequestMapping("/api/exports")
+@RequestMapping("/exports")
 @RequiredArgsConstructor
 @Tag(name = "导出管理", description = "数据导出任务申请、查询与下载")
 public class ExportController {

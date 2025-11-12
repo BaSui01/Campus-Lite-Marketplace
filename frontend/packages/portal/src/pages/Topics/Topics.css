@@ -1,0 +1,431 @@
+/**
+ * 话题列表页面样式 - 发现热门话题！🔥
+ * @author BaSui 😎
+ * @description 美观的话题列表界面设计
+ */
+
+.topics-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px 0;
+}
+
+.topics-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==================== 头部 ==================== */
+
+.topics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 32px 32px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(240, 147, 251, 0.3);
+}
+
+.topics-header__info {
+  flex: 1;
+}
+
+.topics-header__title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.topics-header__subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+}
+
+.topics-header__actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* ==================== 搜索栏 ==================== */
+
+.topics-search {
+  margin-bottom: 20px;
+  padding: 20px 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.topics-search input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.topics-search input:focus {
+  outline: none;
+  border-color: #f5576c;
+  box-shadow: 0 0 0 2px rgba(245, 87, 108, 0.1);
+}
+
+/* ==================== 标签页 ==================== */
+
+.topics-tabs {
+  margin-bottom: 24px;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ==================== 内容区域 ==================== */
+
+.topics-content {
+  min-height: 400px;
+}
+
+.topics-loading {
+  padding: 20px 0;
+}
+
+.topics-empty {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 80px 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.topics-empty .empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.topics-empty .empty-text {
+  font-size: 24px;
+  color: #2d3436;
+  font-weight: bold;
+  margin: 0 0 12px 0;
+}
+
+.topics-empty .empty-tip {
+  font-size: 16px;
+  color: #636e72;
+  margin: 0 0 32px 0;
+}
+
+/* ==================== 话题网格 ==================== */
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.topic-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.topic-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.topic-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+.topic-card:hover::before {
+  opacity: 1;
+}
+
+.topic-card__icon {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.topic-card__content {
+  flex: 1;
+  cursor: pointer;
+  min-height: 120px;
+}
+
+.topic-card__name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2d3436;
+  margin: 0 0 12px 0;
+  transition: color 0.3s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topic-card__content:hover .topic-card__name {
+  color: #f5576c;
+}
+
+.topic-card__description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #636e72;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topic-card__stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.topic-card__stats .stat-item {
+  font-size: 13px;
+  color: #8c8c8c;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.topic-card__actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.topic-card__actions button {
+  flex: 1;
+}
+
+/* ==================== 创建话题表单 ==================== */
+
+.create-topic-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #2d3436;
+}
+
+.form-label .required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #f5576c;
+  box-shadow: 0 0 0 2px rgba(245, 87, 108, 0.1);
+}
+
+.form-textarea::placeholder {
+  color: #bfbfbf;
+}
+
+.char-count {
+  font-size: 12px;
+  color: #8c8c8c;
+  text-align: right;
+}
+
+/* ==================== 响应式适配 ==================== */
+
+@media (max-width: 1024px) {
+  .topics-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .topics-page {
+    padding: 10px 0;
+  }
+
+  .topics-container {
+    padding: 0 10px;
+  }
+
+  .topics-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 20px;
+  }
+
+  .topics-header__title {
+    font-size: 28px;
+  }
+
+  .topics-header__subtitle {
+    font-size: 14px;
+  }
+
+  .topics-header__actions {
+    width: 100%;
+  }
+
+  .topics-header__actions button {
+    width: 100%;
+  }
+
+  .topics-search {
+    padding: 16px 20px;
+  }
+
+  .topics-tabs {
+    padding: 12px 16px;
+  }
+
+  .topics-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .topic-card {
+    padding: 20px;
+  }
+
+  .topic-card__icon {
+    font-size: 40px;
+  }
+
+  .topic-card__name {
+    font-size: 18px;
+  }
+
+  .topics-empty {
+    padding: 60px 16px;
+  }
+
+  .topics-empty .empty-icon {
+    font-size: 64px;
+  }
+
+  .topics-empty .empty-text {
+    font-size: 20px;
+  }
+
+  .topics-empty .empty-tip {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topics-header {
+    padding: 20px 16px;
+  }
+
+  .topics-header__title {
+    font-size: 24px;
+  }
+
+  .topics-search {
+    padding: 12px 16px;
+  }
+
+  .topics-tabs {
+    padding: 10px 12px;
+  }
+
+  .topic-card {
+    padding: 16px;
+  }
+
+  .topic-card__icon {
+    font-size: 36px;
+  }
+
+  .topic-card__name {
+    font-size: 17px;
+  }
+
+  .topic-card__description {
+    font-size: 13px;
+  }
+
+  .topic-card__stats .stat-item {
+    font-size: 12px;
+  }
+
+  .topic-card__actions {
+    flex-direction: column;
+  }
+
+  .topics-empty {
+    padding: 40px 12px;
+  }
+
+  .topics-empty .empty-icon {
+    font-size: 56px;
+  }
+
+  .topics-empty .empty-text {
+    font-size: 18px;
+  }
+}

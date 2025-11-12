@@ -4,7 +4,7 @@
  * @description 商品发布、查询、更新、删除、收藏等接口（基于 OpenAPI 生成代码）
  */
 
-import { getApi } from '../utils/apiClient';
+import { getApi, apiClient } from '../utils/apiClient';
 import type {
   GoodsResponse,
   CreateGoodsRequest,
@@ -20,6 +20,7 @@ export interface GoodsListParams {
   categoryId?: number;     // 分类 ID
   minPrice?: number;       // 最低价格
   maxPrice?: number;       // 最高价格
+  status?: string;         // 商品状态（PENDING/APPROVED/REJECTED/SOLD/OFFLINE）
   page?: number;           // 页码（从 0 开始）
   size?: number;           // 每页大小
   sortBy?: string;         // 排序字段
@@ -38,17 +39,21 @@ export class GoodsService {
    */
   async listGoods(params?: GoodsListParams): Promise<PageGoodsResponse> {
     const api = getApi();
-    const response = await api.listGoods(
-      params?.keyword,
-      params?.categoryId,
-      params?.minPrice,
-      params?.maxPrice,
-      params?.page,
-      params?.size,
-      params?.sortBy,
-      params?.sortDirection,
-      params?.tags
-    );
+    // ✅ listGoods 需要对象参数，只传递有值的参数避免后端枚举解析错误
+    const requestParams: any = {};
+    
+    if (params?.keyword !== undefined) requestParams.keyword = params.keyword;
+    if (params?.categoryId !== undefined) requestParams.categoryId = params.categoryId;
+    if (params?.minPrice !== undefined) requestParams.minPrice = params.minPrice;
+    if (params?.maxPrice !== undefined) requestParams.maxPrice = params.maxPrice;
+    if (params?.status !== undefined) requestParams.status = params.status;  // 只在有值时传递status（枚举类型）
+    if (params?.page !== undefined) requestParams.page = params.page;
+    if (params?.size !== undefined) requestParams.size = params.size;
+    if (params?.sortBy !== undefined) requestParams.sortBy = params.sortBy;
+    if (params?.sortDirection !== undefined) requestParams.sortDirection = params.sortDirection;
+    if (params?.tags !== undefined) requestParams.tags = params.tags;
+    
+    const response = await api.listGoods(requestParams);
     return response.data.data as PageGoodsResponse;
   }
 
@@ -59,7 +64,8 @@ export class GoodsService {
    */
   async getGoodsDetail(id: number): Promise<GoodsDetailResponse> {
     const api = getApi();
-    const response = await api.getGoodsDetail(id);
+    // ✅ getGoodsDetail 需要对象参数
+    const response = await api.getGoodsDetail({ id });
     return response.data.data as GoodsDetailResponse;
   }
 
@@ -70,7 +76,8 @@ export class GoodsService {
    */
   async getRecommendGoods(limit?: number): Promise<GoodsResponse[]> {
     const api = getApi();
-    const response = await api.hot(undefined, limit);
+    // ✅ hot 需要对象参数 { campusId?, size? }
+    const response = await api.hot({ size: limit });
     return response.data.data as GoodsResponse[];
   }
 
@@ -81,7 +88,8 @@ export class GoodsService {
    */
   async getPersonalRecommendations(limit?: number): Promise<GoodsResponse[]> {
     const api = getApi();
-    const response = await api.personal(limit);
+    // ✅ personal 需要对象参数 { size: number }
+    const response = await api.personal({ size: limit });
     return response.data.data as GoodsResponse[];
   }
 
@@ -92,7 +100,8 @@ export class GoodsService {
    */
   async createGoods(data: CreateGoodsRequest): Promise<number> {
     const api = getApi();
-    const response = await api.createGoods(data);
+    // ✅ createGoods 需要对象参数 { createGoodsRequest: data }
+    const response = await api.createGoods({ createGoodsRequest: data });
     return response.data.data as number;
   }
 
@@ -105,13 +114,18 @@ export class GoodsService {
     status?: string;
     page?: number;
     size?: number;
+    sortBy?: string;
+    sortDirection?: string;
   }): Promise<PageGoodsResponse> {
-    const api = getApi();
-    const response = await api.getMyGoods(
-      params?.status,
-      params?.page,
-      params?.size
-    );
+    // ✅ 直接调用新的 /goods/my 接口（后端已添加）
+    const response = await apiClient.get('/goods/my', {
+      params: {
+        page: params?.page || 0,
+        size: params?.size || 10,
+        sortBy: params?.sortBy || 'createdAt',
+        sortDirection: params?.sortDirection || 'DESC',
+      },
+    });
     return response.data.data as PageGoodsResponse;
   }
 
@@ -135,7 +149,8 @@ export class GoodsService {
    */
   async favoriteGoods(goodsId: number): Promise<void> {
     const api = getApi();
-    await api.favoriteGoods(goodsId);
+    // ✅ 正确方法名是 addFavorite
+    await api.addFavorite({ goodsId });
   }
 
   /**
@@ -145,7 +160,8 @@ export class GoodsService {
    */
   async unfavoriteGoods(goodsId: number): Promise<void> {
     const api = getApi();
-    await api.unfavoriteGoods(goodsId);
+    // ✅ 正确方法名是 removeFavorite
+    await api.removeFavorite({ goodsId });
   }
 
   /**
@@ -155,7 +171,8 @@ export class GoodsService {
    */
   async isFavorited(goodsId: number): Promise<boolean> {
     const api = getApi();
-    const response = await api.isFavorited(goodsId);
+    // ✅ isFavorited 需要对象参数
+    const response = await api.isFavorited({ goodsId });
     return response.data.data as boolean;
   }
 
@@ -167,7 +184,8 @@ export class GoodsService {
    */
   async getMyFavorites(page?: number, size?: number): Promise<PageGoodsResponse> {
     const api = getApi();
-    const response = await api.getMyFavorites(page, size);
+    // ✅ 正确方法名是 listFavorites
+    const response = await api.listFavorites({ page, size });
     return response.data.data as PageGoodsResponse;
   }
 
@@ -197,6 +215,7 @@ export class GoodsService {
     // 如果有限制，返回前 N 个
     return limit ? tags.slice(0, limit) : tags;
   }
+
 }
 
 // 导出单例

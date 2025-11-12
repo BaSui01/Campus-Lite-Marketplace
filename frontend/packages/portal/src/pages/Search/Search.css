@@ -214,18 +214,21 @@
 .search-sort__price {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: 10px;
+  flex: 1;
+  min-width: 300px; /* 确保有足够的空间 */
 }
 
 .search-sort__price .price-input {
-  width: 90px;
-  padding: 8px 12px;
+  flex: 1;
+  min-width: 0; /* 防止溢出 */
+  padding: 10px 14px;
   border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   color: #595959;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .search-sort__price .price-input:hover {
@@ -235,46 +238,75 @@
 .search-sort__price .price-input:focus {
   border-color: #ff6b35;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
+}
+
+/* 移除 number 输入框的箭头 */
+.search-sort__price .price-input::-webkit-outer-spin-button,
+.search-sort__price .price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.search-sort__price .price-input[type='number'] {
+  -moz-appearance: textfield;
 }
 
 .search-sort__price .price-separator {
   color: #8c8c8c;
-  font-weight: bold;
+  font-weight: 600;
+  flex-shrink: 0;
 }
 
 .search-sort__price .price-apply-btn {
-  padding: 8px 16px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #ff6b35;
   color: #ffffff;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .search-sort__price .price-apply-btn:hover {
   background: #ff8555;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 107, 53, 0.35);
+}
+
+.search-sort__price .price-apply-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(255, 107, 53, 0.25);
 }
 
 .search-sort__price .price-clear-btn {
-  padding: 8px 16px;
+  padding: 10px 18px;
   border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #ffffff;
   color: #595959;
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .search-sort__price .price-clear-btn:hover {
   border-color: #ff4d4f;
-  color: #ff4d4f;
+  background: #ff4d4f;
+  color: white;
+  box-shadow: 0 4px 10px rgba(255, 77, 79, 0.35);
+}
+
+.search-sort__price .price-clear-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(255, 77, 79, 0.25);
 }
 
 .search-sort__label {
@@ -764,6 +796,63 @@
   .post-result-card {
     padding: 16px 20px;
   }
+}
+
+/* ==================== 搜索引导帮助按钮 ==================== */
+
+/**
+ * 搜索引导帮助按钮样式
+ * @author BaSui 😎
+ * @description 为用户提供搜索功能引导的入口
+ */
+.search-help-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+}
+
+.search-help-btn .help-guide-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #8c8c8c;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-help-btn .help-guide-btn:hover {
+  border-color: #ff6b35;
+  color: #ff6b35;
+  background: #fff5f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+}
+
+/* 搜索引导CTA按钮 */
+.guide-cta-btn {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8555 100%);
+  border: none;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.guide-cta-btn:hover {
+  background: linear-gradient(135deg, #ff8555 0%, #ffa940 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
 }
 
 /* ==================== 搜索高亮样式 ==================== */

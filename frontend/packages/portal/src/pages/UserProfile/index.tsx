@@ -7,8 +7,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Skeleton, Tabs, GoodsCard } from '@campus/shared/components';
+import { creditService, CreditLevel, CREDIT_LEVEL_CONFIG } from '../../services';;
 import { useAuthStore, useNotificationStore } from '../../store';
 import { getApi } from '@campus/shared/utils';
+import { BlacklistButton } from '../../components/BlacklistButton';
 import './UserProfile.css';
 
 // ==================== 类型定义 ====================
@@ -23,6 +25,8 @@ interface UserProfile {
   followingCount: number;
   followerCount: number;
   isFollowing: boolean;
+  creditScore?: number;
+  creditLevel?: CreditLevel;
 }
 
 interface Goods {
@@ -72,8 +76,9 @@ const UserProfile: React.FC = () => {
       // 🚀 调用真实后端 API 获取用户信息
       const response = await api.getUserProfile({ userId: Number(userId) });
 
-      if (response.data.success && response.data.data) {
-        const data = response.data.data;
+      // 后端统一响应为 { code, message, data }，无 success 字段
+      const data = response.data?.data;
+      if (data) {
         setProfile({
           id: data.id!,
           username: data.username || '未知用户',
@@ -106,8 +111,9 @@ const UserProfile: React.FC = () => {
       // 🚀 调用真实后端 API 获取用户商品
       const response = await api.listGoods({ sellerId: Number(userId), page: 0, size: 12 });
 
-      if (response.data.success && response.data.data) {
-        const apiGoods: Goods[] = response.data.data.content.map((item: any) => ({
+      const pageData = response.data?.data;
+      if (pageData?.content) {
+        const apiGoods: Goods[] = pageData.content.map((item: any) => ({
           id: item.id,
           title: item.title,
           price: item.price,
@@ -224,7 +230,20 @@ const UserProfile: React.FC = () => {
           </div>
 
           <div className="user-profile-card__info">
-            <h1 className="user-profile-card__name">{profile.username}</h1>
+            <div className="profile-header">
+              <h1 className="user-profile-card__name">{profile.username}</h1>
+              {profile.creditLevel && (
+                <div 
+                  className="profile-credit-badge" 
+                  style={{ backgroundColor: CREDIT_LEVEL_CONFIG[profile.creditLevel].color }}
+                  title={`信用分: ${profile.creditScore || 100}`}
+                  onClick={() => !isOwnProfile ? navigate(`/users/${userId}/credit`) : navigate('/credit')}
+                >
+                  <span className="credit-icon">{CREDIT_LEVEL_CONFIG[profile.creditLevel].icon}</span>
+                  <span className="credit-name">{CREDIT_LEVEL_CONFIG[profile.creditLevel].levelName}</span>
+                </div>
+              )}
+            </div>
             {profile.campusName && <p className="user-profile-card__campus">🏫 {profile.campusName}</p>}
             {profile.bio && <p className="user-profile-card__bio">{profile.bio}</p>}
 
@@ -254,6 +273,11 @@ const UserProfile: React.FC = () => {
                 <Button type="default" onClick={handleSendMessage}>
                   💬 发消息
                 </Button>
+                <BlacklistButton
+                  userId={profile.id}
+                  userName={profile.username}
+                  size="middle"
+                />
               </div>
             )}
           </div>

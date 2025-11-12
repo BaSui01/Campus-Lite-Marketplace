@@ -145,8 +145,18 @@ export const useAuthGuard = (): UseAuthGuardResult => {
           sessionStorage.setItem('auth_return_url', returnUrl);
         }
 
-        // 跳转登录页
-        navigate('/login');
+        // 🎯 智能判断登录路径：管理端跳转到 /admin/login，门户端跳转到 /login
+        const currentPath = window.location.pathname;
+        const isAdminRoute = currentPath.startsWith('/admin');
+        const loginPath = isAdminRoute ? '/admin/login' : '/login';
+        
+        // ⚠️ 防止无限重定向：如果已经在登录页，不再跳转
+        if (currentPath === loginPath) {
+          console.warn('[Auth Guard] ⚠️ 已在登录页，跳过重定向');
+          return isAuth;
+        }
+        
+        navigate(loginPath);
       }
 
       return isAuth;
@@ -173,8 +183,15 @@ export const useAuthGuard = (): UseAuthGuardResult => {
             sessionStorage.setItem('auth_return_url', returnUrl);
           }
 
-          // 跳转登录页
-          navigate('/login');
+          // 🎯 智能判断登录路径：管理端跳转到 /admin/login，门户端跳转到 /login
+          const currentPath = window.location.pathname;
+          const isAdminRoute = currentPath.startsWith('/admin');
+          const loginPath = isAdminRoute ? '/admin/login' : '/login';
+          
+          // ⚠️ 防止无限重定向：如果已经在登录页，不再跳转
+          if (currentPath !== loginPath) {
+            navigate(loginPath);
+          }
         }
 
         return false;

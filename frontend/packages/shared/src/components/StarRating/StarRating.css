@@ -1,0 +1,140 @@
+/**
+ * StarRating 组件样式
+ * @author BaSui 😎
+ * @description 星级评分组件的样式定义
+ */
+
+/* ==================== 容器 ==================== */
+
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 只读模式：默认鼠标样式 */
+.star-rating--readonly {
+  cursor: default;
+}
+
+/* 可编辑模式：指针样式 */
+.star-rating--editable {
+  cursor: pointer;
+}
+
+/* 禁用状态 */
+.star-rating--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==================== 星星容器 ==================== */
+
+.star-rating__stars {
+  display: inline-flex;
+  gap: 4px;
+}
+
+/* ==================== 单个星星 ==================== */
+
+.star-rating__star {
+  position: relative;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+/* 星星SVG */
+.star-rating__star svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 默认星星颜色（灰色） */
+.star-rating__star-empty {
+  fill: #e0e0e0;
+}
+
+/* 填充星星颜色 */
+.star-rating__star-filled {
+  fill: currentColor;
+}
+
+/* 悬停效果 */
+.star-rating--editable .star-rating__star:hover {
+  transform: scale(1.1);
+}
+
+.star-rating--disabled .star-rating__star:hover {
+  transform: none;
+}
+
+/* ==================== 星星状态类 ==================== */
+
+/* 已填充星星 */
+.star-rating__star--filled .star-rating__star-filled {
+  opacity: 1;
+}
+
+/* 半星 */
+.star-rating__star--half .star-rating__star-filled {
+  clip-path: inset(0 50% 0 0);
+}
+
+/* 悬停状态 */
+.star-rating__star--hovered .star-rating__star-filled {
+  opacity: 0.7;
+}
+
+/* ==================== 尺寸变体 ==================== */
+
+/* 小尺寸 */
+.star-rating--small .star-rating__star {
+  width: 16px;
+  height: 16px;
+}
+
+/* 中等尺寸（默认） */
+.star-rating--medium .star-rating__star {
+  width: 20px;
+  height: 20px;
+}
+
+/* 大尺寸 */
+.star-rating--large .star-rating__star {
+  width: 28px;
+  height: 28px;
+}
+
+/* ==================== 数字展示 ==================== */
+
+.star-rating__value {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.star-rating--small .star-rating__value {
+  font-size: 12px;
+}
+
+.star-rating--large .star-rating__value {
+  font-size: 16px;
+}
+
+/* ==================== 响应式 ==================== */
+
+@media (max-width: 768px) {
+  .star-rating {
+    gap: 2px;
+  }
+
+  .star-rating__stars {
+    gap: 2px;
+  }
+
+  .star-rating__value {
+    margin-left: 6px;
+  }
+}

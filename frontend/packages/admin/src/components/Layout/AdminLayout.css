@@ -1,8 +1,9 @@
 /**
- * 主布局样式
+ * 主布局样式 - 响应式设计
  *
  * @author BaSui 😎
  * @date 2025-11-01
+ * @updated 2025-11-06 - 添加响应式样式支持
  */
 
 .admin-layout {
@@ -54,4 +55,47 @@
   background: #fff;
   min-height: 280px;
   border-radius: 8px;
+}
+
+/* ========== 响应式样式 ========== */
+
+/* 平板端 (768px - 991px) */
+@media (max-width: 991px) and (min-width: 768px) {
+  .admin-header {
+    padding: 0 16px;
+  }
+
+  .admin-content {
+    margin: 16px;
+    padding: 16px;
+  }
+}
+
+/* 手机端 (<768px) */
+@media (max-width: 767px) {
+  .admin-header {
+    padding: 0 12px;
+  }
+
+  .admin-content {
+    margin: 12px;
+    padding: 12px;
+  }
+
+  /* 手机端用户信息区域优化 */
+  .user-info span {
+    display: none; /* 隐藏用户名文字，只显示头像 */
+  }
+}
+
+/* 超小屏幕 (<576px) */
+@media (max-width: 575px) {
+  .admin-header {
+    padding: 0 8px;
+  }
+
+  .admin-content {
+    margin: 8px;
+    padding: 12px;
+  }
 }

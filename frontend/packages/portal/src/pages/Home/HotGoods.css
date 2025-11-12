@@ -1,0 +1,166 @@
+/**
+ * HotGoods 热门商品区域样式
+ * @author BaSui 😎
+ * @updated 2025-11-06 - 现代化美化升级
+ */
+
+/* ==================== 主容器 ==================== */
+.hot-goods {
+  margin-bottom: 56px;
+}
+
+/* ==================== Header ==================== */
+.hot-goods__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+  position: relative;
+}
+
+.hot-goods__header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+.hot-goods__title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hot-goods__more {
+  padding: 10px 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  color: var(--text-secondary, #666);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.hot-goods__more:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: linear-gradient(180deg, rgba(102, 126, 234, 0.08) 0%, rgba(102, 126, 234, 0.12) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.hot-goods__more:active {
+  transform: translateY(0);
+}
+
+/* ==================== 商品网格 ==================== */
+.hot-goods__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* ==================== 错误状态 ==================== */
+.hot-goods__error {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+/* ==================== 响应式 ==================== */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .hot-goods {
+    margin-bottom: 48px;
+  }
+
+  .hot-goods__header {
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+  }
+
+  .hot-goods__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .hot-goods__title {
+    font-size: 28px;
+  }
+
+  .hot-goods__more {
+    padding: 9px 18px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .hot-goods {
+    margin-bottom: 40px;
+  }
+
+  .hot-goods__header {
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+  }
+
+  .hot-goods__header::after {
+    width: 60px;
+  }
+
+  .hot-goods__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .hot-goods__title {
+    font-size: 24px;
+    gap: 8px;
+  }
+
+  .hot-goods__more {
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 10px;
+  }
+
+  .hot-goods__error {
+    padding: 60px 16px;
+  }
+}
+
+/* Ultra Mobile - Small devices */
+@media (max-width: 374px) {
+  .hot-goods__grid {
+    gap: 12px;
+  }
+
+  .hot-goods__title {
+    font-size: 20px;
+  }
+
+  .hot-goods__more {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}

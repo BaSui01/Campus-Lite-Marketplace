@@ -2,7 +2,6 @@ package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.component.RateLimitRuleManager;
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,7 @@ class RateLimitAdminControllerTest {
         when(ruleManager.getIpWhitelist()).thenReturn(Set.of("127.0.0.1"));
         when(ruleManager.getIpBlacklist()).thenReturn(Set.of("192.0.2.1"));
 
-        mockMvc.perform(get("/api/admin/rate-limit/rules"))
+        mockMvc.perform(get("/admin/rate-limit/rules"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.enabled").value(true))
                 .andExpect(jsonPath("$.data.userWhitelist[0]").value(1));
@@ -59,7 +58,7 @@ class RateLimitAdminControllerTest {
     @DisplayName("设置限流开关")
     @WithMockUser(authorities = "system:rate-limit:manage")
     void setEnabled_success() throws Exception {
-        mockMvc.perform(post("/api/admin/rate-limit/enabled/{enabled}", false))
+        mockMvc.perform(post("/admin/rate-limit/enabled/{enabled}", false))
                 .andExpect(status().isOk());
 
         verify(ruleManager).setEnabled(false);
@@ -69,9 +68,9 @@ class RateLimitAdminControllerTest {
     @DisplayName("维护用户白名单")
     @WithMockUser(authorities = "system:rate-limit:manage")
     void manageUserWhitelist_success() throws Exception {
-        mockMvc.perform(post("/api/admin/rate-limit/whitelist/users/{userId}", 88L))
+        mockMvc.perform(post("/admin/rate-limit/whitelist/users/{userId}", 88L))
                 .andExpect(status().isOk());
-        mockMvc.perform(delete("/api/admin/rate-limit/whitelist/users/{userId}", 88L))
+        mockMvc.perform(delete("/admin/rate-limit/whitelist/users/{userId}", 88L))
                 .andExpect(status().isOk());
 
         verify(ruleManager).addUserWhitelist(88L);
@@ -82,13 +81,13 @@ class RateLimitAdminControllerTest {
     @DisplayName("维护 IP 白名单与黑名单")
     @WithMockUser(authorities = "system:rate-limit:manage")
     void manageIpLists_success() throws Exception {
-        mockMvc.perform(post("/api/admin/rate-limit/whitelist/ips/{ip}", "127.0.0.1"))
+        mockMvc.perform(post("/admin/rate-limit/whitelist/ips/{ip}", "127.0.0.1"))
                 .andExpect(status().isOk());
-        mockMvc.perform(delete("/api/admin/rate-limit/whitelist/ips/{ip}", "127.0.0.1"))
+        mockMvc.perform(delete("/admin/rate-limit/whitelist/ips/{ip}", "127.0.0.1"))
                 .andExpect(status().isOk());
-        mockMvc.perform(post("/api/admin/rate-limit/blacklist/ips/{ip}", "192.0.2.1"))
+        mockMvc.perform(post("/admin/rate-limit/blacklist/ips/{ip}", "192.0.2.1"))
                 .andExpect(status().isOk());
-        mockMvc.perform(delete("/api/admin/rate-limit/blacklist/ips/{ip}", "192.0.2.1"))
+        mockMvc.perform(delete("/admin/rate-limit/blacklist/ips/{ip}", "192.0.2.1"))
                 .andExpect(status().isOk());
 
         verify(ruleManager).addIpWhitelist("127.0.0.1");

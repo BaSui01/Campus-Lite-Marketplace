@@ -1,0 +1,252 @@
+/**
+ * 基本信息步骤样式
+ * @author BaSui 😎
+ */
+
+.basic-info-step__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 32px;
+}
+
+.basic-info-step__form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ==================== 表单字段 ==================== */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-field-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.form-field__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-field__required {
+  color: #f5222d;
+  margin-left: 4px;
+}
+
+.form-field__optional {
+  color: #999;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.form-field__textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.form-field__textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.form-field__hint {
+  font-size: 12px;
+  color: #999;
+  text-align: right;
+}
+
+/* ==================== 单选框组 ==================== */
+.form-field__radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.form-field__radio {
+  padding: 10px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-field__radio input[type="radio"] {
+  display: none;
+}
+
+.form-field__radio:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.form-field__radio.active {
+  border-color: #667eea;
+  background: #667eea;
+  color: white;
+}
+
+/* ==================== 复选框组 ==================== */
+.form-field__checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.form-field__checkbox {
+  padding: 10px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-field__checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.form-field__checkbox:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.form-field__checkbox.active {
+  border-color: #667eea;
+  background: #667eea;
+  color: white;
+}
+
+/* ==================== 标签输入 ==================== */
+.form-field__tag-input {
+  display: flex;
+  gap: 8px;
+}
+
+.form-field__tag-add-btn {
+  padding: 0 20px;
+  background: #667eea;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-field__tag-add-btn:hover {
+  background: #5568d3;
+}
+
+.form-field__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.form-field__tag {
+  padding: 6px 12px;
+  background: #f5f5f5;
+  border-radius: 16px;
+  color: #667eea;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-field__tag-remove {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.form-field__tag-remove:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== 操作按钮 ==================== */
+.basic-info-step__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.basic-info-step__btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.basic-info-step__btn--cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.basic-info-step__btn--cancel:hover {
+  background: #e0e0e0;
+}
+
+.basic-info-step__btn--next {
+  background: #667eea;
+  color: white;
+}
+
+.basic-info-step__btn--next:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ==================== 响应式 ==================== */
+@media (max-width: 767px) {
+  .basic-info-step__title {
+    font-size: 20px;
+  }
+
+  .form-field-group {
+    grid-template-columns: 1fr;
+  }
+
+  .basic-info-step__actions {
+    flex-direction: column;
+  }
+
+  .basic-info-step__btn {
+    width: 100%;
+  }
+}

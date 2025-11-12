@@ -29,6 +29,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
+.notifications-header__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .notifications-header__title {
   font-size: 28px;
   font-weight: bold;

@@ -50,6 +50,8 @@ export enum GoodsStatus {
   PENDING = 'PENDING',
   /** 已上架 */
   APPROVED = 'APPROVED',
+  /** 已锁定（待支付占用） */
+  LOCKED = 'LOCKED',
   /** 已拒绝 */
   REJECTED = 'REJECTED',
   /** 已售出 */
@@ -94,20 +96,27 @@ export enum GoodsSortField {
 
 /**
  * 订单状态枚举
+ *
+ * ⚠️ 重要：与后端 OrderStatus.java 保持完全一致！
+ *
+ * @author BaSui 😎
+ * @date 2025-11-10
  */
 export enum OrderStatus {
   /** 待支付 */
   PENDING_PAYMENT = 'PENDING_PAYMENT',
   /** 已支付 */
   PAID = 'PAID',
-  /** 待发货 */
-  PENDING_DELIVERY = 'PENDING_DELIVERY',
-  /** 待收货 */
-  PENDING_RECEIPT = 'PENDING_RECEIPT',
+  /** 已发货 */
+  SHIPPED = 'SHIPPED',
+  /** 已送达（待确认收货） */
+  DELIVERED = 'DELIVERED',
   /** 已完成 */
   COMPLETED = 'COMPLETED',
   /** 已取消 */
   CANCELLED = 'CANCELLED',
+  /** 已评价 */
+  REVIEWED = 'REVIEWED',
   /** 退款中 */
   REFUNDING = 'REFUNDING',
   /** 已退款 */
@@ -172,23 +181,9 @@ export enum MessageStatus {
   RECALLED = 'RECALLED',
 }
 
-/**
- * 通知类型枚举
- */
-export enum NotificationType {
-  /** 系统通知 */
-  SYSTEM = 'SYSTEM',
-  /** 订单通知 */
-  ORDER = 'ORDER',
-  /** 消息通知 */
-  MESSAGE = 'MESSAGE',
-  /** 评价通知 */
-  REVIEW = 'REVIEW',
-  /** 收藏通知 */
-  FAVORITE = 'FAVORITE',
-  /** 举报通知 */
-  REPORT = 'REPORT',
-}
+// 通知类型枚举已移至 services/notificationPreference.ts
+// 请从 @campus/shared/services 导入
+export { NotificationType } from '../services/notificationPreference';
 
 // ==================== 审核相关枚举 ====================
 
@@ -416,6 +411,7 @@ export const UserStatusLabel: Record<UserStatus, string> = {
 export const GoodsStatusLabel: Record<GoodsStatus, string> = {
   [GoodsStatus.PENDING]: '待审核',
   [GoodsStatus.APPROVED]: '已上架',
+  [GoodsStatus.LOCKED]: '已锁定',
   [GoodsStatus.REJECTED]: '已拒绝',
   [GoodsStatus.SOLD]: '已售出',
   [GoodsStatus.OFF_SHELF]: '已下架',
@@ -427,10 +423,11 @@ export const GoodsStatusLabel: Record<GoodsStatus, string> = {
 export const OrderStatusLabel: Record<OrderStatus, string> = {
   [OrderStatus.PENDING_PAYMENT]: '待支付',
   [OrderStatus.PAID]: '已支付',
-  [OrderStatus.PENDING_DELIVERY]: '待发货',
-  [OrderStatus.PENDING_RECEIPT]: '待收货',
+  [OrderStatus.SHIPPED]: '已发货',
+  [OrderStatus.DELIVERED]: '已送达',
   [OrderStatus.COMPLETED]: '已完成',
   [OrderStatus.CANCELLED]: '已取消',
+  [OrderStatus.REVIEWED]: '已评价',
   [OrderStatus.REFUNDING]: '退款中',
   [OrderStatus.REFUNDED]: '已退款',
 };
@@ -456,14 +453,5 @@ export const MessageTypeLabel: Record<MessageType, string> = {
   [MessageType.FILE]: '文件消息',
 };
 
-/**
- * 通知类型中文映射
- */
-export const NotificationTypeLabel: Record<NotificationType, string> = {
-  [NotificationType.SYSTEM]: '系统通知',
-  [NotificationType.ORDER]: '订单通知',
-  [NotificationType.MESSAGE]: '消息通知',
-  [NotificationType.REVIEW]: '评价通知',
-  [NotificationType.FAVORITE]: '收藏通知',
-  [NotificationType.REPORT]: '举报通知',
-};
+// NotificationType 相关映射已移至 constants/status.ts
+// 请使用 NOTIFICATION_TYPE_LABELS, NOTIFICATION_TYPE_ICONS, NOTIFICATION_TYPE_COLORS

@@ -38,7 +38,7 @@ export const DisputeStatisticsApiAxiosParamCreator = function (configuration?: C
          * @throws {RequiredError}
          */
         getStatistics: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/disputes/statistics`;
+            const localVarPath = `/disputes/statistics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

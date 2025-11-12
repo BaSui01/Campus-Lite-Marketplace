@@ -55,7 +55,25 @@ export interface PostResponse {
      * @type {string}
      * @memberof PostResponse
      */
+    'authorAvatar'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PostResponse
+     */
     'status'?: PostResponseStatusEnum;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PostResponse
+     */
+    'isTop'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PostResponse
+     */
+    'isHot'?: boolean;
     /**
      * 
      * @type {number}
@@ -70,6 +88,30 @@ export interface PostResponse {
     'replyCount'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof PostResponse
+     */
+    'likeCount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PostResponse
+     */
+    'collectCount'?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PostResponse
+     */
+    'isLiked'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PostResponse
+     */
+    'isCollected'?: boolean;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof PostResponse
      */
@@ -79,12 +121,25 @@ export interface PostResponse {
      * @type {string}
      * @memberof PostResponse
      */
+    'campusName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PostResponse
+     */
     'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PostResponse
+     */
+    'updatedAt'?: string;
 }
 
 export const PostResponseStatusEnum = {
     Pending: 'PENDING',
     Approved: 'APPROVED',
+    Locked: 'LOCKED',
     Rejected: 'REJECTED',
     Sold: 'SOLD',
     Offline: 'OFFLINE'

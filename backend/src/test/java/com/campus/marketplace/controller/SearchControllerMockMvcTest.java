@@ -1,7 +1,6 @@
 package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.config.JwtAuthenticationFilter;
-import com.campus.marketplace.common.config.TestSecurityConfig;
 import com.campus.marketplace.common.dto.response.SearchResultItem;
 import com.campus.marketplace.service.SearchService;
 import org.junit.jupiter.api.DisplayName;
@@ -65,7 +64,7 @@ class SearchControllerMockMvcTest {
         when(searchService.search(eq("goods"), eq("耳机"), eq(0), eq(10), eq(List.of(1L))))
                 .thenReturn(new PageImpl<>(List.of(item)));
 
-        mockMvc.perform(get("/api/search")
+        mockMvc.perform(get("/search")
                         .param("type", "goods")
                         .param("keyword", "耳机")
                         .param("tagIds", "1"))
@@ -78,7 +77,7 @@ class SearchControllerMockMvcTest {
     @Test
     @DisplayName("GET /api/search -> 关键词为空返回400")
     void search_withBlankKeyword_returnsBadRequest() throws Exception {
-        mockMvc.perform(get("/api/search")
+        mockMvc.perform(get("/search")
                         .param("type", "goods")
                         .param("keyword", "  "))
                 .andExpect(status().isBadRequest());

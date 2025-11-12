@@ -1,0 +1,146 @@
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 骨架屏加载 */
+.stat-card-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-line {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-title {
+  height: 16px;
+  width: 60%;
+}
+
+.skeleton-value {
+  height: 32px;
+  width: 80%;
+}
+
+.skeleton-trend {
+  height: 14px;
+  width: 40%;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 卡片头部 */
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.stat-card-title {
+  font-size: 14px;
+  color: #8c8c8c;
+  font-weight: 500;
+}
+
+.stat-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 24px;
+}
+
+/* 卡片内容 */
+.stat-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-card-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.stat-card-prefix,
+.stat-card-suffix {
+  font-size: 16px;
+  color: #595959;
+  font-weight: 500;
+}
+
+.stat-card-number {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1f1f1f;
+}
+
+/* 趋势指示 */
+.stat-card-trend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.trend-up {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.trend-down {
+  color: #f5222d;
+  font-weight: 500;
+}
+
+.trend-neutral {
+  color: #8c8c8c;
+  font-weight: 500;
+}
+
+.trend-label {
+  color: #8c8c8c;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .stat-card-number {
+    font-size: 24px;
+  }
+}
