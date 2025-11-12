@@ -432,6 +432,12 @@ services:
   # ========================================
   # 🌉 ngrok（将本地服务暴露为公网地址）
   # ========================================
+  # 🎯 用途: 同时暴露前后端三个服务到公网
+  #   - 8200: 后端API（支付回调必需）
+  #   - 8210: 前端管理端
+  #   - 8220: 前端用户端
+  # 🔧 启用方式: docker compose --project-directory . -f docker/docker-compose.yml --profile tunnel up -d
+  # 🌐 访问管理界面: http://localhost:4040
   ngrok:
     image: ngrok/ngrok:3
     container_name: campus-ngrok
@@ -439,9 +445,12 @@ services:
     profiles: ["tunnel"]
     environment:
       NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN:?请在 .env 中设置 NGROK_AUTHTOKEN}
-    command: ["http", "--log=stdout", "${NGROK_ADDR:-host.docker.internal:8200}"]
+    # 使用配置文件启动多隧道
+    command: ["start", "--all", "--config", "/etc/ngrok.yml"]
+    volumes:
+      - ./docker/ngrok/ngrok.yml:/etc/ngrok.yml:ro
     ports:
-      - "4040:4040"   # ngrok 本地控制台
+      - "4040:4040"   # ngrok Web管理界面
     networks:
       - campus
 
