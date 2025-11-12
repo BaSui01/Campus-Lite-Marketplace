@@ -64,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
     private final AuditLogService auditLogService;
     private final CouponUserRelationRepository couponUserRelationRepository;
     private final CouponService couponService;
-    private final com.campus.marketplace.service.EmailTemplateService emailTemplateService;
+    
 
     /**
      * 创建订单
@@ -140,15 +140,11 @@ public class OrderServiceImpl implements OrderService {
         log.info("订单创建成功: orderNo={}, buyerId={}, sellerId={}, amount={}",
                 orderNo, buyer.getId(), goods.getSellerId(), actualAmount);
 
-        // 下单后锁定商品，等待支付
-        // 临时禁用：部分环境存在 t_goods.status CHECK 约束不含 LOCKED，导致 400；
+        // 注意：不在下单时锁定商品状态（避免 LOCKED 枚举值约束问题）
+
         // 依赖“存在未取消订单即视为被占用”的业务校验避免并发下单。
-        // 如需启用，移除此禁用块，并确保数据库允许 LOCKED 枚举值。
-        if (false) {
-            goods.setStatus(GoodsStatus.LOCKED);
-            goodsRepository.save(goods);
-            log.info("物品状态更新为已锁定(待支付): goodsId={}", goods.getId());
-        }
+
+
 
         // 下单即发送锁定期通知（买家/卖家）
         try {
@@ -290,27 +286,57 @@ public class OrderServiceImpl implements OrderService {
         // 仅在此处进行一次通知发送（通过模板队列触发站内+邮件），避免重复邮件
         // 若后续需要更丰富的邮件内容，应改造模板而非在此重复直发
 
-        // 通知买家与卖家
+        // 通知卖家与买家（区分角色与配送方式，使用精简模板 + i18n）
         try {
-            java.util.Map<String, Object> params = new java.util.HashMap<>();
-            params.put("orderNo", order.getOrderNo());
-            try {
-                Goods g = goodsRepository.findById(order.getGoodsId()).orElse(null);
-                if (g != null) {
-                    params.put("goodsTitle", g.getTitle());
-                    params.put("goodsPrice", g.getPrice() != null ? g.getPrice().toPlainString() : null);
+            Goods g = null;
+            try { g = goodsRepository.findById(order.getGoodsId()).orElse(null); } catch (Exception ignored) {}
+            String goodsTitle = g != null ? g.getTitle() : null;
+
+            // 公共参数
+            java.util.Map<String, Object> base = new java.util.HashMap<>();
+            base.put("orderNo", order.getOrderNo());
+            if (goodsTitle != null) base.put("goodsTitle", goodsTitle);
+
+            // 卖家发货提示（快递：提示发货+收件人；面交：提示约定面交）
+            {
+                java.util.Map<String, Object> params = new java.util.HashMap<>(base);
+                String deliverHint;
+                if (order.getDeliveryMethod() == com.campus.marketplace.common.enums.DeliveryMethod.EXPRESS) {
+                    String rn = order.getReceiverName() != null ? order.getReceiverName() : "";
+                    String rp = order.getReceiverPhone() != null ? order.getReceiverPhone() : "";
+                    deliverHint = "请尽快发货；收件人" + rn + (rp.isEmpty() ? "" : "，" + rp);
+                } else {
+                    deliverHint = "请与买家约定时间地点当面交付";
                 }
-            } catch (Exception ignored) {}
-            params.put("actualAmount", order.getActualAmount() != null ? order.getActualAmount().toPlainString() : null);
-            params.put("paymentMethod", order.getPaymentMethod());
-            params.put("paymentTime", order.getPaymentTime() != null ? order.getPaymentTime().toString() : null);
-            params.put("transactionId", request.transactionId());
-            notificationDispatcher.enqueueTemplate(order.getBuyerId(), "ORDER_PAID", params,
-                    com.campus.marketplace.common.enums.NotificationType.ORDER_PAID.name(),
-                    order.getId(), "ORDER", "/orders/" + order.getOrderNo());
-            notificationDispatcher.enqueueTemplate(order.getSellerId(), "ORDER_PAID", params,
-                    com.campus.marketplace.common.enums.NotificationType.ORDER_PAID.name(),
-                    order.getId(), "ORDER", "/orders/" + order.getOrderNo());
+                params.put("deliverHint", deliverHint);
+                notificationDispatcher.enqueueTemplate(
+                        order.getSellerId(),
+                        "ORDER_PAID_SELLER_SHIP",
+                        params,
+                        com.campus.marketplace.common.enums.NotificationType.ORDER_PAID.name(),
+                        order.getId(),
+                        "ORDER",
+                        "/orders/" + order.getOrderNo()
+                );
+            }
+
+            // 买家收货提醒（快递：留意物流签收；面交：按约定面提）
+            {
+                java.util.Map<String, Object> params = new java.util.HashMap<>(base);
+                String deliverHint = (order.getDeliveryMethod() == com.campus.marketplace.common.enums.DeliveryMethod.EXPRESS)
+                        ? "请留意物流并按时签收"
+                        : "请按约定时间地点当面取货";
+                params.put("deliverHint", deliverHint);
+                notificationDispatcher.enqueueTemplate(
+                        order.getBuyerId(),
+                        "ORDER_PAID_BUYER_RECEIVE",
+                        params,
+                        com.campus.marketplace.common.enums.NotificationType.ORDER_PAID.name(),
+                        order.getId(),
+                        "ORDER",
+                        "/orders/" + order.getOrderNo()
+                );
+            }
         } catch (Exception ignored) {}
         return true;
     }
@@ -606,6 +632,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 获取订单实付金额（系统内部使用，无权限校验）
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public java.math.BigDecimal getOrderActualAmount(String orderNo) {
+        Order order = orderRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+        return order.getActualAmount() != null ? order.getActualAmount() : order.getAmount();
+    }
+
+    /**
      * 更新订单配送/收货信息
      */
     @Override
@@ -738,83 +775,6 @@ public class OrderServiceImpl implements OrderService {
         String timestamp = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
         return "ORD" + timestamp;
-    }
-
-    /**
-     * 发送支付成功邮件 📧
-     * 
-     * 在支付回调成功后调用，发送包含商品详情的邮件给买家
-     * 
-     * @param order 订单对象
-     * @param transactionId 交易流水号
-     */
-    private void sendPaymentSuccessEmail(Order order, String transactionId) {
-        log.info("📧 准备发送支付成功邮件: orderNo={}", order.getOrderNo());
-
-        // 1. 查询买家信息（获取邮箱）
-        User buyer = userRepository.findById(order.getBuyerId())
-                .orElse(null);
-        if (buyer == null || buyer.getEmail() == null || buyer.getEmail().isEmpty()) {
-            log.warn("⚠️ 买家未绑定邮箱，跳过邮件发送: buyerId={}", order.getBuyerId());
-            return;
-        }
-
-        // 2. 查询商品信息
-        Goods goods = goodsRepository.findById(order.getGoodsId())
-                .orElse(null);
-        if (goods == null) {
-            log.warn("⚠️ 商品不存在，跳过邮件发送: goodsId={}", order.getGoodsId());
-            return;
-        }
-
-        // 3. 查询卖家信息
-        User seller = userRepository.findById(order.getSellerId())
-                .orElse(null);
-        String sellerName = seller != null ? seller.getUsername() : "未知卖家";
-
-        // 4. 准备邮件数据
-        String goodsTitle = goods.getTitle();
-        String goodsDescription = goods.getDescription() != null && !goods.getDescription().isEmpty() 
-                ? goods.getDescription() 
-                : "暂无描述";
-        String goodsPrice = String.format("%.2f", goods.getPrice());
-        String goodsImage = (goods.getImages() != null && goods.getImages().length > 0 && goods.getImages()[0] != null && !goods.getImages()[0].isEmpty())
-                ? goods.getImages()[0]
-                : "https://picsum.photos/200/200?random=" + goods.getId();
-        String actualAmount = String.format("%.2f", order.getActualAmount());
-        
-        // 支付方式格式化
-        String paymentMethod = order.getPaymentMethod();
-        if ("WECHAT".equalsIgnoreCase(paymentMethod)) {
-            paymentMethod = "微信支付";
-        } else if ("ALIPAY".equalsIgnoreCase(paymentMethod)) {
-            paymentMethod = "支付宝";
-        }
-        
-        String paymentTime = order.getPaymentTime() != null 
-                ? order.getPaymentTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                : LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        // 5. 发送邮件
-        try {
-            emailTemplateService.sendPaymentSuccess(
-                    buyer.getEmail(),
-                    order.getOrderNo(),
-                    goodsTitle,
-                    goodsDescription,
-                    goodsPrice,
-                    goodsImage,
-                    actualAmount,
-                    paymentMethod,
-                    paymentTime,
-                    transactionId,
-                    sellerName
-            );
-            log.info("✅ 支付成功邮件发送成功: orderNo={}, email={}", order.getOrderNo(), buyer.getEmail());
-        } catch (Exception e) {
-            log.error("💥 支付成功邮件发送异常: orderNo={}", order.getOrderNo(), e);
-            throw e;
-        }
     }
 
     /**

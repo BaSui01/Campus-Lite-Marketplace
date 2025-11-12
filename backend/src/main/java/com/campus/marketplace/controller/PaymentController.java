@@ -3,9 +3,6 @@ package com.campus.marketplace.controller;
 import com.campus.marketplace.common.dto.request.PayOrderRequest;
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
 import com.campus.marketplace.common.dto.response.ApiResponse;
-import com.campus.marketplace.common.dto.response.OrderResponse;
-
-import java.math.BigDecimal;
 import com.campus.marketplace.service.OrderService;
 import com.campus.marketplace.service.impl.WechatPaymentService;
 import com.campus.marketplace.service.impl.WechatPaymentServiceV2;
@@ -171,13 +168,11 @@ public class PaymentController {
                 try {
                     // ✅ 安全实践：从数据库查询订单金额，而不是信任回调数据
                     // 原因：防止回调数据被篡改，确保金额以系统记录为准
-                    OrderResponse orderResponse = orderService.getOrderDetail(orderNo);
-                    if (orderResponse == null) {
+                    java.math.BigDecimal amount = orderService.getOrderActualAmount(orderNo);
+                    if (amount == null) {
                         log.error("💥 订单不存在: orderNo={}", orderNo);
                         throw new IllegalStateException("订单不存在");
                     }
-
-                    BigDecimal amount = orderResponse.amount();
 
                     PaymentCallbackRequest callbackRequest = new PaymentCallbackRequest(
                             orderNo,
@@ -261,14 +256,11 @@ public class PaymentController {
 
             // 4. 为了安全，从数据库查询订单金额，而不是信任回调中的金额
             try {
-                OrderResponse orderResponse = orderService.getOrderDetail(orderNo);
-                if (orderResponse == null) {
+                java.math.BigDecimal amount = orderService.getOrderActualAmount(orderNo);
+                if (amount == null) {
                     log.error("💥 订单不存在: orderNo={}", orderNo);
                     throw new IllegalStateException("订单不存在");
                 }
-
-                // 使用实付金额进行校验，避免折扣场景下误判
-                java.math.BigDecimal amount = orderResponse.actualAmount();
 
                 PaymentCallbackRequest callbackRequest = new PaymentCallbackRequest(
                         orderNo,

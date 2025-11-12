@@ -2,7 +2,6 @@ package com.campus.marketplace.controller;
 
 import com.campus.marketplace.common.dto.ReviewStatisticsDTO;
 import com.campus.marketplace.common.dto.response.ApiResponse;
-import com.campus.marketplace.service.ReviewService;
 import com.campus.marketplace.service.ReviewStatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "商品评价公开查询", description = "按商品ID查询评价统计信息")
 public class GoodsReviewController {
 
-    private final ReviewService reviewService;
     private final ReviewStatisticsService reviewStatisticsService;
 
     @GetMapping("/goods/{goodsId}/reviews/stats")

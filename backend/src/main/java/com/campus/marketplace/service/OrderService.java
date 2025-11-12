@@ -5,6 +5,7 @@ import com.campus.marketplace.common.dto.request.PayOrderRequest;
 import com.campus.marketplace.common.dto.request.PaymentCallbackRequest;
 import com.campus.marketplace.common.dto.response.OrderResponse;
 import com.campus.marketplace.common.dto.response.PaymentResponse;
+import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 
 /**
@@ -91,6 +92,12 @@ public interface OrderService {
      * @return 订单详情
      */
     OrderResponse getOrderDetail(String orderNo);
+
+    /**
+     * 获取订单实付金额（系统内部使用）
+     * 不进行权限校验，供支付回调等系统流程查询金额校验使用
+     */
+    BigDecimal getOrderActualAmount(String orderNo);
 
     /**
      * 更新订单的配送与收货信息
