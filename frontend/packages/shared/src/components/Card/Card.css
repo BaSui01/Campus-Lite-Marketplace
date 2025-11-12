@@ -234,6 +234,7 @@
   opacity: 0.1;
   transform: translate(-50%, -50%);
   transition: width var(--transition-normal, 0.3s ease), height var(--transition-normal, 0.3s ease);
+  pointer-events: none; /* 避免遮挡子元素按钮点击 */
 }
 
 .campus-card__action:hover::before {

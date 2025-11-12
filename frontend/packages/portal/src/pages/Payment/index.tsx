@@ -106,7 +106,7 @@ export const Payment: React.FC = () => {
   const handlePaymentSuccess = () => {
     toast.success('支付成功！正在跳转...');
     setTimeout(() => {
-      navigate(`/order/${orderNo}`);
+      navigate(`/orders/${orderNo}`);
     }, 1500);
   };
 
@@ -178,7 +178,7 @@ export const Payment: React.FC = () => {
             <div className="payment-actions">
               <button
                 className="btn-cancel"
-                onClick={() => navigate(`/order/${orderNo}`)}
+                onClick={() => navigate(`/orders/${orderNo}`)}
               >
                 取消支付
               </button>

@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Skeleton, Empty, OrderCard } from '@campus/shared/components';
 import { orderService } from '@campus/shared/services';
 import { 
@@ -48,6 +48,7 @@ export const Orders: React.FC = () => {
   );
   const [page, setPage] = useState(0);
   const pageSize = 10;
+  const queryClient = useQueryClient();
 
   // 查询订单列表
   const { data: ordersData, isLoading } = useQuery({
@@ -102,7 +103,27 @@ export const Orders: React.FC = () => {
 
   // 查看订单详情
   const handleViewOrder = (orderNo: string) => {
-    navigate(`/order/${orderNo}`);
+    navigate(`/orders/${orderNo}`);
+  };
+
+  // 立即支付：跳转到支付页选择支付方式
+  const handlePay = (o: { orderNo: string }) => {
+    if (!o?.orderNo) return;
+    navigate(`/payment?orderNo=${encodeURIComponent(o.orderNo)}`);
+  };
+
+  // 取消订单（待支付）
+  const handleCancel = async (o: { orderNo: string }) => {
+    if (!o?.orderNo) return;
+    if (!window.confirm('确定要取消该订单吗？')) return;
+    try {
+      await orderService.cancelOrder(o.orderNo);
+      // 刷新列表
+      await queryClient.invalidateQueries({ queryKey: ['orders'] });
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || e?.message || '取消失败，请稍后重试';
+      window.alert(msg);
+    }
   };
 
   const orderList = ordersData?.content || [];
@@ -186,7 +207,9 @@ export const Orders: React.FC = () => {
                     seller: order.sellerUsername ? { id: String(order.sellerId), name: order.sellerUsername } : undefined,
                     createdAt: order.createdAt as unknown as string,
                   }}
-                  onViewDetail={() => handleViewOrder(order.orderNo!)}
+                  onDetailClick={() => handleViewOrder(order.orderNo!)}
+                  onPayClick={() => handlePay({ orderNo: order.orderNo! })}
+                  onCancelClick={() => handleCancel({ orderNo: order.orderNo! })}
                 />
               ))}
             </div>

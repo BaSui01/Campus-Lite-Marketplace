@@ -94,10 +94,10 @@ const PaymentResult: React.FC = () => {
   const handlePrimaryAction = () => {
     if (status === 'SUCCESS') {
       // 查看订单详情
-      navigate(`/order/${orderNo}`);
+      navigate(`/orders/${orderNo}`);
     } else if (status === 'FAILED') {
       // 重新支付
-      navigate(`/order/${orderNo}`);
+      navigate(`/orders/${orderNo}`);
     } else if (status === 'TIMEOUT') {
       // 重新下单,返回商品详情页
       if (orderInfo?.goodsId) {

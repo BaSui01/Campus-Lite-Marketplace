@@ -27,8 +27,13 @@ export const AlipayRedirect: React.FC<Props> = ({ paymentHtml, onCancel }) => {
         console.log('✅ [AlipayRedirect] 找到表单，准备提交');
         console.log('🔍 [AlipayRedirect] 表单 action:', form.action);
         console.log('🔍 [AlipayRedirect] 表单 method:', form.method);
+        
+        // 🎯 改为同页提交：不新开标签，保持当前标签页完成支付与回跳
+        //    这样用户支付完成后会根据 return_url 回到站内结果页
+        form.target = '_self';
+        
         setTimeout(() => {
-          console.log('🚀 [AlipayRedirect] 提交表单...');
+          console.log('🚀 [AlipayRedirect] 在当前窗口提交表单...');
           form.submit();
         }, 100);
       } else {
@@ -63,10 +68,10 @@ export const AlipayRedirect: React.FC<Props> = ({ paymentHtml, onCancel }) => {
       <div className="redirect-tips">
         <h4>支付提示</h4>
         <ul>
-          <li>页面即将自动跳转到支付宝</li>
-          <li>请在支付宝完成支付操作</li>
-          <li>支付完成后会自动返回</li>
-          <li>如未自动跳转，请点击取消后重试</li>
+          <li>支付宝将在当前页面打开</li>
+          <li>请按提示完成支付操作</li>
+          <li>支付完成后将自动回到结果页</li>
+          <li>如未跳转，请稍候或重试</li>
         </ul>
       </div>
     </div>

@@ -130,7 +130,7 @@ const PaymentStatus: React.FC = () => {
           </button>
 
           <button
-            onClick={() => navigate(`/order/${orderNo}`)}
+            onClick={() => navigate(`/orders/${orderNo}`)}
             className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
           >
             查看订单详情

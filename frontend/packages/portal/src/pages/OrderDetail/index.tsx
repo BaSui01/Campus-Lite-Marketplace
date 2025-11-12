@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Skeleton, Timeline } from '@campus/shared/components';
 import { orderService } from '@campus/shared/services/order';
+import { userService } from '@campus/shared/services';
 import { websocketService } from '@campus/shared/utils';
 import { useNotificationStore } from '../../store';
 import { LogisticsCard } from '../../components/LogisticsCard';
@@ -29,6 +30,9 @@ const OrderDetail: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // 买卖双方用户资料（用于头像/手机号等）
+  const [buyerProfile, setBuyerProfile] = useState<any | null>(null);
+  const [sellerProfile, setSellerProfile] = useState<any | null>(null);
   const [paying, setPaying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -68,8 +72,19 @@ const OrderDetail: React.FC = () => {
 
     try {
       // 🚀 调用真实后端 API 获取订单详情（统一接口）
-      const orderData = await orderService.getOrderDetail(orderNo);
+      const orderData: any = await orderService.getOrderDetail(orderNo);
       setOrder(orderData);
+      // 异步加载买卖双方资料（头像、手机号等）
+      try {
+        const tasks: Promise<any>[] = [];
+        if (orderData?.buyerId) tasks.push(userService.getUserById(orderData.buyerId));
+        else tasks.push(Promise.resolve(null));
+        if (orderData?.sellerId) tasks.push(userService.getUserById(orderData.sellerId));
+        else tasks.push(Promise.resolve(null));
+        const [buyer, seller] = await Promise.all(tasks);
+        setBuyerProfile(buyer);
+        setSellerProfile(seller);
+      } catch (_) {}
 
       // 计算倒计时截止时间（优先使用后端返回的 paymentExpireAt；否则用 createdAt + timeoutMinutes）
       try {
@@ -186,8 +201,8 @@ const OrderDetail: React.FC = () => {
    * 打开支付弹窗
    */
   const handleOpenPayModal = () => {
-    setShowPayModal(true);
-    setSelectedPaymentMethod(null);
+    if (!orderNo) return;
+    navigate(`/payment?orderNo=${encodeURIComponent(orderNo)}`);
   };
 
   /**
@@ -478,17 +493,6 @@ const OrderDetail: React.FC = () => {
     }
   };
 
-  const getDeliveryMethodText = (method?: string) => {
-    switch (method) {
-      case 'FACE_TO_FACE':
-        return '面交';
-      case 'EXPRESS':
-        return '快递';
-      default:
-        return '—';
-    }
-  };
-
   /**
    * 渲染待支付倒计时+锁定提示
    */
@@ -623,15 +627,17 @@ const OrderDetail: React.FC = () => {
           <h2 className="section-title">商品信息</h2>
           <div className="goods-card" onClick={() => order.goodsId && navigate(`/goods/${order.goodsId}`)}>
             <div className="goods-image">
-              {order.goods?.images?.[0] ? (
+              {((order as any)?.goodsImage) ? (
+                <img src={(order as any).goodsImage} alt={(order as any).goodsTitle || '商品'} />
+              ) : order.goods?.images?.[0] ? (
                 <img src={order.goods.images[0]} alt={order.goods.title} />
               ) : (
                 <div className="image-placeholder">📦</div>
               )}
             </div>
             <div className="goods-info">
-              <h3 className="goods-title">{order.goods?.title || '未知商品'}</h3>
-              <p className="goods-desc">{order.goods?.description || '暂无描述'}</p>
+              <h3 className="goods-title">{(order as any)?.goodsTitle || order.goods?.title || '未知商品'}</h3>
+              <p className="goods-desc">{order.goods?.description || ''}</p>
               <div className="goods-price">{formatPrice(order.amount)}</div>
             </div>
           </div>
@@ -726,8 +732,8 @@ const OrderDetail: React.FC = () => {
         <div className="order-timeline-section">
           <h2 className="section-title">订单进度</h2>
           {(() => {
-            const { items, activeIndex } = buildTimelineItems();
-            return <Timeline items={items as any} activeIndex={activeIndex} />;
+            const timelineData = buildTimelineItems();
+            return <Timeline items={timelineData.items as any} activeIndex={timelineData.activeIndex} />;
           })()}
         </div>
 
@@ -744,11 +750,20 @@ const OrderDetail: React.FC = () => {
             <div className="user-card">
               <div className="user-label">买家</div>
               <div className="user-info">
-                <div className="user-avatar">👤</div>
+                <div className="user-avatar">
+                  {buyerProfile?.avatar ? (
+                    <img src={buyerProfile.avatar} alt="buyer" style={{ width: 36, height: 36, borderRadius: '50%' }} />
+                  ) : (
+                    <span>👤</span>
+                  )}
+                </div>
                 <div className="user-details">
-                  <div className="user-name">{order.buyer?.username || '未知用户'}</div>
-                  {order.buyer?.phone && (
-                    <div className="user-contact">📱 {order.buyer.phone}</div>
+                  <div className="user-name">{buyerProfile?.username || (order as any)?.buyerUsername || '未知用户'}</div>
+                  {(buyerProfile?.id || (order as any)?.buyerId) && (
+                    <div className="user-contact">ID：{buyerProfile?.id || (order as any)?.buyerId}</div>
+                  )}
+                  {buyerProfile?.phone && (
+                    <div className="user-contact">📱 {buyerProfile.phone}</div>
                   )}
                 </div>
               </div>
@@ -758,11 +773,20 @@ const OrderDetail: React.FC = () => {
             <div className="user-card">
               <div className="user-label">卖家</div>
               <div className="user-info">
-                <div className="user-avatar">👤</div>
+                <div className="user-avatar">
+                  {sellerProfile?.avatar ? (
+                    <img src={sellerProfile.avatar} alt="seller" style={{ width: 36, height: 36, borderRadius: '50%' }} />
+                  ) : (
+                    <span>👤</span>
+                  )}
+                </div>
                 <div className="user-details">
-                  <div className="user-name">{order.seller?.username || '未知用户'}</div>
-                  {order.seller?.phone && (
-                    <div className="user-contact">📱 {order.seller.phone}</div>
+                  <div className="user-name">{sellerProfile?.username || (order as any)?.sellerUsername || '未知用户'}</div>
+                  {(sellerProfile?.id || (order as any)?.sellerId) && (
+                    <div className="user-contact">ID：{sellerProfile?.id || (order as any)?.sellerId}</div>
+                  )}
+                  {sellerProfile?.phone && (
+                    <div className="user-contact">📱 {sellerProfile.phone}</div>
                   )}
                 </div>
               </div>
